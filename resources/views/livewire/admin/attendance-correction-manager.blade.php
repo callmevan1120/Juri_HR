@@ -27,7 +27,69 @@
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <div class="grid gap-3 md:hidden">
+            @forelse ($corrections as $correction)
+                <article class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <h3 class="truncate text-sm font-semibold text-slate-950 dark:text-white">{{ $correction->user?->name ?? __('Deleted User') }}</h3>
+                            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{{ $correction->attendance_date->translatedFormat('d M Y') }} · {{ $correction->requestTypeLabel() }}</p>
+                        </div>
+                        <span class="shrink-0 rounded-full px-2 py-1 text-[11px] font-medium
+                            {{ $correction->status === 'approved'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                                : ($correction->status === 'rejected'
+                                    ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'
+                                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300') }}">
+                            {{ $correction->statusLabel() }}
+                        </span>
+                    </div>
+
+                    <div class="mt-3 grid gap-2 text-xs text-slate-600 dark:text-slate-300">
+                        <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-800/70">
+                            <div class="font-medium text-slate-500 dark:text-slate-400">{{ __('Current') }}</div>
+                            <div>{{ __('Shift') }}: {{ data_get($correction->current_snapshot, 'shift_name', __('Not assigned')) }}</div>
+                            <div>{{ __('Check in') }}: {{ data_get($correction->current_snapshot, 'time_in', __('None')) }}</div>
+                            <div>{{ __('Check out') }}: {{ data_get($correction->current_snapshot, 'time_out', __('None')) }}</div>
+                        </div>
+                        <div class="rounded-lg bg-primary-50/70 p-2 text-primary-900 dark:bg-primary-950/30 dark:text-primary-100">
+                            <div class="font-medium text-primary-700 dark:text-primary-200">{{ __('Requested') }}</div>
+                            @if ($correction->requestedShift)
+                                <div>{{ __('Shift') }}: {{ $correction->requestedShift->name }}</div>
+                            @endif
+                            @if ($correction->requested_time_in)
+                                <div>{{ __('Check in') }}: {{ $correction->requested_time_in->translatedFormat('d M H:i') }}</div>
+                            @endif
+                            @if ($correction->requested_time_out)
+                                <div>{{ __('Check out') }}: {{ $correction->requested_time_out->translatedFormat('d M H:i') }}</div>
+                            @endif
+                            @unless ($correction->requestedShift || $correction->requested_time_in || $correction->requested_time_out)
+                                <div>{{ __('No detailed change recorded.') }}</div>
+                            @endunless
+                        </div>
+                    </div>
+
+                    @if ($correction->reason)
+                        <p class="mt-3 text-xs leading-5 text-slate-500 dark:text-slate-400">{{ $correction->reason }}</p>
+                    @endif
+
+                    @if (in_array($correction->status, ['pending', 'pending_admin'], true))
+                        <div class="mt-3 grid grid-cols-2 gap-2">
+                            <x-actions.button type="button" size="sm" wire:click="approve({{ $correction->id }})">
+                                {{ __('Approve') }}
+                            </x-actions.button>
+                            <x-actions.secondary-button type="button" size="sm" wire:click="confirmReject({{ $correction->id }})">
+                                {{ __('Reject') }}
+                            </x-actions.secondary-button>
+                        </div>
+                    @endif
+                </article>
+            @empty
+                <x-admin.empty-state :title="__('No attendance correction requests found.')" :description="__('Try changing the status, request type, or search filter.')" :framed="true" />
+            @endforelse
+        </div>
+
+        <div class="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/80 md:block">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-900/40">

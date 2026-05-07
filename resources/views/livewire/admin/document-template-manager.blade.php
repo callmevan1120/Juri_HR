@@ -49,6 +49,23 @@
         }
 
         @media (max-width: 640px) {
+            .document-template-live-preview {
+                --doc-preview-scale: .42;
+                overflow: hidden;
+            }
+
+            .document-template-live-preview .employee-document-preview {
+                margin: 0;
+                max-width: 100%;
+                overflow: hidden;
+                transform-origin: top left;
+                width: 100%;
+            }
+
+            .document-template-live-preview .employee-document-page {
+                max-width: none;
+            }
+
             .document-template-manager .wcag-touch-target {
                 min-width: 0;
             }

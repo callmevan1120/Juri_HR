@@ -17,7 +17,7 @@
             @endphp
 
             <nav
-                class="flex gap-1.5 overflow-x-auto rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden dark:border-gray-700 dark:bg-gray-800 sm:flex-wrap sm:overflow-visible"
+                class="grid grid-cols-2 gap-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:flex sm:flex-wrap"
                 role="tablist"
                 aria-label="{{ __('Manager Inbox') }}"
             >
@@ -49,15 +49,15 @@
                         aria-controls="manager-inbox-panel"
                         aria-selected="{{ $isActive ? 'true' : 'false' }}"
                         aria-label="{{ $tab['label'] }}: {{ $statusLabel }}"
-                        class="wcag-touch-target inline-flex shrink-0 items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 sm:px-3
+                        class="wcag-touch-target inline-flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium leading-tight transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 sm:justify-start sm:gap-2 sm:px-3 sm:text-sm sm:font-semibold
                         {{ $isActive
                             ? 'bg-primary-700 text-white shadow-sm dark:bg-primary-500 dark:text-white'
                             : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-950 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700 dark:hover:text-white' }}"
                     >
-                        <span class="inline-flex h-7 w-7 items-center justify-center rounded-md {{ $count > 0 || $isActive ? $iconColors : $inactiveIconColor }}" aria-hidden="true">
-                            @svg($tab['icon'], 'w-4 h-4')
+                        <span class="hidden h-7 w-7 shrink-0 items-center justify-center rounded-md {{ $count > 0 || $isActive ? $iconColors : $inactiveIconColor }} sm:inline-flex" aria-hidden="true">
+                            @svg($tab['icon'], 'h-4 w-4')
                         </span>
-                        <span class="whitespace-nowrap">{{ $tab['label'] }}</span>
+                        <span class="min-w-0 truncate">{{ $tab['label'] }}</span>
                         @if($count > 0)
                             <span class="ml-0.5 inline-flex min-w-6 items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-xs font-bold leading-none text-white ring-2 ring-white dark:ring-gray-800" aria-hidden="true">
                                 {{ $count > 99 ? '99+' : $count }}

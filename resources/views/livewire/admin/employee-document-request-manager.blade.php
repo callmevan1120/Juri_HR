@@ -69,7 +69,75 @@
             </x-admin.alert>
         @endif
 
-        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <div class="grid gap-3 md:hidden">
+            @forelse ($requests as $request)
+                <article class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+                    <div class="flex items-start gap-3">
+                        <x-forms.checkbox wire:model.live="selectedRequestIds" value="{{ $request->id }}" class="mt-1" />
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0">
+                                    <h3 class="truncate text-sm font-semibold text-slate-950 dark:text-white">{{ $request->user->name }}</h3>
+                                    <p class="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{{ $request->documentTypeLabel() }} · {{ $request->created_at->diffForHumans() }}</p>
+                                </div>
+                                <span class="shrink-0 rounded-full px-2 py-1 text-[11px] font-medium
+                                    {{ $request->status === \App\Models\EmployeeDocumentRequest::STATUS_READY
+                                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                                        : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_REJECTED
+                                            ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'
+                                            : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_UPLOAD_PROCESSING
+                                                ? 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300'
+                                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300')) }}">
+                                    {{ $request->statusLabel() }}
+                                </span>
+                            </div>
+
+                            <div class="mt-3 rounded-lg bg-slate-50 p-2 text-xs text-slate-600 dark:bg-slate-800/70 dark:text-slate-300">
+                                <div class="font-medium text-slate-900 dark:text-white">{{ $request->purpose }}</div>
+                                @if ($request->details)
+                                    <div class="mt-1 line-clamp-3 whitespace-pre-line text-slate-500 dark:text-slate-400">{{ $request->details }}</div>
+                                @endif
+                                @if ($request->due_date)
+                                    <div class="mt-1 text-slate-500 dark:text-slate-400">{{ __('Due') }} {{ $request->due_date->format('d M Y') }}</div>
+                                @endif
+                            </div>
+
+                            <div class="mt-3 flex flex-wrap justify-end gap-2">
+                                @can('generate', $request)
+                                    <x-actions.icon-button wire:click="generate({{ $request->id }})" variant="primary" label="{{ __('Generate document') }}: {{ $request->user->name }}">
+                                        <x-heroicon-m-document-text class="h-5 w-5" />
+                                    </x-actions.icon-button>
+                                @endcan
+                                @can('fulfill', $request)
+                                    <x-actions.icon-button wire:click="confirmReady({{ $request->id }})" variant="success" label="{{ __('Approve document request') }}: {{ $request->user->name }}">
+                                        <x-heroicon-m-check-circle class="h-5 w-5" />
+                                    </x-actions.icon-button>
+                                @endcan
+                                @can('reject', $request)
+                                    <x-actions.icon-button wire:click="confirmReject({{ $request->id }})" variant="danger" label="{{ __('Reject document request') }}: {{ $request->user->name }}">
+                                        <x-heroicon-m-x-circle class="h-5 w-5" />
+                                    </x-actions.icon-button>
+                                @endcan
+                                @if ($request->generated_path)
+                                    <x-actions.icon-button href="{{ route('admin.document-requests.download', $request) }}" variant="neutral" label="{{ __('Download generated document') }}: {{ $request->user->name }}">
+                                        <x-heroicon-m-arrow-down-tray class="h-5 w-5" />
+                                    </x-actions.icon-button>
+                                @endif
+                                @if ($request->uploaded_path)
+                                    <x-actions.icon-button href="{{ route('admin.document-requests.uploaded', $request) }}" variant="neutral" label="{{ __('Download uploaded document') }}: {{ $request->user->name }}">
+                                        <x-heroicon-m-arrow-down-tray class="h-5 w-5" />
+                                    </x-actions.icon-button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <x-admin.empty-state :title="__('No document requests found.')" :description="__('Try changing the status, request type, or search filter.')" :framed="true" />
+            @endforelse
+        </div>
+
+        <div class="hidden overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/80 md:block">
             <div class="overflow-x-scroll">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-900/40">

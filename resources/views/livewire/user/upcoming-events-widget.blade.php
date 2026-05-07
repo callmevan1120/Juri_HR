@@ -1,7 +1,4 @@
-<div class="rounded-2xl border border-primary-100 bg-white dark:border-gray-700 dark:bg-gray-800 relative overflow-hidden transition-all">
-
-    {{-- Decorative Blob --}}
-    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-primary-50 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+<div class="relative overflow-hidden rounded-2xl border border-primary-100 bg-white transition-all dark:border-gray-700 dark:bg-gray-800">
 
     {{-- Header --}}
     <div class="p-4 border-b border-primary-50 dark:border-gray-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">

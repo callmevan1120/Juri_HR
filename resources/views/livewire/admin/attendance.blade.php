@@ -19,7 +19,11 @@
         'format' => 'excel',
     ]);
     $lockAction =
-        "\$dispatch('feature-lock', { title: " . json_encode(__('Export Locked')) . ", message: " . json_encode(__('This feature is available in the Enterprise Edition. Please upgrade.')) . " })";
+        "\$dispatch('feature-lock', { title: " .
+        json_encode(__('Export Locked')) .
+        ', message: ' .
+        json_encode(__('This feature is available in the Enterprise Edition. Please upgrade.')) .
+        ' })';
 @endphp
 <x-admin.page-shell :title="__('Attendance Data')" :description="__('Monitor employee attendance, shifts, and status.')">
     <x-slot name="actions">
@@ -83,8 +87,8 @@
             <div class="col-span-1">
                 <x-forms.label for="start_date" value="{{ __('Start Date') }}" class="mb-1.5 block" />
                 <div wire:ignore>
-                    <x-forms.input type="date" id="start_date" wire:model.live="startDate" value="{{ $startDate }}"
-                        class="w-full" />
+                    <x-forms.input type="date" id="start_date" wire:model.live="startDate"
+                        value="{{ $startDate }}" class="w-full" />
                 </div>
             </div>
 
@@ -123,12 +127,7 @@
     </x-slot>
 
     <div wire:poll.5s class="mb-6">
-        <x-admin.import-export-run-list
-            :runs="$recentReportRuns"
-            :title="__('Attendance report export jobs')"
-            :description="__('PDF and Excel attendance reports run in the background. Download completed files here.')"
-            :empty="__('No attendance report export jobs yet.')"
-        />
+        <x-admin.import-export-run-list :runs="$recentReportRuns" :title="__('Attendance report export jobs')" :description="__('PDF and Excel attendance reports run in the background. Download completed files here.')" :empty="__('No attendance report export jobs yet.')" />
     </div>
 
     <!-- Content -->
@@ -227,12 +226,17 @@
 
                                     $cellClass = match ($status) {
                                         'present'
-                                            => 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                                        'late' => 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-                                        'excused' => 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-                                        'sick' => 'bg-gray-50 text-gray-700 dark:bg-gray-700/50 dark:text-gray-400',
-                                        'absent' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-                                        default => 'text-gray-400',
+                                            => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-300',
+                                        'late'
+                                            => 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-300',
+                                        'excused'
+                                            => 'bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-900/30 dark:text-sky-300',
+                                        'sick'
+                                            => 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-900/30 dark:text-purple-300',
+                                        'absent'
+                                            => 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-900/30 dark:text-rose-300',
+                                        default
+                                            => 'bg-slate-50 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400',
                                     };
 
                                     // Count stats

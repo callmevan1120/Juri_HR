@@ -2,9 +2,6 @@
     <section aria-labelledby="home-page-title" class="relative overflow-hidden rounded-b-[2.5rem] border-b border-transparent bg-gradient-to-br from-primary-700 to-primary-800 pb-20 pt-6 shadow-xl transition-all duration-300 dark:border-white/5 dark:from-gray-900 dark:to-primary-950">
         {{-- Background Pattern --}}
         <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNmZmYiLz48L3N2Zz0=')]"></div>
-        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
-
         <div class="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
              <div class="mb-4 flex items-center justify-between text-white">
                 {{-- Welcome Text (Left) --}}

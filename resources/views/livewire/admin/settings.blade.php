@@ -115,7 +115,7 @@
     <div class="flex flex-col gap-4 xl:flex-row">
         <!-- Sidebar Navigation -->
         <aside class="w-full flex-shrink-0 xl:sticky xl:top-24 xl:w-64 xl:self-start">
-            <nav class="flex gap-2 overflow-x-auto pb-1 xl:block xl:space-y-1 xl:overflow-visible xl:pb-0" role="tablist" aria-label="{{ __('Settings categories') }}">
+            <nav class="grid grid-cols-2 gap-2 pb-1 sm:grid-cols-3 xl:block xl:space-y-1 xl:pb-0" role="tablist" aria-label="{{ __('Settings categories') }}">
                 <template x-for="tab in tabs" :key="tab.id">
                     <button type="button" role="tab" @click="activeTab = tab.id" :id="'settings-tab-' + tab.id"
                         :aria-controls="'settings-panel-' + tab.id" :aria-selected="(activeTab === tab.id).toString()"
@@ -126,7 +126,7 @@
                             'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200': activeTab !==
                                 tab.id
                         }"
-                        class="wcag-touch-target group flex min-w-max items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 dark:focus:ring-offset-gray-900 xl:w-full xl:gap-3 xl:py-2.5">
+                        class="wcag-touch-target group flex min-w-0 items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium leading-tight transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 dark:focus:ring-offset-gray-900 sm:text-sm xl:w-full xl:gap-3 xl:px-3 xl:py-2.5">
                         <span
                             :class="activeTab === tab.id ? 'text-primary-600 dark:text-primary-400' :
                                 'text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300'">
@@ -137,7 +137,7 @@
                             <x-heroicon-o-bell x-show="tab.icon === 'bell'" class="h-5 w-5" />
                             <x-heroicon-o-briefcase x-show="tab.icon === 'briefcase'" class="h-5 w-5" />
                         </span>
-                        <span class="flex-1 whitespace-nowrap text-left" x-text="tab.label"></span>
+                        <span class="min-w-0 flex-1 truncate text-left" x-text="tab.label"></span>
                         <span
                             class="inline-flex min-w-[2rem] items-center justify-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-500 dark:bg-gray-700 dark:text-gray-300"
                             x-text="tab.count"></span>
