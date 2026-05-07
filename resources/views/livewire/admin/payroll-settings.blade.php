@@ -233,7 +233,7 @@
                     <x-forms.checkbox id="is_taxable" wire:model="is_taxable" />
                     <div class="ml-2">
                         <x-forms.label for="is_taxable" value="{{ __('Is Taxable Income?') }}" />
-                        <p class="text-xs text-gray-500">
+                        <p class="sr-only">
                             {{ __('Enable if this component should be included in PPh 21 calculation base (Not fully implemented yet).') }}
                         </p>
                     </div>
@@ -259,7 +259,8 @@
         </x-slot>
 
         <x-slot name="content">
-            {{ __('Are you sure you want to delete this component? This will not affect past payroll records, but will be removed from future calculations.') }}
+            <p>{{ __('Are you sure you want to delete this component?') }}</p>
+            <p class="sr-only">{{ __('This will not affect past payroll records, but will be removed from future calculations.') }}</p>
         </x-slot>
 
         <x-slot name="footer">

@@ -79,7 +79,7 @@
             </x-admin.page-tools>
         </x-slot>
 
-        <div class="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+        <div class="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
             <aside class="space-y-2">
                 @foreach ($profileSections as $sectionKey => $section)
                     <button type="button" class="w-full rounded-xl border px-4 py-3 text-left transition"
@@ -94,7 +94,7 @@
                 @endforeach
             </aside>
 
-            <div class="min-w-0 space-y-6">
+            <div class="min-w-0 space-y-4">
                 @if (Laravel\Fortify\Features::canUpdateProfileInformation())
                     <section x-cloak x-show="activeTab === 'details'" x-transition.opacity.duration.150ms>
                         @livewire('profile.update-profile-information-form')

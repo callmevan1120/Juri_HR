@@ -103,7 +103,7 @@
             <x-admin.insight-panel class="overflow-hidden">
                 <div class="border-b border-slate-200/70 px-5 py-4 dark:border-slate-800">
                     <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Notification History') }}</h2>
-                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                    <p class="sr-only">
                         {{ __('All user-specific notifications are listed here, including read items when the filter allows them.') }}
                     </p>
                 </div>
@@ -178,7 +178,7 @@
             <x-admin.insight-panel class="overflow-hidden">
                 <div class="border-b border-slate-200/70 px-5 py-4 dark:border-slate-800">
                     <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Announcements') }}</h2>
-                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                    <p class="sr-only">
                         {{ __('Active announcements remain visible until dismissed or expired.') }}
                     </p>
                 </div>

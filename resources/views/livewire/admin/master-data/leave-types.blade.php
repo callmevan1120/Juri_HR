@@ -29,7 +29,7 @@
         <x-admin.panel>
             <div class="border-b border-gray-200/70 px-4 py-3 dark:border-gray-700/70">
                 <h2 class="text-lg font-semibold text-slate-950 dark:text-white">{{ __('Leave Type Directory') }}</h2>
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <p class="sr-only">
                     {{ __('Annual leave can use quota. Sick and special leave types do not reduce sick quota because sick quota is no longer enforced.') }}
                 </p>
             </div>
@@ -105,7 +105,7 @@
 
             <div class="grid grid-cols-1 divide-y divide-gray-200 dark:divide-gray-700 lg:hidden">
                 @foreach ($leaveTypes as $leaveType)
-                    <div class="p-5">
+                    <div class="p-4">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <h3 class="truncate text-base font-semibold text-slate-950 dark:text-white">{{ $leaveType->name }}</h3>

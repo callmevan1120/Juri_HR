@@ -10,18 +10,18 @@
                 </x-slot>
             </x-user.page-header>
 
-            <div class="p-6 lg:p-8">
+            <div class="p-3 sm:p-4">
                 @if ($isEnrolled && !$isCapturing)
                     <div class="max-w-md mx-auto text-center">
                         <div
-                            class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-sky-50 ring-1 ring-sky-100 dark:bg-sky-950/30 dark:ring-sky-900/50">
-                            <x-heroicon-o-check-circle class="h-12 w-12 text-sky-600 dark:text-sky-300" />
+                            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sky-50 ring-1 ring-sky-100 dark:bg-sky-950/30 dark:ring-sky-900/50">
+                            <x-heroicon-o-check-circle class="h-8 w-8 text-sky-600 dark:text-sky-300" />
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ __('Face ID Active') }}</h3>
-                        <p class="text-gray-500 dark:text-gray-400 mb-8">
+                        <h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">{{ __('Face ID Active') }}</h3>
+                        <p class="sr-only">
                             {{ __('Your face is registered for attendance verification.') }}</p>
 
-                        <div class="flex flex-col gap-3">
+                        <div class="mt-5 flex flex-col gap-2">
                             @if (\App\Helpers\Editions::attendanceLocked())
                                 <button type="button"
                                     @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
@@ -54,12 +54,12 @@
                     <div data-face-enrollment-root
                         wire:key="face-enrollment-{{ $isEnrolled ? 'enrolled' : 'capture' }}-{{ $isCapturing ? 'capturing' : 'idle' }}"
                         x-data="faceEnrollment()" x-init="init()" class="max-w-lg mx-auto">
-                        <div class="relative mb-5 aspect-[4/3] overflow-hidden rounded-[2rem] bg-slate-950 shadow-2xl shadow-slate-950/20 ring-1 ring-white/10">
+                        <div class="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl bg-slate-950 shadow-xl shadow-slate-950/15 ring-1 ring-white/10">
                             <video x-ref="video" autoplay playsinline muted class="h-full w-full object-cover contrast-105 saturate-105"></video>
                             <canvas x-ref="overlay" class="absolute inset-0 w-full h-full"></canvas>
                         </div>
 
-                        <div class="min-h-[48px] flex items-center justify-center mb-5">
+                        <div class="mb-4 flex min-h-[44px] items-center justify-center">
                             <div class="px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 text-center"
                                 role="status" aria-live="polite" aria-atomic="true"
                                 :class="statusToneClass()">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
 
-                        <div class="text-sm text-center text-gray-700 dark:text-gray-300 mb-6 min-h-[20px]"
+                        <div class="mb-4 min-h-[20px] text-center text-xs text-gray-700 dark:text-gray-300"
                             x-text="hintMessage"></div>
 
                         <div class="flex gap-3">

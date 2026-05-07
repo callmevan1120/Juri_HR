@@ -12,12 +12,12 @@
     </x-slot>
 
     <x-slot name="content">
-        <div class="max-w-xl text-sm text-gray-600 dark:text-gray-400">
+        <div class="sr-only">
             {{ __('If necessary, you may log out of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.') }}
         </div>
 
         @if (count($this->sessions) > 0)
-            <div class="mt-5 space-y-6">
+            <div class="mt-5 space-y-4">
                 <!-- Other Browser Sessions -->
                 @foreach ($this->sessions as $session)
                     <div class="flex items-center">

@@ -57,13 +57,13 @@
     @if ($activeTab === 'cases')
         @if ($selectedCase)
             <!-- Task Board Full Screen View -->
-            <div class="mb-6 flex flex-col justify-between gap-4 rounded-xl bg-white p-5 shadow-sm dark:bg-gray-800 sm:flex-row sm:items-center">
+            <div class="mb-4 flex flex-col justify-between gap-3 rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800 sm:flex-row sm:items-center">
                 <div>
                     <x-actions.button type="button" wire:click="unselectCase" variant="ghost" size="sm" class="mb-2 -ml-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
                         <x-heroicon-m-arrow-left class="mr-1 h-4 w-4" /> {{ __('Back to Cases') }}
                     </x-actions.button>
-                    <h2 class="text-xl font-bold text-gray-950 dark:text-white">{{ $selectedCase->user->name }} - {{ __('Checklist') }}</h2>
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">{{ $selectedCase->template->typeLabel() }} · {{ $selectedCase->progressPercent() }}% {{ __('Completed') }}</p>
+                    <h2 class="text-base font-semibold text-gray-950 dark:text-white">{{ $selectedCase->user->name }} - {{ __('Checklist') }}</h2>
+                    <p class="mt-1 text-xs text-gray-600 dark:text-gray-300">{{ $selectedCase->template->typeLabel() }} · {{ $selectedCase->progressPercent() }}% {{ __('Completed') }}</p>
                 </div>
                 <div>
                     @can('manageHrChecklists')
@@ -107,7 +107,7 @@
                                 @endphp
                                 <article
                                     wire:key="task-{{ $task->id }}"
-                                    class="group relative cursor-grab rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-primary-400 hover:shadow-md focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 active:cursor-grabbing dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500"
+                                    class="group relative cursor-grab rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition-all hover:border-primary-400 hover:shadow-md focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 active:cursor-grabbing dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500"
                                     draggable="true"
                                     @dragstart="$event.dataTransfer.setData('text/plain', '{{ $task->id }}')"
                                 >
@@ -120,12 +120,12 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <h4 class="font-semibold text-gray-900 leading-tight dark:text-white">{{ __($task->title) }}</h4>
+                                    <h4 class="text-sm font-semibold leading-tight text-gray-900 dark:text-white">{{ __($task->title) }}</h4>
                                     @if($task->description)
-                                        <p class="mt-1.5 text-xs text-gray-600 dark:text-gray-400 line-clamp-2">{{ __($task->description) }}</p>
+                                        <p class="sr-only">{{ __($task->description) }}</p>
                                     @endif
 
-                                    <div class="mt-4 flex items-center gap-2 border-t border-gray-100 pt-3 dark:border-gray-700/50">
+                                    <div class="mt-3 flex items-center gap-2 border-t border-gray-100 pt-2.5 dark:border-gray-700/50">
                                         <div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-[10px] font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400" title="{{ $task->assignee->name ?? __('Unassigned') }}">
                                             {{ substr($task->assignee->name ?? '?', 0, 1) }}
                                         </div>
@@ -188,7 +188,7 @@
                                         default => 'primary',
                                     };
                                 @endphp
-                                <article wire:click="selectCase({{ $case->id }})" role="button" tabindex="0" class="group relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-400 hover:shadow-md focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500">
+                                <article wire:click="selectCase({{ $case->id }})" role="button" tabindex="0" class="group relative rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-400 hover:shadow-md focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500">
                                     <div class="mb-2 flex items-start justify-between gap-2">
                                         <div class="min-w-0 flex-1">
                                             <h4 class="font-semibold text-gray-900 dark:text-white">{{ $case->user->name }}</h4>
@@ -228,18 +228,18 @@
     @else
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @foreach ($templates as $template)
-                <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <div class="flex items-start justify-between gap-3">
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-wide text-primary-700 dark:text-primary-300">{{ $template->typeLabel() }}</p>
                             <h3 class="mt-1 font-bold text-gray-950 dark:text-white">{{ __($template->name) }}</h3>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">{{ __($template->description ?? '') }}</p>
+                            <p class="sr-only">{{ __($template->description ?? '') }}</p>
                         </div>
                         <x-admin.status-badge :tone="$template->is_active ? 'success' : 'neutral'">{{ $template->is_active ? __('Active') : __('Inactive') }}</x-admin.status-badge>
                     </div>
-                    <ol class="mt-4 space-y-2">
+                    <ol class="mt-3 space-y-2">
                         @foreach ($template->items as $item)
-                            <li class="rounded-lg bg-gray-50 p-3 text-sm dark:bg-gray-900/40">
+                            <li class="rounded-lg bg-gray-50 p-2.5 text-sm dark:bg-gray-900/40">
                                 <div class="font-semibold text-gray-900 dark:text-white">{{ __($item->title) }}</div>
                                 <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                     {{ \App\Models\HrChecklistTemplateItem::assigneeTypes()[$item->default_assignee_type] ?? __('HR') }} · {{ __('Day offset') }}: {{ $item->due_offset_days }}

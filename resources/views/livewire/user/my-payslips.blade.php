@@ -29,17 +29,17 @@
             <div class="user-page-body pt-0">
                 @if($needsSetup)
                     {{-- Password Setup Form --}}
-                    <div class="p-6 lg:p-8">
+                    <div class="p-3 sm:p-4">
                         <div class="max-w-md mx-auto">
-                            <div class="text-center mb-8">
-                                <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 mb-4">
-                                    <x-heroicon-o-lock-closed class="h-7 w-7" />
+                            <div class="mb-5 text-center">
+                                <div class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20">
+                                    <x-heroicon-o-lock-closed class="h-5 w-5" />
                                 </div>
-                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Secure Your Payslips') }}</h3>
-                                <p class="text-sm text-gray-500 mt-2 px-2">{{ __('Please set a password to access your encrypted payslip files.') }}</p>
+                                <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('Secure Your Payslips') }}</h3>
+                                <p class="sr-only">{{ __('Please set a password to access your encrypted payslip files.') }}</p>
                             </div>
 
-                            <form wire:submit.prevent="setupPassword" class="space-y-5">
+                            <form wire:submit.prevent="setupPassword" class="space-y-4">
                                 <div class="space-y-1">
                                     <x-forms.label for="new_password" value="{{ __('New Password') }}" class="ml-1 text-xs uppercase tracking-wider text-gray-500" />
                                     <x-forms.input id="new_password" type="password" class="block w-full rounded-lg border-gray-200 focus:border-primary-500 focus:ring-primary-500/20" wire:model="new_password" required placeholder="{{ __('********') }}" />
@@ -49,7 +49,7 @@
                                     <x-forms.label for="new_password_confirmation" value="{{ __('Confirm Password') }}" class="ml-1 text-xs uppercase tracking-wider text-gray-500" />
                                     <x-forms.input id="new_password_confirmation" type="password" class="block w-full rounded-lg border-gray-200 focus:border-primary-500 focus:ring-primary-500/20" wire:model="new_password_confirmation" required placeholder="{{ __('********') }}" />
                                 </div>
-                                <div class="flex flex-col-reverse items-stretch justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700 sm:flex-row">
+                                <div class="flex flex-col-reverse items-stretch justify-end gap-2 border-t border-gray-100 pt-3 dark:border-gray-700 sm:flex-row">
                                     @if(Auth::user()->hasValidPayslipPassword())
                                         <x-actions.secondary-button wire:click="cancelReset" wire:loading.attr="disabled">
                                             {{ __('Cancel') }}
@@ -75,10 +75,10 @@
                     @else
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
                             @foreach($payrolls as $payroll)
-                                <div class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-6">
+                                <div class="p-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-4">
                                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div class="flex items-center gap-4">
-                                        <div class="h-12 w-12 rounded-xl flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
                                             <span class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">{{ \Carbon\Carbon::createFromDate(null, $payroll->month)->translatedFormat('M') }}</span>
                                         </div>
                                         <div>

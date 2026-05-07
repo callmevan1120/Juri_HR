@@ -27,7 +27,7 @@
         <div class="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
             <x-admin.panel class="p-4">
                 <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('Saved Templates') }}</h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('Select a template to preview or manage it.') }}</p>
+                <p class="sr-only">{{ __('Select a template to preview or manage it.') }}</p>
 
                 <div class="mt-5 overflow-hidden rounded-xl border border-gray-100 dark:border-gray-700">
                     <table class="min-w-full divide-y divide-gray-100 text-sm dark:divide-gray-700">
@@ -75,7 +75,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="px-4 py-8 text-center text-sm text-gray-500">{{ __('No templates yet.') }}</td>
+                                    <td class="px-4 py-5 text-center text-sm text-gray-500">{{ __('No templates yet.') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -102,7 +102,7 @@
                         {!! $templatePreviewHtml !!}
                     </div>
                 @else
-                    <div class="py-16 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                         {{ __('No template selected.') }}
                     </div>
                 @endif
@@ -113,7 +113,8 @@
     <x-overlays.confirmation-modal wire:model.live="confirmingTemplateDeletion">
         <x-slot name="title">{{ __('Delete Template') }}</x-slot>
         <x-slot name="content">
-            {{ __('Unused templates will be deleted. Templates already used by generated documents will be deactivated to preserve document history.') }}
+            <p>{{ __('Delete Template') }}?</p>
+            <p class="sr-only">{{ __('Unused templates will be deleted. Templates already used by generated documents will be deactivated to preserve document history.') }}</p>
         </x-slot>
         <x-slot name="footer">
             <x-actions.secondary-button type="button" wire:click="cancelDeleteTemplate" wire:loading.attr="disabled">

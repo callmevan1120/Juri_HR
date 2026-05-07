@@ -37,11 +37,11 @@
     <a href="#error-main" class="skip-link">{{ __('Skip to main content') }}</a>
 
     <div class="min-h-screen px-4 py-[max(1rem,env(safe-area-inset-top))] sm:px-6">
-        <main id="error-main" tabindex="-1" class="mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center py-8">
+        <main id="error-main" tabindex="-1" class="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center py-6">
             <section aria-labelledby="error-page-title" class="w-full overflow-hidden rounded-[1.75rem] border border-primary-100/80 bg-white/95 shadow-[0_24px_60px_-34px_rgba(34,64,41,0.35)] backdrop-blur dark:border-primary-900/40 dark:bg-gray-900/90 dark:shadow-[0_24px_60px_-38px_rgba(0,0,0,0.8)]">
                 <div class="h-1.5 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700"></div>
 
-                <div class="grid gap-8 px-5 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-10 lg:px-10">
+                <div class="grid gap-4 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-6 lg:px-6">
                     <div class="space-y-6 text-left">
                         <div class="inline-flex items-center gap-3">
                             <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/30">
@@ -57,11 +57,11 @@
                             </div>
                         </div>
 
-                        <div class="rounded-3xl border border-primary-100 bg-primary-50/80 p-5 dark:border-primary-900/40 dark:bg-primary-950/20">
+                        <div class="rounded-2xl border border-primary-100 bg-primary-50/80 p-5 dark:border-primary-900/40 dark:bg-primary-950/20">
                             <p class="text-sm font-semibold uppercase tracking-[0.22em] text-primary-800 dark:text-primary-200">
                                 {{ __('Need help?') }}
                             </p>
-                            <p class="mt-3 text-sm leading-7 text-gray-700 dark:text-gray-300">
+                            <p class="sr-only">
                                 {{ __('If this issue keeps appearing, document the page you were opening and contact the administrator so it can be checked more quickly.') }}
                             </p>
                         </div>

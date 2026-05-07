@@ -7,7 +7,7 @@
                 <div class="auth-card__header">
                     <p class="auth-card__eyebrow">{{ __('Password Recovery') }}</p>
                     <h2 id="forgot-password-title" class="auth-card__title">{{ __('Forgot your password?') }}</h2>
-                    <p class="auth-card__copy">
+                    <p class="auth-card__copy sr-only">
                         {{ __('Enter the email address tied to your account and we will send you a secure link to set a new password.') }}
                     </p>
                 </div>

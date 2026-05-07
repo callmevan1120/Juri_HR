@@ -27,7 +27,7 @@
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-                <div class="border-b border-gray-100 bg-gray-50/80 px-5 py-4 dark:border-gray-700 dark:bg-gray-900/20 sm:px-6 lg:px-8">
+                <div class="border-b border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/20 sm:px-5">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-wrap items-center gap-2">
                             <button
@@ -59,19 +59,19 @@
                 </div>
 
                 @if($announcements->isEmpty() && $notifications->isEmpty())
-                    <div class="flex flex-col items-center justify-center px-4 py-16 text-center">
-                        <div class="mb-4 rounded-full bg-gray-50 p-4 dark:bg-gray-700/50">
-                            <x-heroicon-o-inbox class="h-10 w-10 text-gray-400 dark:text-gray-500" />
+                    <div class="flex flex-col items-center justify-center px-4 py-8 text-center">
+                        <div class="mb-3 rounded-full bg-gray-50 p-3 dark:bg-gray-700/50">
+                            <x-heroicon-o-inbox class="h-7 w-7 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <h2 class="text-base font-bold text-gray-900 dark:text-gray-100">{{ __('No new notifications') }}</h2>
-                        <p class="mt-1 max-w-xs text-sm text-gray-700 dark:text-gray-300">{{ __('We\'ll let you know when something important arrives.') }}</p>
+                        <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ __('No new notifications') }}</h2>
+                        <p class="sr-only">{{ __('We\'ll let you know when something important arrives.') }}</p>
                     </div>
                 @else
                     <div id="notifications-list" class="divide-y divide-gray-100 dark:divide-gray-700/50">
                         @forelse($notifications as $notification)
                             @php($targetUrl = \App\Support\Helpers::normalizeInternalUrl($notification->data['url'] ?? $notification->data['action_url'] ?? null))
                             <article class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
-                                <div class="flex gap-4 p-5 sm:p-6">
+                                <div class="flex gap-4 p-4">
                                     <div class="mt-0.5 flex-shrink-0">
                                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white shadow-md shadow-primary-500/25 dark:bg-primary-500 dark:shadow-none" aria-hidden="true">
                                             <x-heroicon-o-bell class="h-5 w-5" />
@@ -83,7 +83,7 @@
                                             wire:click="markAsRead('{{ $notification->id }}')"
                                             class="block min-w-0 flex-1 rounded-2xl transition focus:outline-none focus:ring-2 focus:ring-primary-500/40">
                                             <div class="mb-1 flex items-start justify-between gap-3">
-                                                <h2 class="text-sm font-bold text-gray-900 dark:text-white">
+                                                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">
                                                     {{ $notification->data['title'] ?? __('Notification') }}
                                                 </h2>
                                                 <time class="whitespace-nowrap text-sm font-medium text-gray-700 dark:text-gray-300" datetime="{{ $notification->created_at?->toIso8601String() }}">
@@ -91,7 +91,7 @@
                                                 </time>
                                             </div>
 
-                                            <p class="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                                            <p class="line-clamp-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                                                 {{ $notification->data['message'] ?? '' }}
                                             </p>
 
@@ -106,7 +106,7 @@
                                     @else
                                         <div class="min-w-0 flex-1">
                                             <div class="mb-1 flex items-start justify-between gap-3">
-                                                <h2 class="text-sm font-bold text-gray-900 dark:text-white">
+                                                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">
                                                     {{ $notification->data['title'] ?? __('Notification') }}
                                                 </h2>
                                                 <time class="whitespace-nowrap text-sm font-medium text-gray-700 dark:text-gray-300" datetime="{{ $notification->created_at?->toIso8601String() }}">
@@ -114,7 +114,7 @@
                                                 </time>
                                             </div>
 
-                                            <p class="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                                            <p class="line-clamp-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                                                 {{ $notification->data['message'] ?? '' }}
                                             </p>
 
@@ -130,14 +130,14 @@
                                 </div>
                             </article>
                         @empty
-                            <div class="px-5 py-10 text-center text-sm text-gray-600 dark:text-gray-300 sm:px-6">
+                            <div class="px-4 py-6 text-center text-sm text-gray-600 dark:text-gray-300 sm:px-6">
                                 {{ __('No notifications found for this filter.') }}
                             </div>
                         @endforelse
 
                         @foreach($announcements as $announcement)
                             <article class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
-                                <div class="flex gap-4 p-5 sm:p-6">
+                                <div class="flex gap-4 p-4">
                                     <div class="mt-0.5 flex-shrink-0">
                                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white shadow-md shadow-amber-500/25 dark:bg-amber-500 dark:shadow-none" aria-hidden="true">
                                             <x-heroicon-o-megaphone class="h-5 w-5" />
@@ -146,7 +146,7 @@
 
                                     <div class="min-w-0 flex-1">
                                         <div class="mb-1 flex items-start justify-between gap-3">
-                                            <h2 class="text-sm font-bold text-gray-900 dark:text-white">
+                                            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">
                                                 {{ $announcement->title }}
                                             </h2>
                                             <time class="whitespace-nowrap text-sm font-medium text-gray-700 dark:text-gray-300" datetime="{{ $announcement->created_at?->toIso8601String() }}">
@@ -154,7 +154,7 @@
                                             </time>
                                         </div>
 
-                                        <p class="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                                        <p class="line-clamp-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                                             {{ \Illuminate\Support\Str::limit(strip_tags($announcement->content), 200) }}
                                         </p>
 

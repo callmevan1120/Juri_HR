@@ -7,7 +7,7 @@
                 <div class="auth-card__header">
                     <p class="auth-card__eyebrow">{{ __('Password Reset') }}</p>
                     <h2 id="reset-password-title" class="auth-card__title">{{ __('Create a new password') }}</h2>
-                    <p class="auth-card__copy">
+                    <p class="auth-card__copy sr-only">
                         {{ __('Set a new password for your account, then use it the next time you sign in.') }}
                     </p>
                 </div>
@@ -23,7 +23,7 @@
                         <div class="auth-section">
                             <div class="auth-section__header">
                                 <h3 class="auth-section__title">{{ __('Account verification') }}</h3>
-                                <p class="auth-section__copy">
+                                <p class="auth-section__copy sr-only">
                                     {{ __('Confirm the account email and choose a strong password to complete the reset process.') }}
                                 </p>
                             </div>

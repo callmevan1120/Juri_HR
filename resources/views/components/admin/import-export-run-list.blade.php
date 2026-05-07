@@ -18,7 +18,7 @@
                 <h4 class="{{ $compact ? 'truncate text-sm font-bold normal-case tracking-normal text-slate-900 dark:text-white' : 'text-sm font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400' }}">
                     {{ $title }}
                 </h4>
-                <p class="{{ $compact ? 'sr-only' : 'mt-1 text-sm text-gray-600 dark:text-gray-300' }}">{{ $description }}</p>
+                <p class="sr-only">{{ $description }}</p>
             </div>
             <span class="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 {{ count($visibleRuns) }} {{ __('jobs') }}

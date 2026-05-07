@@ -17,7 +17,7 @@
                             <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
                                 {{ __('Workflow') }}
                             </h3>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                            <p class="sr-only">
                                 {{ __('Prepare an export report or import historical attendance records in one place.') }}
                             </p>
                         </div>
@@ -83,7 +83,7 @@
                                     <h4 class="mt-4 text-xl font-semibold text-gray-900 dark:text-white">
                                         {{ __('Export Attendance Report') }}
                                     </h4>
-                                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                    <p class="sr-only">
                                         {{ __('Choose a date range, then optionally narrow the result by division, job title, or education before downloading the spreadsheet.') }}
                                     </p>
                                 </div>
@@ -92,7 +92,7 @@
                                     <h5 class="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
                                         {{ __('Export Notes') }}
                                     </h5>
-                                    <ul class="mt-4 space-y-2 text-sm text-amber-800 dark:text-amber-200">
+                                    <ul class="sr-only">
                                         <li>{{ __('Use preview first if you want to verify the report scope before exporting.') }}</li>
                                         <li>{{ __('Advanced filters help reduce large datasets before generating Excel output.') }}</li>
                                     </ul>
@@ -103,7 +103,7 @@
                                 <x-admin.page-tools
                                     :title="__('Filter Export Dataset')"
                                     :description="__('Choose the report period first, then open advanced filters if you need a narrower export scope.')"
-                                    grid-class="grid grid-cols-1 items-end gap-5 sm:grid-cols-2"
+                                    grid-class="grid grid-cols-1 items-end gap-3 sm:grid-cols-2"
                                 >
                                     <div>
                                         <label for="start_date" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -139,7 +139,7 @@
                                     <span class="text-sm text-red-500">{{ $message }}</span>
                                 @enderror
 
-                                <div x-data="{ expanded: false }" class="rounded-xl border border-gray-200 bg-gray-50/70 p-5 dark:border-gray-700 dark:bg-gray-900/30">
+                                <div x-data="{ expanded: false }" class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/30">
                                     <button
                                         type="button"
                                         @click="expanded = !expanded"
@@ -152,7 +152,7 @@
                                         <x-heroicon-o-chevron-down class="h-4 w-4 transition-transform" x-bind:class="{ 'rotate-180': expanded }" />
                                     </button>
 
-                                    <div x-show="expanded" x-collapse id="attendance-advanced-filters" class="mt-5 grid gap-5 md:grid-cols-3">
+                                    <div x-show="expanded" x-collapse id="attendance-advanced-filters" class="mt-4 grid gap-3 md:grid-cols-3">
                                         <div class="space-y-1.5">
                                             <label for="division" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">
                                                 {{ __('Division') }}
@@ -232,7 +232,7 @@
                                     <h4 class="mt-4 text-xl font-semibold text-gray-900 dark:text-white">
                                         {{ __('Import Attendance Dataset') }}
                                     </h4>
-                                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                    <p class="sr-only">
                                         {{ __('Upload an Excel file to import attendance history in bulk. Use the official template to match columns and formatting.') }}
                                     </p>
 
@@ -252,7 +252,7 @@
                                     <h5 class="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
                                         {{ __('Before Uploading') }}
                                     </h5>
-                                    <ul class="mt-4 space-y-2 text-sm text-amber-800 dark:text-amber-200">
+                                    <ul class="sr-only">
                                         <li>{{ __('Keep the template headers unchanged to preserve import mapping.') }}</li>
                                         <li>{{ __('Use valid employee NIP values and avoid duplicate dates for the same employee.') }}</li>
                                         <li>{{ __('Review skipped rows after import and correct them before retrying.') }}</li>
@@ -260,14 +260,14 @@
                                 </x-admin.alert>
                             </div>
 
-                            <div class="space-y-5">
+                            <div class="space-y-4">
                                 <form
                                     x-data="{ file: null, dragging: false }"
                                     @drop.prevent="dragging = false; file = $event.dataTransfer.files[0]; $refs.file.files = $event.dataTransfer.files; $wire.upload('file', file)"
                                     @dragover.prevent="dragging = true"
                                     @dragleave.prevent="dragging = false"
                                     wire:submit.prevent="import"
-                                    class="space-y-5"
+                                    class="space-y-4"
                                 >
                                     <div
                                         :class="dragging ? 'border-primary-500 bg-primary-50/60 dark:bg-primary-900/10' : 'border-gray-300 dark:border-gray-600'"
@@ -371,11 +371,11 @@
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="rounded-xl bg-gradient-to-br from-green-400 to-green-600 p-4 text-center text-white shadow-md">
-                                <div class="text-4xl font-bold">{{ $importResult['imported'] }}</div>
+                                <div class="text-2xl font-bold">{{ $importResult['imported'] }}</div>
                                 <div class="mt-1 text-sm opacity-90">{{ __('Success') }}</div>
                             </div>
                             <div class="rounded-xl bg-gradient-to-br from-red-400 to-red-600 p-4 text-center text-white shadow-md">
-                                <div class="text-4xl font-bold">{{ $importResult['skipped'] }}</div>
+                                <div class="text-2xl font-bold">{{ $importResult['skipped'] }}</div>
                                 <div class="mt-1 text-sm opacity-90">{{ __('Skipped') }}</div>
                             </div>
                         </div>

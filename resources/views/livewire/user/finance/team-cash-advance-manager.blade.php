@@ -15,7 +15,7 @@
 
             <div class="user-page-body pt-0">
                 <div class="mb-6 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <div class="user-filter-grid lg:max-w-3xl">
+                    <div class="user-filter-grid lg:max-w-2xl">
                         <div class="relative w-full">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                 <x-heroicon-m-magnifying-glass class="h-5 w-5 text-gray-400" />

@@ -108,6 +108,36 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    protected function defaultProfilePhotoUrl(): string
+    {
+        $name = trim((string) $this->name);
+        $initials = collect(preg_split('/\s+/', $name) ?: [])
+            ->filter()
+            ->take(2)
+            ->map(fn (string $segment): string => Str::upper(Str::substr($segment, 0, 1)))
+            ->join('');
+
+        $initials = $initials !== '' ? $initials : 'U';
+
+        $palette = [
+            ['#dcfce7', '#166534'],
+            ['#dbeafe', '#1d4ed8'],
+            ['#fef3c7', '#92400e'],
+            ['#ede9fe', '#6d28d9'],
+            ['#fce7f3', '#be185d'],
+        ];
+        [$background, $foreground] = $palette[crc32($name ?: $initials) % count($palette)];
+
+        $svg = sprintf(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="48" fill="%s"/><text x="50%%" y="53%%" text-anchor="middle" dominant-baseline="middle" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700" fill="%s">%s</text></svg>',
+            $background,
+            $foreground,
+            e($initials),
+        );
+
+        return 'data:image/svg+xml;utf8,'.rawurlencode($svg);
+    }
+
     public static $groups = ['user', 'admin', 'superadmin'];
 
     public const EMPLOYMENT_STATUS_ACTIVE = 'active';

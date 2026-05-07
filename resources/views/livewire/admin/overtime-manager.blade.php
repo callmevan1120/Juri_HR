@@ -75,32 +75,31 @@
                     @foreach ($overtimes as $overtime)
                         @php($employee = $overtime->user)
                         <div
-                            class="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                            <div class="flex items-center gap-3">
+                            class="flex flex-col gap-2.5 p-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex items-center gap-2.5">
                                 <div
-                                    class="h-10 w-10 rounded-lg flex items-center justify-center
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg
                                         @if ($overtime->status === 'approved') bg-green-100 dark:bg-green-900/30
                                         @elseif($overtime->status === 'rejected') bg-red-100 dark:bg-red-900/30
                                         @else bg-yellow-100 dark:bg-yellow-900/30 @endif">
-                                    <span class="text-base">
+                                    <span class="h-2.5 w-2.5 rounded-full
                                         @if ($overtime->status === 'approved')
-                                            ✅
+                                            bg-green-600
                                         @elseif($overtime->status === 'rejected')
-                                            ❌
+                                            bg-red-600
                                         @else
-                                            ⏳
-                                        @endif
-                                    </span>
+                                            bg-yellow-600
+                                        @endif"></span>
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white">
+                                    <h4 class="text-sm font-semibold text-gray-900 dark:text-white">
                                         {{ $employee?->name ?? __('Deleted employee') }}
                                     </h4>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $employee?->division?->name ?? '-' }} •
                                         {{ $employee?->jobTitle?->name ?? '-' }}
                                     </p>
-                                    <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                    <p class="mt-0.5 text-xs text-gray-600 dark:text-gray-300">
                                         {{ $overtime->date->format('d M Y') }} •
                                         {{ $overtime->start_time->format('H:i') }} -
                                         {{ $overtime->end_time->format('H:i') }}
@@ -108,11 +107,11 @@
                                             class="text-indigo-600 dark:text-indigo-400 font-semibold">({{ $overtime->duration_text }})</span>
                                     </p>
                                     @if ($overtime->reason)
-                                        <p class="text-[10px] text-gray-400 italic mt-0.5 line-clamp-1">
+                                        <p class="sr-only">
                                             {{ $overtime->reason }}</p>
                                     @endif
                                     @if ($overtime->rejection_reason)
-                                        <p class="text-[10px] text-red-500 mt-0.5">{{ __('Reason') }}:
+                                        <p class="mt-0.5 text-[10px] text-red-500">{{ __('Reason') }}:
                                             {{ $overtime->rejection_reason }}</p>
                                     @endif
                                 </div>
@@ -159,7 +158,7 @@
         </x-slot>
 
         <x-slot name="content">
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p class="sr-only">
                 {{ __('Please provide a reason for rejection:') }}
             </p>
             <x-forms.textarea wire:model="rejectionReason" rows="3" class="w-full"

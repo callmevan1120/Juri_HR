@@ -5,7 +5,7 @@
         <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
         <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
 
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
              <div class="mb-4 flex items-center justify-between text-white">
                 {{-- Welcome Text (Left) --}}
                 <div>
@@ -22,7 +22,7 @@
     </section>
 
     {{-- Overlapping Content Container --}}
-    <div class="relative z-20 mx-auto -mt-20 max-w-7xl space-y-8 px-4 pb-12 sm:px-6 lg:px-8">
+    <div class="relative z-20 mx-auto -mt-20 max-w-6xl space-y-4 px-4 pb-8 sm:px-6 lg:px-8">
          
          {{-- Attendance Command Center (Floating) --}}
          <section aria-labelledby="attendance-summary-heading">

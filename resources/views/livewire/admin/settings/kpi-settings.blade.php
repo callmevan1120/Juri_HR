@@ -76,11 +76,7 @@
                     class="text-sm font-medium {{ $totalGroupWeight === 100 ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300' }}">
                     {{ __('Total Active Category Weight:') }} <span
                         class="font-bold text-lg">{{ $totalGroupWeight }}%</span>
-                    @if ($totalGroupWeight !== 100)
-                        <span class="ml-2">⚠️ {{ __('Must total exactly 100% for balanced calculation.') }}</span>
-                    @else
-                        <span class="ml-2">✅ {{ __('Balanced') }}</span>
-                    @endif
+                    <span class="ml-2">{{ $totalGroupWeight === 100 ? __('Balanced') : __('Must total exactly 100% for balanced calculation.') }}</span>
                 </p>
             </div>
         </x-admin.alert>
@@ -149,7 +145,6 @@
                         <span
                             class="text-xs px-2 py-1 rounded-md font-bold {{ $childWeight === 100 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
                             {{ __('Child Weight:') }} {{ $childWeight }}%
-                            {{ $childWeight === 100 ? '✅' : '⚠️' }}
                         </span>
                         <x-actions.icon-button wire:click="createTemplate({{ $group->id }})" variant="primary"
                             label="{{ __('Add KPI Component') }}: {{ $group->name }}">
@@ -285,7 +280,7 @@
                     <x-forms.input id="groupWeight" type="number" class="mt-1 block w-full font-mono"
                         wire:model="groupWeight" min="0" max="100" />
                     <x-forms.input-error for="groupWeight" class="mt-2" />
-                    <p class="text-xs text-gray-500 mt-1">
+                    <p class="sr-only">
                         {{ __('Total weight of all active categories must be exactly 100%.') }}</p>
                 </div>
                 <div class="mt-4 flex items-center gap-2">
@@ -331,7 +326,7 @@
                         class="mt-1 block min-h-[8rem] w-full resize-y rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm leading-6 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-primary-600 dark:focus:ring-primary-600"
                         placeholder="{{ __("Write each point starting with a dash (-):\n- Achieve 100% monthly SLA\n- 0% downtime per quarter\n- Timely reports") }}"
                     ></textarea>
-                    <p class="mt-1.5 text-[11px] text-gray-400">
+                    <p class="sr-only">
                         {{ __('Tip: Start each item with "- " (dash space) to display as a list in the appraisal form.') }}
                     </p>
                     <x-forms.input-error for="indicator_description" class="mt-2" />
@@ -341,7 +336,7 @@
                     <x-forms.input id="weight" type="number" class="mt-1 block w-full font-mono"
                         wire:model="weight" min="1" max="100" />
                     <x-forms.input-error for="weight" class="mt-2" />
-                    <p class="text-xs text-gray-500 mt-1">
+                    <p class="sr-only">
                         {{ __('Total active component weight in a category must be 100%.') }}</p>
                 </div>
 
@@ -373,7 +368,7 @@
                     <div>
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Appraisal Period Lock') }}
                         </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <p class="sr-only">
                             {{ __('Set when employees and managers can submit appraisals. Close the window to prevent late submissions.') }}
                         </p>
                     </div>
@@ -426,11 +421,11 @@
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">
                         {{ __('Advanced Evaluation Metrics') }}</h3>
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                <p class="sr-only">
                     {{ __('Set the balance between objective system factors (Attendance) and the manager\'s subjective assessment (KPI).') }}
                 </p>
 
-                <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-5 border border-gray-100 dark:border-gray-600">
+                <div class="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700/30">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                         <div>
                             <x-forms.label for="attendanceWeight" value="{{ __('System Attendance Weight (%)') }}"
@@ -455,7 +450,7 @@
                             <x-forms.input-error for="attendanceWeight" class="mt-2" />
                         </div>
 
-                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                        <div class="sr-only">
                             <strong>{{ __('How it works:') }}</strong>
                             {{ __('The final score consists of two factors. System Attendance is calculated automatically. The remaining percentage is allocated to the Manager\'s subjective assessment of the KPIs above.') }}
                         </div>

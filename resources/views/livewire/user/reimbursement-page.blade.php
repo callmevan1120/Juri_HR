@@ -35,11 +35,11 @@
                 @if ($isCreating)
                     {{-- CREATE FORM --}}
                     <div
-                        class="mx-auto max-w-3xl rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 lg:p-8">
-                        <form wire:submit.prevent="save" class="space-y-6">
+                        class="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-5">
+                        <form wire:submit.prevent="save" class="space-y-4">
 
                             {{-- Date & Type --}}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {{-- Date --}}
                                 <div>
                                     <label
@@ -97,13 +97,13 @@
 
                             {{-- Attachment --}}
                             <div
-                                class="p-4 sm:p-5 bg-gray-50 dark:bg-gray-900/30 rounded-2xl border border-gray-200 dark:border-gray-700 border-dashed">
+                                class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
                                 <label class="mb-3 font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                     <x-heroicon-o-paper-clip class="h-5 w-5 text-gray-400" />
                                     {{ __('Attachment (Recall/Bill)') }}
                                 </label>
 
-                                <div class="mt-2 flex justify-center px-6 pt-5 pb-6">
+                                <div class="mt-2 flex justify-center px-4 py-4">
                                     <div class="space-y-1 text-center">
                                         @if ($attachment)
                                             <div
@@ -123,14 +123,14 @@
                                                     aria-label="{{ __('Attachment (Recall/Bill)') }}">
                                                 <p class="pl-1 hidden sm:inline">{{ __('or drag and drop') }}</p>
                                             </div>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ __('PNG, JPG, PDF up to 10MB') }}</p>
+                                            <p class="sr-only">{{ __('PNG, JPG, PDF up to 10MB') }}</p>
                                         @endif
                                     </div>
                                 </div>
                                 <x-forms.input-error for="attachment" class="mt-2" />
                             </div>
 
-                            <div class="flex flex-col-reverse items-stretch justify-end gap-3 pt-4 sm:flex-row">
+                            <div class="flex flex-col-reverse items-stretch justify-end gap-2 pt-3 sm:flex-row">
                                 <button type="button" wire:click="cancel"
                                     class="px-5 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                     {{ __('Cancel') }}
@@ -146,7 +146,7 @@
                     {{-- LIST VIEW --}}
 
                     <div
-                        class="mb-6 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        class="mb-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-4">
                         <div class="user-filter-grid">
                             <div>
                                 <label
@@ -231,7 +231,7 @@
                                                     </span>
                                                 </div>
                                                 <p
-                                                    class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1 break-all">
+                                                    class="sr-only">
                                                     {{ $claim->description }}</p>
                                                 <div
                                                     class="text-[10px] text-gray-400 mt-0.5 sm:mt-1 flex items-center gap-1">

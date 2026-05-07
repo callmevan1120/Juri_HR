@@ -94,12 +94,12 @@
 
                 <div class="grid grid-cols-1 divide-y divide-gray-200 dark:divide-gray-700 lg:hidden">
                     @foreach ($divisions as $division)
-                        <div class="p-5">
+                        <div class="p-4">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <h3 class="truncate text-base font-semibold text-slate-950 dark:text-white">
                                         {{ $division->name }}</h3>
-                                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                    <p class="sr-only">
                                         {{ __('Used for department grouping and reporting.') }}</p>
                                 </div>
 
@@ -107,7 +107,7 @@
                             </div>
 
                             <div
-                                class="mt-4 flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-4 dark:border-gray-700/50">
+                                class="mt-3 flex flex-wrap justify-end gap-2 border-t border-gray-100 pt-3 dark:border-gray-700/50">
                                 <x-actions.button type="button" wire:click="edit({{ $division->id }})"
                                     variant="soft-primary" size="sm"
                                     label="{{ __('Edit division') }}: {{ $division->name }}">

@@ -212,7 +212,7 @@
                         : __('Employee receives status update'));
             @endphp
 
-            <div class="space-y-5">
+            <div class="space-y-4">
                 <ol class="grid gap-2 border-b border-slate-100 pb-4 text-sm dark:border-slate-800 sm:grid-cols-3">
                     <li class="flex items-start gap-2">
                         <span class="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-[11px] font-semibold text-white">1</span>
@@ -234,7 +234,7 @@
                         <div class="flex items-center justify-between gap-3">
                             <div>
                                 <h3 class="text-sm font-semibold text-slate-900 dark:text-white">{{ __('Who is this for?') }}</h3>
-                                <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{{ __('One request will be created for each selected employee.') }}</p>
+                                <p class="sr-only">{{ __('One request will be created for each selected employee.') }}</p>
                             </div>
                             <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                                 {{ trans_choice(':count employee selected|:count employees selected', $selectedEmployeesCount, ['count' => $selectedEmployeesCount]) }}
@@ -253,7 +253,7 @@
                         <div class="mb-1.5 flex items-center justify-between gap-3">
                             <div>
                                 <h3 class="text-sm font-semibold text-slate-900 dark:text-white">{{ __('What document is needed?') }}</h3>
-                                <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{{ __('The document type controls whether the employee uploads a file, the system generates a PDF, or an admin handles it manually.') }}</p>
+                                <p class="sr-only">{{ __('The document type controls whether the employee uploads a file, the system generates a PDF, or an admin handles it manually.') }}</p>
                             </div>
                             <x-actions.button type="button" size="sm" variant="ghost" wire:click="applyRequestPreset">
                                 <x-heroicon-m-sparkles class="h-4 w-4" />
@@ -305,7 +305,7 @@
                                 <x-forms.checkbox wire:model.live="generateImmediately" />
                                 <span>
                                     <span class="block font-semibold">{{ __('Generate PDF immediately') }}</span>
-                                    <span class="mt-0.5 block text-xs">{{ __('If enabled, the PDF is generated as soon as this request is created.') }}</span>
+                                    <span class="sr-only">{{ __('If enabled, the PDF is generated as soon as this request is created.') }}</span>
                                 </span>
                             </label>
                         @endif
@@ -357,18 +357,18 @@
                             </div>
 
                             @if ($selectedDocumentTypeProfile->requires_employee_upload)
-                                <p class="pt-3 text-xs font-medium text-amber-700 dark:text-amber-300">
+                                <p class="sr-only">
                                     {{ __('Employee receives an upload request. After the file is uploaded, admin can download it, approve it, or reject it.') }}
                                 </p>
                             @elseif ($selectedDocumentTypeProfile->auto_generate_enabled && $selectedDocumentTypeProfile->activeTemplate())
-                                <p class="pt-3 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                                <p class="sr-only">
                                     {{ $generateImmediately
                                         ? __('The request will be created and the generated PDF will be attached to the employee notification email.')
                                         : __('The request will be pending. Admin can generate the PDF later from the table action.')
                                     }}
                                 </p>
                             @else
-                                <p class="pt-3 text-xs text-gray-600 dark:text-gray-300">
+                                <p class="sr-only">
                                     {{ __('The request will stay pending until an admin prepares the document manually and marks it ready.') }}
                                 </p>
                             @endif
@@ -398,7 +398,7 @@
                         <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $reviewRequest->purpose }}</div>
                     </div>
                 @endif
-                <p class="text-sm text-slate-600 dark:text-slate-300">
+                <p class="sr-only">
                     {{ __('Use approve when the document is ready or the uploaded file is accepted. Add delivery, pickup, or confirmation details for the employee.') }}
                 </p>
                 <x-forms.textarea wire:model.live="reviewNote" rows="4"
@@ -423,7 +423,7 @@
                         <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $reviewRequest->purpose }}</div>
                     </div>
                 @endif
-                <p class="text-sm text-slate-600 dark:text-slate-300">
+                <p class="sr-only">
                     {{ __('Rejecting sends the employee a status update. Add a clear reason or what they need to fix.') }}
                 </p>
                 <x-forms.textarea wire:model.live="reviewNote" rows="4"

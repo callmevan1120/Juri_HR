@@ -234,7 +234,7 @@
                                         <div>
                                             <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">Server
                                                 Hardware ID (HWID)</h4>
-                                            <p class="text-xs text-yellow-600 dark:text-yellow-500 mt-1">
+                                            <p class="sr-only">
                                                 {{ __('Please give this code to Developer if you want to request Enterprise License for this server.') }}
                                             </p>
                                         </div>

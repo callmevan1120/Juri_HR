@@ -32,15 +32,15 @@
 
             <div class="user-page-body pt-0">
                 @unless($canRequestCashAdvance)
-                    <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100">
+                    <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-medium text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100">
                         <span class="font-semibold">{{ __('Kasbon is available after your basic salary has been updated.') }}</span>
                     </div>
                 @endunless
 
                 @if($showCreateModal)
                 {{-- CREATE FORM --}}
-                <div class="mx-auto max-w-3xl rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 lg:p-8">
-                <form wire:submit.prevent="submit" class="space-y-6">
+                <div class="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-5">
+                <form wire:submit.prevent="submit" class="space-y-4">
 
                     {{-- Amount --}}
                     <div>
@@ -68,7 +68,7 @@
                     </div>
 
                     {{-- Deduction Target --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         {{-- Payment Month --}}
                         <div>
                             <label class="mb-2 block font-bold text-gray-700 dark:text-gray-300">{{ __('Salary Deduction Month') }}</label>
@@ -88,14 +88,15 @@
                         </div>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
-                        <p class="text-sm text-orange-800 dark:text-orange-300 flex items-start gap-2">
-                            <x-heroicon-o-information-circle class="h-5 w-5 shrink-0" />
-                            <span><strong class="font-bold">{{ __('IMPORTANT') }}:</strong> {{ __('If approved, this amount will be automatically deducted from your payroll for the month and year you selected above.') }}</span>
+                    <div class="rounded-xl border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20">
+                        <p class="flex items-start gap-2 text-xs font-medium text-orange-800 dark:text-orange-300">
+                            <x-heroicon-o-information-circle class="h-4 w-4 shrink-0" />
+                            <span><strong class="font-bold">{{ __('IMPORTANT') }}</strong></span>
+                            <span class="sr-only">{{ __('If approved, this amount will be automatically deducted from your payroll for the month and year you selected above.') }}</span>
                         </p>
                     </div>
 
-                    <div class="flex flex-col-reverse items-stretch justify-end gap-3 pt-4 sm:flex-row">
+                    <div class="flex flex-col-reverse items-stretch justify-end gap-2 pt-3 sm:flex-row">
                         <button type="button" wire:click="$set('showCreateModal', false)" class="px-5 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                             {{ __('Cancel') }}
                         </button>
@@ -110,7 +111,7 @@
                 {{-- LIST VIEW --}}
 
                 {{-- Summary Cards (Compact Mode) --}}
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
                     {{-- Unpaid --}}
                     <div class="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10 p-3 flex items-center gap-3">
                         <div class="h-10 w-10 shrink-0 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -175,7 +176,7 @@
                                             {{ __($advance->status === 'pending' ? 'Pending' : ($advance->status === 'approved' ? 'Approved' : ($advance->status === 'paid' ? 'Paid' : 'Rejected'))) }}
                                         </span>
                                     </div>
-                                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1 break-all">{{ $advance->purpose }}</p>
+                                    <p class="sr-only">{{ $advance->purpose }}</p>
                                     <div class="text-[10px] text-gray-400 mt-0.5 sm:mt-1 flex items-center gap-1">
                                         <x-heroicon-o-calendar-days class="h-3 w-3" />
                                         {{ $advance->created_at->format('d M Y') }}

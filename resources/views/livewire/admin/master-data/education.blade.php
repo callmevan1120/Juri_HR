@@ -95,12 +95,12 @@
 
                 <div class="grid grid-cols-1 divide-y divide-gray-200 dark:divide-gray-700 lg:hidden">
                     @foreach ($educations as $education)
-                        <div class="p-5">
+                        <div class="p-4">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <h3 class="truncate text-base font-semibold text-slate-950 dark:text-white">
                                         {{ $education->name }}</h3>
-                                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                    <p class="sr-only">
                                         {{ __('Available for employee data mapping.') }}</p>
                                 </div>
 

@@ -48,7 +48,7 @@
                         };
                     @endphp
 
-                    <div class="flex flex-col gap-3 p-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-4 xl:flex-row xl:items-center xl:justify-between">
+                    <div class="flex flex-col gap-2.5 p-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 xl:flex-row xl:items-center xl:justify-between">
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-2">
                                 <h4 class="truncate text-sm font-bold text-gray-900 dark:text-white">
@@ -65,7 +65,7 @@
                                 {{ $swapRequest->user?->jobTitle?->name ?? '-' }}
                             </p>
 
-                            <div class="mt-2 grid gap-2 text-xs text-gray-600 dark:text-gray-300 md:grid-cols-3">
+                            <div class="mt-2 grid gap-1.5 text-xs text-gray-600 dark:text-gray-300 md:grid-cols-3">
                                 <div>
                                     <span class="block text-[11px] font-semibold uppercase text-gray-400 dark:text-gray-500">{{ __('Schedule Date') }}</span>
                                     <span>{{ $date?->format('d M Y') ?? '-' }}</span>
@@ -80,7 +80,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-2 grid gap-2 text-xs text-gray-600 dark:text-gray-300 md:grid-cols-2">
+                            <div class="mt-1.5 grid gap-1.5 text-xs text-gray-600 dark:text-gray-300 md:grid-cols-2">
                                 <p>
                                     <span class="font-semibold text-gray-700 dark:text-gray-200">{{ __('Replacement') }}:</span>
                                     {{ $swapRequest->replacementUser?->name ?? __('Not specified') }}
@@ -94,13 +94,13 @@
                             </div>
 
                             @if ($swapRequest->reason)
-                                <p class="mt-2 line-clamp-1 text-xs text-gray-500 dark:text-gray-400">
+                                <p class="sr-only">
                                     {{ $swapRequest->reason }}
                                 </p>
                             @endif
 
                             @if ($swapRequest->rejection_note)
-                                <p class="mt-2 text-xs text-red-600 dark:text-red-400">
+                                <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">
                                     {{ __('Rejection note') }}: {{ $swapRequest->rejection_note }}
                                 </p>
                             @endif
@@ -126,7 +126,7 @@
                 @endforeach
             </div>
 
-            <div class="border-t border-gray-200/60 bg-gray-50/70 px-4 py-4 dark:border-gray-700/60 dark:bg-gray-900/40">
+            <div class="border-t border-gray-200/60 bg-gray-50/70 px-4 py-3 dark:border-gray-700/60 dark:bg-gray-900/40">
                 {{ $requests->links() }}
             </div>
         @endif
@@ -138,7 +138,7 @@
         </x-slot>
 
         <x-slot name="content">
-            <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            <p class="sr-only">
                 {{ __('Add a rejection note for this employee.') }}
             </p>
             <x-forms.textarea wire:model="rejectionNote" rows="3" class="w-full" placeholder="{{ __('Reason...') }}" />

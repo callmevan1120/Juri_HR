@@ -208,7 +208,7 @@
         <x-overlays.dialog-modal wire:model="confirmingRejection">
             <x-slot name="title">{{ __('Reject Request') }}</x-slot>
             <x-slot name="content">
-                <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Are you sure you want to reject this request? Please provide a reason.') }}</p>
+                <p class="sr-only">{{ __('Are you sure you want to reject this request? Please provide a reason.') }}</p>
                 <div class="mt-4">
                     <x-forms.label value="{{ __('Rejection Reason') }}" />
                     <x-forms.textarea wire:model="rejectionReason" class="mt-1 w-full" rows="3" placeholder="{{ __('Optional') }}" />

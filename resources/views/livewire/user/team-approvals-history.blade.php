@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <div class="space-y-6">
+        <div class="space-y-4">
             @if ($activeTab === 'leaves')
             <!-- Desktop Table -->
             <div class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
@@ -89,7 +89,7 @@
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse ($leaves as $leave)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
                                             <img class="h-10 w-10 rounded-full object-cover"
@@ -106,20 +106,20 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <span
                                         class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $leave->status === 'sick' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
                                         {{ ucfirst($leave->status) }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ \Carbon\Carbon::parse($leave->date)->format('d M Y') }}
                                     @if ($leave->note)
                                     <div class="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{{ $leave->note }}
                                     </div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     @if ($leave->approval_status === 'pending')
                                     <span
                                         class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
@@ -143,7 +143,7 @@
                                     @endif
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 text-right">
+                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-right">
                                     @if ($leave->approval_note)
                                     <span class="italic">{{ $leave->approval_note }}</span>
                                     @else
@@ -153,7 +153,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                     {{ __('No leave requests found') }}
                                 </td>
                             </tr>
@@ -221,7 +221,7 @@
                     @endif
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
                     {{ __('No leave requests found') }}
                 </div>
                 @endforelse
@@ -266,7 +266,7 @@
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse ($reimbursements as $reimbursement)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
                                             <img class="h-10 w-10 rounded-full object-cover"
@@ -283,14 +283,14 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <span class="text-sm text-gray-900 dark:text-white">{{ ucfirst($reimbursement->type) }}</span>
                                     <div class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($reimbursement->date)->format('d M Y') }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
                                     Rp {{ number_format($reimbursement->amount, 0, ',', '.') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     @if ($reimbursement->status === 'pending')
                                     <span
                                         class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
@@ -314,7 +314,7 @@
                                     @endif
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 text-right">
+                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-right">
                                     @if ($reimbursement->admin_note)
                                     <span class="italic">{{ $reimbursement->admin_note }}</span>
                                     @else
@@ -324,7 +324,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                     {{ __('No reimbursement requests found') }}
                                 </td>
                             </tr>
@@ -392,7 +392,7 @@
                     </div>
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
                     {{ __('No reimbursement requests found') }}
                 </div>
                 @endforelse
@@ -417,7 +417,7 @@
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse ($overtimes as $overtime)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
                                             <img class="h-10 w-10 rounded-full object-cover" src="{{ $overtime->user->profile_photo_url }}" alt="{{ $overtime->user->name }}">
@@ -428,16 +428,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="text-sm text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($overtime->date)->format('d M Y') }}</div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ \Carbon\Carbon::parse($overtime->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($overtime->end_time)->format('H:i') }}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ \Carbon\Carbon::parse($overtime->start_time)->diff(\Carbon\Carbon::parse($overtime->end_time))->format('%h hr %i min') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     @if ($overtime->status === 'pending')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">{{ __('Pending') }}</span>
                                     @elseif($overtime->status === 'approved')
@@ -452,7 +452,7 @@
                                     @endif
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-wrap text-sm text-gray-500 dark:text-gray-400 text-right">
+                                <td class="px-4 py-3 whitespace-wrap text-sm text-gray-500 dark:text-gray-400 text-right">
                                     <span class="truncate max-w-[200px] inline-block" title="{{ $overtime->reason }}">
                                         {{ $overtime->reason ?? '-' }}
                                     </span>
@@ -460,7 +460,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">{{ __('No overtime records found') }}</td>
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">{{ __('No overtime records found') }}</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -511,7 +511,7 @@
                     <div class="mt-2 text-sm text-gray-600 dark:text-gray-300 italic">"{{ $overtime->reason }}"</div>
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">{{ __('No overtime records found') }}</div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">{{ __('No overtime records found') }}</div>
                 @endforelse
             </div>
             <div class="px-4 py-3">
@@ -534,7 +534,7 @@
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse ($kasbons as $kasbon)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
                                             <img class="h-10 w-10 rounded-full object-cover" src="{{ $kasbon->user->profile_photo_url }}" alt="{{ $kasbon->user->name }}">
@@ -545,16 +545,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="text-sm text-gray-900 dark:text-white font-medium">{{ \Carbon\Carbon::create()->month($kasbon->payment_month)->englishMonth }}</div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $kasbon->payment_year }}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
                                     Rp {{ number_format($kasbon->amount, 0, ',', '.') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     @if ($kasbon->status === 'pending')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">{{ __('Pending') }}</span>
                                     @elseif($kasbon->status === 'approved')
@@ -571,7 +571,7 @@
                                     @endif
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-wrap text-right text-sm font-medium">
+                                <td class="px-4 py-3 whitespace-wrap text-right text-sm font-medium">
                                     <span class="truncate max-w-[200px] inline-block font-normal text-gray-500 dark:text-gray-400" title="{{ $kasbon->purpose }}">
                                         {{ $kasbon->purpose ?? '-' }}
                                     </span>
@@ -579,7 +579,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">{{ __('No kasbon records found') }}</td>
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">{{ __('No kasbon records found') }}</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -621,7 +621,7 @@
                     <div class="mt-2 text-sm text-gray-600 dark:text-gray-300 italic">"{{ $kasbon->purpose }}"</div>
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">{{ __('No kasbon records found') }}</div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">{{ __('No kasbon records found') }}</div>
                 @endforelse
             </div>
             <div class="px-4 py-3">

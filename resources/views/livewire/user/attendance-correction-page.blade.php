@@ -26,7 +26,7 @@
 
             <div class="user-page-body pt-0">
                 <div
-                    class="mb-6 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                    class="mb-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-4">
                     <div class="user-filter-grid">
                         <div>
                             <label
@@ -118,13 +118,13 @@
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
-                                            <div class="max-w-md whitespace-pre-line">{{ $correction->reason }}</div>
+                                            <div class="line-clamp-2 max-w-md whitespace-pre-line">{{ $correction->reason }}</div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="5"
-                                            class="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                             {{ __('No attendance correction requests found.') }}
                                         </td>
                                     </tr>
@@ -134,10 +134,10 @@
                     </div>
                 </div>
 
-                <div class="space-y-4 md:hidden">
+                <div class="space-y-3 md:hidden">
                     @forelse ($corrections as $correction)
                         <article
-                            class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -157,7 +157,7 @@
                                 </span>
                             </div>
 
-                            <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                            <div class="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                                 <div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Type') }}</p>
                                     <p class="font-medium text-gray-900 dark:text-white">
@@ -191,7 +191,7 @@
                             <div
                                 class="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-900/40 dark:text-gray-200">
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Reason') }}</p>
-                                <div class="mt-1 whitespace-pre-line">{{ $correction->reason }}</div>
+                                <div class="mt-1 line-clamp-2 whitespace-pre-line">{{ $correction->reason }}</div>
                             </div>
 
                             @if ($correction->rejection_note || ($correction->headApprover && $correction->status === 'pending_admin'))
@@ -213,7 +213,7 @@
                         </article>
                     @empty
                         <div
-                            class="rounded-xl border border-gray-100 bg-white p-8 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            class="rounded-xl border border-gray-100 bg-white p-4 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                             {{ __('No attendance correction requests found.') }}
                         </div>
                     @endforelse
@@ -235,7 +235,7 @@
             <div class="space-y-5 pb-48">
                 <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
                     <x-forms.label for="attendance-date" value="{{ __('Attendance Date') }}" class="mb-1.5 block" />
-                    <p class="mb-3 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                    <p class="sr-only">
                         {{ __('Choose the date first, then fill the corrected times below for that same day.') }}
                     </p>
                     <div wire:ignore>
@@ -262,7 +262,7 @@
                     </div>
                 @else
                     <div
-                        class="rounded-2xl border border-dashed border-gray-200 bg-gray-50/70 p-4 text-xs leading-5 text-gray-600 dark:border-gray-700 dark:bg-gray-900/20 dark:text-gray-300">
+                        class="sr-only">
                         {{ __('No attendance snapshot was found for this date yet. You can still request a missing check in or a full correction if needed.') }}
                     </div>
                 @endif
@@ -271,7 +271,7 @@
                     <div>
                         <p class="text-sm font-semibold text-gray-900 dark:text-white">
                             {{ __('What needs to be corrected?') }}</p>
-                        <p class="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                        <p class="sr-only">
                             {{ __('Choose one or more items below. You can request check in and check out corrections together.') }}
                         </p>
                         <x-forms.input-error for="includeRequestedTimeIn" class="mt-2" />
@@ -284,7 +284,7 @@
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
                                         {{ __('Requested Check In Time') }}</h3>
-                                    <p class="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                                    <p class="sr-only">
                                         {{ __('Fill this if your check in was missing or recorded incorrectly.') }}
                                     </p>
                                 </div>
@@ -324,7 +324,7 @@
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
                                         {{ __('Requested Check Out Time') }}</h3>
-                                    <p class="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                                    <p class="sr-only">
                                         {{ __('Fill this if your check out was missing or recorded incorrectly.') }}
                                     </p>
                                 </div>
@@ -364,7 +364,7 @@
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
                                         {{ __('Correct Shift') }}</h3>
-                                    <p class="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                                    <p class="sr-only">
                                         {{ __('Enable this if the assigned shift for that day was wrong.') }}
                                     </p>
                                 </div>

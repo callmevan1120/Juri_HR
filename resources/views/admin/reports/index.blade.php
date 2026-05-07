@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-admin.page-shell :title="__('Report Center')" :description="__('Export operational HR data without loading thousands of rows in the browser.')">
-        <div class="grid gap-5 xl:grid-cols-2">
+        <div class="grid gap-3 xl:grid-cols-2">
             <x-admin.panel class="overflow-hidden">
                 <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
                     <div class="flex items-start justify-between gap-3">
                         <div>
                             <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('HR Operations') }}</p>
                             <h2 class="mt-1 text-base font-semibold text-slate-950 dark:text-white">{{ __('Leave Request Report') }}</h2>
-                            <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                            <p class="sr-only">
                                 {{ __('Export annual leave, sick leave, and custom leave requests by period and approval status.') }}
                             </p>
                         </div>
@@ -15,7 +15,7 @@
                     </div>
                 </div>
 
-                <form method="GET" action="{{ route('admin.reports.leaves.export') }}" class="grid gap-4 p-5 sm:grid-cols-2">
+                <form method="GET" action="{{ route('admin.reports.leaves.export') }}" class="grid gap-3 p-4 sm:grid-cols-2">
                     <div>
                         <x-forms.label for="leave_start_date" value="{{ __('Start Date') }}" class="mb-1.5 block" />
                         <x-forms.input id="leave_start_date" name="start_date" type="date" class="w-full" />
@@ -90,7 +90,7 @@
                         <div>
                             <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Finance Operations') }}</p>
                             <h2 class="mt-1 text-base font-semibold text-slate-950 dark:text-white">{{ __('Payroll Summary Report') }}</h2>
-                            <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                            <p class="sr-only">
                                 {{ __('Export payroll summaries by period, status, division, and job title for payroll reconciliation.') }}
                             </p>
                         </div>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
 
-                <form method="GET" action="{{ route('admin.reports.payrolls.export') }}" class="grid gap-4 p-5 sm:grid-cols-2">
+                <form method="GET" action="{{ route('admin.reports.payrolls.export') }}" class="grid gap-3 p-4 sm:grid-cols-2">
                     <div>
                         <x-forms.label for="payroll_month" value="{{ __('Month') }}" class="mb-1.5 block" />
                         <x-forms.select id="payroll_month" name="month" class="w-full">
@@ -169,7 +169,7 @@
                         <div>
                             <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('HR Operations') }}</p>
                             <h2 class="mt-1 text-base font-semibold text-slate-950 dark:text-white">{{ __('Schedule Roster Report') }}</h2>
-                            <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                            <p class="sr-only">
                                 {{ __('Export employee schedules by period, division, job title, shift, and off-day status.') }}
                             </p>
                         </div>
@@ -177,7 +177,7 @@
                     </div>
                 </div>
 
-                <form method="GET" action="{{ route('admin.reports.schedules.export') }}" class="grid gap-4 p-5 sm:grid-cols-2">
+                <form method="GET" action="{{ route('admin.reports.schedules.export') }}" class="grid gap-3 p-4 sm:grid-cols-2">
                     <div>
                         <x-forms.label for="schedule_start_date" value="{{ __('Start Date') }}" class="mb-1.5 block" />
                         <x-forms.input id="schedule_start_date" name="start_date" type="date" class="w-full" />
@@ -247,7 +247,7 @@
                         <div>
                             <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('HR Operations') }}</p>
                             <h2 class="mt-1 text-base font-semibold text-slate-950 dark:text-white">{{ __('Overtime Report') }}</h2>
-                            <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                            <p class="sr-only">
                                 {{ __('Export overtime requests with duration, approval status, reviewer, and estimated cost.') }}
                             </p>
                         </div>
@@ -255,7 +255,7 @@
                     </div>
                 </div>
 
-                <form method="GET" action="{{ route('admin.reports.overtime.export') }}" class="grid gap-4 p-5 sm:grid-cols-2">
+                <form method="GET" action="{{ route('admin.reports.overtime.export') }}" class="grid gap-3 p-4 sm:grid-cols-2">
                     <div>
                         <x-forms.label for="overtime_start_date" value="{{ __('Start Date') }}" class="mb-1.5 block" />
                         <x-forms.input id="overtime_start_date" name="start_date" type="date" class="w-full" />

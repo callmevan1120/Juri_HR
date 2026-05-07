@@ -146,7 +146,7 @@
             @if ($isAdminRoute)
                 <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[22rem] overflow-hidden">
                     <div class="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-white via-slate-50 to-transparent dark:from-slate-900 dark:via-slate-950 dark:to-transparent"></div>
-                    <div class="absolute left-0 top-10 h-48 w-48 rounded-full bg-cyan-200/30 blur-3xl dark:bg-cyan-500/10"></div>
+                    <div class="hidden"></div>
                     <div class="absolute right-0 top-0 h-56 w-56 rounded-full bg-emerald-200/25 blur-3xl dark:bg-emerald-500/10"></div>
                 </div>
             @endif
@@ -415,7 +415,7 @@
                 timerProgressBar: true,
                 background: 'transparent',
                 customClass: {
-                    popup: '!bg-white dark:!bg-gray-800 !text-gray-900 dark:!text-white !rounded-3xl !shadow-xl !border !border-gray-100 dark:!border-gray-700/50 !px-4 !py-3 !w-auto !max-w-[90vw] !mx-auto !mt-4',
+                    popup: '!bg-white dark:!bg-gray-800 !text-gray-900 dark:!text-white !rounded-2xl !shadow-sm !border !border-gray-100 dark:!border-gray-700/50 !px-4 !py-3 !w-auto !max-w-[90vw] !mx-auto !mt-4',
                     title: '!text-sm !font-bold',
                     timerProgressBar: '!bg-primary-500 !h-1'
                 },

@@ -95,7 +95,7 @@
                                 };
                             @endphp
 
-                            <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/95">
+                            <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/95">
                                 <div class="border-b border-gray-100 px-5 py-5 dark:border-gray-700 sm:px-6">
                                     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                         <div class="flex items-start gap-4">
@@ -186,15 +186,15 @@
                                             @if($asset->notes)
                                                 <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
                                                     <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Asset Notes') }}</dt>
-                                                    <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $asset->notes }}</dd>
+                                                    <dd class="sr-only">{{ $asset->notes }}</dd>
                                                 </div>
                                             @endif
                                         </dl>
                                     </div>
                                 </div>
 
-                                <div class="flex flex-col gap-3 border-t border-gray-100 bg-gray-50/80 px-5 py-4 dark:border-gray-700 dark:bg-gray-900/30 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-                                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ __('Return request uses OTP verification and is available only for assigned assets.') }}</p>
+                                <div class="flex flex-col gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/30 lg:flex-row lg:items-center lg:justify-between">
+                                    <p class="sr-only">{{ __('Return request uses OTP verification and is available only for assigned assets.') }}</p>
 
                                     @if($isReturnable)
                                         <x-actions.button
@@ -220,10 +220,10 @@
                 @elseif($returnedHistories->isEmpty())
                     <div class="user-empty-state">
                         <div class="user-empty-state__icon">
-                            <x-heroicon-o-arrow-uturn-left class="h-12 w-12 text-gray-300 dark:text-gray-500" />
+                            <x-heroicon-o-arrow-uturn-left class="h-8 w-8 text-gray-300 dark:text-gray-500" />
                         </div>
                         <h3 class="user-empty-state__title">{{ __('No returned asset history yet.') }}</h3>
-                        <p class="user-empty-state__copy">{{ __('Assets that you have already returned will appear here as history.') }}</p>
+                        <p class="sr-only">{{ __('Assets that you have already returned will appear here as history.') }}</p>
                     </div>
                 @else
                     <div class="space-y-4">
@@ -251,7 +251,7 @@
                                     ],
                                 };
                             @endphp
-                            <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/95">
+                            <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/95">
                                 <div class="flex flex-col gap-4 border-b border-gray-100 px-5 py-5 dark:border-gray-700 sm:flex-row sm:items-start sm:justify-between sm:px-6">
                                     <div class="flex items-start gap-4">
                                         <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl {{ $historyTypeMeta['classes'] }}">
@@ -293,7 +293,7 @@
 
                                             <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
                                                 <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Note') }}</dt>
-                                                <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                                                <dd class="sr-only">
                                                     {{ $history->notes ?: '—' }}
                                                 </dd>
                                             </div>
@@ -323,7 +323,7 @@
                 @endif
 
                 @if(!$otpRequested)
-                    <p class="text-sm leading-6 text-gray-600 dark:text-gray-300">
+                    <p class="sr-only">
                         {{ __('To return this asset, an OTP code will be sent to your immediate supervisor or the administrator. You must acquire this 6-digit code from them to confirm the handover.') }}
                     </p>
                 @else

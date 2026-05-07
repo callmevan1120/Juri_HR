@@ -34,18 +34,18 @@
                 @if($appraisals->isEmpty())
                     <div class="user-empty-state">
                         <div class="user-empty-state__icon">
-                            <x-heroicon-o-document-text class="w-12 h-12 text-gray-300 dark:text-gray-500" />
+                            <x-heroicon-o-document-text class="h-8 w-8 text-gray-300 dark:text-gray-500" />
                         </div>
                         <h3 class="user-empty-state__title">{{ __('No performance reviews found.') }}</h3>
-                        <p class="user-empty-state__copy">{{ __('Your managers have not initiated any appraisals yet.') }}</p>
+                        <p class="sr-only">{{ __('Your managers have not initiated any appraisals yet.') }}</p>
                     </div>
                 @else
                     <div class="divide-y divide-gray-100 dark:divide-gray-700">
                         @foreach($appraisals as $appraisal)
-                            <div class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-6">
-                                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-4">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div class="flex items-center gap-4">
-                                    <div class="h-12 w-12 rounded-xl flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/30">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/30">
                                         <span class="text-indigo-600 dark:text-indigo-400 font-bold text-sm">{{ \Carbon\Carbon::createFromDate($appraisal->period_year, $appraisal->period_month, 1)->format('M') }}</span>
                                     </div>
                                     <div>
@@ -58,7 +58,7 @@
                                                 {{ __(ucwords(str_replace('_', ' ', $appraisal->status))) }}
                                             </span>
                                         </h4>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                             {{ __('Evaluator') }}: {{ $appraisal->evaluator ? $appraisal->evaluator->name : __('Not assigned yet') }}
                                         </p>
                                         <div class="flex items-center gap-2 text-[10px] text-gray-400 mt-0.5">
@@ -135,12 +135,12 @@
                 <div class="mt-0.5 text-indigo-500">
                     <x-heroicon-m-information-circle class="h-5 w-5" />
                 </div>
-                <div class="text-sm text-indigo-800 dark:text-indigo-300">
+                <div class="sr-only">
                     {{ __('Please rate your performance for each KPI. Use a scale of 1-5. Provide clear details of evidence of achievement to make it easier for the Manager to provide the final evaluation.') }}
                 </div>
             </div>
             
-            <div class="space-y-8">
+            <div class="space-y-4">
                 @php
                     // Fetch directly to preserve relationships across Livewire component updates
                     $activeAppraisal = \App\Models\Appraisal::with('evaluations.kpiTemplate.kpiGroup')->find($activeAppraisalId);

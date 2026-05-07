@@ -136,7 +136,7 @@
         <x-slot name="title">{{ __('Reject Attendance Correction') }}</x-slot>
         <x-slot name="content">
             <div class="space-y-3">
-                <p class="text-sm text-slate-600 dark:text-slate-300">
+                <p class="sr-only">
                     {{ __('Add an optional note so the employee understands why this request was rejected.') }}
                 </p>
                 <x-forms.textarea wire:model.live="rejectionNote" rows="4"

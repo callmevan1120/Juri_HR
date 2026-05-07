@@ -97,7 +97,7 @@
 
         {{-- Form (compact) --}}
         <div class="px-5 py-4 space-y-3">
-            <p class="text-xs text-gray-500 dark:text-gray-400">
+            <p class="sr-only">
                 {{ __('Fill in your details below to request an Enterprise upgrade. We will contact you via WhatsApp.') }}
             </p>
 

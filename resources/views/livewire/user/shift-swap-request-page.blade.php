@@ -26,44 +26,44 @@
                 @endif
 
                 <div
-                    class="hidden overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
+                    class="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         {{ __('Schedule Date') }}</th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         {{ __('Requested Shift') }}</th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         {{ __('Replacement') }}</th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         {{ __('Status') }}</th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         {{ __('Reason') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 bg-white dark:divide-gray-700 dark:bg-gray-800">
                                 @forelse ($requests as $request)
                                     <tr>
-                                        <td class="px-5 py-4 text-sm text-gray-700 dark:text-gray-200">
+                                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                                             <div class="font-semibold">
                                                 {{ $request->effectiveScheduleDate()?->translatedFormat('d M Y') ?? '-' }}</div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Current') }}:
                                                 {{ $request->currentShift->name ?? __('No current schedule') }}</div>
                                         </td>
-                                        <td class="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
                                             {{ $request->requestedShift->name ?? '-' }}
                                         </td>
-                                        <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                                             {{ $request->replacementUser->name ?? __('Not specified') }}
                                         </td>
-                                        <td class="px-5 py-4">
+                                        <td class="px-4 py-3">
                                             <span
                                                 class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $request->status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : ($request->status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200') }}">
                                                 {{ $request->statusLabel() }}
@@ -77,14 +77,14 @@
                                                     {{ $request->rejection_note }}</div>
                                             @endif
                                         </td>
-                                        <td class="max-w-sm px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                            <div class="line-clamp-2">{{ $request->reason }}</div>
+                                        <td class="max-w-sm px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                                            <div class="sr-only">{{ $request->reason }}</div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="5"
-                                            class="px-5 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                             {{ __('No shift swap requests found.') }}
                                         </td>
                                     </tr>
@@ -94,10 +94,10 @@
                     </div>
                 </div>
 
-                <div class="space-y-4 md:hidden">
+                <div class="space-y-3 md:hidden">
                     @forelse ($requests as $request)
                         <article
-                            class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -113,7 +113,7 @@
                                 </span>
                             </div>
 
-                            <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                            <div class="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                                 <div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Requested Shift') }}</p>
                                     <p class="font-medium text-gray-900 dark:text-white">
@@ -127,7 +127,7 @@
                             </div>
 
                             <div
-                                class="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-900/40 dark:text-gray-200">
+                                class="sr-only">
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Reason') }}</p>
                                 <div class="mt-1">{{ $request->reason }}</div>
                             </div>
@@ -151,7 +151,7 @@
                         </article>
                     @empty
                         <div
-                            class="rounded-xl border border-gray-100 bg-white p-8 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            class="rounded-xl border border-gray-100 bg-white p-4 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                             {{ __('No shift swap requests found.') }}
                         </div>
                     @endforelse
@@ -173,10 +173,10 @@
             @php($selectedRequestedShift = $shifts->first(fn($shift) => (string) $shift->id === (string) $requestedShiftId))
             @php($selectedReplacement = $replacementUsers->first(fn($replacement) => (string) $replacement->id === (string) $replacementUserId))
 
-            <form wire:submit="store" class="space-y-5">
-                <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+            <form wire:submit="store" class="space-y-4">
+                <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
                     <x-forms.label for="swap-schedule" value="{{ __('Schedule Date') }}" class="mb-1.5 block" />
-                    <p class="mb-3 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                    <p class="sr-only">
                         {{ __('Choose the work date you want to change first. The assigned shift for that date will be loaded automatically below.') }}
                     </p>
                     <div wire:ignore wire:key="swap-schedule-date-{{ $scheduleDate ?? 'empty' }}">
@@ -189,7 +189,7 @@
 
                 @if ($selectedSchedule)
                     <div
-                        class="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-200">
+                        class="rounded-2xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-200 sm:p-4">
                         <p class="font-semibold text-gray-900 dark:text-white">{{ __('Current Schedule Snapshot') }}
                         </p>
                         <div class="mt-3 grid gap-3 sm:grid-cols-2">
@@ -222,14 +222,15 @@
                     </div>
                 @elseif ($selectedScheduleDate)
                     <div
-                        class="rounded-2xl border border-sky-100 bg-sky-50/60 p-4 text-sm text-sky-800 dark:border-sky-900/50 dark:bg-sky-950/10 dark:text-sky-200">
-                        {{ __('No current schedule is assigned for this date. The requested shift will be added to the schedule after approval.') }}
+                            class="rounded-2xl border border-sky-100 bg-sky-50/60 p-3 text-sm text-sky-800 dark:border-sky-900/50 dark:bg-sky-950/10 dark:text-sky-200">
+                        <span>{{ __('No current schedule') }}</span>
+                        <span class="sr-only">{{ __('No current schedule is assigned for this date. The requested shift will be added to the schedule after approval.') }}</span>
                     </div>
                 @endif
 
-                <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+                <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
                     <x-forms.label for="swap-shift" value="{{ __('Requested Shift') }}" class="mb-1.5 block" />
-                    <p class="mb-3 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                    <p class="sr-only">
                         {{ __('Choose the replacement shift you want for that same date.') }}
                     </p>
                     <x-forms.select id="swap-shift" wire:model.live="requestedShiftId" class="block w-full">
@@ -260,10 +261,10 @@
                     @endif
                 </div>
 
-                <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+                <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
                     <x-forms.label for="swap-replacement"
                         value="{{ __('Replacement Employee') }} ({{ __('Optional') }})" class="mb-1.5 block" />
-                    <p class="mb-3 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                    <p class="sr-only">
                         {{ __('Pick a teammate if you already know who can cover this shift. You can search by name and leave this empty if the reviewer should decide later.') }}
                     </p>
                     <x-user.tom-select-user id="swap-replacement" wire:model.live="replacementUserId"
@@ -301,7 +302,7 @@
 
                 @if ($selectedScheduleDate && $selectedRequestedShift)
                     <div
-                        class="rounded-2xl border border-primary-100 bg-primary-50/60 p-4 dark:border-primary-900/50 dark:bg-primary-950/10">
+                        class="rounded-2xl border border-primary-100 bg-primary-50/60 p-3 dark:border-primary-900/50 dark:bg-primary-950/10 sm:p-4">
                         <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Request Summary') }}</p>
                         <div class="mt-3 grid gap-3 sm:grid-cols-2">
                             <div
@@ -337,9 +338,9 @@
                     </div>
                 @endif
 
-                <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+                <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
                     <x-forms.label for="swap-reason" value="{{ __('Reason') }}" class="mb-1.5 block" />
-                    <p class="mb-3 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                    <p class="sr-only">
                         {{ __('Explain the reason clearly so your supervisor can review the request quickly.') }}
                     </p>
                     <x-forms.textarea id="swap-reason" wire:model.live="reason" rows="4" class="block w-full"

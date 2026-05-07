@@ -124,11 +124,11 @@
 
                 <div class="grid grid-cols-1 divide-y divide-gray-200 dark:divide-gray-700 lg:hidden">
                     @foreach ($jobTitles as $jobTitle)
-                        <div class="p-5">
+                        <div class="p-4">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <h3 class="font-semibold text-slate-950 dark:text-white">{{ $jobTitle->name }}</h3>
-                                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $jobTitle->division->name ?? '-' }}</p>
+                                    <p class="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">{{ $jobTitle->division->name ?? '-' }}</p>
                                 </div>
 
                                 @if ($jobTitle->jobLevel)

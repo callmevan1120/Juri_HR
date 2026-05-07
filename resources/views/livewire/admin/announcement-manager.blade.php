@@ -48,12 +48,12 @@
     <!-- Content -->
     <x-admin.panel>
         @if ($announcements->isEmpty())
-            <div class="px-6 py-16">
+            <div class="px-6 py-8">
                 <div class="flex flex-col items-center justify-center text-center">
                     <x-heroicon-o-megaphone class="h-12 w-12 text-gray-300 dark:text-gray-600" />
                     <h3 class="mt-4 text-lg font-bold text-gray-900 dark:text-white">{{ __('No announcements yet') }}
                     </h3>
-                    <p class="mt-2 max-w-2xl text-gray-500 dark:text-gray-400">
+                    <p class="sr-only">
                         {{ __('Create your first announcement to broadcast updates to all employees.') }}
                     </p>
                 </div>
@@ -81,7 +81,7 @@
                         <!-- Priority Top Bar -->
                         <div class="h-1.5 w-full {{ $styles['bar'] }}"></div>
 
-                        <div class="flex flex-1 flex-col p-5">
+                        <div class="flex flex-1 flex-col p-4">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 mb-2">
@@ -94,7 +94,7 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <h3 class="font-bold text-gray-900 dark:text-white line-clamp-2" title="{{ $announcement->title }}">
+                                    <h3 class="line-clamp-1 font-semibold text-gray-900 dark:text-white" title="{{ $announcement->title }}">
                                         {{ $announcement->title }}
                                     </h3>
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -107,14 +107,14 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4 flex-1">
-                                <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+                            <div class="sr-only">
+                                <p>
                                     {{ Str::limit(strip_tags($announcement->content), 120) }}
                                 </p>
                             </div>
 
                             @if($requiresAck)
-                                <div class="mt-5 border-t border-gray-100 pt-4 dark:border-gray-700/50">
+                                <div class="mt-3 border-t border-gray-100 pt-3 dark:border-gray-700/50">
                                     <div class="flex items-center justify-between text-xs mb-1.5">
                                         <span class="font-medium text-gray-700 dark:text-gray-300">{{ __('Acknowledgement Status') }}</span>
                                         <span class="font-bold {{ $textProgressColor }}">{{ $announcement->dismissed_by_users_count }}/{{ $totalActiveUsers }}</span>
@@ -126,7 +126,7 @@
                             @endif
                         </div>
 
-                        <div class="flex items-center justify-end gap-2 border-t border-gray-100 bg-gray-50/50 px-5 py-3 dark:border-gray-700/50 dark:bg-gray-800/50">
+                        <div class="flex items-center justify-end gap-2 border-t border-gray-100 bg-gray-50/50 px-4 py-2.5 dark:border-gray-700/50 dark:bg-gray-800/50">
                             @if ($requiresAck)
                                 <x-actions.button type="button" wire:click="viewStatus({{ $announcement->id }})" variant="soft-primary" size="sm">
                                     <x-heroicon-m-users class="mr-1.5 h-4 w-4" /> {{ __('Status') }}
@@ -192,7 +192,7 @@
                                 <option value="once">{{ __('Show Once') }}</option>
                                 <option value="acknowledge">{{ __('Require Confirmation') }}</option>
                             </x-forms.select>
-                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            <p class="sr-only">
                                 {{ __('Show Once: the modal appears one time per user. Require Confirmation: it keeps appearing on user pages until they press the confirmation button or the announcement expires.') }}
                             </p>
                         </div>
@@ -272,7 +272,7 @@
                                     <span class="inline-flex items-center rounded-md bg-warning-50 px-2 py-1 text-xs font-medium text-warning-700 ring-1 ring-inset ring-warning-600/20 dark:bg-warning-900/20 dark:text-warning-400">{{ __('Pending') }}</span>
                                 </div>
                             @empty
-                                <div class="py-8 text-center text-sm text-gray-500">{{ __('Everyone has acknowledged.') }}</div>
+                                <div class="py-5 text-center text-sm text-gray-500">{{ __('Everyone has acknowledged.') }}</div>
                             @endforelse
                         </div>
 
@@ -288,7 +288,7 @@
                                     <span class="inline-flex items-center rounded-md bg-success-50 px-2 py-1 text-xs font-medium text-success-700 ring-1 ring-inset ring-success-600/20 dark:bg-success-900/20 dark:text-success-400">{{ __('Acknowledged') }}</span>
                                 </div>
                             @empty
-                                <div class="py-8 text-center text-sm text-gray-500">{{ __('No one has acknowledged yet.') }}</div>
+                                <div class="py-5 text-center text-sm text-gray-500">{{ __('No one has acknowledged yet.') }}</div>
                             @endforelse
                         </div>
                     </div>

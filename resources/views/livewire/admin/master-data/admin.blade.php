@@ -372,7 +372,7 @@
                 @if ($assignableAdminRoles->isNotEmpty())
                     <div class="mt-4">
                         <x-forms.label value="{{ __('Access Roles') }}" />
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        <p class="sr-only">
                             {{ __('Choose one admin role for this account. Add view/manage permissions inside the role when access needs to expand.') }}
                         </p>
                         <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -579,7 +579,7 @@
                 @if ($assignableAdminRoles->isNotEmpty())
                     <div class="mt-4">
                         <x-forms.label value="{{ __('Access Roles') }}" />
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        <p class="sr-only">
                             {{ __('Choose one admin role for this account. Add view/manage permissions inside the role when access needs to expand.') }}
                         </p>
                         <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">

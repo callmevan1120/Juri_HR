@@ -123,7 +123,7 @@
                             ],
                         )" />
                 </div>
-                <p class="text-xs text-gray-500 mt-2">
+                <p class="sr-only">
                     {{ __('Leave blank to use automatic closest-time detection.') }}
                 </p>
             </div>

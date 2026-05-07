@@ -1,5 +1,5 @@
-<div class="space-y-6">
-    <div class="mb-6">
+<div class="space-y-3">
+    <div class="mb-3">
         <nav class="user-segmented-tabs" role="tablist" aria-label="{{ __('Kasbon views') }}">
             <button type="button" wire:click="switchTab('requests')"
                 id="cash-advance-requests-tab"
@@ -28,22 +28,22 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Employee') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Date / Purpose') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Amount') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Deduction Target') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Status') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Actions') }}
                         </th>
                     </tr>
@@ -51,7 +51,7 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
                     @forelse($advances as $advance)
                     <tr>
-                        <td class="whitespace-nowrap px-6 py-4">
+                        <td class="whitespace-nowrap px-4 py-3">
                             <div class="flex items-center">
                                 <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
                                     <img class="h-10 w-10 rounded-full object-cover" src="{{ $advance->user->profile_photo_url }}" alt="{{ $advance->user->name }}">
@@ -64,17 +64,17 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                             <div>{{ $advance->created_at->translatedFormat('d M Y') }}</div>
-                            <div class="mt-0.5 max-w-xs truncate text-xs text-gray-400">{{ $advance->purpose }}</div>
+                            <div class="sr-only">{{ $advance->purpose }}</div>
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
+                        <td class="whitespace-nowrap px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
                             Rp {{ number_format($advance->amount, 0, ',', '.') }}
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                             {{ \Carbon\Carbon::create()->month((int) $advance->payment_month)->translatedFormat('F') }} {{ $advance->payment_year }}
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4">
+                        <td class="whitespace-nowrap px-4 py-3">
                             <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5
                                 @if($advance->status === 'approved') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
                                 @elseif($advance->status === 'paid') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
@@ -95,7 +95,7 @@
                             </div>
                             @endif
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                        <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
                                 @php
                                     $canApprove = in_array($advance->status, ['pending', 'pending_finance'], true)
@@ -122,7 +122,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                             {{ __('No cash advance data found.') }}
                         </td>
                     </tr>
@@ -132,9 +132,9 @@
         </div>
     </div>
 
-    <div id="cash-advance-requests-panel-mobile" role="tabpanel" aria-labelledby="cash-advance-requests-tab" tabindex="0" class="space-y-4 md:hidden">
+    <div id="cash-advance-requests-panel-mobile" role="tabpanel" aria-labelledby="cash-advance-requests-tab" tabindex="0" class="space-y-3 md:hidden">
         @forelse($advances as $advance)
-        <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <div class="flex items-start gap-3">
                 <div class="flex min-w-0 flex-1 items-center">
                     <img class="h-10 w-10 rounded-full object-cover" src="{{ $advance->user->profile_photo_url }}" alt="{{ $advance->user->name }}">
@@ -154,7 +154,7 @@
                 </span>
             </div>
 
-            <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
                 <div>
                     <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date') }}</div>
                     <div class="mt-1 font-medium text-gray-900 dark:text-white">{{ $advance->created_at->translatedFormat('d M Y') }}</div>
@@ -164,8 +164,8 @@
                     <div class="mt-1 font-semibold text-gray-900 dark:text-white">Rp {{ number_format($advance->amount, 0, ',', '.') }}</div>
                 </div>
                 <div class="col-span-2">
-                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Purpose') }}</div>
-                    <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">{{ $advance->purpose }}</div>
+                    <div class="sr-only">{{ __('Purpose') }}</div>
+                    <div class="sr-only">{{ $advance->purpose }}</div>
                 </div>
                 <div class="col-span-2">
                     <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Deduction Target') }}</div>
@@ -184,7 +184,7 @@
             </div>
             @endif
 
-            <div class="mt-4 flex flex-wrap gap-2">
+            <div class="mt-3 flex flex-wrap gap-2">
                 @php
                     $canApprove = in_array($advance->status, ['pending', 'pending_finance'], true)
                         && Auth::user()->can('approve', $advance);
@@ -232,16 +232,16 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Employee') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Total Kasbon') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Deduction Breakdown') }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        <th scope="col" class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             {{ __('Recent History') }}
                         </th>
                     </tr>
@@ -249,7 +249,7 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
                     @forelse($userGrouped as $user)
                     <tr>
-                        <td class="px-6 py-4 align-top">
+                        <td class="px-4 py-3 align-top">
                             <div class="flex items-center">
                                 <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
                                     <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
@@ -260,10 +260,10 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
+                        <td class="whitespace-nowrap px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
                             Rp {{ number_format($user->cashAdvances->whereIn('status', ['paid', 'approved', 'pending'])->sum('amount'), 0, ',', '.') }}
                         </td>
-                        <td class="px-6 py-4 align-top">
+                        <td class="px-4 py-3 align-top">
                             @php
                                 $groupedByMonth = $user->cashAdvances
                                     ->whereIn('status', ['paid', 'approved', 'pending'])
@@ -281,7 +281,7 @@
                                 @endforeach
                             </div>
                         </td>
-                        <td class="px-6 py-4 align-top">
+                        <td class="px-4 py-3 align-top">
                             <div class="space-y-3">
                                 @foreach($user->cashAdvances->sortByDesc('created_at')->take(3) as $hist)
                                 <div class="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
@@ -304,7 +304,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                             {{ __('No kasbon data found.') }}
                         </td>
                     </tr>
@@ -314,9 +314,9 @@
         </div>
     </div>
 
-    <div id="cash-advance-users-panel-mobile" role="tabpanel" aria-labelledby="cash-advance-users-tab" tabindex="0" class="space-y-4 md:hidden">
+    <div id="cash-advance-users-panel-mobile" role="tabpanel" aria-labelledby="cash-advance-users-tab" tabindex="0" class="space-y-3 md:hidden">
         @forelse($userGrouped as $user)
-        <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <div class="flex items-center gap-3">
                 <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
                 <div class="min-w-0">
@@ -325,7 +325,7 @@
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-3">
                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Total Kasbon') }}</div>
                 <div class="mt-1 text-base font-semibold text-gray-900 dark:text-white">Rp {{ number_format($user->cashAdvances->whereIn('status', ['paid', 'approved', 'pending'])->sum('amount'), 0, ',', '.') }}</div>
             </div>
@@ -338,7 +338,7 @@
                     })
                     ->sortKeysDesc();
             @endphp
-            <div class="mt-4">
+            <div class="mt-3">
                 <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">{{ __('Deduction Breakdown') }}</div>
                 <div class="space-y-2">
                     @foreach($groupedByMonth as $key => $items)
@@ -350,7 +350,7 @@
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-3">
                 <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">{{ __('Recent History') }}</div>
                 <div class="space-y-3">
                     @foreach($user->cashAdvances->sortByDesc('created_at')->take(3) as $hist)

@@ -7,7 +7,7 @@
                 <div class="auth-card__header">
                     <p class="auth-card__eyebrow">{{ __('Verify Email') }}</p>
                     <h2 id="verify-email-title" class="auth-card__title">{{ __('Check your inbox') }}</h2>
-                    <p class="auth-card__copy">
+                    <p class="auth-card__copy sr-only">
                         {{ __('Enter the verification code we sent to your email address. If you did not receive it, you can request a new code.') }}
                     </p>
                 </div>
@@ -22,7 +22,7 @@
                     <div class="auth-section">
                         <div class="auth-section__header">
                             <h3 class="auth-section__title">{{ __('Verification code') }}</h3>
-                            <p class="auth-section__copy">
+                            <p class="auth-section__copy sr-only">
                                 {{ __('Type the 6 digit code from your email to activate your account.') }}
                             </p>
                         </div>

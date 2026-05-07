@@ -25,7 +25,7 @@
                 <div class="auth-card__header">
                     <p class="auth-card__eyebrow">{{ __('Register') }}</p>
                     <h2 id="register-form-title" class="auth-card__title">{{ __('Create an Account') }}</h2>
-                    <p class="auth-card__copy">
+                    <p class="auth-card__copy sr-only">
                         {{ __('Complete your profile and account details below.') }}
                     </p>
                 </div>
@@ -38,7 +38,7 @@
                             <fieldset class="auth-section">
                                 <legend class="auth-section__title">{{ __('Account basics') }}</legend>
                                 <div class="auth-section__header">
-                                    <p class="auth-section__copy">
+                                    <p class="auth-section__copy sr-only">
                                         {{ __('Start with the main identity and contact information for this account.') }}
                                     </p>
                                 </div>
@@ -133,7 +133,7 @@
                             <fieldset class="auth-section">
                                 <legend class="auth-section__title">{{ __('Location details') }}</legend>
                                 <div class="auth-section__header">
-                                    <p class="auth-section__copy">
+                                    <p class="auth-section__copy sr-only">
                                         {{ __('Complete your area and address so attendance settings can be configured correctly.') }}
                                     </p>
                                 </div>
@@ -205,7 +205,7 @@
                         <fieldset class="auth-section transition duration-200" :class="submitting ? 'opacity-85' : ''">
                             <legend class="auth-section__title">{{ __('Security') }}</legend>
                             <div class="auth-section__header">
-                                <p class="auth-section__copy">
+                                <p class="auth-section__copy sr-only">
                                     {{ __('Create a password you can remember and confirm it once before submitting.') }}
                                 </p>
                             </div>

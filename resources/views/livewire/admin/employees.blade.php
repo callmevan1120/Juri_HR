@@ -65,7 +65,7 @@
                                 {{ __('Visible employee records') }}
                             </h2>
                         </div>
-                        <p class="mt-1 truncate text-xs text-slate-600 dark:text-slate-300">
+                        <p class="sr-only">
                             {{ __('Quick access to role, unit, contact, and education data for each employee.') }}
                         </p>
                     </div>
@@ -774,7 +774,7 @@
                             </x-forms.select>
                             <x-forms.input-error for="form.employment_status" class="mt-2" />
                             @if (in_array($form->employment_status, [\App\Models\User::EMPLOYMENT_STATUS_DELETION_REQUESTED, \App\Models\User::EMPLOYMENT_STATUS_DELETED], true))
-                                <p class="mt-2 text-xs text-amber-600 dark:text-amber-300">
+                                <p class="sr-only">
                                     {{ __('Deletion lifecycle statuses are resolved through the review action, not this form.') }}
                                 </p>
                             @endif

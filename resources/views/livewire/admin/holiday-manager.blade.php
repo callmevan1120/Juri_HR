@@ -100,7 +100,7 @@
                                     <x-heroicon-o-calendar-days
                                         class="h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" />
                                     <p class="font-medium">{{ __('No holidays found') }}</p>
-                                    <p class="text-sm mt-1">{{ __('Add holidays to manage work schedules.') }}</p>
+                                    <p class="sr-only">{{ __('Add holidays to manage work schedules.') }}</p>
                                 </div>
                             </td>
                         </tr>

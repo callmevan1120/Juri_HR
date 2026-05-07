@@ -1,12 +1,12 @@
 <div>
     @if ($approvedAbsence)
-        <section aria-labelledby="attendance-status-date" class="wcag-card rounded-3xl p-6">
-            <div class="mb-6 flex items-start justify-between gap-4">
+        <section aria-labelledby="attendance-status-date" class="wcag-card rounded-2xl p-4">
+            <div class="mb-4 flex items-start justify-between gap-3">
                 <div>
                     <p class="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">
                         {{ __('Your Status') }}
                     </p>
-                    <h2 id="attendance-status-date" class="text-xl font-bold leading-tight text-gray-950 dark:text-white">
+                    <h2 id="attendance-status-date" class="text-lg font-semibold leading-tight text-gray-950 dark:text-white">
                         {{ $approvedAbsence->date->translatedFormat('l, d F Y') }}
                     </h2>
                 </div>
@@ -25,7 +25,7 @@
             </div>
 
             <div
-                class="flex items-start gap-4 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700/50 dark:bg-gray-700/30">
+                class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700/50 dark:bg-gray-700/30">
                 <div
                     class="flex-shrink-0 rounded-xl bg-white p-2.5 text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-200">
                     <x-heroicon-m-document-text class="w-6 h-6" />
@@ -40,20 +40,16 @@
         </section>
     @elseif($requiresFaceEnrollment)
         <section aria-labelledby="face-enrollment-heading"
-            class="wcag-card group relative overflow-hidden rounded-3xl p-6 text-center transition-all hover:shadow-lg">
-            <div
-                class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-primary-50 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50">
-            </div>
-
+            class="wcag-card group relative overflow-hidden rounded-2xl p-4 text-center transition-all hover:shadow-lg">
             <div class="relative z-10">
                 <div
-                    class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/40 dark:text-primary-300">
-                    <x-heroicon-m-face-smile class="w-8 h-8" />
+                    class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/40 dark:text-primary-300">
+                    <x-heroicon-m-face-smile class="h-6 w-6" />
                 </div>
 
-                <h2 id="face-enrollment-heading" class="mb-2 text-lg font-bold text-gray-950 dark:text-white">
+                <h2 id="face-enrollment-heading" class="mb-2 text-base font-semibold text-gray-950 dark:text-white">
                     {{ __('Face ID Registration Required') }}</h2>
-                <p class="mx-auto mb-6 max-w-xs text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                <p class="sr-only">
                     {{ __('To ensure security, you must register your face data before you can clock in/out.') }}
                 </p>
 

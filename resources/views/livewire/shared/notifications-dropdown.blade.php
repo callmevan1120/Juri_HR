@@ -80,7 +80,7 @@
                                     <x-heroicon-o-x-mark class="h-4 w-4" />
                                 </button>
                             </div>
-                            <p class="mt-1 line-clamp-3 text-xs text-gray-600 dark:text-gray-400">
+                            <p class="mt-1 line-clamp-2 text-xs text-gray-600 dark:text-gray-400">
                                 {{ Str::limit(strip_tags($announcement->content), 100) }}
                             </p>
                             <div class="mt-2 flex items-center justify-between">

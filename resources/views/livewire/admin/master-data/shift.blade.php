@@ -159,12 +159,12 @@
 
                 <div class="grid grid-cols-1 divide-y divide-gray-200 dark:divide-gray-700 lg:hidden">
                     @foreach ($shifts as $shift)
-                        <div wire:key="shift-card-{{ $shift->id }}" class="p-5">
+                        <div wire:key="shift-card-{{ $shift->id }}" class="p-4">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <h3 class="truncate text-base font-semibold text-slate-950 dark:text-white">
                                         {{ $shift->name }}</h3>
-                                    <p class="mt-1 text-sm font-mono text-slate-500 dark:text-slate-400">
+                                    <p class="mt-1 text-xs font-mono text-slate-500 dark:text-slate-400">
                                         {{ $shift->formatted_start_time }}
                                         <span class="text-slate-400">-</span>
                                         {{ $shift->formatted_end_time ?? __('Flexible') }}
@@ -243,7 +243,7 @@
         <x-slot name="title">{{ __('Delete Shift') }}</x-slot>
         <x-slot name="content">
             {{ __('Are you sure you want to delete') }} <b>{{ $deleteName }}</b>?
-            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            <p class="sr-only">
                 {{ __('This action removes the shift from the master list. Make sure it is no longer needed in scheduling rules.') }}
             </p>
         </x-slot>
@@ -264,11 +264,10 @@
 
         <x-slot name="content">
             <form wire:submit.prevent="{{ $editing ? 'update' : 'create' }}">
-                <div class="space-y-5">
-                    <div
-                        class="rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300">
-                        <p class="font-medium text-slate-900 dark:text-white">{{ __('Shift setup guidance') }}</p>
-                        <p class="mt-1">
+                <div class="space-y-4">
+                    <div class="sr-only">
+                        <p>{{ __('Shift setup guidance') }}</p>
+                        <p>
                             {{ __('Leave the end time blank for flexible shifts. If the end time is earlier than the start time, the system will treat it as an overnight shift.') }}
                         </p>
                     </div>

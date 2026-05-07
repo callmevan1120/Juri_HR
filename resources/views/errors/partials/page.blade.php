@@ -23,22 +23,22 @@
             <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary-700 dark:text-primary-300">{{ $eyebrow }}</p>
         @endif
 
-        <h1 id="error-page-title" class="text-3xl font-black tracking-tight text-gray-950 dark:text-white sm:text-4xl">
+        <h1 id="error-page-title" class="text-xl font-black tracking-tight text-gray-950 dark:text-white sm:text-2xl">
             {{ $titleText }}
         </h1>
 
-        <p class="max-w-2xl text-base leading-8 text-gray-700 dark:text-gray-300">
+        <p class="max-w-2xl text-base leading-6 text-gray-700 dark:text-gray-300">
             {{ $summary }}
         </p>
     </div>
 
     @if ($details !== [])
-        <section aria-labelledby="error-details-title" class="rounded-3xl border border-gray-200 bg-white/80 p-5 dark:border-gray-800 dark:bg-gray-950/30">
+        <section aria-labelledby="error-details-title" class="rounded-2xl border border-gray-200 bg-white/80 p-5 dark:border-gray-800 dark:bg-gray-950/30">
             <h2 id="error-details-title" class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-900 dark:text-gray-100">
                 {{ __('What this usually means') }}
             </h2>
 
-            <ul class="mt-4 space-y-3 text-sm leading-7 text-gray-700 dark:text-gray-300">
+            <ul class="mt-4 space-y-3 text-sm leading-6 text-gray-700 dark:text-gray-300">
                 @foreach ($details as $detail)
                     <li class="flex gap-3">
                         <span class="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-primary-600 dark:bg-primary-400" aria-hidden="true"></span>

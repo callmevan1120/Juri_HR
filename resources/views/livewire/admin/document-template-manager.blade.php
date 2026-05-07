@@ -62,7 +62,7 @@
         }
     </style>
 
-    <div class="min-w-0 space-y-5">
+    <div class="min-w-0 space-y-3">
         @if (session()->has('success'))
             <div class="rounded-xl border border-green-100 bg-green-50 p-4 text-sm font-medium text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
                 {{ session('success') }}
@@ -74,9 +74,9 @@
             </div>
         @endif
 
-        <div class="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_38rem]">
-            <section class="min-w-0 space-y-5">
-                <x-admin.panel class="p-4 sm:p-5">
+        <div class="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_36rem]">
+            <section class="min-w-0 space-y-3">
+                <x-admin.panel class="p-4">
                     <div class="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                         <div class="min-w-0">
                             <div class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800 dark:bg-primary-950/40 dark:text-primary-100">
@@ -86,7 +86,7 @@
                             <h2 class="mt-3 break-words text-base font-semibold text-gray-950 dark:text-white sm:text-lg">
                                 {{ $currentType?->name ?? __('Select document type') }}
                             </h2>
-                            <p class="mt-1 max-w-full break-words text-sm text-gray-500 dark:text-gray-400">
+                            <p class="sr-only">
                                 {{ __('Pick which document users/admins can request. Common workflow settings are kept here.') }}
                             </p>
                         </div>
@@ -104,7 +104,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+                    <div class="mt-4 grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_18rem]">
                         <div class="min-w-0">
                             <x-forms.label for="doc-template-type" value="{{ __('Document Type') }}" class="mb-1.5 block" />
                             <x-forms.select id="doc-template-type" wire:model.live="documentTemplateForm.document_type_id" class="w-full">
@@ -139,7 +139,7 @@
                                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
                                     {{ blank($documentTypeForm['id'] ?? null) ? __('Create Document Type') : __('Edit Document Type') }}
                                 </h3>
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                <p class="sr-only">
                                     {{ __('Use this only to add a new request category or change who can request it.') }}
                                 </p>
                             </div>
@@ -188,7 +188,7 @@
                     @endif
                 </x-admin.panel>
 
-                <x-admin.panel class="p-4 sm:p-5">
+                <x-admin.panel class="p-4">
                     <div class="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                         <div class="min-w-0">
                             <div class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800 dark:bg-primary-950/40 dark:text-primary-100">
@@ -196,7 +196,7 @@
                                 {{ __('Write Template') }}
                             </div>
                             <h2 class="mt-3 text-base font-semibold text-gray-950 dark:text-white sm:text-lg">{{ __('Content and format') }}</h2>
-                            <p class="mt-1 max-w-full break-words text-sm text-gray-500 dark:text-gray-400">{{ __('Use presets for common letters, or switch to HTML only when custom formatting is needed.') }}</p>
+                            <p class="sr-only">{{ __('Use presets for common letters, or switch to HTML only when custom formatting is needed.') }}</p>
                         </div>
                         <div class="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap">
                             <x-actions.button type="button" wire:click="startNewDocumentTemplate" variant="secondary" size="sm" class="w-full whitespace-nowrap">
@@ -214,7 +214,7 @@
                             {{ blank($documentTemplateForm['id'] ?? null) ? __('Creating new template') : __('Editing saved template') }}
                         </span>
                         <span class="hidden text-gray-400 sm:mx-1 sm:inline">·</span>
-                        <span class="mt-1 block sm:mt-0 sm:inline">{{ __('Live Preview updates as you type; save only when the draft is ready.') }}</span>
+                        <span class="sr-only">{{ __('Live Preview updates as you type; save only when the draft is ready.') }}</span>
                     </div>
 
                     <div class="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-6">
@@ -259,7 +259,7 @@
                         <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-950 dark:text-white">{{ __('Header & Footer') }}</h3>
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                <p class="sr-only">
                                     {{ __('These fields control the letterhead and fixed footer for this template.') }}
                                 </p>
                             </div>
@@ -347,14 +347,14 @@
                     </details>
                 </x-admin.panel>
 
-                <x-admin.panel class="p-5">
+                <x-admin.panel class="p-4">
                     <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                         <div>
                             <div class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800 dark:bg-primary-950/40 dark:text-primary-100">
                                 <span class="flex h-5 w-5 items-center justify-center rounded-full bg-primary-700 text-white">3</span>
                                 {{ __('Review & Save') }}
                             </div>
-                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            <p class="sr-only">
                                 {{ __('Download a preview when needed, then save. If set active, this template becomes the generated PDF for this document type.') }}
                             </p>
                         </div>
@@ -373,7 +373,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                    <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                         @forelse ($templatesForCurrentType->take(6) as $template)
                             <button type="button" wire:click="editDocumentTemplate({{ $template->id }})"
                                 class="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-left transition hover:border-primary-200 hover:bg-primary-50 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary-800 dark:hover:bg-primary-950/20">
@@ -406,7 +406,7 @@
                                     {{ __('Realtime') }}
                                 </span>
                             </div>
-                            <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ __('Updates while editing, using sample employee data') }}</p>
+                            <p class="sr-only">{{ __('Updates while editing, using sample employee data') }}</p>
                         </div>
                         <x-actions.button type="button" wire:click="downloadPreviewPdf" variant="secondary" size="sm">
                             <x-heroicon-m-arrow-down-tray class="h-4 w-4" />

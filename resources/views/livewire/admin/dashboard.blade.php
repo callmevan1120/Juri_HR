@@ -118,7 +118,7 @@
 
         <div class="hidden gap-3 lg:grid lg:grid-cols-5">
             @foreach ($queueLinks as $item)
-                <a href="{{ $item['route'] }}" class="relative overflow-hidden rounded-xl border border-slate-200/70 bg-white p-5 shadow-sm transition hover:border-primary-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/80">
+                <a href="{{ $item['route'] }}" class="relative overflow-hidden rounded-xl border border-slate-200/70 bg-white p-4 shadow-sm transition hover:border-primary-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/80">
                     <div class="flex items-center justify-between">
                         <p class="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{{ $item['label'] }}</p>
                         <x-heroicon-o-arrow-right class="h-4 w-4 text-slate-400" />
@@ -132,7 +132,7 @@
 
         <!-- Restructured Snapshot & Signals -->
         <div class="grid gap-4 md:grid-cols-2">
-            <x-admin.insight-panel class="p-3 sm:p-5">
+            <x-admin.insight-panel class="p-3 sm:p-4">
                 <div class="mb-3 flex items-center justify-between gap-3 sm:mb-4">
                     <h3 class="min-w-0 text-sm font-bold text-slate-900 dark:text-white sm:text-base">{{ $isToday ? __('Team readiness for today') : __('Team readiness on :date', ['date' => $date->translatedFormat('d M Y')]) }}</h3>
                     <span class="shrink-0 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-bold text-primary-700 dark:bg-primary-900/20 dark:text-primary-300">{{ $attendanceCoverage }}%</span>
@@ -151,7 +151,7 @@
                 </div>
             </x-admin.insight-panel>
 
-            <x-admin.insight-panel class="p-3 sm:p-5">
+            <x-admin.insight-panel class="p-3 sm:p-4">
                 <div class="mb-3 flex items-center justify-between sm:mb-4">
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white sm:text-base">{{ __('Attention Signals') }}</h3>
                     <x-heroicon-o-bell-alert class="h-5 w-5 text-amber-500" />
@@ -283,46 +283,44 @@
                 </div>
             </div>
 
-            <div class="grid items-start gap-4 lg:grid-cols-3">
-                <div class="grid min-w-0 gap-4 md:grid-cols-2 lg:col-span-2">
-                    <!-- Live Activity Feed -->
-                    <x-admin.insight-panel class="flex h-[22rem] min-w-0 flex-col p-4">
-                        <h4 class="mb-3 text-sm font-semibold text-slate-900 dark:text-white">{{ __('Live Activity') }}</h4>
-                        <div class="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1">
-                            @forelse (collect($recentUserActivities)->take(12) as $activity)
-                                <div class="rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2 dark:border-slate-700/50 dark:bg-slate-800/50">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="truncate text-xs font-medium text-slate-900 dark:text-white">{{ $activity['user_name'] }}</p>
-                                        <span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium {{ $activity['badge_class'] }}">{{ $activity['badge'] }}</span>
-                                    </div>
-                                    <p class="mt-0.5 truncate text-[10px] leading-4 text-slate-500">{{ $activity['summary'] }} • {{ $activity['created_at']->diffForHumans() }}</p>
+            <div class="grid items-start gap-4 lg:grid-cols-2">
+                <!-- Live Activity Feed -->
+                <x-admin.insight-panel class="flex h-[22rem] min-w-0 flex-col p-4">
+                    <h4 class="mb-3 text-sm font-semibold text-slate-900 dark:text-white">{{ __('Live Activity') }}</h4>
+                    <div class="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1">
+                        @forelse (collect($recentUserActivities)->take(12) as $activity)
+                            <div class="rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2 dark:border-slate-700/50 dark:bg-slate-800/50">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="truncate text-xs font-medium text-slate-900 dark:text-white">{{ $activity['user_name'] }}</p>
+                                    <span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium {{ $activity['badge_class'] }}">{{ $activity['badge'] }}</span>
                                 </div>
-                            @empty
-                                <p class="text-xs text-slate-500">{{ __('No recent activity.') }}</p>
-                            @endforelse
-                        </div>
-                    </x-admin.insight-panel>
+                                <p class="mt-0.5 truncate text-[10px] leading-4 text-slate-500">{{ $activity['summary'] }} • {{ $activity['created_at']->diffForHumans() }}</p>
+                            </div>
+                        @empty
+                            <p class="text-xs text-slate-500">{{ __('No recent activity.') }}</p>
+                        @endforelse
+                    </div>
+                </x-admin.insight-panel>
 
-                    <x-admin.insight-panel class="flex h-[22rem] min-w-0 flex-col p-4">
-                        <div class="mb-3 flex items-center justify-between gap-3">
-                            <h4 class="text-sm font-semibold text-slate-900 dark:text-white">{{ __('Not Logged In') }}</h4>
-                            <span class="shrink-0 text-xs font-medium text-slate-500">{{ $notLoggedInUsersCount }}</span>
-                        </div>
-                        <div class="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1">
-                            @forelse ($notLoggedInUsers as $user)
-                                <div class="rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2 dark:border-slate-700/50 dark:bg-slate-800/50">
-                                    <p class="truncate text-xs font-medium text-slate-900 dark:text-white">{{ $user->name }}</p>
-                                </div>
-                            @empty
-                                <p class="text-xs text-slate-500">{{ __('Everyone logged in.') }}</p>
-                            @endforelse
-                        </div>
-                    </x-admin.insight-panel>
-                </div>
+                <x-admin.insight-panel class="flex h-[22rem] min-w-0 flex-col p-4">
+                    <div class="mb-3 flex items-center justify-between gap-3">
+                        <h4 class="text-sm font-semibold text-slate-900 dark:text-white">{{ __('Not Logged In') }}</h4>
+                        <span class="shrink-0 text-xs font-medium text-slate-500">{{ $notLoggedInUsersCount }}</span>
+                    </div>
+                    <div class="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1">
+                        @forelse ($notLoggedInUsers as $user)
+                            <div class="rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2 dark:border-slate-700/50 dark:bg-slate-800/50">
+                                <p class="truncate text-xs font-medium text-slate-900 dark:text-white">{{ $user->name }}</p>
+                            </div>
+                        @empty
+                            <p class="text-xs text-slate-500">{{ __('Everyone logged in.') }}</p>
+                        @endforelse
+                    </div>
+                </x-admin.insight-panel>
 
-                <x-admin.insight-panel class="flex min-w-0 flex-col p-4">
+                <x-admin.insight-panel class="flex min-h-32 min-w-0 flex-col p-4">
                     <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Overdue Checkout') }}</h4>
-                    <div class="space-y-2">
+                    <div class="max-h-56 space-y-2 overflow-y-auto pr-1">
                         @forelse ($overdueUsers as $overdue)
                             <div class="flex items-center justify-between gap-2 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 dark:border-rose-900/20 dark:bg-rose-900/10">
                                 <div class="min-w-0">
@@ -341,7 +339,7 @@
                     </div>
                 </x-admin.insight-panel>
 
-                <x-admin.insight-panel class="flex min-w-0 flex-col p-4">
+                <x-admin.insight-panel class="flex min-h-32 min-w-0 flex-col p-4">
                     <div class="flex items-center justify-between mb-3">
                         <h4 class="text-sm font-bold text-slate-900 dark:text-white">{{ __('Upcoming Leaves') }}</h4>
                         @if ($reportExportHref)
@@ -350,7 +348,7 @@
                             </x-actions.button>
                         @endif
                     </div>
-                    <div class="space-y-2">
+                    <div class="max-h-56 space-y-2 overflow-y-auto pr-1">
                         @forelse ($calendarLeaves->take(4) as $leave)
                             <div class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 dark:border-slate-700/50 dark:bg-slate-800/50">
                                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
@@ -367,7 +365,7 @@
                     </div>
                 </x-admin.insight-panel>
 
-                <div class="min-w-0" wire:poll.5s>
+                <div class="min-w-0 lg:col-span-2" wire:poll.5s>
                     <x-admin.import-export-run-list
                         :runs="$recentReportRuns"
                         :title="__('Monthly report jobs')"
@@ -385,7 +383,7 @@
                         {{ __('Team Attendance') }}</p>
                     <h3 class="mt-1 text-base font-semibold text-slate-950 dark:text-white">
                         {{ __('View attendance by employee') }}</h3>
-                    <p class="mt-0.5 text-xs text-slate-600 dark:text-slate-300">
+                    <p class="sr-only">
                         {{ __('Search the team list to review shift, attendance status, and supporting details for the selected date.') }}
                     </p>
                 </div>

@@ -66,7 +66,7 @@
                             <x-heroicon-o-arrow-path class="h-10 w-10 text-amber-500" />
                             <p class="mt-3 text-sm font-semibold text-amber-700 dark:text-amber-300">
                                 {{ __('Dynamic QR Active') }}</p>
-                            <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                            <p class="sr-only">
                                 {{ __('Use the live display page to show the rotating QR token.') }}
                             </p>
                         </div>

@@ -1,13 +1,13 @@
-<div class="space-y-6">
+<div class="space-y-4">
     {{-- Main Card --}}
     <div>
         
         {{-- Header --}}
-        <div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+        <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
             <div class="hidden sm:block"></div>
 
             <div class="text-center">
-                <h3 class="flex items-center justify-center gap-2 text-lg font-bold text-gray-900 dark:text-white">
+                <h3 class="flex items-center justify-center gap-2 text-base font-semibold text-gray-900 dark:text-white">
                     <span class="p-1.5 bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400 rounded-lg">
                         <x-heroicon-o-calendar-days class="h-5 w-5" />
                     </span>
@@ -31,7 +31,7 @@
         </div>
 
         {{-- Calendar Grid --}}
-        <div class="mb-6">
+        <div class="mb-4">
             {{-- Days Header --}}
             <div class="grid grid-cols-7 mb-2">
                 @foreach ([__('Sun'), __('Mon'), __('Tue'), __('Wed'), __('Thu'), __('Fri'), __('Sat')] as $index => $day)
@@ -137,7 +137,7 @@
         
         {{-- Holidays List --}}
         @if($holidays->isNotEmpty())
-        <div class="mb-6 px-4 py-3 bg-red-50/50 dark:bg-rose-900/10 rounded-xl border border-red-100 dark:border-rose-900/20">
+        <div class="mb-4 rounded-xl border border-red-100 bg-red-50/50 px-3 py-2 dark:border-rose-900/20 dark:bg-rose-900/10">
             <h4 class="text-[10px] font-bold text-red-600 dark:text-red-400 mb-2 uppercase tracking-wide">
                 {{ __('Holidays this Month') }}
             </h4>
@@ -157,7 +157,7 @@
             <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
                 {{ __('Summary') }}
             </h4>
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div class="grid grid-cols-2 gap-2 sm:grid-cols-5">
                 @foreach([
                     ['label' => 'Present', 'key' => 'present', 'color' => 'text-emerald-600', 'bg' => 'bg-emerald-50 dark:bg-emerald-900/20', 'border' => 'border-emerald-100 dark:border-emerald-800/30'],
                     ['label' => 'Late', 'key' => 'late', 'color' => 'text-amber-600', 'bg' => 'bg-amber-50 dark:bg-amber-900/20', 'border' => 'border-amber-100 dark:border-amber-800/30'],

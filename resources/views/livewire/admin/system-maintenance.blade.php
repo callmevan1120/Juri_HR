@@ -228,7 +228,7 @@
 
                     <div class="space-y-4 rounded-xl border border-slate-200/70 bg-slate-50/70 p-4 dark:border-slate-700/70 dark:bg-slate-900/40">
                         <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">{{ __('Destructive Guardrail') }}</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-300">
+                        <p class="sr-only">
                             {{ __('Type CLEAN before executing any destructive task. Admin and superadmin accounts are never removed by the employee cleanup option.') }}
                         </p>
 
@@ -240,7 +240,7 @@
                         </div>
 
                         <x-admin.alert tone="warning">
-                            <p class="text-sm text-amber-800 dark:text-amber-200">
+                            <p class="sr-only">
                                 {{ __('Run a fresh SQL backup before deleting production data or queue history.') }}
                             </p>
                         </x-admin.alert>
@@ -253,7 +253,8 @@
                             </x-actions.danger-button>
                         @else
                             <x-admin.alert tone="info">
-                                <p class="text-sm">{{ __('Cleanup execution is restricted to maintenance managers.') }}</p>
+                                <p class="text-xs font-medium">{{ __('Permission required') }}</p>
+                                <p class="sr-only">{{ __('Cleanup execution is restricted to maintenance managers.') }}</p>
                             </x-admin.alert>
                         @endif
                     </div>
@@ -270,7 +271,7 @@
                 <div class="grid gap-4 px-5 py-5 lg:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)]">
                     <div class="rounded-xl border border-slate-200/70 bg-slate-50/60 p-3.5 dark:border-slate-700/70 dark:bg-slate-900/40">
                         <h3 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Backup') }}</h3>
-                        <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                        <p class="sr-only">
                             {{ __('Run direct downloads for immediate SQL export or queue longer backup jobs in the background.') }}
                         </p>
 
@@ -295,7 +296,8 @@
                             </x-actions.button>
                         @else
                             <x-admin.alert tone="info" class="mt-3">
-                                <p class="text-sm">{{ __('Backup actions are read-only until a maintenance manager role is assigned and backup MFA requirements are satisfied.') }}</p>
+                                <p class="text-xs font-medium">{{ __('Read-only mode') }}</p>
+                                <p class="sr-only">{{ __('Backup actions are read-only until a maintenance manager role is assigned and backup MFA requirements are satisfied.') }}</p>
                             </x-admin.alert>
                         @endif
 
@@ -313,7 +315,7 @@
                             @endif
                         </div>
 
-                        <div class="mt-3 rounded-lg border border-slate-200/70 bg-white px-3.5 py-3 text-sm text-slate-600 dark:border-slate-700/70 dark:bg-slate-900/80 dark:text-slate-300">
+                        <div class="sr-only">
                             {{ __('Queued backups need an active queue worker on the `maintenance` queue. Application backups produce a ZIP snapshot of the codebase and config files, not a deployable image.') }}
                         </div>
 
@@ -348,7 +350,7 @@
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                 <div>
                                     <h4 class="text-sm font-semibold text-slate-950 dark:text-white">{{ __('Backup Automation') }}</h4>
-                                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                                    <p class="sr-only">
                                         {{ __('Schedule routine backups and prune retained artifacts automatically.') }}
                                     </p>
                                 </div>
@@ -420,7 +422,8 @@
                                         @endif
                                     </p>
                                 @else
-                                    <p>{{ __('Automation is disabled. Manual backups remain available, but no scheduled snapshots or retention cleanup will run.') }}</p>
+                                    <p class="font-medium text-slate-900 dark:text-white">{{ __('Disabled') }}</p>
+                                    <p class="sr-only">{{ __('Automation is disabled. Manual backups remain available, but no scheduled snapshots or retention cleanup will run.') }}</p>
                                 @endif
                             </div>
 
@@ -437,7 +440,7 @@
                             <div class="flex items-center justify-between gap-4">
                                 <div>
                                     <h3 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Retained Backups') }}</h3>
-                                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                                    <p class="sr-only">
                                         {{ __('Completed backup artifacts available for later download or cleanup.') }}
                                     </p>
                                 </div>
@@ -489,7 +492,7 @@
                             <div class="flex items-center justify-between gap-4">
                                 <div>
                                     <h3 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Backup Job Runs') }}</h3>
-                                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                                    <p class="sr-only">
                                         {{ __('Recent queued backup activity across database and application snapshots.') }}
                                     </p>
                                 </div>
@@ -555,9 +558,10 @@
 
                 <div class="grid gap-4 px-5 py-5 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,1fr)]">
                     @if ($canManageBackups)
-                        <form wire:submit.prevent="restoreDatabase" class="space-y-5">
+                        <form wire:submit.prevent="restoreDatabase" class="space-y-4">
                             <x-admin.alert tone="danger">
-                                <p class="text-sm text-rose-800 dark:text-rose-200">
+                                <p class="text-xs font-semibold text-rose-800 dark:text-rose-200">{{ __('Danger') }}</p>
+                                <p class="sr-only">
                                     {{ __('Restoring a database will overwrite current records. Confirm the target environment and backup origin before continuing.') }}
                                 </p>
                             </x-admin.alert>
@@ -587,18 +591,20 @@
 
                             <div wire:loading wire:target="restoreDatabase" role="status" aria-live="polite"
                                 class="text-sm text-slate-500">
-                                {{ __('Restoring database snapshot. Keep this window open until the process completes.') }}
+                                <span>{{ __('Restoring... do not close this window.') }}</span>
+                                <span class="sr-only">{{ __('Restoring database snapshot. Keep this window open until the process completes.') }}</span>
                             </div>
                         </form>
                     @else
                         <x-admin.alert tone="info">
-                            <p class="text-sm">{{ __('Restore operations are restricted to maintenance managers with backup access.') }}</p>
+                            <p class="text-xs font-medium">{{ __('Permission required') }}</p>
+                            <p class="sr-only">{{ __('Restore operations are restricted to maintenance managers with backup access.') }}</p>
                         </x-admin.alert>
                     @endif
 
                     <div class="rounded-xl border border-slate-200/70 bg-slate-50/60 p-4 dark:border-slate-700/70 dark:bg-slate-900/40">
                         <h3 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Restore Requirements') }}</h3>
-                        <ul class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                        <ul class="sr-only">
                             <li>{{ __('Only `.sql` backups generated and signed by this application are accepted.') }}</li>
                             <li>{{ __('Foreign key checks are disabled only during replay and re-enabled automatically afterward.') }}</li>
                             <li>{{ __('A fresh backup is recommended immediately before every restore attempt.') }}</li>

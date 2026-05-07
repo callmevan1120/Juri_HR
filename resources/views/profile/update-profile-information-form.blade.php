@@ -83,7 +83,7 @@
 
                             <div class="max-w-xl space-y-1">
                                 <x-forms.label for="profile-photo-input" value="{{ __('Profile Photo') }}" />
-                                <p class="text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                <p class="sr-only">
                                     {{ __('Tap the profile photo to choose a new image. The photo can be cropped and will save immediately after you confirm it.') }}
                                 </p>
                                 <div class="flex flex-wrap items-center gap-3 pt-1 text-sm">
@@ -121,19 +121,19 @@
                 <template x-teleport="body">
                     <div x-show="cropModalOpen" x-cloak x-trap.inert.noscroll="cropModalOpen"
                         x-on:keydown.escape.window="closeCropModal()"
-                        class="fixed inset-0 z-[90] overflow-y-auto overscroll-contain px-3 py-[calc(0.75rem+env(safe-area-inset-top))] sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
+                        class="fixed inset-0 z-[90] overflow-y-auto overscroll-contain px-3 py-[calc(0.75rem+env(safe-area-inset-top))] sm:px-5 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
                         <div class="fixed inset-0 bg-gray-950/70" x-on:click="closeCropModal()"></div>
 
                         <div class="relative z-10 flex min-h-[100dvh] items-start justify-center sm:items-center">
                             <div
-                                class="w-full max-w-2xl overflow-hidden rounded-[2rem] border border-primary-100 bg-white shadow-2xl dark:border-primary-900/60 dark:bg-gray-900"
+                                class="w-full max-w-xl overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-xl dark:border-primary-900/60 dark:bg-gray-900"
                                 style="max-height: calc(100dvh - 1.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
-                            <div class="border-b border-primary-100 px-5 py-4 dark:border-primary-900/50 sm:px-6">
+                            <div class="border-b border-primary-100 px-4 py-3 dark:border-primary-900/50 sm:px-5">
                                 <div class="flex items-start justify-between gap-4">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                                             {{ __('Adjust Photo') }}</h3>
-                                        <p class="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                        <p class="sr-only">
                                             {{ __('Center your face inside the frame. You can drag the photo and zoom if needed before saving.') }}
                                         </p>
                                     </div>
@@ -146,7 +146,7 @@
                                 </div>
                             </div>
 
-                            <div class="space-y-4 px-4 py-4 sm:space-y-5 sm:px-6 sm:py-5">
+                            <div class="space-y-4 px-4 py-4 sm:space-y-5 sm:px-5 sm:py-5">
                                 <div class="flex justify-center">
                                     <div
                                         class="relative overflow-hidden rounded-[1.75rem] border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-primary-100/60 p-3 dark:border-primary-900/50 dark:from-gray-900 dark:via-gray-900 dark:to-primary-950/20 sm:p-4">
@@ -176,14 +176,14 @@
                                     </div>
 
                                     <div
-                                        class="rounded-2xl border border-primary-100 bg-primary-50/70 px-4 py-3 text-sm leading-6 text-primary-800 dark:border-primary-900/50 dark:bg-primary-950/30 dark:text-primary-200">
+                                        class="sr-only">
                                         {{ __('Drag inside the frame to reposition your photo.') }}
                                     </div>
                                 </div>
                             </div>
 
                             <div
-                                class="flex flex-col-reverse gap-3 border-t border-primary-100 bg-gray-50/90 px-5 py-4 dark:border-primary-900/50 dark:bg-gray-950/70 sm:flex-row sm:items-center sm:justify-end sm:px-6">
+                                class="flex flex-col-reverse gap-3 border-t border-primary-100 bg-gray-50/90 px-4 py-3 dark:border-primary-900/50 dark:bg-gray-950/70 sm:flex-row sm:items-center sm:justify-end sm:px-5">
                                 <x-actions.secondary-button type="button" x-on:click="closeCropModal()">
                                     {{ __('Cancel') }}
                                 </x-actions.secondary-button>
@@ -287,7 +287,7 @@
             <div class="profile-field-group">
                 <div class="flex flex-col gap-1">
                     <h4 class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Domicile Area') }}</h4>
-                    <p id="profile-region-help" class="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                    <p id="profile-region-help" class="sr-only">
                         {{ __('Complete your domicile area so attendance and administrative settings remain accurate.') }}
                     </p>
                 </div>
@@ -339,7 +339,7 @@
         <!-- Address -->
         <div class="col-span-6">
             <x-forms.label for="address" value="{{ __('Address') }}" />
-            <p id="profile-address-help" class="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+            <p id="profile-address-help" class="sr-only">
                 {{ __('Use a complete street address so location-based features and internal records stay aligned.') }}
             </p>
             <x-forms.textarea id="address" type="text" rows="4" class="mt-2 block w-full"

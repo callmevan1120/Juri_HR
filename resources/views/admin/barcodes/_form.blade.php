@@ -123,7 +123,7 @@
                             @else
                                 @livewire('admin.barcode-value-input-component')
                             @endif
-                            <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                            <p class="sr-only">
                                 {{ __('Used only when dynamic QR is off.') }}
                             </p>
                         </div>
@@ -142,7 +142,7 @@
                                 />
                                 <span class="text-xs font-semibold uppercase tracking-[0.14em]">{{ __('sec') }}</span>
                             </div>
-                            <p class="mt-2 text-xs text-emerald-700/90 dark:text-emerald-300/90">
+                            <p class="sr-only">
                                 {{ __('30 to 60 seconds is usually enough.') }}
                             </p>
                             @error('dynamic_ttl_seconds')

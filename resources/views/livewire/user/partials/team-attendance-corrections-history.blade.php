@@ -12,7 +12,7 @@
             <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
                 @forelse ($attendanceCorrections as $correction)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
                                     <img class="h-10 w-10 rounded-full object-cover"
@@ -25,12 +25,12 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-200">
+                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                             <div class="font-semibold">{{ $correction->requestTypeLabel() }}</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400">{{ $correction->attendance_date->translatedFormat('d M Y') }}</div>
                             <div class="mt-1 max-w-xs truncate text-xs text-gray-500 dark:text-gray-400">{{ $correction->reason }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
                             <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold
                                 {{ $correction->status === 'approved'
                                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
@@ -40,7 +40,7 @@
                                 {{ $correction->statusLabel() }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">
+                        <td class="px-4 py-3 text-right text-sm text-gray-500 dark:text-gray-400">
                             @if ($correction->status === 'pending_admin')
                                 <span>{{ $correction->headApprover?->name ?? __('Supervisor') }}</span>
                             @else
@@ -50,7 +50,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                             {{ __('No attendance correction history found') }}
                         </td>
                     </tr>
@@ -102,7 +102,7 @@
             </div>
         </div>
     @empty
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
             {{ __('No attendance correction history found') }}
         </div>
     @endforelse

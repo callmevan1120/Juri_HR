@@ -25,7 +25,7 @@
                 @endif
             </x-user.page-header>
 
-                <div class="px-5 py-4 sm:px-6 lg:px-8 border-b border-gray-100 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/20 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-col gap-3 border-b border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/20 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                     <div class="flex items-center gap-2">
                         <button
                             type="button"
@@ -52,19 +52,19 @@
 
                 <div class="p-0">
                     @if($announcements->isEmpty() && $notifications->isEmpty())
-                        <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
-                            <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-full mb-4">
-                                <x-heroicon-o-inbox class="h-10 w-10 text-gray-400 dark:text-gray-500" />
+                        <div class="flex flex-col items-center justify-center px-4 py-8 text-center">
+                            <div class="mb-3 rounded-full bg-gray-50 p-3 dark:bg-gray-700/50">
+                                <x-heroicon-o-inbox class="h-7 w-7 text-gray-400 dark:text-gray-500" />
                             </div>
-                            <h2 class="text-base font-bold text-gray-900 dark:text-gray-100">{{ __('No new notifications') }}</h2>
-                            <p class="mt-1 max-w-xs mx-auto text-sm text-gray-700 dark:text-gray-300">{{ __('We\'ll let you know when something important arrives.') }}</p>
+                            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ __('No new notifications') }}</h2>
+                            <p class="sr-only">{{ __('We\'ll let you know when something important arrives.') }}</p>
                         </div>
                     @else
                         <ul role="list" class="divide-y divide-gray-100 dark:divide-gray-700/50">
                             {{-- User Notifications --}}
                             @foreach($notifications as $notification)
                                 <li class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors duration-200">
-                                    <div class="p-5 sm:p-6 flex gap-4">
+                                    <div class="p-4 flex gap-4">
                                         <!-- Icon -->
                                         <div class="flex-shrink-0 mt-0.5">
                                             <span class="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none">
@@ -75,14 +75,14 @@
                                         <!-- Content -->
                                         <div class="min-w-0 flex-1">
                                             <div class="mb-1 flex items-center justify-between">
-                                                <h2 class="truncate pr-4 text-sm font-bold text-gray-900 dark:text-white">
+                                                <h2 class="truncate pr-4 text-sm font-semibold text-gray-900 dark:text-white">
                                                     {{ $notification->data['title'] ?? 'Notification' }}
                                                 </h2>
                                                 <span class="whitespace-nowrap text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     {{ $notification->created_at->diffForHumans() }}
                                                 </span>
                                             </div>
-                                        <div class="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                                        <div class="line-clamp-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                                                 {{ $notification->data['message'] ?? '' }}
                                         </div>
                                         @if(isset($notification->data['url']) || isset($notification->data['action_url']))
@@ -99,7 +99,7 @@
                             {{-- Announcements --}}
                             @foreach($announcements as $announcement)
                                 <li class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors duration-200">
-                                    <div class="p-5 sm:p-6 flex gap-4">
+                                    <div class="p-4 flex gap-4">
                                         <!-- Icon / Status -->
                                         <div class="flex-shrink-0 mt-0.5">
                                             <span class="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 text-white shadow-md shadow-primary-200 dark:shadow-none">
@@ -110,14 +110,14 @@
                                         <!-- Content -->
                                         <div class="min-w-0 flex-1">
                                             <div class="mb-1 flex items-center justify-between">
-                                                <h2 class="truncate pr-4 text-sm font-bold text-gray-900 dark:text-white">
+                                                <h2 class="truncate pr-4 text-sm font-semibold text-gray-900 dark:text-white">
                                                     {{ $announcement->title }}
                                                 </h2>
                                                 <span class="whitespace-nowrap text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     {{ $announcement->created_at->diffForHumans() }}
                                                 </span>
                                             </div>
-                                            <div class="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                                            <div class="line-clamp-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                                                 {!! Str::limit(strip_tags($announcement->content), 200) !!}
                                             </div>
                                             <button
@@ -144,8 +144,8 @@
             </div>
         @endif
         
-        <div class="mt-6 text-center">
-            <p class="text-sm text-gray-700 dark:text-gray-300">{{ __('End of Notifications') }}</p>
+        <div class="mt-4 text-center">
+            <p class="sr-only">{{ __('End of Notifications') }}</p>
         </div>
     </div>
 </div>

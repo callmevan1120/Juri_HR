@@ -135,10 +135,10 @@
         <!-- Finance & HR Banner -->
         <div class="grid grid-cols-2 lg:grid-cols-5 divide-x divide-y lg:divide-y-0 divide-slate-200 dark:divide-slate-800 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
             @foreach ($summaryCards as $card)
-                <div class="p-5 flex flex-col justify-center">
+                <div class="flex flex-col justify-center p-3.5">
                     <p class="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">
                         {{ $card['label'] }}</p>
-                    <p class="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    <p class="mt-1 text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                         {{ $card['value'] }}</p>
                 </div>
             @endforeach
@@ -179,19 +179,19 @@
 
         <!-- Map & Headcount -->
         <div class="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <x-admin.insight-panel class="flex flex-col overflow-hidden p-5">
+            <x-admin.insight-panel class="flex flex-col overflow-hidden p-4">
                 <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Geographical Distribution') }}</h3>
-                <div class="flex-1 min-h-[320px] w-full">
+                <div class="min-h-[280px] w-full flex-1">
                     <div id="employeeOriginsMap" x-ref="employeeOriginsMap" wire:ignore class="h-full w-full rounded-xl border border-slate-200 dark:border-slate-800 z-0"></div>
                 </div>
             </x-admin.insight-panel>
 
             <div class="grid gap-4">
-                <x-admin.insight-panel class="p-5">
+                <x-admin.insight-panel class="p-4">
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Headcount Distribution') }}</h3>
                     <div class="h-[200px]"><canvas x-ref="headcountChart" role="img" aria-label="{{ __('Headcount distribution chart') }}"></canvas></div>
                 </x-admin.insight-panel>
-                <x-admin.insight-panel class="p-5">
+                <x-admin.insight-panel class="p-4">
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Top Performing Divisions') }}</h3>
                     <div class="space-y-2">
                         @forelse ($divisionLeaders as $index => $division)
@@ -236,14 +236,14 @@
 
         <!-- Wall of Fame -->
         <div class="grid gap-4 md:grid-cols-3">
-            <x-admin.insight-panel class="p-5 border-emerald-200/50 bg-gradient-to-b from-white to-emerald-50/30 dark:border-emerald-900/30 dark:from-slate-900 dark:to-emerald-900/10">
-                <div class="flex items-center gap-2 mb-4">
+            <x-admin.insight-panel class="border-emerald-200/50 bg-gradient-to-b from-white to-emerald-50/30 p-4 dark:border-emerald-900/30 dark:from-slate-900 dark:to-emerald-900/10">
+                <div class="mb-3 flex items-center gap-2">
                     <x-heroicon-s-star class="h-5 w-5 text-emerald-500" />
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white">{{ __('Early Birds') }}</h3>
                 </div>
-                <div class="space-y-3">
+                <div class="space-y-2">
                     @forelse ($topDiligent as $employee)
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700/50">
+                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/50 dark:bg-slate-800">
                             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $employee->name }}</span>
                             <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ gmdate('H:i', $employee->avg_check_in) }}</span>
                         </div>
@@ -253,14 +253,14 @@
                 </div>
             </x-admin.insight-panel>
 
-            <x-admin.insight-panel class="p-5 border-amber-200/50 bg-gradient-to-b from-white to-amber-50/30 dark:border-amber-900/30 dark:from-slate-900 dark:to-amber-900/10">
-                <div class="flex items-center gap-2 mb-4">
+            <x-admin.insight-panel class="border-amber-200/50 bg-gradient-to-b from-white to-amber-50/30 p-4 dark:border-amber-900/30 dark:from-slate-900 dark:to-amber-900/10">
+                <div class="mb-3 flex items-center gap-2">
                     <x-heroicon-s-exclamation-triangle class="h-5 w-5 text-amber-500" />
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white">{{ __('Frequent Late') }}</h3>
                 </div>
-                <div class="space-y-3">
+                <div class="space-y-2">
                     @forelse ($topLate as $employee)
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700/50">
+                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/50 dark:bg-slate-800">
                             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $employee->name }}</span>
                             <span class="text-xs font-bold text-amber-600 dark:text-amber-400">{{ $employee->late_count }}x</span>
                         </div>
@@ -270,14 +270,14 @@
                 </div>
             </x-admin.insight-panel>
 
-            <x-admin.insight-panel class="p-5 border-rose-200/50 bg-gradient-to-b from-white to-rose-50/30 dark:border-rose-900/30 dark:from-slate-900 dark:to-rose-900/10">
-                <div class="flex items-center gap-2 mb-4">
+            <x-admin.insight-panel class="border-rose-200/50 bg-gradient-to-b from-white to-rose-50/30 p-4 dark:border-rose-900/30 dark:from-slate-900 dark:to-rose-900/10">
+                <div class="mb-3 flex items-center gap-2">
                     <x-heroicon-s-arrow-right-end-on-rectangle class="h-5 w-5 text-rose-500" />
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white">{{ __('Early Runners') }}</h3>
                 </div>
-                <div class="space-y-3">
+                <div class="space-y-2">
                     @forelse ($topEarlyLeavers as $employee)
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700/50">
+                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/50 dark:bg-slate-800">
                             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $employee->name }}</span>
                             <span class="text-xs font-bold text-rose-600 dark:text-rose-400">{{ $employee->early_leave_count }}x</span>
                         </div>
@@ -291,7 +291,7 @@
         <!-- Extended Analytics Row -->
         <div class="grid gap-4 md:grid-cols-2">
             <!-- Top Regions -->
-            <x-admin.insight-panel class="p-5">
+            <x-admin.insight-panel class="p-4">
                 <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Top Employee Regions') }}</h3>
                 <div class="space-y-2.5">
                     @forelse ($topRegions as $region => $count)
@@ -312,7 +312,7 @@
             </x-admin.insight-panel>
 
             <!-- Attendance Rate Gauge -->
-            <x-admin.insight-panel class="p-5">
+            <x-admin.insight-panel class="p-4">
                 <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Attendance Rate') }}</h3>
                 <div class="flex items-center gap-4">
                     <div class="relative flex-shrink-0">

@@ -20,20 +20,20 @@
                 <div class="user-page-body">
                     
                     {{-- Leave Quota Summary --}}
-                    <div class="mb-6 grid grid-cols-1 gap-3">
-                        <div class="flex flex-col items-center justify-center rounded-2xl border border-primary-200 bg-primary-50 p-4 text-center transition-colors hover:bg-primary-100/50 dark:border-primary-800/30 dark:bg-primary-900/20">
+                    <div class="mb-4 grid grid-cols-1 gap-3">
+                        <div class="flex flex-col items-center justify-center rounded-2xl border border-primary-200 bg-primary-50 p-3 text-center transition-colors hover:bg-primary-100/50 dark:border-primary-800/30 dark:bg-primary-900/20">
                             <p class="mb-1 text-sm font-semibold text-primary-800 dark:text-primary-200">{{ __('Annual Leave Quota') }}</p>
                             <div class="flex items-baseline gap-1">
-                                <span class="text-2xl font-black text-primary-800 dark:text-primary-200">{{ $remainingExcused ?? 0 }}</span>
+                                <span class="text-xl font-semibold text-primary-800 dark:text-primary-200">{{ $remainingExcused ?? 0 }}</span>
                                 <span class="text-sm font-semibold text-primary-700/80 dark:text-primary-300/80">/ {{ $annualQuota ?? 12 }}</span>
                             </div>
                             <p class="mt-2 text-sm text-primary-800/80 dark:text-primary-200/80">{{ __('Used') }}: {{ $usedExcused ?? 0 }}</p>
                         </div>
                     </div>
 
-                    <div class="mb-6 rounded-2xl border border-gray-200 bg-gray-50/80 p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/30 dark:text-gray-300">
+                    <div class="mb-4 rounded-2xl border border-gray-200 bg-gray-50/80 p-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/30 dark:text-gray-300">
                         <p class="font-semibold text-gray-800 dark:text-gray-100">{{ __('Before you submit') }}</p>
-                        <p class="mt-1 leading-relaxed">
+                        <p class="sr-only">
                             {{ __('Choose the correct leave type, set the date range carefully, and attach supporting files when required. Only annual leave types reduce the annual quota; sick leave and special leave types do not use quota.') }}
                         </p>
                     </div>

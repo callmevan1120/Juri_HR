@@ -29,8 +29,8 @@
             <div class="user-page-body pt-0">
                 @if($showModal)
                     {{-- Create Form --}}
-                    <div class="mx-auto max-w-3xl rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 lg:p-8">
-                        <form wire:submit.prevent="store" class="space-y-6">
+                    <div class="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-5">
+                        <form wire:submit.prevent="store" class="space-y-4">
                             
                             {{-- Date --}}
                             <div>
@@ -40,7 +40,7 @@
                             </div>
 
                             {{-- Time Range --}}
-                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <x-forms.label for="start_time" value="{{ __('Start Time') }}" />
                                     <x-forms.input id="start_time" type="time" class="mt-1 block w-full" wire:model="start_time" />
@@ -60,7 +60,7 @@
                                 <x-forms.input-error for="reason" class="mt-2" />
                             </div>
 
-                            <div class="flex flex-col-reverse items-stretch gap-3 border-t border-gray-100 pt-4 dark:border-gray-700 sm:flex-row sm:justify-end">
+                            <div class="flex flex-col-reverse items-stretch gap-2 border-t border-gray-100 pt-3 dark:border-gray-700 sm:flex-row sm:justify-end">
                                 <x-actions.secondary-button wire:click="close" wire:loading.attr="disabled">
                                     {{ __('Cancel') }}
                                 </x-actions.secondary-button>
@@ -87,14 +87,14 @@
                     @else
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
                                      @foreach($overtimes as $overtime)
-                                <div class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-6">
+                                <div class="p-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-4">
                                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="h-12 w-12 rounded-xl flex items-center justify-center bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
-                                            <x-heroicon-o-clock class="h-6 w-6" />
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                                            <x-heroicon-o-clock class="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <h4 class="text-sm font-bold text-gray-900 dark:text-white capitalize">
+                                            <h4 class="text-sm font-semibold capitalize text-gray-900 dark:text-white">
                                                 {{ $overtime->date->format('d M Y') }}
                                             </h4>
                                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
@@ -102,7 +102,7 @@
                                                 <span class="mx-1">•</span>
                                                 {{ $overtime->duration_text }}
                                             </p>
-                                            <p class="text-[10px] text-gray-400 italic line-clamp-1">{{ $overtime->reason }}</p>
+                                            <p class="sr-only">{{ $overtime->reason }}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -117,7 +117,7 @@
                                 </div>
                              @endforeach
                         </div>
-                        <div class="rounded-b-2xl border-t border-gray-100 p-4 dark:border-gray-700">
+                        <div class="rounded-b-2xl border-t border-gray-100 p-3 dark:border-gray-700">
                             {{ $overtimes->links() }}
                         </div>
                     @endif

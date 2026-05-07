@@ -13,7 +13,7 @@
             <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
                 @forelse ($attendanceCorrections as $correction)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
                                     <img class="h-10 w-10 rounded-full object-cover"
@@ -26,12 +26,12 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-200">
+                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                             <div class="font-semibold">{{ $correction->requestTypeLabel() }}</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400">{{ $correction->attendance_date->translatedFormat('d M Y') }}</div>
                             <div class="mt-1 max-w-xs truncate text-xs text-gray-500 dark:text-gray-400">{{ $correction->reason }}</div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-200">
+                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                             <div class="space-y-1 text-xs">
                                 @if ($correction->requested_time_in)
                                     <div>{{ __('Check in') }}: {{ $correction->requested_time_in->translatedFormat('d M Y H:i') }}</div>
@@ -44,10 +44,10 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             {{ $correction->created_at->diffForHumans() }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex justify-end gap-2">
                                 <button wire:click="approveAttendanceCorrection('{{ $correction->id }}')"
                                     class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 p-2 rounded-lg transition-colors"
@@ -64,7 +64,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                             {{ __('No attendance correction requests found') }}
                         </td>
                     </tr>
@@ -133,7 +133,7 @@
             </div>
         </div>
     @empty
-        <div class="rounded-xl border border-gray-100 bg-white p-8 text-center text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+        <div class="rounded-xl border border-gray-100 bg-white p-4 text-center text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
             {{ __('No attendance correction requests found') }}
         </div>
     @endforelse

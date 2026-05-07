@@ -210,7 +210,7 @@
     }
 @endphp
 
-<div x-data="{ showMore: false }" class="space-y-6" aria-label="{{ __('User shortcuts') }}">
+<div x-data="{ showMore: false }" class="space-y-3" aria-label="{{ __('User shortcuts') }}">
     <section class="quick-wallet-surface" aria-labelledby="quick-wallet-title">
         <div class="quick-wallet-header">
             <div>

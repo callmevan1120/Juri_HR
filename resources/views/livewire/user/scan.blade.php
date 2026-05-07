@@ -1,5 +1,5 @@
 <div id="scan-wrapper"
-    class="scan-attendance-flow w-full to-slate-100 dark:from-slate-900 dark:to-slate-800 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2 sm:py-3">
+    class="scan-attendance-flow mx-auto w-full max-w-6xl px-4 py-2 to-slate-100 dark:from-slate-900 dark:to-slate-800 sm:px-6 sm:py-3 lg:px-8">
     @php
         use Illuminate\Support\Carbon;
         $hasCheckedIn = !is_null($attendance?->time_in);
@@ -42,12 +42,12 @@
             <div x-data="faceVerificationModal()" x-show="showModal" x-cloak
                 class="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm"
                 @face-verify.window="openModal($event.detail)">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+                <div class="mx-4 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-gray-800"
                     @click.stop>
                     {{-- Header --}}
                     <div
-                        class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        class="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-700">
+                        <h3 class="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white">
                             <span
                                 class="p-1.5 bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400 rounded-lg">
                                 <x-heroicon-o-face-smile class="h-5 w-5" />
@@ -62,8 +62,8 @@
                     </div>
 
                     {{-- Camera Preview --}}
-                    <div class="p-6">
-                        <div class="relative aspect-square bg-gray-900 rounded-xl overflow-hidden mb-4"> <video
+                    <div class="p-4">
+                        <div class="relative mb-4 aspect-square overflow-hidden rounded-xl bg-gray-900"> <video
                                 x-ref="video" autoplay playsinline muted class="w-full h-full object-cover"></video>
                             <canvas x-ref="overlay" class="absolute inset-0 w-full h-full"></canvas>
 
@@ -312,23 +312,23 @@
         @include('components.feedback.alert-messages')
 
         @if ($approvedAbsence)
-            <div class="w-full max-w-md mx-auto bg-white rounded-3xl shadow-xl overflow-hidden p-8 text-center mt-6">
-                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span class="text-4xl">✅</span>
+            <div class="mx-auto mt-4 w-full max-w-md overflow-hidden rounded-2xl bg-white p-4 text-center shadow-sm">
+                <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+                    <x-heroicon-o-check class="h-8 w-8 text-green-700" />
                 </div>
 
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ __('You are on Leave') }}</h2>
+                <h2 class="mb-2 text-xl font-semibold text-gray-900">{{ __('You are on Leave') }}</h2>
                 <div
-                    class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider bg-green-100 text-green-700 mb-6">
+                    class="mb-4 inline-flex items-center rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-green-700">
                     {{ __(ucfirst($approvedAbsence->status)) }}
                 </div>
 
-                <div class="bg-gray-50 rounded-2xl p-4 mb-6 text-left">
+                <div class="mb-4 rounded-2xl bg-gray-50 p-3 text-left">
                     <p class="text-sm text-gray-500 mb-1">{{ __('Date') }}</p>
                     <p class="font-semibold text-gray-900 mb-3">{{ $approvedAbsence->date->format('d F Y') }}</p>
 
-                    <p class="text-sm text-gray-500 mb-1">{{ __('Note') }}</p>
-                    <p class="font-semibold text-gray-900 italic">"{{ $approvedAbsence->note }}"</p>
+                    <p class="sr-only">{{ __('Note') }}</p>
+                    <p class="sr-only">"{{ $approvedAbsence->note }}"</p>
                 </div>
 
                 <a href="{{ route('home') }}"
@@ -338,31 +338,31 @@
             </div>
         @elseif ($isComplete)
             {{-- Completion View --}}
-            <div class="space-y-4 sm:space-y-6">
+            <div class="space-y-3 sm:space-y-4">
                 <div
-                    class="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow dark:border-gray-700 dark:bg-gray-800 text-center">
+                    class="rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 text-center">
                     <div
                         class="success-checkmark mb-4 inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-500 dark:to-green-700 rounded-full shadow-lg">
                         <x-heroicon-o-check class="h-10 w-10 text-green-700 dark:text-white" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ __('Attendance Complete!') }}
                     </h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <p class="sr-only">
                         {{ __('You\'ve successfully completed today\'s attendance') }}</p>
                 </div>
             </div>
         @elseif ($hasCheckedIn && !$hasCheckedOut)
             {{-- Checked In View --}}
-            <div class="space-y-4 sm:space-y-6">
+            <div class="space-y-3 sm:space-y-4">
                 <div class="py-2 relative z-[60]">
                     <div class="flex items-center gap-4">
-                        <div class="p-3 bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300 rounded-xl">
-                            <x-heroicon-o-check-circle class="h-7 w-7" />
+                        <div class="rounded-xl bg-blue-100 p-2.5 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300">
+                            <x-heroicon-o-check-circle class="h-6 w-6" />
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                                 {{ __('You\'re Checked In!') }}</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-300">{{ __('Scan QR to check out') }}</p>
+                            <p class="sr-only">{{ __('Scan QR to check out') }}</p>
                         </div>
                     </div>
                 </div>
@@ -409,7 +409,7 @@
             </div>
         @else
             {{-- Initial State - Not Checked In --}}
-            <div class="flex flex-col gap-4 sm:gap-6 lg:flex-row">
+            <div class="flex flex-col gap-4 sm:gap-4 lg:flex-row">
                 @if (!$isAbsence)
                     <div class="w-full">
                         <div id="scanner-card-container" wire:ignore>
@@ -450,7 +450,7 @@
 
                             {{-- Processing UI (Hidden by default) --}}
                             <div id="processing-card-container"
-                                class="hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-lg dark:border-gray-700 dark:bg-gray-800 text-center">
+                                class="hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 text-center">
                                 <div class="relative w-20 h-20 mx-auto mb-6">
                                     <div
                                         class="absolute inset-0 border-4 border-gray-200 dark:border-gray-700 rounded-full">

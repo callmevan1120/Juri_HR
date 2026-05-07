@@ -17,7 +17,7 @@
                             <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
                                 {{ __('Workflow') }}
                             </h3>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                            <p class="sr-only">
                                 {{ __('Choose whether you want to export existing data or import a new file.') }}
                             </p>
                         </div>
@@ -82,21 +82,21 @@
                                 <h4 class="mt-4 text-xl font-semibold text-gray-900 dark:text-white">
                                     {{ __('Export User Dataset') }}
                                 </h4>
-                                <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                <p class="sr-only">
                                     {{ __('Choose which account groups should be included in the export file. The generated spreadsheet is ready for reporting or backup purposes.') }}
                                 </p>
 
-                                <div class="mt-6 space-y-3">
-                                    <div class="rounded-xl border border-white/70 bg-white/80 px-4 py-3 text-sm text-gray-600 shadow-sm dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-300">
+                                <div class="sr-only">
+                                    <div>
                                         {{ __('Employee accounts are exported with profile and payroll-related fields.') }}
                                     </div>
-                                    <div class="rounded-xl border border-white/70 bg-white/80 px-4 py-3 text-sm text-gray-600 shadow-sm dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-300">
+                                    <div>
                                         {{ __('Admin and Superadmin groups can be included in the same export batch.') }}
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="space-y-5">
+                            <div class="space-y-4">
                                 <div class="grid gap-4 sm:grid-cols-3">
                                     <label class="group relative flex cursor-pointer flex-col rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-primary-300 hover:bg-primary-50/40 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-700 dark:hover:bg-primary-900/10">
                                         <div class="flex items-start justify-between gap-3">
@@ -167,7 +167,7 @@
                                     <h4 class="mt-4 text-xl font-semibold text-gray-900 dark:text-white">
                                         {{ __('Import User Dataset') }}
                                     </h4>
-                                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                    <p class="sr-only">
                                         {{ __('Upload an Excel file to create or update user records in bulk. Use the official template to avoid column mismatches.') }}
                                     </p>
                                     <x-actions.button
@@ -186,7 +186,7 @@
                                     <h5 class="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
                                         {{ __('Before Uploading') }}
                                     </h5>
-                                    <ul class="mt-4 space-y-2 text-sm text-amber-800 dark:text-amber-200">
+                                    <ul class="sr-only">
                                         <li>{{ __('Use the downloaded template without changing the header row.') }}</li>
                                         <li>{{ __('Prepare XLSX or CSV files with a maximum size of 10MB.') }}</li>
                                         <li>{{ __('Fix validation errors from the report, then re-import the corrected rows.') }}</li>
@@ -194,14 +194,14 @@
                                 </x-admin.alert>
                             </div>
 
-                            <div class="space-y-5">
+                            <div class="space-y-4">
                                 <form
                                     x-data="{ file: null, dragging: false }"
                                     @drop.prevent="dragging = false; file = $event.dataTransfer.files[0]; $refs.file.files = $event.dataTransfer.files; $wire.upload('file', file)"
                                     @dragover.prevent="dragging = true"
                                     @dragleave.prevent="dragging = false"
                                     wire:submit.prevent="import"
-                                    class="space-y-5"
+                                    class="space-y-4"
                                 >
                                     <div
                                         :class="dragging ? 'border-primary-500 bg-primary-50/60 dark:bg-primary-900/10' : 'border-gray-300 dark:border-gray-600'"

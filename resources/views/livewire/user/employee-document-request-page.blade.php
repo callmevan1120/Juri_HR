@@ -59,7 +59,7 @@
                     </div>
                 </div>
 
-                <div class="hidden overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
+                <div class="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
                     <div class="overflow-x-visible">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
@@ -74,7 +74,7 @@
                             <tbody class="divide-y divide-gray-100 bg-white dark:divide-gray-700 dark:bg-gray-800">
                                 @forelse ($requests as $request)
                                     <tr>
-                                        <td class="px-5 py-4 text-sm text-gray-700 dark:text-gray-200">
+                                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                                             <div class="font-semibold">{{ $request->documentTypeLabel() }}</div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400">{{ $request->created_at->diffForHumans() }}</div>
                                             @if ($request->due_date)
@@ -84,13 +84,13 @@
                                                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Requested by') }} {{ $request->requester->name }}</div>
                                             @endif
                                         </td>
-                                        <td class="max-w-sm px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                        <td class="max-w-sm px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                                             <div class="font-medium text-gray-900 dark:text-white">{{ $request->purpose }}</div>
                                             @if ($request->details)
-                                                <div class="mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">{{ $request->details }}</div>
+                                                <div class="sr-only">{{ $request->details }}</div>
                                             @endif
                                         </td>
-                                        <td class="px-5 py-4">
+                                        <td class="px-4 py-3">
                                             <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $request->status === \App\Models\EmployeeDocumentRequest::STATUS_READY ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_REJECTED ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_UPLOAD_PROCESSING ? 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200')) }}">
                                                 {{ $request->statusLabel() }}
                                             </span>
@@ -98,10 +98,10 @@
                                                 <div class="mt-1 text-[10px] text-gray-400">{{ __('by') }} {{ $request->reviewer->name }}</div>
                                             @endif
                                         </td>
-                                        <td class="max-w-sm px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                            {{ $request->fulfillment_note ?: $request->rejection_note ?: '-' }}
+                                        <td class="max-w-sm px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                                            <span class="truncate">{{ $request->fulfillment_note ?: $request->rejection_note ?: '-' }}</span>
                                         </td>
-                                        <td class="px-5 py-4 text-right text-sm">
+                                        <td class="px-4 py-3 text-right text-sm">
                                             <div class="flex flex-wrap justify-end gap-2">
                                                 @can('upload', $request)
                                                     <x-actions.icon-button wire:click="prepareUpload({{ $request->id }})" variant="primary" label="{{ __('Upload document') }}: {{ $request->documentTypeLabel() }}" data-e2e="document-upload-open" data-request-id="{{ $request->id }}">
@@ -123,7 +123,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-5 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+                                        <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                             <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
                                                 <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
                                                     <x-heroicon-o-document-plus class="h-6 w-6" />
@@ -144,7 +144,7 @@
 
                 <div class="space-y-4 md:hidden">
                     @forelse ($requests as $request)
-                        <article class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        <article class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $request->documentTypeLabel() }}</div>
@@ -161,15 +161,15 @@
                                 </span>
                             </div>
 
-                            <div class="mt-4 rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
+                            <div class="mt-3 rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Purpose') }}</p>
                                 <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">{{ $request->purpose }}</p>
                                 @if ($request->details)
-                                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ $request->details }}</p>
+                                    <p class="sr-only">{{ $request->details }}</p>
                                 @endif
                             </div>
 
-                            <div class="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                            <div class="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                                 <div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Status') }}</p>
                                     <div class="mt-1 text-sm text-gray-700 dark:text-gray-200">
@@ -181,7 +181,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Admin Note') }}</p>
-                                    <p class="mt-1 text-sm text-gray-700 dark:text-gray-200">
+                                    <p class="mt-1 truncate text-sm text-gray-700 dark:text-gray-200">
                                         {{ $request->fulfillment_note ?: $request->rejection_note ?: '-' }}
                                     </p>
                                 </div>
@@ -209,13 +209,13 @@
                             </div>
                         </article>
                     @empty
-                        <div class="rounded-2xl border border-gray-100 bg-white p-8 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                        <div class="rounded-2xl border border-gray-100 bg-white p-5 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                             <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
                                 <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
                                     <x-heroicon-o-document-plus class="h-6 w-6" />
                                 </span>
                                 <span class="font-medium text-gray-900 dark:text-white">{{ __('No document requests yet.') }}</span>
-                                <span>{{ __('Create a request when you need a company document or need to upload an employee document.') }}</span>
+                                <span class="sr-only">{{ __('Create a request when you need a company document or need to upload an employee document.') }}</span>
                                 <x-actions.button type="button" wire:click="create" size="sm">
                                     {{ __('New Request') }}
                                 </x-actions.button>
@@ -235,11 +235,11 @@
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-request-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
                 <div class="fixed inset-0 bg-gray-900/60" wire:click="close"></div>
-                <div class="relative w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl dark:bg-gray-800"
+                <div class="relative w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
                     style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
-                    <h2 id="document-request-modal-title" class="text-xl font-semibold text-gray-900 dark:text-white">{{ __('New Document Request') }}</h2>
+                    <h2 id="document-request-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('New Document Request') }}</h2>
 
-                    <form wire:submit="store" class="mt-6 space-y-5">
+                    <form wire:submit="store" class="mt-4 space-y-4">
                         <div>
                             <x-forms.label for="document-type" value="{{ __('Document Type') }}" class="mb-1.5 block" />
                             <x-forms.select id="document-type" wire:model.live="documentType" class="block w-full">
@@ -259,12 +259,12 @@
 
                         <div>
                             <x-forms.label for="document-details" value="{{ __('Additional Details') }} ({{ __('Optional') }})" class="mb-1.5 block" />
-                            <x-forms.textarea id="document-details" wire:model.live="details" rows="4" class="block w-full"
+                            <x-forms.textarea id="document-details" wire:model.live="details" rows="3" class="block w-full"
                                 placeholder="{{ __('Add recipient name, deadline, required language, or other notes.') }}" />
                             <x-forms.input-error for="details" class="mt-1" />
                         </div>
 
-                        <div class="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 dark:border-gray-700 sm:flex-row sm:justify-end">
+                        <div class="flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 dark:border-gray-700 sm:flex-row sm:justify-end">
                             <x-actions.button type="button" wire:click="close" variant="secondary" class="w-full sm:w-auto">
                                 {{ __('Cancel') }}
                             </x-actions.button>
@@ -282,21 +282,21 @@
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-upload-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
                 <div class="fixed inset-0 bg-gray-900/60" wire:click="cancelUpload"></div>
-                <div class="relative w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-xl dark:bg-gray-800"
+                <div class="relative w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
                     style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
-                    <h2 id="document-upload-modal-title" class="text-xl font-semibold text-gray-900 dark:text-white">{{ __('Upload Document') }}</h2>
+                    <h2 id="document-upload-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Upload Document') }}</h2>
 
-                    <form wire:submit="upload" class="mt-6 space-y-5" data-e2e="document-upload-form">
+                    <form wire:submit="upload" class="mt-4 space-y-4" data-e2e="document-upload-form">
                         <div>
                             <x-forms.label for="document-upload-file" value="{{ __('File') }}" class="mb-1.5 block" />
                             <input id="document-upload-file" wire:model="attachment" type="file" data-e2e="document-upload-file" class="block w-full rounded-xl border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-primary-50 file:px-4 file:py-3 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:file:bg-primary-900/30 dark:file:text-primary-200" />
                             <x-forms.input-error for="attachment" class="mt-1" />
-                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400" wire:loading.remove wire:target="attachment,upload">{{ __('Accepted: PDF, image, Word, or Excel. Maximum 10 MB.') }}</p>
+                            <p class="sr-only" wire:loading.remove wire:target="attachment,upload">{{ __('Accepted: PDF, image, Word, or Excel. Maximum 10 MB.') }}</p>
                             <p class="mt-2 text-xs font-medium text-sky-700 dark:text-sky-300" wire:loading wire:target="attachment">{{ __('Uploading file...') }}</p>
                             <p class="mt-2 text-xs font-medium text-sky-700 dark:text-sky-300" wire:loading wire:target="upload">{{ __('Processing upload...') }}</p>
                         </div>
 
-                        <div class="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 dark:border-gray-700 sm:flex-row sm:justify-end">
+                        <div class="flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 dark:border-gray-700 sm:flex-row sm:justify-end">
                             <x-actions.button type="button" wire:click="cancelUpload" variant="secondary" class="w-full sm:w-auto" wire:loading.attr="disabled" wire:target="attachment,upload">
                                 {{ __('Cancel') }}
                             </x-actions.button>
