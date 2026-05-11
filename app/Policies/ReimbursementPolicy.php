@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Reimbursement;
 use App\Models\User;
+use App\Support\ApprovalMatrixService;
 
 class ReimbursementPolicy
 {
@@ -42,6 +43,10 @@ class ReimbursementPolicy
 
     private function canReview(User $user, Reimbursement $reimbursement): bool
     {
+        if (app(ApprovalMatrixService::class)->canActorApprove($user, 'reimbursement', $reimbursement)) {
+            return true;
+        }
+
         if ($user->subordinates->contains('id', $reimbursement->user_id)) {
             return true;
         }

@@ -4,7 +4,16 @@ namespace App\Providers;
 
 use App\Contracts\AuditServiceInterface;
 use App\Models\ActivityLog;
+use App\Models\Attendance;
+use App\Models\AttendanceCorrection;
+use App\Models\CashAdvance;
+use App\Models\Payroll;
+use App\Models\PayrollComponent;
+use App\Models\Reimbursement;
+use App\Models\Role;
 use App\Models\SystemBackupRun;
+use App\Models\User;
+use App\Observers\SensitiveModelAuditObserver;
 use App\Observers\SystemBackupRunObserver;
 use App\Services\Audit\CommunityAuditService;
 use App\Services\Enterprise\LicenseGuard;
@@ -29,6 +38,19 @@ class AuditServiceProvider extends ServiceProvider
     public function boot(): void
     {
         SystemBackupRun::observe(SystemBackupRunObserver::class);
+
+        foreach ([
+            User::class,
+            Payroll::class,
+            PayrollComponent::class,
+            Role::class,
+            AttendanceCorrection::class,
+            Attendance::class,
+            Reimbursement::class,
+            CashAdvance::class,
+        ] as $modelClass) {
+            $modelClass::observe(SensitiveModelAuditObserver::class);
+        }
 
         Event::listen(Login::class, function (Login $event) {
             ActivityLog::record('Login Successful', 'User logged in.');

@@ -2,20 +2,29 @@
 
 namespace App\Support;
 
+use App\Models\ApprovalMatrixRule;
 use App\Models\CashAdvance;
 use App\Models\User;
 use App\Notifications\CashAdvanceUpdated;
 use App\Notifications\CashAdvanceUpdatedEmail;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 
 class CashAdvanceApprovalService
 {
     public function __construct(
         protected ApprovalActorService $approvalActors,
+        protected ApprovalMatrixService $approvalMatrix,
     ) {}
 
     public function approve(CashAdvance $advance, User $actor): string
     {
+        $matrixMessage = $this->approveWithMatrix($advance, $actor);
+
+        if ($matrixMessage !== null) {
+            return $matrixMessage;
+        }
+
         if ($this->approvalActors->canFinalizeCashAdvanceApproval($actor)) {
             $advance->update([
                 'status' => 'approved',
@@ -43,6 +52,12 @@ class CashAdvanceApprovalService
 
     public function reject(CashAdvance $advance, User $actor): string
     {
+        $matrixMessage = $this->rejectWithMatrix($advance, $actor);
+
+        if ($matrixMessage !== null) {
+            return $matrixMessage;
+        }
+
         $payload = [
             'status' => 'rejected',
         ];
@@ -69,6 +84,10 @@ class CashAdvanceApprovalService
 
     public function canManage(CashAdvance $advance, User $user): bool
     {
+        if ($this->approvalMatrix->canActorApprove($user, ApprovalMatrixRule::WORKFLOW_CASH_ADVANCE, $advance)) {
+            return true;
+        }
+
         if ($user->can('manageCashAdvances')) {
             return true;
         }
@@ -124,15 +143,19 @@ class CashAdvanceApprovalService
                     if ($this->approvalActors->isFinanceHead($user)) {
                         $query->where(function (Builder $builder) use ($myDivisionId, $myRank) {
                             $builder->where('status', 'pending_finance')
+                                ->orWhere('status', 'pending_matrix')
                                 ->orWhereHas('user', function (Builder $userQuery) use ($myDivisionId, $myRank) {
                                     $userQuery->where('division_id', $myDivisionId)
                                         ->whereHas('jobTitle.jobLevel', fn (Builder $levelQuery) => $levelQuery->where('rank', '>', $myRank));
                                 });
                         });
                     } else {
-                        $query->whereHas('user', function (Builder $userQuery) use ($myDivisionId, $myRank) {
-                            $userQuery->where('division_id', $myDivisionId)
-                                ->whereHas('jobTitle.jobLevel', fn (Builder $levelQuery) => $levelQuery->where('rank', '>', $myRank));
+                        $query->where(function (Builder $builder) use ($myDivisionId, $myRank) {
+                            $builder->where('status', 'pending_matrix')
+                                ->orWhereHas('user', function (Builder $userQuery) use ($myDivisionId, $myRank) {
+                                    $userQuery->where('division_id', $myDivisionId)
+                                        ->whereHas('jobTitle.jobLevel', fn (Builder $levelQuery) => $levelQuery->where('rank', '>', $myRank));
+                                });
                         });
                     }
                 } else {
@@ -182,5 +205,116 @@ class CashAdvanceApprovalService
 
         $advance->user->notify(new CashAdvanceUpdated($advance));
         $advance->user->notify(new CashAdvanceUpdatedEmail($advance));
+    }
+
+    private function approveWithMatrix(CashAdvance $advance, User $actor): ?string
+    {
+        $advance->loadMissing('user');
+        $steps = $this->approvalMatrix->storedOrResolvedSteps(ApprovalMatrixRule::WORKFLOW_CASH_ADVANCE, $advance);
+
+        if ($steps === []) {
+            return null;
+        }
+
+        $completed = $this->approvalMatrix->completedSteps($advance);
+        $currentStep = $this->approvalMatrix->currentStep($steps, $completed);
+
+        if (! $this->approvalMatrix->canActorApproveStep($actor, $advance, $currentStep)) {
+            throw new AuthorizationException;
+        }
+
+        $completed[] = [
+            'key' => (string) ($currentStep['key'] ?? ''),
+            'label' => (string) ($currentStep['label'] ?? $currentStep['key'] ?? ''),
+            'actor_id' => $actor->id,
+            'approved_at' => now()->toIso8601String(),
+        ];
+
+        $nextStep = $this->approvalMatrix->currentStep($steps, $completed);
+        $payload = $this->matrixPayload($advance, $steps, $completed, $nextStep);
+
+        if (($currentStep['key'] ?? '') === 'direct_manager') {
+            $payload += [
+                'head_approved_by' => $actor->id,
+                'head_approved_at' => now(),
+            ];
+        }
+
+        if (in_array(($currentStep['key'] ?? ''), ['finance', 'finance_head'], true)) {
+            $payload += [
+                'finance_approved_by' => $actor->id,
+                'finance_approved_at' => now(),
+            ];
+        }
+
+        if ($nextStep === null) {
+            $payload += [
+                'status' => 'approved',
+                'approved_by' => $actor->id,
+                'approved_at' => now(),
+            ];
+        }
+
+        $advance->update($payload);
+        $this->notifyStatusUpdated($advance);
+
+        return $nextStep === null
+            ? __('Kasbon approved.')
+            : __('Kasbon forwarded to the next approval step.');
+    }
+
+    private function rejectWithMatrix(CashAdvance $advance, User $actor): ?string
+    {
+        $advance->loadMissing('user');
+        $steps = $this->approvalMatrix->storedOrResolvedSteps(ApprovalMatrixRule::WORKFLOW_CASH_ADVANCE, $advance);
+
+        if ($steps === []) {
+            return null;
+        }
+
+        $currentStep = $this->approvalMatrix->currentStep($steps, $this->approvalMatrix->completedSteps($advance));
+
+        if (! $this->approvalMatrix->canActorApproveStep($actor, $advance, $currentStep)) {
+            throw new AuthorizationException;
+        }
+
+        $payload = [
+            'status' => 'rejected',
+            'approval_steps' => $steps,
+            'approval_matrix_rule_id' => $advance->approval_matrix_rule_id
+                ?: $this->approvalMatrix->ruleId(ApprovalMatrixRule::WORKFLOW_CASH_ADVANCE, $advance),
+            'approval_current_step' => (string) ($currentStep['key'] ?? ''),
+        ];
+
+        if (($currentStep['key'] ?? '') === 'direct_manager') {
+            $payload += [
+                'head_approved_by' => $actor->id,
+                'head_approved_at' => now(),
+            ];
+        } else {
+            $payload += [
+                'finance_approved_by' => $actor->id,
+                'finance_approved_at' => now(),
+                'approved_by' => $actor->id,
+                'approved_at' => now(),
+            ];
+        }
+
+        $advance->update($payload);
+        $this->notifyStatusUpdated($advance);
+
+        return __('Kasbon rejected.');
+    }
+
+    private function matrixPayload(CashAdvance $advance, array $steps, array $completed, ?array $nextStep): array
+    {
+        return [
+            'status' => $nextStep === null ? 'approved' : $this->approvalMatrix->statusForStep($nextStep),
+            'approval_matrix_rule_id' => $advance->approval_matrix_rule_id
+                ?: $this->approvalMatrix->ruleId(ApprovalMatrixRule::WORKFLOW_CASH_ADVANCE, $advance),
+            'approval_steps' => $steps,
+            'approval_current_step' => $nextStep['key'] ?? null,
+            'approval_completed_steps' => $completed,
+        ];
     }
 }

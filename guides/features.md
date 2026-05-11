@@ -198,6 +198,61 @@ Generate fingerprint hardware server:
 php artisan enterprise:hwid
 ```
 
+## Roadmap Fase dan Task
+
+Roadmap ini disusun mobile-first, shared-hosting first, dan tetap mengikuti RBAC/policy yang sudah ada.
+
+Status implementasi fondasi:
+
+- Fase 1: audit trail detail dan risk scoring absensi sudah memiliki model, service, migration, dan feature test.
+- Fase 2: approval matrix reimbursement/kasbon sudah memiliki rule engine, status bertahap, dan feature test.
+- Fase 3: offline attendance sync terbatas sudah memiliki API endpoint, persistence queue, idempotency, dan risk flag.
+- Fase 4: kalkulator payroll Indonesia dan payment instruction sudah tersedia sebagai service teruji.
+- Fase 5: lifecycle, shift planning, notification preference, webhook/API integration, dan KPI service sudah tersedia sebagai foundation backend.
+- Fase 6: multi-company ringan, marketplace template HR, dan issue labels komunitas sudah tersedia sebagai foundation produk.
+
+### Fase 1 - Trust, Audit, dan Risiko Absensi
+
+- Audit trail detail per entity: rekam perubahan field-level untuk salary, payroll, role/permission, koreksi absensi, dan approval cuti.
+- Risk scoring absensi: skor risiko untuk mock location, jarak mendekati radius, device berubah, face confidence rendah, waktu check-in tidak wajar, offline submission, dan retry QR token.
+- Tampilan audit/risk di admin: kartu ringkas mobile-first, filter entity, aktor, tanggal, dan tingkat risiko.
+- Export audit/risk: tetap memakai background job database queue supaya aman untuk data besar.
+
+### Fase 2 - Approval Matrix Configurable
+
+- Rule approval bertingkat berdasarkan divisi, role, nominal, lokasi, dan policy.
+- Approval chain untuk reimbursement, kasbon, koreksi absensi, cuti, lembur, dan payroll-sensitive actions.
+- Fallback approver, delegation, SLA reminder, dan audit keputusan approval.
+- RBAC baru harus diselaraskan dengan `config/rbac.php`, gate/policy, menu visibility, dan test authorization.
+
+### Fase 3 - Field Operations Offline
+
+- Offline queue terbatas untuk absensi lapangan: GPS, foto, timestamp lokal, barcode/QR payload, dan device context.
+- Sync saat online dengan flag `offline submitted`, waktu submit asli, waktu sync, dan risk score tambahan.
+- Conflict handling untuk token QR expired, lokasi berubah jauh, atau foto/GPS tidak lengkap.
+- Validasi APK/mobile browser wajib sebelum rilis.
+
+### Fase 4 - Payroll Indonesia Lanjutan
+
+- PPh 21 TER, BPJS TK/Kesehatan, THR, prorata, potongan, tunjangan tetap/tidak tetap.
+- Payroll component yang bisa dipetakan ke taxable/non-taxable dan recurring/one-time.
+- Export bank/payment instruction untuk payroll disbursement.
+- Audit field-level untuk setiap perubahan nominal payroll dan komponen payroll.
+
+### Fase 5 - Employee Lifecycle dan Operasional
+
+- Probation, contract end reminder, renewal workflow, resignation, exit interview, asset return checklist, dan auto-disable account.
+- Shift planning visual calendar dengan drag-and-drop roster, conflict detection, kapasitas lokasi/divisi, dan bulk assign.
+- Notification preference per user/admin untuk in-app, email, WhatsApp/webhook, Telegram, dan digest.
+- Webhook/API integration untuk accounting/payroll eksternal, Slack/Telegram/WhatsApp gateway, Google Calendar, dan SSO.
+- Dashboard KPI operasional: late rate, absence rate, overtime cost, leave liability, reimbursement aging, payroll variance, dan asset overdue.
+
+### Fase 6 - Produk dan Komunitas
+
+- Multi-company atau multi-tenant ringan untuk konsultan/vendor yang mengelola banyak klien.
+- Marketplace template dokumen HR: kontrak, surat tugas, surat cuti, paklaring, warning letter, dan onboarding checklist.
+- Public roadmap dan issue labels untuk kontribusi komunitas repository public.
+
 ## Performa Admin
 
 Beberapa halaman yang rawan lambat pada data besar memakai query ter-paginate dan eager loading terarah:

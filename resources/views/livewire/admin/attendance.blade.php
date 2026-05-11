@@ -24,6 +24,52 @@
         ', message: ' .
         json_encode(__('This feature is available in the Enterprise Edition. Please upgrade.')) .
         ' })';
+    $attendanceStatusMeta = static function (string $status): array {
+        return match ($status) {
+            'present' => [
+                'label' => __('Present'),
+                'dot' => 'bg-emerald-500',
+                'color' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/20 dark:text-emerald-300',
+                'cell' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-300',
+                'short' => 'H',
+            ],
+            'late' => [
+                'label' => __('Late'),
+                'dot' => 'bg-amber-500',
+                'color' => 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/20 dark:text-amber-300',
+                'cell' => 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-300',
+                'short' => 'T',
+            ],
+            'excused' => [
+                'label' => __('Excused'),
+                'dot' => 'bg-sky-500',
+                'color' => 'bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-900/20 dark:text-sky-300',
+                'cell' => 'bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-900/30 dark:text-sky-300',
+                'short' => 'I',
+            ],
+            'sick' => [
+                'label' => __('Sick'),
+                'dot' => 'bg-purple-500',
+                'color' => 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-900/20 dark:text-purple-300',
+                'cell' => 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-900/30 dark:text-purple-300',
+                'short' => 'S',
+            ],
+            'absent' => [
+                'label' => __('Absent'),
+                'dot' => 'bg-rose-500',
+                'color' => 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-900/20 dark:text-rose-300',
+                'cell' => 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-900/30 dark:text-rose-300',
+                'short' => 'A',
+            ],
+            default => [
+                'label' => '-',
+                'dot' => 'bg-slate-400',
+                'color' => 'bg-slate-50 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400',
+                'cell' => 'bg-slate-50 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400',
+                'short' => '-',
+            ],
+        };
+    };
 @endphp
 <x-admin.page-shell :title="__('Attendance Data')" :description="__('Monitor employee attendance, shifts, and status.')">
     <x-slot name="actions">
@@ -224,45 +270,25 @@
                                         'status' => $date->isWeekend() || !$date->isPast() ? '-' : 'absent',
                                     ])['status'];
 
-                                    $cellClass = match ($status) {
-                                        'present'
-                                            => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-300',
-                                        'late'
-                                            => 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-300',
-                                        'excused'
-                                            => 'bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-900/30 dark:text-sky-300',
-                                        'sick'
-                                            => 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-900/30 dark:text-purple-300',
-                                        'absent'
-                                            => 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-900/30 dark:text-rose-300',
-                                        default
-                                            => 'bg-slate-50 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400',
-                                    };
+                                    $statusMeta = $attendanceStatusMeta($status);
+                                    $cellClass = $statusMeta['cell'];
 
                                     // Count stats
                                     switch ($status) {
                                         case 'present':
                                             $presentCount++;
-                                            $short = 'H';
                                             break;
                                         case 'late':
                                             $lateCount++;
-                                            $short = 'T';
                                             break;
                                         case 'excused':
                                             $excusedCount++;
-                                            $short = 'I';
                                             break;
                                         case 'sick':
                                             $sickCount++;
-                                            $short = 'S';
                                             break;
                                         case 'absent':
                                             $absentCount++;
-                                            $short = 'A';
-                                            break;
-                                        default:
-                                            $short = '-';
                                             break;
                                     }
                                 @endphp
@@ -271,18 +297,38 @@
                                     @if ($attendance && ($attendance['attachment'] || $attendance['coordinates']))
                                         <button type="button" wire:click="show({{ $attendance['id'] }})"
                                             aria-label="{{ __('View attendance details') }}: {{ $employee->name }}, {{ $date->format('Y-m-d') }}"
-                                            class="wcag-touch-target h-full w-full rounded {{ $cellClass }} font-medium transition-all hover:ring-2 focus:outline-none focus:ring-2 ring-inset ring-primary-500">
-                                            {{ $isPerDayFilter ? __($status) : $short }}
+                                            class="{{ $isPerDayFilter ? 'inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs' : 'wcag-touch-target h-full w-full rounded' }} {{ $isPerDayFilter ? $statusMeta['color'] : $cellClass }} font-medium ring-1 ring-inset transition-all hover:ring-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                            @if ($isPerDayFilter)
+                                                <span class="h-1.5 w-1.5 rounded-full {{ $statusMeta['dot'] }}"></span>
+                                                {{ $statusMeta['label'] }}
+                                                @if ($attendance['is_suspicious'] ?? false)
+                                                    <span title="{{ $attendance['suspicious_reason'] }}"
+                                                        class="ml-1 cursor-help text-rose-500">!</span>
+                                                @endif
+                                            @else
+                                                {{ $statusMeta['short'] }}
+                                            @endif
                                         </button>
                                     @else
-                                        <span class="inline-block w-full rounded {{ $cellClass }} font-medium">
-                                            {{ $isPerDayFilter ? __($status) : $short }}
+                                        <span
+                                            class="{{ $isPerDayFilter ? 'inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs' : 'inline-block w-full rounded' }} {{ $isPerDayFilter ? $statusMeta['color'] : $cellClass }} font-medium ring-1 ring-inset">
+                                            @if ($isPerDayFilter)
+                                                <span class="h-1.5 w-1.5 rounded-full {{ $statusMeta['dot'] }}"></span>
+                                                {{ $statusMeta['label'] }}
+                                            @else
+                                                {{ $statusMeta['short'] }}
+                                            @endif
                                         </span>
                                     @endif
                                 </td>
                             @endforeach
 
                             @if ($isPerDayFilter)
+                                @php
+                                    $dailyAttendance = $employee->attendances->first();
+                                    $timeIn = $dailyAttendance ? \App\Helpers::format_time($dailyAttendance->time_in) : null;
+                                    $timeOut = $dailyAttendance ? \App\Helpers::format_time($dailyAttendance->time_out) : null;
+                                @endphp
                                 <td class="px-4 py-3 text-gray-900 dark:text-white">{{ $timeIn ?? '-' }}</td>
                                 <td class="px-4 py-3 text-gray-900 dark:text-white">{{ $timeOut ?? '-' }}</td>
                                 <td class="px-4 py-3 text-right">
@@ -347,15 +393,17 @@
                                     !\Carbon\Carbon::parse($startDate)->isWeekend()
                                         ? 'absent'
                                         : '-');
-                                $color = match ($status) {
-                                    'present' => 'bg-green-100 text-green-800',
-                                    'late' => 'bg-amber-100 text-amber-800',
-                                    'absent' => 'bg-red-100 text-red-800',
-                                    default => 'bg-gray-100 text-gray-800',
-                                };
+                                $statusMeta = $attendanceStatusMeta($status);
                             @endphp
                             <span
-                                class="px-2 py-1 rounded text-xs font-bold uppercase {{ $color }}">{{ __($status) }}</span>
+                                class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset {{ $statusMeta['color'] }}">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $statusMeta['dot'] }}"></span>
+                                {{ $statusMeta['label'] }}
+                                @if ($att && ($att['is_suspicious'] ?? false))
+                                    <span title="{{ $att['suspicious_reason'] }}"
+                                        class="ml-1 cursor-help text-rose-500">!</span>
+                                @endif
+                            </span>
                         @endif
                     </div>
 

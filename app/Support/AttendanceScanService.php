@@ -18,6 +18,7 @@ class AttendanceScanService
 {
     public function __construct(
         private readonly DynamicBarcodeTokenService $dynamicBarcodeTokenService,
+        private readonly AttendanceRiskScorer $attendanceRiskScorer,
     ) {}
 
     /**
@@ -106,6 +107,10 @@ class AttendanceScanService
         $barcode = $scanContext['barcode'];
         $scanSource = $scanContext['source'] ?? 'static';
         $attendanceForDay = $this->attendanceForDay($user);
+        $distance = $this->calculateDistance(
+            new LatLong((float) $coords[0], (float) $coords[1]),
+            new LatLong((float) $barcode->latLng['lat'], (float) $barcode->latLng['lng'])
+        );
 
         if (! $attendanceForDay || $attendanceForDay->time_in === null) {
             $attendance = $this->createAttendance(
@@ -117,6 +122,8 @@ class AttendanceScanService
                 gracePeriod: $gracePeriod,
                 gpsAccuracy: $gpsAccuracy,
                 gpsVariance: $gpsVariance,
+                distance: $distance,
+                scanSource: $scanSource,
             );
             $message = __('Attendance In Successful');
             ActivityLog::record(
@@ -132,6 +139,8 @@ class AttendanceScanService
                 note: $note,
                 gpsAccuracy: $gpsAccuracy,
                 gpsVariance: $gpsVariance,
+                distance: $distance,
+                scanSource: $scanSource,
             );
             $message = __('Attendance Out Successful');
             ActivityLog::record(
@@ -210,6 +219,8 @@ class AttendanceScanService
         int $gracePeriod,
         ?float $gpsAccuracy,
         ?float $gpsVariance,
+        int $distance,
+        string $scanSource,
     ): Attendance {
         $now = Carbon::now();
         $shift = Shift::query()->findOrFail($shiftId);
@@ -228,6 +239,8 @@ class AttendanceScanService
             coords: $coords,
             gpsAccuracy: $gpsAccuracy,
             gpsVariance: $gpsVariance,
+            distance: $distance,
+            scanSource: $scanSource,
         );
     }
 
@@ -242,6 +255,8 @@ class AttendanceScanService
         ?string $note,
         ?float $gpsAccuracy,
         ?float $gpsVariance,
+        int $distance,
+        string $scanSource,
     ): Attendance {
         $existingAttachment = $attendance->attachment;
         $attachments = [];
@@ -270,6 +285,24 @@ class AttendanceScanService
             $suspiciousReasons[] = 'Checkout zero GPS variance';
         }
 
+        $risk = $this->attendanceRiskScorer->score(
+            attendance: $attendance,
+            barcode: $barcode,
+            shift: $attendance->shift,
+            event: 'check_out',
+            context: [
+                'distance' => $distance,
+                'gps_accuracy' => $gpsAccuracy,
+                'gps_variance' => $gpsVariance,
+                'source' => $scanSource,
+            ],
+        );
+        $risk = $this->attendanceRiskScorer->merge(
+            $attendance->risk_factors,
+            (int) ($attendance->risk_score ?? 0),
+            $risk,
+        );
+
         $attendance->update([
             'time_out' => Carbon::now(),
             'latitude_out' => (float) $coords[0],
@@ -278,8 +311,12 @@ class AttendanceScanService
             'gps_variance_out' => $gpsVariance,
             'attachment' => json_encode($attachments),
             'note' => $note ?: $attendance->note,
-            'is_suspicious' => $isSuspicious,
+            'is_suspicious' => $isSuspicious || $risk['score'] >= 25,
             'suspicious_reason' => $isSuspicious ? implode('; ', array_unique($suspiciousReasons)) : null,
+            'risk_score' => $risk['score'],
+            'risk_level' => $risk['level'],
+            'risk_factors' => $risk['factors'],
+            'risk_evaluated_at' => $risk['evaluated_at'],
         ]);
 
         return $attendance;
@@ -299,6 +336,8 @@ class AttendanceScanService
         array $coords,
         ?float $gpsAccuracy,
         ?float $gpsVariance,
+        int $distance,
+        string $scanSource,
     ): Attendance {
         $isSuspicious = false;
         $suspiciousReasons = [];
@@ -341,6 +380,31 @@ class AttendanceScanService
             'is_suspicious' => $isSuspicious,
             'suspicious_reason' => $isSuspicious ? implode('; ', $suspiciousReasons) : null,
         ];
+
+        $riskProbe = new Attendance(array_merge($payload, [
+            'user_id' => $user->id,
+            'date' => $date,
+        ]));
+        $risk = $this->attendanceRiskScorer->score(
+            attendance: $riskProbe,
+            barcode: $barcode,
+            shift: $shift,
+            event: 'check_in',
+            context: [
+                'distance' => $distance,
+                'gps_accuracy' => $gpsAccuracy,
+                'gps_variance' => $gpsVariance,
+                'source' => $scanSource,
+            ],
+        );
+
+        $payload = array_merge($payload, [
+            'is_suspicious' => $isSuspicious || $risk['score'] >= 25,
+            'risk_score' => $risk['score'],
+            'risk_level' => $risk['level'],
+            'risk_factors' => $risk['factors'],
+            'risk_evaluated_at' => $risk['evaluated_at'],
+        ]);
 
         if ($overrideable) {
             $overrideable->update($payload);

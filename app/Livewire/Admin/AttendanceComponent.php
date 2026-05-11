@@ -76,7 +76,7 @@ class AttendanceComponent extends Component
                 ->with('shift:id,name')
                 ->whereIn('user_id', $userIds)
                 ->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
-                ->get(['id', 'user_id', 'status', 'date', 'latitude_in', 'longitude_in', 'attachment', 'note', 'time_in', 'time_out', 'shift_id'])
+                ->get(['id', 'user_id', 'status', 'date', 'latitude_in', 'longitude_in', 'attachment', 'note', 'time_in', 'time_out', 'shift_id', 'is_suspicious', 'suspicious_reason'])
                 ->map(fn (Attendance $attendance) => $this->decorateAttendanceForGrid($attendance))
                 ->groupBy('user_id');
 

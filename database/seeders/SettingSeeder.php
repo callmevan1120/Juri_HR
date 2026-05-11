@@ -153,6 +153,48 @@ class SettingSeeder extends Seeder
                 'type' => 'number',
                 'description' => 'Bobot Skor Absensi dalam Penilaian Appraisal (%)',
             ],
+            [
+                'key' => 'payroll.country',
+                'value' => 'ID',
+                'group' => 'payroll',
+                'type' => 'text',
+                'description' => 'Payroll localization country code',
+            ],
+            [
+                'key' => 'payroll.tax_method',
+                'value' => 'pph21_ter',
+                'group' => 'payroll',
+                'type' => 'select',
+                'description' => 'Default Indonesian payroll tax method',
+            ],
+            [
+                'key' => 'payroll.bpjs_kesehatan_cap',
+                'value' => '12000000',
+                'group' => 'payroll',
+                'type' => 'number',
+                'description' => 'BPJS Kesehatan wage cap for payroll calculation',
+            ],
+            [
+                'key' => 'payroll.bpjs_jp_cap',
+                'value' => '10000000',
+                'group' => 'payroll',
+                'type' => 'number',
+                'description' => 'BPJS Ketenagakerjaan JP wage cap for payroll calculation',
+            ],
+            [
+                'key' => 'payroll.thr_prorata_enabled',
+                'value' => '1',
+                'group' => 'payroll',
+                'type' => 'boolean',
+                'description' => 'Enable prorated THR calculation for eligible employees',
+            ],
+            [
+                'key' => 'payroll.bank_instruction_format',
+                'value' => 'generic_csv',
+                'group' => 'payroll',
+                'type' => 'select',
+                'description' => 'Default payroll payment instruction export format',
+            ],
         ];
 
         foreach ($settings as $setting) {

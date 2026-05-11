@@ -20,7 +20,9 @@
     ])->filter()->values();
     $companyContact = $headerContact !== '' ? $headerContact : $contactLines->implode(' · ');
     $renderedBody = $body;
-    $documentDate = trim((string) ($documentMeta['Tanggal'] ?? ''));
+    $documentDate = collect(['Tanggal', __('Date'), 'Date'])
+        ->map(fn ($key) => trim((string) ($documentMeta[$key] ?? '')))
+        ->first(fn ($value) => $value !== '') ?? '';
     $logoSrc = $preview
         ? \App\Support\MailBranding::logoUrl()
         : \App\Support\MailBranding::logoPdfSource();

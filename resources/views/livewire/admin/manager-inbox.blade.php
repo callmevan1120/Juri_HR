@@ -87,13 +87,15 @@
                 </div>
 
                 @if($items->isEmpty())
-                    <x-admin.empty-state :title="__('Inbox Zero!')" :description="__('You have caught up with all your pending requests.')" :framed="true" class="border-dashed">
-                        <x-slot name="icon">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-success-50 dark:bg-success-900/20">
+                    <div class="flex min-h-[12rem] w-full items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 md:min-h-[calc(100vh-19rem)]">
+                        <div>
+                            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-50 dark:bg-success-900/20">
                                 <x-heroicon-o-check-badge class="h-6 w-6 text-success-500" />
                             </div>
-                        </x-slot>
-                    </x-admin.empty-state>
+                            <h3 class="mt-3 text-sm font-semibold text-gray-900 dark:text-white">{{ __('Inbox Zero!') }}</h3>
+                            <p class="sr-only">{{ __('You have caught up with all your pending requests.') }}</p>
+                        </div>
+                    </div>
                 @else
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                         @foreach($items as $item)

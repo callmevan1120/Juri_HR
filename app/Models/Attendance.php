@@ -61,6 +61,10 @@ class Attendance extends Model
         'approved_by',
         'approved_at',
         'rejection_note',
+        'risk_score',
+        'risk_level',
+        'risk_factors',
+        'risk_evaluated_at',
     ];
 
     const STATUS_PENDING = 'pending';
@@ -81,6 +85,10 @@ class Attendance extends Model
             'longitude_in' => 'float',
             'latitude_out' => 'float',
             'longitude_out' => 'float',
+            'is_suspicious' => 'boolean',
+            'risk_score' => 'integer',
+            'risk_factors' => 'array',
+            'risk_evaluated_at' => 'datetime',
         ];
     }
 

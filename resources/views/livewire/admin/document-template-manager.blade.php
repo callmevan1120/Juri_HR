@@ -413,8 +413,8 @@
                 </x-admin.panel>
             </section>
 
-            <aside class="xl:sticky xl:top-24 xl:self-start">
-                <x-admin.panel class="overflow-hidden p-0">
+            <aside class="min-h-0 xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:self-start">
+                <x-admin.panel class="flex max-h-[78vh] min-h-0 flex-col overflow-hidden p-0 xl:max-h-[calc(100vh-7rem)]">
                     <div class="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3 dark:border-gray-800">
                         <div>
                             <div class="flex items-center gap-2">
@@ -430,13 +430,13 @@
                             {{ __('PDF') }}
                         </x-actions.button>
                     </div>
-                    <div class="relative">
+                    <div class="relative min-h-0 flex-1">
                         <div wire:loading.flex
                             wire:target="templateBuilderForm,documentTemplateForm.name,documentTemplateForm.body,documentTemplateForm.footer,documentTemplateForm.paper_size,documentTemplateForm.orientation,documentTemplateForm.layout_options"
                             class="absolute right-3 top-3 z-10 items-center rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm ring-1 ring-primary-100 dark:bg-gray-900/95 dark:text-primary-200 dark:ring-primary-900">
                             {{ __('Updating preview...') }}
                         </div>
-                        <div class="document-template-live-preview max-h-[calc(100vh-9rem)] overflow-auto bg-slate-950 p-4">
+                        <div class="document-template-live-preview h-[62vh] overflow-auto overscroll-contain bg-slate-950 p-4 xl:h-[calc(100vh-12rem)]">
                             {!! $templatePreviewHtml !!}
                         </div>
                     </div>

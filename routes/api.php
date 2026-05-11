@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Device\BarcodeScanController;
 use App\Http\Controllers\Api\Device\LocationController;
+use App\Http\Controllers\Api\Device\OfflineAttendanceSyncController;
 use App\Http\Controllers\Api\Device\PermissionsStatusController;
 use App\Http\Controllers\Api\Device\PhotoUploadController;
 use App\Http\Controllers\Api\WilayahController;
@@ -25,6 +26,7 @@ Route::prefix('wilayah')->middleware('throttle:api')->group(function () {
 Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('device')->group(function () {
     Route::post('/location', LocationController::class)->middleware('abilities:'.ApiTokenPermission::DEVICE_LOCATION);
     Route::post('/barcode', BarcodeScanController::class)->middleware('abilities:'.ApiTokenPermission::DEVICE_BARCODE);
+    Route::post('/offline-attendance', OfflineAttendanceSyncController::class)->middleware('abilities:'.ApiTokenPermission::DEVICE_BARCODE);
     Route::post('/photo', PhotoUploadController::class)->middleware('abilities:'.ApiTokenPermission::DEVICE_PHOTO);
     Route::get('/permissions', PermissionsStatusController::class)->middleware('abilities:'.ApiTokenPermission::DEVICE_PERMISSIONS);
 });

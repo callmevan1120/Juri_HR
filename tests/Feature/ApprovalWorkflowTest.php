@@ -3,15 +3,18 @@
 use App\Livewire\Admin\ReimbursementManager;
 use App\Livewire\User\Finance\TeamCashAdvanceManager;
 use App\Livewire\User\TeamApprovals;
+use App\Models\ApprovalMatrixRule;
 use App\Models\CashAdvance;
 use App\Models\Division;
 use App\Models\JobLevel;
 use App\Models\JobTitle;
 use App\Models\Reimbursement;
+use App\Models\Role;
 use App\Models\User;
 use App\Notifications\CashAdvanceUpdated;
 use App\Notifications\ReimbursementStatusUpdated;
 use App\Support\TeamApprovalQueryService;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 
@@ -190,6 +193,65 @@ test('finance head can finalize pending finance reimbursements from manager queu
     Notification::assertSentTo($employee, ReimbursementStatusUpdated::class);
 });
 
+test('approval matrix can require manager finance and hr role for high value reimbursement', function () {
+    Notification::fake();
+
+    [$manager, $employee] = createApprovalHierarchy();
+    $financeHead = createFinanceHead();
+    $hr = User::factory()->create();
+    $hrRole = Role::create([
+        'name' => 'HR Head Matrix',
+        'slug' => 'hr_head_matrix',
+        'description' => 'Can approve HR matrix steps.',
+        'permissions' => [],
+    ]);
+    $hr->roles()->sync([$hrRole->id]);
+
+    ApprovalMatrixRule::create([
+        'workflow' => ApprovalMatrixRule::WORKFLOW_REIMBURSEMENT,
+        'name' => 'High value reimbursement',
+        'priority' => 100,
+        'conditions' => ['min_amount' => 5000000],
+        'steps' => [
+            ['key' => 'direct_manager', 'label' => 'Direct Manager', 'approver_type' => 'direct_manager'],
+            ['key' => 'finance_head', 'label' => 'Finance Head', 'approver_type' => 'finance_head'],
+            ['key' => 'hr_head', 'label' => 'HR Head', 'approver_type' => 'role', 'role' => 'hr_head_matrix'],
+        ],
+    ]);
+
+    $reimbursement = Reimbursement::create([
+        'user_id' => $employee->id,
+        'date' => now()->toDateString(),
+        'type' => 'Travel',
+        'amount' => 6000000,
+        'description' => 'Out of town implementation.',
+        'status' => 'pending',
+    ]);
+
+    app(\App\Support\ReimbursementApprovalService::class)->approve($reimbursement, $manager);
+    $reimbursement->refresh();
+
+    expect($reimbursement->status)->toBe('pending_finance')
+        ->and($reimbursement->approval_current_step)->toBe('finance_head')
+        ->and($reimbursement->head_approved_by)->toBe($manager->id);
+
+    app(\App\Support\ReimbursementApprovalService::class)->approve($reimbursement, $financeHead);
+    $reimbursement->refresh();
+
+    expect($reimbursement->status)->toBe('pending_matrix')
+        ->and($reimbursement->approval_current_step)->toBe('hr_head')
+        ->and($reimbursement->finance_approved_by)->toBe($financeHead->id)
+        ->and(Gate::forUser($hr)->allows('approve', $reimbursement))->toBeTrue();
+
+    app(\App\Support\ReimbursementApprovalService::class)->approve($reimbursement, $hr);
+    $reimbursement->refresh();
+
+    expect($reimbursement->status)->toBe('approved')
+        ->and($reimbursement->approval_current_step)->toBeNull()
+        ->and($reimbursement->approved_by)->toBe($hr->id)
+        ->and($reimbursement->approval_completed_steps)->toHaveCount(3);
+});
+
 test('team cash advance manager allows authorized supervisor to approve subordinate request', function () {
     enableEnterpriseAttendanceForTests();
 
@@ -218,6 +280,49 @@ test('team cash advance manager allows authorized supervisor to approve subordin
         ->and($advance->head_approved_at)->not->toBeNull();
 
     Notification::assertSentTo($employee, CashAdvanceUpdated::class);
+});
+
+test('approval matrix can route cash advance through manager and finance', function () {
+    enableEnterpriseAttendanceForTests();
+    Notification::fake();
+
+    [$manager, $employee] = createApprovalHierarchy();
+    $financeHead = createFinanceHead();
+
+    ApprovalMatrixRule::create([
+        'workflow' => ApprovalMatrixRule::WORKFLOW_CASH_ADVANCE,
+        'name' => 'Large kasbon',
+        'priority' => 100,
+        'conditions' => ['min_amount' => 1000000],
+        'steps' => [
+            ['key' => 'direct_manager', 'label' => 'Direct Manager', 'approver_type' => 'direct_manager'],
+            ['key' => 'finance_head', 'label' => 'Finance Head', 'approver_type' => 'finance_head'],
+        ],
+    ]);
+
+    $advance = CashAdvance::create([
+        'user_id' => $employee->id,
+        'amount' => 1500000,
+        'purpose' => 'Emergency project float',
+        'payment_month' => (int) now()->month,
+        'payment_year' => (int) now()->year,
+        'status' => 'pending',
+    ]);
+
+    app(\App\Support\CashAdvanceApprovalService::class)->approve($advance, $manager);
+    $advance->refresh();
+
+    expect($advance->status)->toBe('pending_finance')
+        ->and($advance->approval_current_step)->toBe('finance_head')
+        ->and($advance->head_approved_by)->toBe($manager->id);
+
+    app(\App\Support\CashAdvanceApprovalService::class)->approve($advance, $financeHead);
+    $advance->refresh();
+
+    expect($advance->status)->toBe('approved')
+        ->and($advance->approved_by)->toBe($financeHead->id)
+        ->and($advance->finance_approved_by)->toBe($financeHead->id)
+        ->and($advance->approval_completed_steps)->toHaveCount(2);
 });
 
 test('team cash advance manager forbids unrelated users from approving subordinate request', function () {

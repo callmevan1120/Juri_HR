@@ -4,6 +4,7 @@ namespace App\Services\Attendance;
 
 use App\Models\ActivityLog;
 use App\Models\Attendance;
+use App\Support\AttendanceRiskScorer;
 use App\Support\DynamicBarcodeTokenService;
 use Ballen\Distical\Calculator as DistanceCalculator;
 use Ballen\Distical\Entities\LatLong;
@@ -14,10 +15,21 @@ class DeviceAttendanceService
 {
     public function __construct(
         protected DynamicBarcodeTokenService $dynamicBarcodeTokenService,
+        protected AttendanceRiskScorer $attendanceRiskScorer,
     ) {}
 
-    public function saveBarcodeScan(int|string $userId, string $barcodePayload, float $latitude, float $longitude, ?string $timestamp = null): array
-    {
+    public function saveBarcodeScan(
+        int|string $userId,
+        string $barcodePayload,
+        float $latitude,
+        float $longitude,
+        ?string $timestamp = null,
+        ?float $gpsAccuracy = null,
+        ?float $gpsVariance = null,
+        bool $mockLocationDetected = false,
+        bool $offlineSubmitted = false,
+        int $qrTokenRetries = 0,
+    ): array {
         $scanContext = $this->dynamicBarcodeTokenService->resolveScannedBarcodeWithSource($barcodePayload);
         $barcode = $scanContext['barcode'];
         $scanSource = $scanContext['source'] ?? 'static';
@@ -70,6 +82,8 @@ class DeviceAttendanceService
                 'time_in' => $attendanceTime,
                 'latitude_in' => $latitude,
                 'longitude_in' => $longitude,
+                'accuracy_in' => $gpsAccuracy,
+                'gps_variance_in' => $gpsVariance,
                 'status' => $attendance->status === 'absent' ? 'present' : ($attendance->status ?: 'present'),
             ]);
             $action = 'check_in';
@@ -87,6 +101,8 @@ class DeviceAttendanceService
                 'time_out' => $attendanceTime,
                 'latitude_out' => $latitude,
                 'longitude_out' => $longitude,
+                'accuracy_out' => $gpsAccuracy,
+                'gps_variance_out' => $gpsVariance,
             ]);
             $action = 'check_out';
         } else {
@@ -96,6 +112,38 @@ class DeviceAttendanceService
                 'status' => 409,
             ];
         }
+
+        $risk = $this->attendanceRiskScorer->score(
+            attendance: $attendance,
+            barcode: $barcode,
+            shift: $attendance->shift,
+            event: $action,
+            context: [
+                'distance' => $distance,
+                'gps_accuracy' => $gpsAccuracy,
+                'gps_variance' => $gpsVariance,
+                'mock_location_detected' => $mockLocationDetected,
+                'offline_submitted' => $offlineSubmitted,
+                'qr_token_retries' => $qrTokenRetries,
+                'source' => $scanSource,
+            ],
+        );
+
+        if ($attendance->exists) {
+            $risk = $this->attendanceRiskScorer->merge(
+                $attendance->risk_factors,
+                (int) ($attendance->risk_score ?? 0),
+                $risk,
+            );
+        }
+
+        $attendance->fill([
+            'is_suspicious' => (bool) $attendance->is_suspicious || $risk['score'] >= 25,
+            'risk_score' => $risk['score'],
+            'risk_level' => $risk['level'],
+            'risk_factors' => $risk['factors'],
+            'risk_evaluated_at' => $risk['evaluated_at'],
+        ]);
 
         $attendance->save();
 

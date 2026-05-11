@@ -25,6 +25,11 @@ class BarcodeScanController extends Controller
                 latitude: (float) $validated['latitude'],
                 longitude: (float) $validated['longitude'],
                 timestamp: $validated['timestamp'] ?? null,
+                gpsAccuracy: isset($validated['accuracy']) ? (float) $validated['accuracy'] : null,
+                gpsVariance: isset($validated['gps_variance']) ? (float) $validated['gps_variance'] : null,
+                mockLocationDetected: (bool) ($validated['mock_location_detected'] ?? false),
+                offlineSubmitted: (bool) ($validated['offline_submitted'] ?? false),
+                qrTokenRetries: (int) ($validated['qr_token_retries'] ?? 0),
             );
 
             if (! $result['ok']) {

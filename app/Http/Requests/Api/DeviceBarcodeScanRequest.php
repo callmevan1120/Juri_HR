@@ -21,6 +21,11 @@ class DeviceBarcodeScanRequest extends FormRequest
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'timestamp' => ['nullable', 'date_format:Y-m-d H:i:s'],
+            'accuracy' => ['nullable', 'numeric', 'min:0'],
+            'gps_variance' => ['nullable', 'numeric', 'min:0'],
+            'mock_location_detected' => ['nullable', 'boolean'],
+            'offline_submitted' => ['nullable', 'boolean'],
+            'qr_token_retries' => ['nullable', 'integer', 'min:0', 'max:10'],
         ];
     }
 }

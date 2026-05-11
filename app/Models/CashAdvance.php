@@ -11,6 +11,10 @@ class CashAdvance extends Model
         'amount',
         'purpose',
         'status',
+        'approval_matrix_rule_id',
+        'approval_steps',
+        'approval_current_step',
+        'approval_completed_steps',
         'payment_month',
         'payment_year',
         'approved_by',
@@ -23,6 +27,8 @@ class CashAdvance extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'approval_steps' => 'array',
+        'approval_completed_steps' => 'array',
         'approved_at' => 'datetime',
         'head_approved_at' => 'datetime',
         'finance_approved_at' => 'datetime',

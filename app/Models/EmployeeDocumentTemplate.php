@@ -17,13 +17,22 @@ class EmployeeDocumentTemplate extends Model
         'footer',
         'layout_options',
         'is_active',
+        'is_marketplace',
+        'marketplace_slug',
+        'marketplace_category',
+        'marketplace_tags',
+        'source_template_id',
+        'published_at',
         'created_by',
         'updated_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_marketplace' => 'boolean',
         'layout_options' => 'array',
+        'marketplace_tags' => 'array',
+        'published_at' => 'datetime',
     ];
 
     public function documentType(): BelongsTo
@@ -44,5 +53,10 @@ class EmployeeDocumentTemplate extends Model
     public function generatedRequests(): HasMany
     {
         return $this->hasMany(EmployeeDocumentRequest::class, 'generated_template_id');
+    }
+
+    public function sourceTemplate(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'source_template_id');
     }
 }

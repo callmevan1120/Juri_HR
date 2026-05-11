@@ -36,6 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'nip',
+        'company_id',
         'name',
         'email',
         'password',
@@ -58,9 +59,20 @@ class User extends Authenticatable implements MustVerifyEmail
         'language',
         'basic_salary',
         'hourly_rate',
+        'ptkp_status',
+        'bank_name',
+        'bank_account_name',
+        'bank_account_number',
         'payslip_password',
         'payslip_password_set_at',
         'employment_status',
+        'probation_ends_at',
+        'contract_ends_at',
+        'resignation_submitted_at',
+        'resigned_at',
+        'resignation_reason',
+        'exit_interview_completed_at',
+        'account_auto_disable_at',
         'account_deletion_requested_at',
         'account_deletion_reason',
         'account_deletion_reviewed_at',
@@ -102,6 +114,12 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'email_verification_code_expires_at' => 'datetime',
             'birth_date' => 'datetime:Y-m-d',
+            'probation_ends_at' => 'date',
+            'contract_ends_at' => 'date',
+            'resignation_submitted_at' => 'datetime',
+            'resigned_at' => 'datetime',
+            'exit_interview_completed_at' => 'datetime',
+            'account_auto_disable_at' => 'datetime',
             'account_deletion_requested_at' => 'datetime',
             'account_deletion_reviewed_at' => 'datetime',
             'password' => 'hashed',
@@ -337,6 +355,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Education::class);
     }
 
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
     public function division()
     {
         return $this->belongsTo(Division::class);
@@ -380,6 +403,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function employeeDocumentRequests()
     {
         return $this->hasMany(EmployeeDocumentRequest::class);
+    }
+
+    public function hrChecklistCases(): HasMany
+    {
+        return $this->hasMany(HrChecklistCase::class);
+    }
+
+    public function notificationPreferences(): HasMany
+    {
+        return $this->hasMany(UserNotificationPreference::class);
     }
 
     public function hasAssignedRoles(): bool

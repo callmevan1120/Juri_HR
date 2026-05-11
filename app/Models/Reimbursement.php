@@ -14,6 +14,10 @@ class Reimbursement extends Model
         'description',
         'attachment',
         'status',
+        'approval_matrix_rule_id',
+        'approval_steps',
+        'approval_current_step',
+        'approval_completed_steps',
         'admin_note',
         'approved_by',
         'head_approved_by',
@@ -25,6 +29,8 @@ class Reimbursement extends Model
     protected $casts = [
         'date' => 'date',
         'amount' => 'decimal:2',
+        'approval_steps' => 'array',
+        'approval_completed_steps' => 'array',
         'head_approved_at' => 'datetime',
         'finance_approved_at' => 'datetime',
     ];

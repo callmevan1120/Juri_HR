@@ -41,6 +41,11 @@ class ActivityLog extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function details()
+    {
+        return $this->hasMany(ActivityLogDetail::class);
+    }
+
     public static function record($action, $description = null)
     {
         // Open Core: Delegate to Service (Community = No-op, Enterprise = Logged)
