@@ -16,6 +16,8 @@ class HrChecklistTemplate extends Model
         'type',
         'name',
         'description',
+        'division_id',
+        'job_title_id',
         'is_active',
         'created_by',
     ];
@@ -27,6 +29,16 @@ class HrChecklistTemplate extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
+    }
+
+    public function jobTitle(): BelongsTo
+    {
+        return $this->belongsTo(JobTitle::class);
     }
 
     public function items(): HasMany

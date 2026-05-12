@@ -9,6 +9,7 @@ use App\Models\HrChecklistTemplateItem;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class HrChecklistService
 {
@@ -50,10 +51,13 @@ class HrChecklistService
                 'effective_date' => $effectiveDate->toDateString(),
                 'started_by' => $actor->id,
             ]);
+            $previousTask = null;
 
             foreach ($template->items as $item) {
-                $case->tasks()->create([
+                $dependsOnPrevious = (bool) data_get($item->metadata, 'depends_on_previous', false);
+                $task = $case->tasks()->create([
                     'template_item_id' => $item->id,
+                    'depends_on_task_id' => $dependsOnPrevious ? $previousTask?->id : null,
                     'assigned_to' => $this->resolveAssigneeId($item, $employee, $actor),
                     'title' => $item->title,
                     'description' => $item->description,
@@ -61,6 +65,7 @@ class HrChecklistService
                     'due_date' => $effectiveDate->copy()->addDays((int) $item->due_offset_days)->toDateString(),
                     'status' => HrChecklistTask::STATUS_PENDING,
                 ]);
+                $previousTask = $task;
             }
 
             return $case->load(['user', 'template', 'tasks.assignee']);
@@ -69,6 +74,14 @@ class HrChecklistService
 
     public function updateTaskStatus(HrChecklistTask $task, User $actor, string $status, ?string $notes = null): HrChecklistTask
     {
+        $task->loadMissing('dependency');
+
+        if (in_array($status, HrChecklistTask::closedStatuses(), true) && ! $task->dependencyIsClosed()) {
+            throw ValidationException::withMessages([
+                'task' => __('Complete the dependent task before closing this task.'),
+            ]);
+        }
+
         $closed = in_array($status, HrChecklistTask::closedStatuses(), true);
 
         DB::transaction(function () use ($task, $actor, $status, $notes, $closed): void {
@@ -83,6 +96,55 @@ class HrChecklistService
         });
 
         return $task->refresh();
+    }
+
+    public function recordTaskAttachment(HrChecklistTask $task, string $path, string $originalName): HrChecklistTask
+    {
+        $task->update([
+            'attachment_path' => $path,
+            'attachment_original_name' => $originalName,
+            'attachment_uploaded_at' => now(),
+        ]);
+
+        return $task->refresh();
+    }
+
+    public function templateFor(User $employee, string $type): ?HrChecklistTemplate
+    {
+        return HrChecklistTemplate::query()
+            ->where('type', $type)
+            ->where('is_active', true)
+            ->orderByRaw('case when job_title_id = ? then 0 when division_id = ? then 1 else 2 end', [
+                $employee->job_title_id ?? 0,
+                $employee->division_id ?? 0,
+            ])
+            ->where(function ($query) use ($employee): void {
+                $query
+                    ->where(function ($nested): void {
+                        $nested->whereNull('division_id')->whereNull('job_title_id');
+                    })
+                    ->orWhere('division_id', $employee->division_id)
+                    ->orWhere('job_title_id', $employee->job_title_id);
+            })
+            ->orderBy('name')
+            ->first();
+    }
+
+    public function createCaseForEmployeeStatus(User $employee, User $actor, string $status, Carbon|string $effectiveDate): ?HrChecklistCase
+    {
+        $type = match ($status) {
+            User::EMPLOYMENT_STATUS_ACTIVE => HrChecklistTemplate::TYPE_ONBOARDING,
+            User::EMPLOYMENT_STATUS_RESIGNED, User::EMPLOYMENT_STATUS_INACTIVE => HrChecklistTemplate::TYPE_OFFBOARDING,
+            default => null,
+        };
+
+        if ($type === null) {
+            return null;
+        }
+
+        $template = $this->templateFor($employee, $type);
+
+        return $template ? $this->createCase($employee, $template, $actor, $effectiveDate) : null;
     }
 
     public function refreshCaseStatus(HrChecklistCase $case): void

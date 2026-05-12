@@ -76,4 +76,25 @@ class HrChecklistCase extends Model
 
         return (int) round(((int) $closed / (int) $total) * 100);
     }
+
+    /**
+     * @return array{total:int,closed:int,pending:int,blocked:int,overdue:int,clearance_ready:bool}
+     */
+    public function clearanceSummary(): array
+    {
+        $tasks = $this->relationLoaded('tasks') ? $this->tasks : $this->tasks()->get();
+        $closedStatuses = HrChecklistTask::closedStatuses();
+
+        $closed = $tasks->whereIn('status', $closedStatuses)->count();
+        $blocked = $tasks->where('status', HrChecklistTask::STATUS_BLOCKED)->count();
+
+        return [
+            'total' => $tasks->count(),
+            'closed' => $closed,
+            'pending' => $tasks->where('status', HrChecklistTask::STATUS_PENDING)->count(),
+            'blocked' => $blocked,
+            'overdue' => $tasks->filter(fn (HrChecklistTask $task): bool => $task->isOverdue())->count(),
+            'clearance_ready' => $tasks->count() > 0 && $closed === $tasks->count() && $blocked === 0,
+        ];
+    }
 }

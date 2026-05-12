@@ -7,10 +7,13 @@ use App\Models\ActivityLogDetail;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\CompanyAsset;
 use App\Models\Payroll;
 use App\Models\PayrollComponent;
 use App\Models\Reimbursement;
 use App\Models\Role;
+use App\Models\Setting;
+use App\Models\SystemBackupRun;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -116,6 +119,30 @@ class SensitiveAuditTrail
                 'finance_approved_by',
                 'finance_approved_at',
             ],
+            CompanyAsset::class => [
+                'user_id',
+                'date_assigned',
+                'return_date',
+                'status',
+                'notes',
+            ],
+            Setting::class => [
+                'key',
+                'value',
+                'group',
+                'type',
+            ],
+            SystemBackupRun::class => [
+                'type',
+                'status',
+                'file_path',
+                'file_name',
+                'size_bytes',
+                'error_message',
+                'started_at',
+                'completed_at',
+                'failed_at',
+            ],
         ];
     }
 
@@ -156,8 +183,8 @@ class SensitiveAuditTrail
                     'entity_type' => $model::class,
                     'entity_id' => (string) $model->getKey(),
                     'field' => $field,
-                    'old_value' => $this->normalizeValue($field, $model->getOriginal($field)),
-                    'new_value' => $this->normalizeValue($field, $model->getAttribute($field)),
+                    'old_value' => $this->normalizeValue($field, $model->getOriginal($field), $model),
+                    'new_value' => $this->normalizeValue($field, $model->getAttribute($field), $model),
                     'metadata' => [
                         'table' => $model->getTable(),
                         'model' => class_basename($model),
@@ -192,8 +219,12 @@ class SensitiveAuditTrail
     /**
      * @return array{redacted?: bool, masked?: bool, value?: mixed}
      */
-    private function normalizeValue(string $field, mixed $value): array
+    private function normalizeValue(string $field, mixed $value, ?Model $model = null): array
     {
+        if ($model instanceof Setting && $field === 'value' && str((string) $model->key)->contains(['license', 'secret', 'token', 'password'])) {
+            return ['redacted' => true];
+        }
+
         if ($this->shouldRedact($field)) {
             return ['redacted' => true];
         }
@@ -218,7 +249,7 @@ class SensitiveAuditTrail
 
     private function shouldRedact(string $field): bool
     {
-        return str($field)->contains(['password', 'token', 'secret', 'recovery']);
+        return str($field)->contains(['password', 'token', 'secret', 'recovery', 'enterprise_license']);
     }
 
     private function shouldMask(string $field): bool

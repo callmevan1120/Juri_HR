@@ -6,8 +6,8 @@ use App\Models\HrChecklistCase;
 use App\Models\HrChecklistTask;
 use App\Models\HrChecklistTemplate;
 use App\Models\User;
+use App\Queries\Hr\HrChecklistManagerQuery;
 use App\Support\HrChecklistService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -173,54 +173,30 @@ class HrChecklistManager extends Component
             ->value('id');
     }
 
-    public function render()
+    public function render(HrChecklistManagerQuery $query)
     {
-        $casesQuery = HrChecklistCase::query()
-            ->with(['user.division', 'user.jobTitle', 'template'])
-            ->withCount([
-                'tasks',
-                'tasks as closed_tasks_count' => fn (Builder $query) => $query->whereIn('status', HrChecklistTask::closedStatuses()),
-            ])
-            ->when($this->typeFilter !== 'all', fn (Builder $query) => $query->where('type', $this->typeFilter))
-            ->when($this->statusFilter !== 'all', fn (Builder $query) => $query->where('status', $this->statusFilter))
-            ->when($this->search !== '', function (Builder $query) {
-                $query->where(function (Builder $subQuery) {
-                    $subQuery
-                        ->whereHas('user', fn (Builder $userQuery) => $userQuery
-                            ->where('name', 'like', '%'.$this->search.'%')
-                            ->orWhere('nip', 'like', '%'.$this->search.'%'))
-                        ->orWhereHas('template', fn (Builder $templateQuery) => $templateQuery->where('name', 'like', '%'.$this->search.'%'));
-                });
-            })
-            ->latest('effective_date')
-            ->latest();
-
-        $selectedCase = $this->selectedCaseId
-            ? HrChecklistCase::with(['user.directManager', 'template', 'tasks.assignee', 'tasks.completer'])
-                ->withCount([
-                    'tasks',
-                    'tasks as closed_tasks_count' => fn (Builder $query) => $query->whereIn('status', HrChecklistTask::closedStatuses()),
-                ])
-                ->find($this->selectedCaseId)
-            : null;
+        $selectedCase = $query->selectedCase($this->selectedCaseId);
 
         return view('livewire.admin.hr-checklist-manager', [
-            'cases' => $casesQuery->paginate(30),
+            'cases' => $query->cases($this->typeFilter, $this->statusFilter, $this->search),
             'selectedCase' => $selectedCase,
-            'templates' => HrChecklistTemplate::with('items')->orderBy('type')->orderBy('name')->get(),
-            'templateOptions' => HrChecklistTemplate::query()
-                ->where('type', $this->type)
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(),
-            'employeeOptions' => User::query()
-                ->where('group', 'user')
-                ->managedBy(auth()->user())
-                ->orderBy('name')
-                ->get(['id', 'name', 'nip', 'division_id', 'job_title_id']),
+            'templates' => $query->templates(),
+            'templateOptions' => $query->templateOptions($this->type),
+            'employeeOptions' => $query->employeeOptions(auth()->user()),
             'types' => HrChecklistTemplate::types(),
             'caseStatuses' => HrChecklistCase::statuses(),
             'taskStatuses' => HrChecklistTask::statuses(),
+            'taskColumns' => [
+                HrChecklistTask::STATUS_PENDING => __('Pending'),
+                HrChecklistTask::STATUS_BLOCKED => __('Blocked'),
+                HrChecklistTask::STATUS_SKIPPED => __('Skipped'),
+                HrChecklistTask::STATUS_DONE => __('Done'),
+            ],
+            'caseColumns' => [
+                HrChecklistCase::STATUS_ACTIVE => __('Active Cases'),
+                HrChecklistCase::STATUS_COMPLETED => __('Completed'),
+                HrChecklistCase::STATUS_CANCELLED => __('Cancelled'),
+            ],
         ]);
     }
 }

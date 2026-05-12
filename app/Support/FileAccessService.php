@@ -56,10 +56,11 @@ class FileAccessService
             }
 
             ActivityLog::record($auditAction, $this->describe($path, $description, $diskName));
+            $headers = ['Content-Type' => $this->contentTypeForPath($path)];
 
             return $download
-                ? $disk->download($path)
-                : $disk->response($path);
+                ? $disk->download($path, null, $headers)
+                : $disk->response($path, null, $headers);
         }
 
         ActivityLog::record("{$auditAction} Missing", $this->describe($path, $description, 'missing'));
@@ -71,5 +72,17 @@ class FileAccessService
         $prefix = $description ? trim($description).'. ' : '';
 
         return $prefix.'File `'.basename($path).'` via '.$location.' handle.';
+    }
+
+    protected function contentTypeForPath(string $path): string
+    {
+        return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'gif' => 'image/gif',
+            'jpeg', 'jpg' => 'image/jpeg',
+            'pdf' => 'application/pdf',
+            'png' => 'image/png',
+            'webp' => 'image/webp',
+            default => 'application/octet-stream',
+        };
     }
 }

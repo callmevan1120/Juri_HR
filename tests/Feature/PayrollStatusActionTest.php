@@ -1,5 +1,6 @@
 <?php
 
+use App\Contracts\PayrollServiceInterface;
 use App\Jobs\SendPayrollPayslipEmail;
 use App\Livewire\Admin\PayrollManager;
 use App\Mail\PayrollPayslipPasswordRequiredMail;
@@ -10,7 +11,6 @@ use App\Models\Role;
 use App\Models\User;
 use App\Notifications\PayrollPaid;
 use App\Support\PayslipPdfFactory;
-use App\Contracts\PayrollServiceInterface;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;

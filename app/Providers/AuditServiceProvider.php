@@ -7,10 +7,12 @@ use App\Models\ActivityLog;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\CompanyAsset;
 use App\Models\Payroll;
 use App\Models\PayrollComponent;
 use App\Models\Reimbursement;
 use App\Models\Role;
+use App\Models\Setting;
 use App\Models\SystemBackupRun;
 use App\Models\User;
 use App\Observers\SensitiveModelAuditObserver;
@@ -48,6 +50,8 @@ class AuditServiceProvider extends ServiceProvider
             Attendance::class,
             Reimbursement::class,
             CashAdvance::class,
+            CompanyAsset::class,
+            Setting::class,
         ] as $modelClass) {
             $modelClass::observe(SensitiveModelAuditObserver::class);
         }

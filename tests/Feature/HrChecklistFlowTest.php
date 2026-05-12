@@ -1,11 +1,14 @@
 <?php
 
+use App\Actions\Hr\CreateChecklistCaseForEmployeeStatus;
 use App\Livewire\Admin\HrChecklistManager;
 use App\Livewire\User\HrTasksPage;
+use App\Models\Division;
 use App\Models\HrChecklistCase;
 use App\Models\HrChecklistTask;
 use App\Models\HrChecklistTemplate;
 use App\Models\HrChecklistTemplateItem;
+use App\Models\JobTitle;
 use App\Models\Role;
 use App\Models\User;
 use App\Support\HrChecklistService;
@@ -131,4 +134,90 @@ test('checklist case is completed when all tasks are closed', function () {
 
     expect($case->refresh()->status)->toBe(HrChecklistCase::STATUS_COMPLETED)
         ->and($case->completed_at)->not->toBeNull();
+});
+
+test('hr checklist v2 exposes overdue reminder dependency attachment and clearance summary', function () {
+    $service = app(HrChecklistService::class);
+    $hr = User::factory()->admin()->create();
+    $employee = User::factory()->create();
+
+    $template = HrChecklistTemplate::create([
+        'type' => HrChecklistTemplate::TYPE_ONBOARDING,
+        'name' => 'Dependency Onboarding',
+        'is_active' => true,
+        'created_by' => $hr->id,
+    ]);
+    $firstItem = $template->items()->create([
+        'title' => 'Upload signed policy',
+        'category' => 'documents',
+        'default_assignee_type' => HrChecklistTemplateItem::ASSIGNEE_EMPLOYEE,
+        'due_offset_days' => -2,
+        'is_required' => true,
+        'sort_order' => 1,
+    ]);
+    $template->items()->create([
+        'title' => 'Confirm system access',
+        'category' => 'access',
+        'default_assignee_type' => HrChecklistTemplateItem::ASSIGNEE_HR,
+        'due_offset_days' => -1,
+        'is_required' => true,
+        'sort_order' => 2,
+        'metadata' => ['depends_on_previous' => true],
+    ]);
+
+    $case = $service->createCase($employee, $template->fresh('items'), $hr, now()->subDay());
+    $firstTask = $case->tasks()->where('template_item_id', $firstItem->id)->firstOrFail();
+    $dependentTask = $case->tasks()->where('id', '!=', $firstTask->id)->firstOrFail();
+
+    expect(HrChecklistTask::query()->reminderReady()->pluck('id')->all())->toContain($firstTask->id)
+        ->and($dependentTask->depends_on_task_id)->toBe($firstTask->id)
+        ->and($case->fresh('tasks')->clearanceSummary()['overdue'])->toBe(2);
+
+    expect(fn () => $service->updateTaskStatus($dependentTask, $hr, HrChecklistTask::STATUS_DONE))
+        ->toThrow(\Illuminate\Validation\ValidationException::class);
+
+    $service->recordTaskAttachment($firstTask, 'hr-checklists/policy.pdf', 'policy.pdf');
+    $service->updateTaskStatus($firstTask->fresh(), $employee, HrChecklistTask::STATUS_DONE);
+    $service->updateTaskStatus($dependentTask->fresh(), $hr, HrChecklistTask::STATUS_DONE);
+
+    $summary = $case->fresh('tasks')->clearanceSummary();
+
+    expect($firstTask->fresh()->attachment_original_name)->toBe('policy.pdf')
+        ->and($case->refresh()->status)->toBe(HrChecklistCase::STATUS_COMPLETED)
+        ->and($summary['clearance_ready'])->toBeTrue();
+});
+
+test('hr checklist can be auto-created from employee status using scoped template', function () {
+    $service = app(HrChecklistService::class);
+    $hr = User::factory()->admin()->create();
+    $division = Division::create(['name' => 'Scoped HR']);
+    $jobTitle = JobTitle::create(['name' => 'Scoped Staff', 'division_id' => $division->id]);
+    $employee = User::factory()->create([
+        'division_id' => $division->id,
+        'job_title_id' => $jobTitle->id,
+    ]);
+
+    $template = HrChecklistTemplate::create([
+        'type' => HrChecklistTemplate::TYPE_OFFBOARDING,
+        'name' => 'Scoped Offboarding',
+        'division_id' => $division->id,
+        'job_title_id' => $jobTitle->id,
+        'is_active' => true,
+        'created_by' => $hr->id,
+    ]);
+    $template->items()->create([
+        'title' => 'Return division asset',
+        'category' => 'assets',
+        'default_assignee_type' => HrChecklistTemplateItem::ASSIGNEE_HR,
+        'due_offset_days' => 0,
+        'is_required' => true,
+        'sort_order' => 1,
+    ]);
+
+    $case = app(CreateChecklistCaseForEmployeeStatus::class)
+        ->handle($employee, $hr, User::EMPLOYMENT_STATUS_RESIGNED, now());
+
+    expect($case)->not->toBeNull()
+        ->and($case->template_id)->toBe($template->id)
+        ->and($case->tasks)->toHaveCount(1);
 });

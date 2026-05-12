@@ -63,7 +63,14 @@
                         <x-heroicon-m-arrow-left class="mr-1 h-4 w-4" /> {{ __('Back to Cases') }}
                     </x-actions.button>
                     <h2 class="text-base font-semibold text-gray-950 dark:text-white">{{ $selectedCase->user->name }} - {{ __('Checklist') }}</h2>
-                    <p class="mt-1 text-xs text-gray-600 dark:text-gray-300">{{ $selectedCase->template->typeLabel() }} · {{ $selectedCase->progressPercent() }}% {{ __('Completed') }}</p>
+                    @php
+                        $clearance = $selectedCase->clearanceSummary();
+                    @endphp
+                    <p class="mt-1 text-xs text-gray-600 dark:text-gray-300">
+                        {{ $selectedCase->template->typeLabel() }} · {{ $selectedCase->progressPercent() }}% {{ __('Completed') }} ·
+                        {{ __('Overdue') }}: {{ $clearance['overdue'] }} ·
+                        {{ $clearance['clearance_ready'] ? __('Clearance ready') : __('Clearance pending') }}
+                    </p>
                 </div>
                 <div>
                     @can('manageHrChecklists')
@@ -79,13 +86,13 @@
 
             <!-- Trello-style Drag and Drop Kanban for Tasks -->
             <div class="grid grid-cols-1 items-start gap-4 pb-10 sm:grid-cols-2 xl:grid-cols-4">
-                @foreach(['pending' => __('Pending'), 'blocked' => __('Blocked'), 'skipped' => __('Skipped'), 'done' => __('Done')] as $statusKey => $columnTitle)
+                @foreach ($taskColumns as $statusKey => $columnTitle)
                     <div
                         class="flex min-w-0 flex-col rounded-xl bg-gray-100/80 p-3 shadow-inner transition-colors duration-200 dark:bg-gray-800/60 max-h-[75vh]"
                         x-data="{ isHovered: false }"
-                        @dragover.prevent="isHovered = true"
-                        @dragleave.prevent="isHovered = false"
-                        @drop="isHovered = false; let taskId = $event.dataTransfer.getData('text/plain'); if(taskId) { $wire.updateTask(taskId, '{{ $statusKey }}') }"
+                        x-on:dragover.prevent="isHovered = true"
+                        x-on:dragleave.prevent="isHovered = false"
+                        x-on:drop="isHovered = false; let taskId = $event.dataTransfer.getData('text/plain'); if(taskId) { $wire.updateTask(taskId, '{{ $statusKey }}') }"
                         :class="isHovered ? 'ring-2 ring-primary-500 bg-primary-50 dark:bg-primary-900/30' : ''"
                     >
                         <div class="mb-3 flex items-center justify-between px-1">
@@ -96,7 +103,10 @@
                         </div>
 
                         <div class="flex flex-col gap-3 overflow-y-auto px-1 pb-2 hide-scrollbar">
-                            @forelse($selectedCase->tasks->where('status', $statusKey) as $task)
+                            @php
+                                $tasksForStatus = $selectedCase->tasks->where('status', $statusKey);
+                            @endphp
+                            @forelse ($tasksForStatus as $task)
                                 @php
                                     $taskTone = match ($task->status) {
                                         \App\Models\HrChecklistTask::STATUS_DONE => 'success',
@@ -109,7 +119,7 @@
                                     wire:key="task-{{ $task->id }}"
                                     class="group relative cursor-grab rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition-all hover:border-primary-400 hover:shadow-md focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 active:cursor-grabbing dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500"
                                     draggable="true"
-                                    @dragstart="$event.dataTransfer.setData('text/plain', '{{ $task->id }}')"
+                                    x-on:dragstart="$event.dataTransfer.setData('text/plain', '{{ $task->id }}')"
                                 >
                                     <div class="mb-2 flex items-center justify-between gap-2">
                                         <x-admin.status-badge :tone="$taskTone" class="shrink-0 text-[10px] uppercase tracking-wider">{{ __($task->status) }}</x-admin.status-badge>
@@ -123,6 +133,16 @@
                                     <h4 class="text-sm font-semibold leading-tight text-gray-900 dark:text-white">{{ __($task->title) }}</h4>
                                     @if($task->description)
                                         <p class="sr-only">{{ __($task->description) }}</p>
+                                    @endif
+                                    @if($task->depends_on_task_id)
+                                        <p class="mt-2 rounded-md bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+                                            {{ __('Depends on') }}: {{ $task->dependency?->title ?? __('another task') }}
+                                        </p>
+                                    @endif
+                                    @if($task->attachment_path)
+                                        <p class="mt-2 truncate rounded-md bg-sky-50 px-2 py-1 text-[11px] font-medium text-sky-700 dark:bg-sky-900/20 dark:text-sky-300">
+                                            {{ __('Attachment') }}: {{ $task->attachment_original_name ?? basename($task->attachment_path) }}
+                                        </p>
                                     @endif
 
                                     <div class="mt-3 flex items-center gap-2 border-t border-gray-100 pt-2.5 dark:border-gray-700/50">
@@ -170,7 +190,7 @@
         @else
             <!-- Cases Board View -->
             <div class="grid items-start gap-4 md:grid-cols-3">
-                @foreach (['active' => __('Active Cases'), 'completed' => __('Completed'), 'cancelled' => __('Cancelled')] as $statusKey => $columnTitle)
+                @foreach ($caseColumns as $statusKey => $columnTitle)
                     <div class="flex flex-col gap-3 rounded-xl bg-gray-50/80 p-3 shadow-inner dark:bg-gray-800/40">
                         <div class="flex items-center justify-between px-1">
                             <h3 class="text-sm font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">{{ $columnTitle }}</h3>
@@ -180,7 +200,10 @@
                         </div>
 
                         <div class="flex flex-col gap-3">
-                            @forelse ($cases->where('status', $statusKey) as $case)
+                            @php
+                                $casesForStatus = $cases->where('status', $statusKey);
+                            @endphp
+                            @forelse ($casesForStatus as $case)
                                 @php
                                     $statusTone = match ($case->status) {
                                         \App\Models\HrChecklistCase::STATUS_COMPLETED => 'success',
@@ -206,6 +229,11 @@
                                         </div>
                                     </div>
                                     <div class="mt-3 text-right">
+                                        @if(($case->overdue_tasks_count ?? 0) > 0)
+                                            <span class="mr-2 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+                                                {{ __('Overdue') }} {{ $case->overdue_tasks_count }}
+                                            </span>
+                                        @endif
                                         <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500">{{ $case->effective_date->translatedFormat('d M Y') }}</span>
                                     </div>
                                 </article>

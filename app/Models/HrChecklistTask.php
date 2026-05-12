@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -18,6 +19,7 @@ class HrChecklistTask extends Model
     protected $fillable = [
         'case_id',
         'template_item_id',
+        'depends_on_task_id',
         'assigned_to',
         'title',
         'description',
@@ -27,11 +29,15 @@ class HrChecklistTask extends Model
         'completed_by',
         'completed_at',
         'notes',
+        'attachment_path',
+        'attachment_original_name',
+        'attachment_uploaded_at',
     ];
 
     protected $casts = [
         'due_date' => 'date',
         'completed_at' => 'datetime',
+        'attachment_uploaded_at' => 'datetime',
     ];
 
     public function case(): BelongsTo
@@ -42,6 +48,11 @@ class HrChecklistTask extends Model
     public function templateItem(): BelongsTo
     {
         return $this->belongsTo(HrChecklistTemplateItem::class, 'template_item_id');
+    }
+
+    public function dependency(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'depends_on_task_id');
     }
 
     public function assignee(): BelongsTo
@@ -82,5 +93,19 @@ class HrChecklistTask extends Model
         return $this->status === self::STATUS_PENDING
             && $this->due_date !== null
             && now()->startOfDay()->greaterThan($this->due_date);
+    }
+
+    public function dependencyIsClosed(): bool
+    {
+        return $this->depends_on_task_id === null
+            || in_array($this->dependency?->status, self::closedStatuses(), true);
+    }
+
+    public function scopeReminderReady(Builder $query): Builder
+    {
+        return $query
+            ->where('status', self::STATUS_PENDING)
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '<', now()->toDateString());
     }
 }
