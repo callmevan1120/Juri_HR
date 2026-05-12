@@ -70,6 +70,15 @@
                                     </div>
                                 </dl>
 
+                                @if ($task->attachment_path)
+                                    @can('downloadAttachment', $task)
+                                        <a href="{{ route('hr-checklist.task-attachment.download', $task) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 ring-1 ring-inset ring-sky-600/20 transition hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:bg-sky-900/20 dark:text-sky-300">
+                                            <x-heroicon-m-paper-clip class="h-4 w-4" />
+                                            {{ $task->attachment_original_name ?? __('Download attachment') }}
+                                        </a>
+                                    @endcan
+                                @endif
+
                                 @can('update', $task)
                                     <div class="space-y-3">
                                         <x-forms.label for="task-note-{{ $task->id }}" value="{{ __('Note') }}" />

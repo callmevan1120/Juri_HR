@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Models\Setting;
 use App\Models\Shift;
 use App\Models\User;
+use App\Services\Attendance\AttendanceRiskScoringService;
 use Ballen\Distical\Calculator as DistanceCalculator;
 use Ballen\Distical\Entities\LatLong;
 use Illuminate\Support\Carbon;
@@ -18,6 +19,7 @@ class AttendanceScanService
 {
     public function __construct(
         private readonly DynamicBarcodeTokenService $dynamicBarcodeTokenService,
+        private readonly AttendanceRiskScoringService $attendanceRiskScoring,
         private readonly AttendanceRiskScorer $attendanceRiskScorer,
     ) {}
 
@@ -285,7 +287,7 @@ class AttendanceScanService
             $suspiciousReasons[] = 'Checkout zero GPS variance';
         }
 
-        $risk = $this->attendanceRiskScorer->score(
+        $risk = $this->attendanceRiskScoring->evaluate(
             attendance: $attendance,
             barcode: $barcode,
             shift: $attendance->shift,
@@ -295,6 +297,7 @@ class AttendanceScanService
                 'gps_accuracy' => $gpsAccuracy,
                 'gps_variance' => $gpsVariance,
                 'source' => $scanSource,
+                'barcode_source' => $scanSource,
             ],
         );
         $risk = $this->attendanceRiskScorer->merge(
@@ -385,7 +388,7 @@ class AttendanceScanService
             'user_id' => $user->id,
             'date' => $date,
         ]));
-        $risk = $this->attendanceRiskScorer->score(
+        $risk = $this->attendanceRiskScoring->evaluate(
             attendance: $riskProbe,
             barcode: $barcode,
             shift: $shift,
@@ -395,6 +398,7 @@ class AttendanceScanService
                 'gps_accuracy' => $gpsAccuracy,
                 'gps_variance' => $gpsVariance,
                 'source' => $scanSource,
+                'barcode_source' => $scanSource,
             ],
         );
 

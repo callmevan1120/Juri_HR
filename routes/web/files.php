@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\User\AttendanceController;
 use App\Http\Controllers\User\AttendancePhotoController;
+use App\Http\Controllers\User\HrChecklistTaskAttachmentController;
 use App\Http\Controllers\User\ReimbursementAttachmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +24,8 @@ Route::middleware([
     Route::get('/reimbursement/attachment/{reimbursement}', [ReimbursementAttachmentController::class, 'show'])
         ->name('reimbursement.attachment.download')
         ->can('view', 'reimbursement');
+
+    Route::get('/hr-checklist/task-attachment/{task}', [HrChecklistTaskAttachmentController::class, 'show'])
+        ->name('hr-checklist.task-attachment.download')
+        ->can('downloadAttachment', 'task');
 });

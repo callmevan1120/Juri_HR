@@ -13,6 +13,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Support\HrChecklistService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 test('admin and hr roles can access hr checklists while employees cannot', function () {
@@ -185,6 +186,43 @@ test('hr checklist v2 exposes overdue reminder dependency attachment and clearan
     expect($firstTask->fresh()->attachment_original_name)->toBe('policy.pdf')
         ->and($case->refresh()->status)->toBe(HrChecklistCase::STATUS_COMPLETED)
         ->and($summary['clearance_ready'])->toBeTrue();
+});
+
+test('hr checklist task attachment download is protected by task policy', function () {
+    Storage::fake('local');
+
+    $service = app(HrChecklistService::class);
+    $hr = User::factory()->admin()->create();
+    $employee = User::factory()->create();
+    $otherEmployee = User::factory()->create();
+    $template = HrChecklistTemplate::create([
+        'type' => HrChecklistTemplate::TYPE_ONBOARDING,
+        'name' => 'Attachment Checklist',
+        'is_active' => true,
+        'created_by' => $hr->id,
+    ]);
+    $template->items()->create([
+        'title' => 'Review attachment',
+        'category' => 'documents',
+        'default_assignee_type' => HrChecklistTemplateItem::ASSIGNEE_EMPLOYEE,
+        'due_offset_days' => 0,
+        'is_required' => true,
+        'sort_order' => 1,
+    ]);
+
+    $case = $service->createCase($employee, $template->fresh('items'), $hr, now());
+    $task = $case->tasks()->firstOrFail();
+    Storage::disk('local')->put('hr-checklists/policy.pdf', 'signed-policy');
+    $service->recordTaskAttachment($task, 'hr-checklists/policy.pdf', 'policy.pdf');
+
+    $this->actingAs($otherEmployee)
+        ->get(route('hr-checklist.task-attachment.download', $task))
+        ->assertForbidden();
+
+    $this->actingAs($employee)
+        ->get(route('hr-checklist.task-attachment.download', $task))
+        ->assertOk()
+        ->assertHeader('content-disposition');
 });
 
 test('hr checklist can be auto-created from employee status using scoped template', function () {

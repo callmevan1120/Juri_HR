@@ -29,5 +29,6 @@ server.php
 /docs/*.md
 .vercel
 /secure_tools/
+/enterprise_build/
 /scripts/apk-page-screenshots.mjs
 /scripts/prepare-apk-screenshots-demo.php

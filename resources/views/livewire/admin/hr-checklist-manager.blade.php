@@ -140,9 +140,15 @@
                                         </p>
                                     @endif
                                     @if($task->attachment_path)
-                                        <p class="mt-2 truncate rounded-md bg-sky-50 px-2 py-1 text-[11px] font-medium text-sky-700 dark:bg-sky-900/20 dark:text-sky-300">
-                                            {{ __('Attachment') }}: {{ $task->attachment_original_name ?? basename($task->attachment_path) }}
-                                        </p>
+                                        @can('downloadAttachment', $task)
+                                            <a href="{{ route('hr-checklist.task-attachment.download', $task) }}" target="_blank" rel="noopener noreferrer" class="mt-2 block truncate rounded-md bg-sky-50 px-2 py-1 text-[11px] font-medium text-sky-700 transition hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:bg-sky-900/20 dark:text-sky-300">
+                                                {{ __('Attachment') }}: {{ $task->attachment_original_name ?? basename($task->attachment_path) }}
+                                            </a>
+                                        @else
+                                            <p class="mt-2 truncate rounded-md bg-sky-50 px-2 py-1 text-[11px] font-medium text-sky-700 dark:bg-sky-900/20 dark:text-sky-300">
+                                                {{ __('Attachment') }}: {{ $task->attachment_original_name ?? basename($task->attachment_path) }}
+                                            </p>
+                                        @endcan
                                     @endif
 
                                     <div class="mt-3 flex items-center gap-2 border-t border-gray-100 pt-2.5 dark:border-gray-700/50">

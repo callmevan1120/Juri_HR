@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Company;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -35,6 +36,23 @@ class MultiCompanyService
         $user->forceFill(['company_id' => $company->id])->save();
 
         return $user->fresh();
+    }
+
+    public function guardUserQuery(Builder $query, User $actor): Builder
+    {
+        if ($actor->isSuperadmin || $actor->company_id === null) {
+            return $query;
+        }
+
+        return $query->where('company_id', $actor->company_id);
+    }
+
+    public function canAccessUser(User $actor, User $target): bool
+    {
+        return $actor->isSuperadmin
+            || $actor->company_id === null
+            || $target->company_id === null
+            || (int) $actor->company_id === (int) $target->company_id;
     }
 
     public function suspend(Company $company): Company

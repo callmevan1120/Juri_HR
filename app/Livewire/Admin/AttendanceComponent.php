@@ -28,6 +28,8 @@ class AttendanceComponent extends Component
 
     public ?string $search = null;
 
+    public string $riskFilter = 'all';
+
     public function mount()
     {
         $this->startDate = now()->format('Y-m-d');
@@ -36,7 +38,7 @@ class AttendanceComponent extends Component
 
     public function updating($key): void
     {
-        if ($key === 'search' || $key === 'division' || $key === 'jobTitle' || $key === 'startDate' || $key === 'endDate') {
+        if (in_array($key, ['search', 'division', 'jobTitle', 'startDate', 'endDate', 'riskFilter'], true)) {
             $this->resetPage();
         }
     }
@@ -65,6 +67,18 @@ class AttendanceComponent extends Component
             })
             ->when($this->division, fn (Builder $q) => $q->where('division_id', $this->division))
             ->when($this->jobTitle, fn (Builder $q) => $q->where('job_title_id', $this->jobTitle))
+            ->when($this->riskFilter !== 'all', function (Builder $query) use ($start, $end): void {
+                $query->whereHas('attendances', function (Builder $attendanceQuery) use ($start, $end): void {
+                    $attendanceQuery->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')]);
+
+                    match ($this->riskFilter) {
+                        'high' => $attendanceQuery->where('risk_level', 'high'),
+                        'medium_high' => $attendanceQuery->whereIn('risk_level', ['medium', 'high']),
+                        'suspicious' => $attendanceQuery->where('is_suspicious', true),
+                        default => null,
+                    };
+                });
+            })
             ->with(['division', 'jobTitle'])
             ->orderBy('name')
             ->paginate(20);
@@ -76,7 +90,7 @@ class AttendanceComponent extends Component
                 ->with('shift:id,name')
                 ->whereIn('user_id', $userIds)
                 ->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
-                ->get(['id', 'user_id', 'status', 'date', 'latitude_in', 'longitude_in', 'attachment', 'note', 'time_in', 'time_out', 'shift_id', 'is_suspicious', 'suspicious_reason'])
+                ->get(['id', 'user_id', 'status', 'date', 'latitude_in', 'longitude_in', 'attachment', 'note', 'time_in', 'time_out', 'shift_id', 'is_suspicious', 'suspicious_reason', 'risk_score', 'risk_level', 'risk_factors'])
                 ->map(fn (Attendance $attendance) => $this->decorateAttendanceForGrid($attendance))
                 ->groupBy('user_id');
 

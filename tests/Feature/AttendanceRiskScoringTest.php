@@ -1,9 +1,16 @@
 <?php
 
+use App\Livewire\Admin\AttendanceComponent;
 use App\Models\Attendance;
 use App\Models\Barcode;
+use App\Models\Setting;
+use App\Models\Shift;
 use App\Models\User;
+use App\Services\Attendance\AttendanceRiskScoringService;
+use App\Support\AttendanceRiskScorer;
+use App\Support\AttendanceScanService;
 use Laravel\Sanctum\Sanctum;
+use Livewire\Livewire;
 
 test('device barcode scan stores attendance risk score and factors', function () {
     $user = User::factory()->create();
@@ -74,4 +81,79 @@ test('device checkout merges new risk factors with existing check in risk', func
         ->and($attendance->risk_level)->toBe('medium')
         ->and($codes)->toContain('gps_accuracy_too_perfect')
         ->and($codes)->toContain('gps_zero_variance');
+});
+
+test('web attendance scan production flow evaluates risk through scoring service', function () {
+    Setting::create(['key' => 'feature.require_photo', 'value' => '0']);
+
+    $calls = new class(app(AttendanceRiskScorer::class)) extends AttendanceRiskScoringService
+    {
+        public int $count = 0;
+
+        public function evaluate(Attendance $attendance, Barcode $barcode, ?Shift $shift, string $event = 'check_in', array $context = []): array
+        {
+            $this->count++;
+
+            return parent::evaluate($attendance, $barcode, $shift, $event, $context);
+        }
+    };
+    app()->instance(AttendanceRiskScoringService::class, $calls);
+
+    $user = User::factory()->create();
+    $shift = Shift::create(['name' => 'Morning', 'start_time' => '08:00', 'end_time' => '17:00']);
+    $barcode = Barcode::factory()->create([
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+        'radius' => 200,
+    ]);
+
+    $result = app(AttendanceScanService::class)->performScan(
+        user: $user,
+        shiftId: $shift->id,
+        coords: [-6.1998, 106.8002],
+        barcodePayload: $barcode->value,
+        photo: null,
+        note: null,
+        gracePeriod: 0,
+        gpsAccuracy: 1.2,
+        gpsVariance: 0,
+    );
+
+    expect($result['ok'])->toBeTrue()
+        ->and($calls->count)->toBe(1)
+        ->and(Attendance::firstOrFail()->risk_score)->toBeGreaterThan(0);
+});
+
+test('admin attendance can filter medium and high risk rows', function () {
+    $admin = User::factory()->admin()->create();
+    $safeUser = User::factory()->create(['name' => 'Safe Employee']);
+    $riskUser = User::factory()->create(['name' => 'Risk Employee']);
+    $barcode = Barcode::factory()->create();
+
+    Attendance::create([
+        'user_id' => $safeUser->id,
+        'barcode_id' => $barcode->id,
+        'date' => now()->toDateString(),
+        'status' => 'present',
+        'approval_status' => Attendance::STATUS_APPROVED,
+        'risk_score' => 0,
+        'risk_level' => 'low',
+    ]);
+    Attendance::create([
+        'user_id' => $riskUser->id,
+        'barcode_id' => $barcode->id,
+        'date' => now()->toDateString(),
+        'status' => 'present',
+        'approval_status' => Attendance::STATUS_APPROVED,
+        'risk_score' => 70,
+        'risk_level' => 'high',
+        'is_suspicious' => true,
+    ]);
+
+    $this->actingAs($admin);
+
+    Livewire::test(AttendanceComponent::class)
+        ->set('riskFilter', 'medium_high')
+        ->assertSee('Risk Employee')
+        ->assertDontSee('Safe Employee');
 });

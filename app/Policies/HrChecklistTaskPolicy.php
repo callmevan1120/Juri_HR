@@ -24,4 +24,9 @@ class HrChecklistTaskPolicy
     {
         return $user->can('manageHrChecklists') || $task->assigned_to === $user->id;
     }
+
+    public function downloadAttachment(User $user, HrChecklistTask $task): bool
+    {
+        return $task->attachment_path !== null && $this->view($user, $task);
+    }
 }

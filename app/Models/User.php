@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\QueuedResetPassword;
 use App\Notifications\QueuedVerifyEmail;
+use App\Support\MultiCompanyService;
 use App\Support\RbacRegistry;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -783,6 +784,12 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function scopeManagedBy($query, $admin)
     {
+        app(MultiCompanyService::class)->guardUserQuery($query, $admin);
+
+        if (! $admin->isSuperadmin && $admin->company_id !== null) {
+            return $query;
+        }
+
         if ($admin->hasGlobalAdminScope()) {
             return $query;
         }

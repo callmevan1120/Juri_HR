@@ -70,6 +70,25 @@
             ],
         };
     };
+    $attendanceRiskMeta = static function (?string $level, int $score = 0): array {
+        return match ($level) {
+            'high' => [
+                'label' => __('High risk'),
+                'color' => 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-900/20 dark:text-rose-300',
+                'short' => 'R'.$score,
+            ],
+            'medium' => [
+                'label' => __('Medium risk'),
+                'color' => 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/20 dark:text-amber-300',
+                'short' => 'R'.$score,
+            ],
+            default => [
+                'label' => __('Low risk'),
+                'color' => 'bg-slate-50 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400',
+                'short' => 'R'.$score,
+            ],
+        };
+    };
 @endphp
 <x-admin.page-shell :title="__('Attendance Data')" :description="__('Monitor employee attendance, shifts, and status.')">
     <x-slot name="actions">
@@ -129,7 +148,7 @@
     </x-slot>
 
     <x-slot name="toolbar">
-        <x-admin.page-tools grid-class="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <x-admin.page-tools grid-class="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-6">
             <div class="col-span-1">
                 <x-forms.label for="start_date" value="{{ __('Start Date') }}" class="mb-1.5 block" />
                 <div wire:ignore>
@@ -156,6 +175,16 @@
                 <x-forms.label for="filter_jobTitle" value="{{ __('Job Title') }}" class="mb-1.5 block" />
                 <x-forms.tom-select id="filter_jobTitle" wire:model.live="jobTitle" placeholder="{{ __('All') }}"
                     :options="\App\Models\JobTitle::all()->map(fn($j) => ['id' => $j->id, 'name' => $j->name])" />
+            </div>
+
+            <div class="col-span-1">
+                <x-forms.label for="attendance-risk-filter" value="{{ __('Risk') }}" class="mb-1.5 block" />
+                <x-forms.select id="attendance-risk-filter" wire:model.live="riskFilter">
+                    <option value="all">{{ __('All risk') }}</option>
+                    <option value="medium_high">{{ __('Medium + high') }}</option>
+                    <option value="high">{{ __('High only') }}</option>
+                    <option value="suspicious">{{ __('Flagged') }}</option>
+                </x-forms.select>
             </div>
 
             <div class="col-span-1">
@@ -271,6 +300,9 @@
                                     ])['status'];
 
                                     $statusMeta = $attendanceStatusMeta($status);
+                                    $riskScore = (int) ($attendance['risk_score'] ?? 0);
+                                    $riskLevel = $attendance['risk_level'] ?? null;
+                                    $riskMeta = $attendanceRiskMeta($riskLevel, $riskScore);
                                     $cellClass = $statusMeta['cell'];
 
                                     // Count stats
@@ -305,8 +337,17 @@
                                                     <span title="{{ $attendance['suspicious_reason'] }}"
                                                         class="ml-1 cursor-help text-rose-500">!</span>
                                                 @endif
+                                                @if ($riskScore > 0)
+                                                    <span title="{{ $riskMeta['label'] }}"
+                                                        class="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ring-1 ring-inset {{ $riskMeta['color'] }}">
+                                                        {{ $riskMeta['short'] }}
+                                                    </span>
+                                                @endif
                                             @else
                                                 {{ $statusMeta['short'] }}
+                                                @if ($riskScore > 0)
+                                                    <span class="sr-only">{{ $riskMeta['label'] }} {{ $riskScore }}</span>
+                                                @endif
                                             @endif
                                         </button>
                                     @else
@@ -315,6 +356,12 @@
                                             @if ($isPerDayFilter)
                                                 <span class="h-1.5 w-1.5 rounded-full {{ $statusMeta['dot'] }}"></span>
                                                 {{ $statusMeta['label'] }}
+                                                @if ($riskScore > 0)
+                                                    <span title="{{ $riskMeta['label'] }}"
+                                                        class="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ring-1 ring-inset {{ $riskMeta['color'] }}">
+                                                        {{ $riskMeta['short'] }}
+                                                    </span>
+                                                @endif
                                             @else
                                                 {{ $statusMeta['short'] }}
                                             @endif
@@ -394,6 +441,8 @@
                                         ? 'absent'
                                         : '-');
                                 $statusMeta = $attendanceStatusMeta($status);
+                                $riskScore = (int) ($att['risk_score'] ?? 0);
+                                $riskMeta = $attendanceRiskMeta($att['risk_level'] ?? null, $riskScore);
                             @endphp
                             <span
                                 class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset {{ $statusMeta['color'] }}">
@@ -402,6 +451,12 @@
                                 @if ($att && ($att['is_suspicious'] ?? false))
                                     <span title="{{ $att['suspicious_reason'] }}"
                                         class="ml-1 cursor-help text-rose-500">!</span>
+                                @endif
+                                @if ($riskScore > 0)
+                                    <span title="{{ $riskMeta['label'] }}"
+                                        class="rounded-full px-1.5 py-0.5 text-[10px] font-bold ring-1 ring-inset {{ $riskMeta['color'] }}">
+                                        {{ $riskMeta['short'] }}
+                                    </span>
                                 @endif
                             </span>
                         @endif
