@@ -7,16 +7,16 @@ const userPassword = process.env.E2E_USER_PASSWORD ?? 'password';
 
 async function login(page, email: string, password: string) {
   await page.goto('/login');
-  await page.getByLabel(/email/i).fill(email);
-  await page.getByLabel(/password/i).fill(password);
+  await page.locator('input[name="email"]').fill(email);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole('button', { name: /log in|login|masuk/i }).click();
   await expect(page).not.toHaveURL(/\/login$/);
 }
 
 test('public login page renders', async ({ page }) => {
   await page.goto('/login');
-  await expect(page.getByLabel(/email/i)).toBeVisible();
-  await expect(page.getByLabel(/password/i)).toBeVisible();
+  await expect(page.locator('input[name="email"]')).toBeVisible();
+  await expect(page.locator('input[name="password"]')).toBeVisible();
 });
 
 test('admin smoke covers dashboard employees attendance HR payroll reports', async ({ page }) => {

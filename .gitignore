@@ -23,6 +23,7 @@ yarn-error.log
 /database/migrations/2026_02_25_000001_create_license_purchases_table.php
 *.sh
 !update.sh
+!scripts/apk-attendance-e2e.sh
 *.zip
 *.Source.php
 server.php
@@ -30,5 +31,6 @@ server.php
 .vercel
 /secure_tools/
 /enterprise_build/
+/test-results/
 /scripts/apk-page-screenshots.mjs
 /scripts/prepare-apk-screenshots-demo.php

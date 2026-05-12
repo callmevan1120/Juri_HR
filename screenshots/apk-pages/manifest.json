@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-05T03:15:48.730Z",
-  "app_url": "http://127.0.0.1:8000",
+  "generated_at": "2026-05-12T14:18:55.139Z",
+  "app_url": "http://127.0.0.1:8001",
   "screenshots": [
     {
       "label": "Login",
       "slug": "login",
       "path": "screenshots/apk-pages/01-login.png",
-      "url": "http://127.0.0.1:8000/login",
+      "url": "http://127.0.0.1:8001/login",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -16,7 +16,7 @@
       "label": "User Home",
       "slug": "user-home",
       "path": "screenshots/apk-pages/02-user-home.png",
-      "url": "http://127.0.0.1:8000/home",
+      "url": "http://127.0.0.1:8001/home",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -26,7 +26,7 @@
       "label": "User Notifications",
       "slug": "user-notifications",
       "path": "screenshots/apk-pages/03-user-notifications.png",
-      "url": "http://127.0.0.1:8000/notifications",
+      "url": "http://127.0.0.1:8001/notifications",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -36,7 +36,7 @@
       "label": "Apply Leave",
       "slug": "user-apply-leave",
       "path": "screenshots/apk-pages/04-user-apply-leave.png",
-      "url": "http://127.0.0.1:8000/apply-leave",
+      "url": "http://127.0.0.1:8001/apply-leave",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -46,7 +46,7 @@
       "label": "Attendance History",
       "slug": "user-attendance-history",
       "path": "screenshots/apk-pages/05-user-attendance-history.png",
-      "url": "http://127.0.0.1:8000/attendance-history",
+      "url": "http://127.0.0.1:8001/attendance-history",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -56,7 +56,7 @@
       "label": "Scan Attendance",
       "slug": "user-scan",
       "path": "screenshots/apk-pages/06-user-scan.png",
-      "url": "http://127.0.0.1:8000/scan?apk_screenshot=1",
+      "url": "http://127.0.0.1:8001/scan?apk_screenshot=1",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -66,7 +66,7 @@
       "label": "Attendance Corrections",
       "slug": "user-attendance-corrections",
       "path": "screenshots/apk-pages/07-user-attendance-corrections.png",
-      "url": "http://127.0.0.1:8000/attendance-corrections",
+      "url": "http://127.0.0.1:8001/attendance-corrections",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -76,7 +76,7 @@
       "label": "Reimbursement",
       "slug": "user-reimbursement",
       "path": "screenshots/apk-pages/08-user-reimbursement.png",
-      "url": "http://127.0.0.1:8000/reimbursement",
+      "url": "http://127.0.0.1:8001/reimbursement",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -86,7 +86,7 @@
       "label": "My Schedule",
       "slug": "user-schedule",
       "path": "screenshots/apk-pages/09-user-schedule.png",
-      "url": "http://127.0.0.1:8000/my-schedule",
+      "url": "http://127.0.0.1:8001/my-schedule",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -96,7 +96,17 @@
       "label": "Shift Swap Requests",
       "slug": "user-shift-swaps",
       "path": "screenshots/apk-pages/10-user-shift-swaps.png",
-      "url": "http://127.0.0.1:8000/shift-swap-requests",
+      "url": "http://127.0.0.1:8001/shift-swap-requests",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "HR Tasks",
+      "slug": "user-hr-tasks",
+      "path": "screenshots/apk-pages/11-user-hr-tasks.png",
+      "url": "http://127.0.0.1:8001/hr-tasks",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -105,8 +115,8 @@
     {
       "label": "User Document Requests",
       "slug": "user-document-requests",
-      "path": "screenshots/apk-pages/11-user-document-requests.png",
-      "url": "http://127.0.0.1:8000/document-requests",
+      "path": "screenshots/apk-pages/12-user-document-requests.png",
+      "url": "http://127.0.0.1:8001/document-requests",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -115,8 +125,8 @@
     {
       "label": "Team Approvals",
       "slug": "user-approvals",
-      "path": "screenshots/apk-pages/12-user-approvals.png",
-      "url": "http://127.0.0.1:8000/approvals",
+      "path": "screenshots/apk-pages/13-user-approvals.png",
+      "url": "http://127.0.0.1:8001/approvals",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -125,8 +135,8 @@
     {
       "label": "Team Approvals History",
       "slug": "user-approvals-history",
-      "path": "screenshots/apk-pages/13-user-approvals-history.png",
-      "url": "http://127.0.0.1:8000/approvals/history",
+      "path": "screenshots/apk-pages/14-user-approvals-history.png",
+      "url": "http://127.0.0.1:8001/approvals/history",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -135,8 +145,18 @@
     {
       "label": "Overtime",
       "slug": "user-overtime",
-      "path": "screenshots/apk-pages/14-user-overtime.png",
-      "url": "http://127.0.0.1:8000/overtime",
+      "path": "screenshots/apk-pages/15-user-overtime.png",
+      "url": "http://127.0.0.1:8001/overtime",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "My Payslips",
+      "slug": "user-payslips",
+      "path": "screenshots/apk-pages/16-user-payslips.png",
+      "url": "http://127.0.0.1:8001/payroll",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -145,8 +165,8 @@
     {
       "label": "My Cash Advances",
       "slug": "user-my-kasbon",
-      "path": "screenshots/apk-pages/15-user-my-kasbon.png",
-      "url": "http://127.0.0.1:8000/my-kasbon",
+      "path": "screenshots/apk-pages/17-user-my-kasbon.png",
+      "url": "http://127.0.0.1:8001/my-kasbon",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -155,8 +175,18 @@
     {
       "label": "Team Cash Advances",
       "slug": "user-team-kasbon",
-      "path": "screenshots/apk-pages/16-user-team-kasbon.png",
-      "url": "http://127.0.0.1:8000/team-kasbon",
+      "path": "screenshots/apk-pages/18-user-team-kasbon.png",
+      "url": "http://127.0.0.1:8001/team-kasbon",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "User Home Before Face ID",
+      "slug": "user-home-before-face-id",
+      "path": "screenshots/apk-pages/19-user-home-before-face-id.png",
+      "url": "http://127.0.0.1:8001/home",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -165,8 +195,8 @@
     {
       "label": "Face Enrollment",
       "slug": "user-face-enrollment",
-      "path": "screenshots/apk-pages/17-user-face-enrollment.png",
-      "url": "http://127.0.0.1:8000/face-enrollment?apk_screenshot=1",
+      "path": "screenshots/apk-pages/20-user-face-enrollment.png",
+      "url": "http://127.0.0.1:8001/face-enrollment?apk_screenshot=1",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -175,8 +205,8 @@
     {
       "label": "My Assets",
       "slug": "user-my-assets",
-      "path": "screenshots/apk-pages/18-user-my-assets.png",
-      "url": "http://127.0.0.1:8000/my-assets",
+      "path": "screenshots/apk-pages/21-user-my-assets.png",
+      "url": "http://127.0.0.1:8001/my-assets",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -185,8 +215,18 @@
     {
       "label": "My Performance",
       "slug": "user-my-performance",
-      "path": "screenshots/apk-pages/19-user-my-performance.png",
-      "url": "http://127.0.0.1:8000/my-performance",
+      "path": "screenshots/apk-pages/22-user-my-performance.png",
+      "url": "http://127.0.0.1:8001/my-performance",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "User Profile",
+      "slug": "user-profile",
+      "path": "screenshots/apk-pages/23-user-profile.png",
+      "url": "http://127.0.0.1:8001/user/profile",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -195,8 +235,158 @@
     {
       "label": "Admin Dashboard",
       "slug": "admin-dashboard",
-      "path": "screenshots/apk-pages/20-admin-dashboard.png",
-      "url": "http://127.0.0.1:8000/admin/dashboard",
+      "path": "screenshots/apk-pages/24-admin-dashboard.png",
+      "url": "http://127.0.0.1:8001/admin/dashboard",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Manager Inbox",
+      "slug": "admin-inbox",
+      "path": "screenshots/apk-pages/25-admin-inbox.png",
+      "url": "http://127.0.0.1:8001/admin/inbox",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Admin Notifications",
+      "slug": "admin-notifications",
+      "path": "screenshots/apk-pages/26-admin-notifications.png",
+      "url": "http://127.0.0.1:8001/admin/notifications",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Daily Attendance",
+      "slug": "admin-attendances",
+      "path": "screenshots/apk-pages/27-admin-attendances.png",
+      "url": "http://127.0.0.1:8001/admin/attendances",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Attendance Corrections",
+      "slug": "admin-attendance-corrections",
+      "path": "screenshots/apk-pages/28-admin-attendance-corrections.png",
+      "url": "http://127.0.0.1:8001/admin/attendance-corrections",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Leave Approvals",
+      "slug": "admin-leaves",
+      "path": "screenshots/apk-pages/29-admin-leaves.png",
+      "url": "http://127.0.0.1:8001/admin/leaves",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Shift Swap Approvals",
+      "slug": "admin-shift-swaps",
+      "path": "screenshots/apk-pages/30-admin-shift-swaps.png",
+      "url": "http://127.0.0.1:8001/admin/shift-swaps",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Overtime",
+      "slug": "admin-overtime",
+      "path": "screenshots/apk-pages/31-admin-overtime.png",
+      "url": "http://127.0.0.1:8001/admin/overtime",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Schedules Roster",
+      "slug": "admin-schedules",
+      "path": "screenshots/apk-pages/32-admin-schedules.png",
+      "url": "http://127.0.0.1:8001/admin/schedules",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Analytics",
+      "slug": "admin-analytics",
+      "path": "screenshots/apk-pages/33-admin-analytics.png",
+      "url": "http://127.0.0.1:8001/admin/analytics",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Holidays",
+      "slug": "admin-holidays",
+      "path": "screenshots/apk-pages/34-admin-holidays.png",
+      "url": "http://127.0.0.1:8001/admin/holidays",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Announcements",
+      "slug": "admin-announcements",
+      "path": "screenshots/apk-pages/35-admin-announcements.png",
+      "url": "http://127.0.0.1:8001/admin/announcements",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Payroll",
+      "slug": "admin-payrolls",
+      "path": "screenshots/apk-pages/36-admin-payrolls.png",
+      "url": "http://127.0.0.1:8001/admin/payrolls",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Reimbursements",
+      "slug": "admin-reimbursements",
+      "path": "screenshots/apk-pages/37-admin-reimbursements.png",
+      "url": "http://127.0.0.1:8001/admin/reimbursements",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Manage Kasbon",
+      "slug": "admin-manage-kasbon",
+      "path": "screenshots/apk-pages/38-admin-manage-kasbon.png",
+      "url": "http://127.0.0.1:8001/admin/manage-kasbon",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Payroll Settings",
+      "slug": "admin-payroll-settings",
+      "path": "screenshots/apk-pages/39-admin-payroll-settings.png",
+      "url": "http://127.0.0.1:8001/admin/payrolls/settings",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -205,18 +395,18 @@
     {
       "label": "Employees",
       "slug": "admin-employees",
-      "path": "screenshots/apk-pages/21-admin-employees.png",
-      "url": "http://127.0.0.1:8000/admin/employees",
+      "path": "screenshots/apk-pages/40-admin-employees.png",
+      "url": "http://127.0.0.1:8001/admin/employees",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
       }
     },
     {
-      "label": "Document Templates",
-      "slug": "admin-document-templates",
-      "path": "screenshots/apk-pages/22-admin-document-templates.png",
-      "url": "http://127.0.0.1:8000/admin/document-templates",
+      "label": "HR Checklists",
+      "slug": "admin-hr-checklists",
+      "path": "screenshots/apk-pages/41-admin-hr-checklists.png",
+      "url": "http://127.0.0.1:8001/admin/hr-checklists",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -225,38 +415,128 @@
     {
       "label": "Admin Document Requests",
       "slug": "admin-document-requests",
-      "path": "screenshots/apk-pages/23-admin-document-requests.png",
-      "url": "http://127.0.0.1:8000/admin/document-requests",
+      "path": "screenshots/apk-pages/42-admin-document-requests.png",
+      "url": "http://127.0.0.1:8001/admin/document-requests",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
       }
     },
     {
-      "label": "Admin Attendances",
-      "slug": "admin-attendances",
-      "path": "screenshots/apk-pages/24-admin-attendances.png",
-      "url": "http://127.0.0.1:8000/admin/attendances",
+      "label": "Document Templates",
+      "slug": "admin-document-templates",
+      "path": "screenshots/apk-pages/43-admin-document-templates.png",
+      "url": "http://127.0.0.1:8001/admin/document-templates",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
       }
     },
     {
-      "label": "Reports",
-      "slug": "admin-reports",
-      "path": "screenshots/apk-pages/25-admin-reports.png",
-      "url": "http://127.0.0.1:8000/admin/reports",
+      "label": "Performance Appraisals",
+      "slug": "admin-appraisals",
+      "path": "screenshots/apk-pages/44-admin-appraisals.png",
+      "url": "http://127.0.0.1:8001/admin/appraisals",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
       }
     },
     {
-      "label": "Roles and Permissions",
-      "slug": "admin-roles",
-      "path": "screenshots/apk-pages/26-admin-roles.png",
-      "url": "http://127.0.0.1:8000/admin/roles-permissions",
+      "label": "Company Assets",
+      "slug": "admin-assets",
+      "path": "screenshots/apk-pages/45-admin-assets.png",
+      "url": "http://127.0.0.1:8001/admin/assets",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Barcode Locations",
+      "slug": "admin-barcodes",
+      "path": "screenshots/apk-pages/46-admin-barcodes.png",
+      "url": "http://127.0.0.1:8001/admin/barcodes",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Divisions",
+      "slug": "admin-divisions",
+      "path": "screenshots/apk-pages/47-admin-divisions.png",
+      "url": "http://127.0.0.1:8001/admin/masterdata/division",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Job Titles",
+      "slug": "admin-job-titles",
+      "path": "screenshots/apk-pages/48-admin-job-titles.png",
+      "url": "http://127.0.0.1:8001/admin/masterdata/job-title",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Education Levels",
+      "slug": "admin-education",
+      "path": "screenshots/apk-pages/49-admin-education.png",
+      "url": "http://127.0.0.1:8001/admin/masterdata/education",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Shifts",
+      "slug": "admin-shifts",
+      "path": "screenshots/apk-pages/50-admin-shifts.png",
+      "url": "http://127.0.0.1:8001/admin/masterdata/shift",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Leave Types",
+      "slug": "admin-leave-types",
+      "path": "screenshots/apk-pages/51-admin-leave-types.png",
+      "url": "http://127.0.0.1:8001/admin/masterdata/leave-types",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Administrators",
+      "slug": "admin-administrators",
+      "path": "screenshots/apk-pages/52-admin-administrators.png",
+      "url": "http://127.0.0.1:8001/admin/masterdata/admin",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "App Settings",
+      "slug": "admin-settings",
+      "path": "screenshots/apk-pages/53-admin-settings.png",
+      "url": "http://127.0.0.1:8001/admin/settings",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "KPI Settings",
+      "slug": "admin-kpi-settings",
+      "path": "screenshots/apk-pages/54-admin-kpi-settings.png",
+      "url": "http://127.0.0.1:8001/admin/settings/kpi",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"
@@ -265,8 +545,78 @@
     {
       "label": "System Maintenance",
       "slug": "admin-maintenance",
-      "path": "screenshots/apk-pages/27-admin-maintenance.png",
-      "url": "http://127.0.0.1:8000/admin/settings",
+      "path": "screenshots/apk-pages/55-admin-maintenance.png",
+      "url": "http://127.0.0.1:8001/admin/system-maintenance",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Operational Health",
+      "slug": "admin-operational-health",
+      "path": "screenshots/apk-pages/56-admin-operational-health.png",
+      "url": "http://127.0.0.1:8001/admin/operational-health",
+      "title": "",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Reports",
+      "slug": "admin-reports",
+      "path": "screenshots/apk-pages/57-admin-reports.png",
+      "url": "http://127.0.0.1:8001/admin/reports",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Activity Logs",
+      "slug": "admin-activity-logs",
+      "path": "screenshots/apk-pages/58-admin-activity-logs.png",
+      "url": "http://127.0.0.1:8001/admin/activity-logs",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Import Export Users",
+      "slug": "admin-import-export-users",
+      "path": "screenshots/apk-pages/59-admin-import-export-users.png",
+      "url": "http://127.0.0.1:8001/admin/import-export/users",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Import Export Attendance",
+      "slug": "admin-import-export-attendance",
+      "path": "screenshots/apk-pages/60-admin-import-export-attendance.png",
+      "url": "http://127.0.0.1:8001/admin/import-export/attendances",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Roles and Permissions",
+      "slug": "admin-roles",
+      "path": "screenshots/apk-pages/61-admin-roles.png",
+      "url": "http://127.0.0.1:8001/admin/roles-permissions",
+      "title": "PasPapan",
+      "screenshot": {
+        "mode": "device-viewport"
+      }
+    },
+    {
+      "label": "Admin Profile",
+      "slug": "admin-profile",
+      "path": "screenshots/apk-pages/62-admin-profile.png",
+      "url": "http://127.0.0.1:8001/admin/profile",
       "title": "PasPapan",
       "screenshot": {
         "mode": "device-viewport"

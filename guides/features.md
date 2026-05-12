@@ -210,6 +210,7 @@ Status implementasi fondasi:
 - Fase 4: kalkulator payroll Indonesia dan payment instruction sudah tersedia sebagai service teruji.
 - Fase 5: lifecycle, shift planning, notification preference, webhook/API integration, dan KPI service sudah tersedia sebagai foundation backend.
 - Fase 6: multi-company ringan, marketplace template HR, dan issue labels komunitas sudah tersedia sebagai foundation produk.
+- Rilis 4.3.0: screenshot katalog menu desktop/APK sudah diperluas menjadi 62 halaman, Playwright smoke masuk CI, Android attendance smoke berjalan di device ADB, dan security scan CI mencakup CodeQL PHP/JS, Semgrep, Gitleaks, serta TruffleHog.
 
 ### Fase 1 - Trust, Audit, dan Risiko Absensi
 
@@ -299,4 +300,6 @@ Testing dan tooling:
 - Pest `4`
 - Laravel Pint
 - Bun
-- feature tests untuk attendance enforcement, Dynamic QR, backup jobs, maintenance security, leave approval, media access, queued report export, import/export retention, template import, overtime manager, HR checklist, dan koreksi absensi lintas hari
+- Playwright smoke untuk browser E2E utama
+- ADB/WebView CDP smoke untuk APK dan screenshot mobile
+- feature tests untuk attendance enforcement, Dynamic QR, backup jobs, maintenance security, leave approval, media access, queued report export, import/export retention, template import, overtime manager, HR checklist, security matrix, multi-company isolation, approval matrix, risk scoring, operational health, dan koreksi absensi lintas hari

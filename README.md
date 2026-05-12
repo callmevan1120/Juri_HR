@@ -22,10 +22,13 @@ PasPapan adalah aplikasi workforce untuk organisasi yang membutuhkan absensi mob
 Fokus utama aplikasi:
 
 - absensi aman dengan GPS, foto, Face ID, static barcode, dan Dynamic QR
-- HR Checklist sebagai fitur utama baru untuk onboarding/offboarding, assignment task HR/karyawan/atasan langsung, due date, progress case, dan self-service HR Tasks
+- HR Checklist v2 untuk onboarding/offboarding, task dependency ringan, overdue indicator, attachment task, summary clearance, dan self-service HR Tasks
+- attendance risk scoring untuk mock location, radius boundary, device context, barcode source, face verification, offline/cached location, dan jam di luar shift
 - panel admin untuk karyawan, absensi, cuti, lembur, reimbursement, kasbon, aset, payroll, reports, settings, dan maintenance
 - self-service karyawan untuk check-in/out, koreksi absensi, cuti, lembur, reimbursement, slip gaji, dokumen, jadwal, HR tasks, dan approval tim
+- approval matrix reusable untuk reimbursement, kasbon, koreksi absensi, cuti, lembur, asset/document/payroll-sensitive workflow foundation
 - import/export background dengan progress run, ringkasan sukses/error, download hasil, dan cleanup otomatis
+- operational health dashboard untuk queue, scheduler, backup, disk, database, cache/session/queue driver, app version, Reverb/polling, dan license status
 - wrapper Android berbasis Capacitor untuk kebutuhan APK
 - modul enterprise-gated untuk fitur lanjutan tertentu
 
@@ -72,12 +75,19 @@ Gunakan [`.env.vercel.example`](./.env.vercel.example) sebagai template environm
 
 ## Rilis Terbaru
 
-Rilis terbaru: [`v4.2.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.2.0)
+Rilis terbaru: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0)
 
-- APK Android: [`PasPapan-v4.2.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.2.0/PasPapan-v4.2.0.apk)
+- APK Android: [`PasPapan-v4.3.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk)
 - Changelog: [`CHANGELOG.md`](./CHANGELOG.md)
 - ID aplikasi Android: `com.pandanteknik.paspapan`
-- Versi Android: `4.2.0` (`versionCode 42`)
+- Versi Android: `4.3.0` (`versionCode 43`)
+
+Sorotan `v4.3.0`:
+
+- security matrix, multi-company isolation guard, private attachment policy, dan CI security scanning diperluas
+- Playwright smoke workflow dan Android attendance smoke tersedia untuk regresi utama
+- screenshot katalog menu diperbarui menjadi 62 halaman untuk desktop dan APK
+- source review enterprise dipisahkan dari artifact runtime obfuscated melalui `.gitattributes` dan panduan packaging
 
 ## Enterprise Offline
 
@@ -96,7 +106,9 @@ Modul `HR Checklists` membantu HR UMKM memastikan onboarding dan offboarding tid
 - Admin/HR membuka `Master Data > HR Checklists` untuk membuat case onboarding atau offboarding.
 - Template default dibuat otomatis untuk onboarding dan offboarding.
 - Task dapat ditugaskan ke HR, karyawan, atau atasan langsung karyawan.
+- Task menampilkan overdue indicator, dependency sederhana, dan attachment privat bila task membutuhkan bukti dokumen.
 - Karyawan dan manager membuka `HR Tasks` dari quick action untuk menyelesaikan task mereka.
+- Summary completion/clearance membantu HR melihat kesiapan onboarding/offboarding.
 - RBAC memakai permission `admin.hr_checklists.view` dan `admin.hr_checklists.manage`.
 - Semua label UI tersedia di `lang/id.json` dan `lang/en.json`.
 
@@ -231,6 +243,20 @@ composer phpstan
 composer audit
 bun run build
 ```
+
+Smoke dan screenshot tambahan:
+
+```bash
+bun run e2e:smoke
+bun run screenshots:desktop
+bun run screenshots:apk
+bun run apk:e2e:attendance
+```
+
+Screenshot katalog saat ini berisi 62 halaman menu/page untuk desktop dan APK. Manifest berada di:
+
+- [`screenshots/desktop-pages/manifest.json`](./screenshots/desktop-pages/manifest.json)
+- [`screenshots/apk-pages/manifest.json`](./screenshots/apk-pages/manifest.json)
 
 ## Demo
 

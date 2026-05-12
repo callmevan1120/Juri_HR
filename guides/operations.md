@@ -179,12 +179,36 @@ composer audit
 bun run build
 ```
 
+CI tambahan:
+
+- `.github/workflows/security.yml` menjalankan CodeQL untuk PHP dan JavaScript/TypeScript, Semgrep, Gitleaks, dan TruffleHog.
+- `.github/workflows/e2e.yml` menjalankan Playwright smoke dengan MySQL 8, migration, build frontend, dan Laravel dev server.
+
 Untuk perubahan lokal kecil, jalankan test yang paling dekat dengan area yang diubah terlebih dahulu, lalu lanjutkan ke gate CI penuh sebelum merge/push rilis. Contoh:
 
 ```bash
 php artisan test tests/Feature/HrChecklistFlowTest.php tests/Feature/UserMenuSmokeTest.php
 ./vendor/bin/pint --test --dirty
 ```
+
+Smoke browser dan screenshot:
+
+```bash
+bun run e2e:smoke
+bun run screenshots:desktop
+```
+
+`bun run screenshots:desktop` menyiapkan demo data lokal, login via token E2E, lalu menulis 62 halaman ke `screenshots/desktop-pages/` beserta `manifest.json`.
+
+Smoke APK/device:
+
+```bash
+bun run apk:smoke
+bun run apk:e2e:attendance
+bun run screenshots:apk
+```
+
+`bun run screenshots:apk` memakai device ADB debug, WebView DevTools/CDP, dan katalog halaman yang sama dengan desktop. Output berada di `screenshots/apk-pages/` dan saat ini berisi 62 screenshot. Untuk state khusus Face ID, script menghapus descriptor demo sebelum screenshot `user-home-before-face-id` agar card `Daftar Face ID Sekarang` benar-benar terekam, lalu halaman berikutnya masuk ke setup Face ID.
 
 Catatan runtime CI:
 

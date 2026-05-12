@@ -4,6 +4,47 @@ Semua perubahan penting PasPapan dicatat di file ini.
 
 ## [Unreleased]
 
+Belum ada perubahan tercatat.
+
+## [4.3.0] - 2026-05-12
+
+### Sorotan
+
+- Memperluas hardening security matrix untuk IDOR, attachment, payslip, backup, payroll privacy, debug route exposure, enterprise gate, dan isolation guard.
+- Menambahkan workflow CI security scan untuk CodeQL PHP/JavaScript, Semgrep, Gitleaks, dan TruffleHog.
+- Menambahkan workflow Playwright smoke berbasis MySQL untuk login dan halaman utama admin/user.
+- Menambahkan Android attendance smoke yang menjalankan flow check-in, upload foto, dan check-out pada device ADB.
+- Memperbarui screenshot katalog menu menjadi 62 halaman untuk desktop dan APK, termasuk state Face ID belum terdaftar sebelum halaman setup Face ID.
+- Memisahkan enterprise obfuscated runtime artifact dari source OSS review lewat `.gitattributes`, `.gitignore`, dan dokumentasi packaging.
+- Menambahkan query object untuk slimming awal `RolePermissionManager`.
+
+### HR & Attendance
+
+- HR Checklist v2 mendukung overdue indicator, dependency sederhana, attachment task privat, reminder-ready query, template filter foundation, dan completion/clearance summary.
+- Attendance risk scoring dipanggil pada flow check-in/check-out dan tampil di admin attendance lewat badge/filter.
+- Operational health dashboard diperluas untuk queue heartbeat, scheduler heartbeat, failed jobs, disk writable/free, DB latency, backup status/checksum, driver runtime, Reverb/polling, app version, dan license status.
+
+### Dokumentasi
+
+- Memperbarui README, changelog, operations, features, deployment/security references, dan enterprise packaging untuk rilis `v4.3.0`.
+- Menambahkan dokumentasi security model, attendance threat/risk scoring, RBAC matrix, dependency policy, file upload security, backup restore threat model, multi-company isolation, runbooks, compliance retention, dan enterprise readiness TODO.
+
+### APK Android
+
+- Nama file: `PasPapan-v4.3.0.apk`
+- ID aplikasi: `com.pandanteknik.paspapan`
+- Nama versi: `4.3.0`
+- Kode versi: `43`
+- Tipe build: APK rilis bertanda tangan
+- SHA-256: `4dcdb1b6f8cd800d968ccf7165a46d95606a1c20c360786890285728032eab2a`
+
+### Catatan Upgrade
+
+- Jalankan migrasi database setelah menarik rilis ini.
+- Jalankan `php artisan optimize:clear`, lalu cache config/route/event sesuai environment produksi.
+- Pastikan queue worker dan scheduler hidup agar operational health, import/export, backup, dan upload processing akurat.
+- Jalankan ulang internal enterprise obfuscator sebelum commit/release jika ada source enterprise yang berubah.
+
 ### HR & UMKM
 
 - Menambahkan modul `HR Checklists` untuk menjalankan checklist onboarding dan offboarding dari admin, termasuk default template, case aktif, due date, assignment ke HR/karyawan/atasan langsung, catatan task, status blocked/skipped/done, dan roll-up status case.
@@ -105,6 +146,7 @@ Semua perubahan penting PasPapan dicatat di file ini.
 - Backup Center ditingkatkan dengan backup berbasis queue, riwayat backup, dan dukungan worker terjadwal.
 - Dokumentasi deployment, operasi, Android build, dan kredensial sandbox demo publik diperluas.
 
+[4.3.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0
 [4.2.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v4.2.0
 [4.1.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v4.1.0
 [4.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v4

@@ -9,3 +9,54 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Enterprise obfuscated runtime artifacts. The readable private sources and
+# obfuscator stay outside OSS review; these files are reviewed as generated
+# runtime outputs after the internal build step.
+/app/Console/Commands/EnterpriseHwId.php linguist-generated=true -diff
+/app/Console/Commands/RunScheduledBackups.php linguist-generated=true -diff
+/app/Helpers/Editions.php linguist-generated=true -diff
+/app/Http/Controllers/Admin/ImportExport/DownloadImportExportRunController.php linguist-generated=true -diff
+/app/Http/Controllers/User/EmployeeDocumentDownloadController.php linguist-generated=true -diff
+/app/Jobs/ProcessActivityLogExportRun.php linguist-generated=true -diff
+/app/Jobs/ProcessAttendanceExportRun.php linguist-generated=true -diff
+/app/Jobs/ProcessAttendanceImportRun.php linguist-generated=true -diff
+/app/Jobs/ProcessEmployeeDocumentUpload.php linguist-generated=true -diff
+/app/Jobs/ProcessMonthlyAttendanceReportRun.php linguist-generated=true -diff
+/app/Jobs/ProcessUserExportRun.php linguist-generated=true -diff
+/app/Jobs/ProcessUserImportRun.php linguist-generated=true -diff
+/app/Jobs/RunSystemBackup.php linguist-generated=true -diff
+/app/Livewire/Admin/AnalyticsDashboard.php linguist-generated=true -diff
+/app/Livewire/Admin/AppraisalManager.php linguist-generated=true -diff
+/app/Livewire/Admin/AssetManager.php linguist-generated=true -diff
+/app/Livewire/Admin/DocumentTemplateLibrary.php linguist-generated=true -diff
+/app/Livewire/Admin/DocumentTemplateManager.php linguist-generated=true -diff
+/app/Livewire/Admin/EmployeeDocumentRequestManager.php linguist-generated=true -diff
+/app/Livewire/Admin/HrChecklistManager.php linguist-generated=true -diff
+/app/Livewire/Admin/ImportExport/Attendance.php linguist-generated=true -diff
+/app/Livewire/Admin/ImportExport/User.php linguist-generated=true -diff
+/app/Livewire/Admin/PayrollManager.php linguist-generated=true -diff
+/app/Livewire/Admin/PayrollSettings.php linguist-generated=true -diff
+/app/Livewire/Admin/SystemMaintenance.php linguist-generated=true -diff
+/app/Livewire/Finance/Concerns/ManagesCashAdvances.php linguist-generated=true -diff
+/app/Livewire/User/EmployeeDocumentRequestPage.php linguist-generated=true -diff
+/app/Livewire/User/Finance/MyCashAdvances.php linguist-generated=true -diff
+/app/Livewire/User/MyPayslips.php linguist-generated=true -diff
+/app/Notifications/EmployeeDocumentRequestStatusUpdated.php linguist-generated=true -diff
+/app/Policies/EmployeeDocumentRequestPolicy.php linguist-generated=true -diff
+/app/Services/AppraisalService.php linguist-generated=true -diff
+/app/Services/Attendance/EnterpriseService.php linguist-generated=true -diff
+/app/Services/Audit/EnterpriseAuditService.php linguist-generated=true -diff
+/app/Services/Enterprise/LicenseGuard.php linguist-generated=true -diff
+/app/Services/Payroll/EnterprisePayrollService.php linguist-generated=true -diff
+/app/Services/Reporting/EnterpriseReportingService.php linguist-generated=true -diff
+/app/Support/EmployeeDocumentPdfFactory.php linguist-generated=true -diff
+/app/Support/EmployeeDocumentRequestService.php linguist-generated=true -diff
+/app/Support/ImportExportRunService.php linguist-generated=true -diff
+/app/Support/ImportExportRunViewService.php linguist-generated=true -diff
+/app/Support/SpreadsheetInspectionService.php linguist-generated=true -diff
+/app/Support/SystemBackupService.php linguist-generated=true -diff
+/app/Support/SystemMaintenanceActionService.php linguist-generated=true -diff
+/app/Support/SystemMaintenanceViewService.php linguist-generated=true -diff
+/app/Support/UserCashAdvanceService.php linguist-generated=true -diff
+/app/Support/UserPayslipService.php linguist-generated=true -diff
