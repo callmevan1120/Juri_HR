@@ -14,6 +14,9 @@ Schedule::command('import-export-runs:prune-expired --hours=12')->hourly()->with
 Schedule::call(fn () => Cache::put('health:scheduler_heartbeat_at', now()->toIso8601String(), now()->addMinutes(10)))
     ->name('health.scheduler-heartbeat')
     ->everyMinute();
+Schedule::job(new \App\Jobs\RecordQueueHeartbeat)
+    ->name('health.queue-heartbeat')
+    ->everyMinute();
 Schedule::command('queue:work --queue=maintenance,default --stop-when-empty --max-time=55 --tries=1')
     ->everyMinute()
     ->withoutOverlapping()

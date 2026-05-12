@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Attendance;
 use App\Models\User;
+use App\Support\MultiCompanyService;
 
 class AttendancePolicy
 {
@@ -19,6 +20,10 @@ class AttendancePolicy
 
     public function view(User $user, Attendance $attendance): bool
     {
+        if (! $this->sameCompany($user, $attendance)) {
+            return false;
+        }
+
         return $attendance->user_id === $user->id
             || $user->can('viewAdminAttendances')
             || $this->canReview($user, $attendance);
@@ -41,6 +46,10 @@ class AttendancePolicy
 
     protected function canReview(User $user, Attendance $attendance): bool
     {
+        if (! $this->sameCompany($user, $attendance)) {
+            return false;
+        }
+
         if (! in_array($attendance->status, Attendance::REQUEST_STATUSES, true)) {
             return false;
         }
@@ -50,5 +59,13 @@ class AttendancePolicy
         }
 
         return $user->subordinates->contains('id', $attendance->user_id);
+    }
+
+    protected function sameCompany(User $actor, Attendance $attendance): bool
+    {
+        $attendance->loadMissing('user');
+
+        return $attendance->user !== null
+            && app(MultiCompanyService::class)->canAccessUser($actor, $attendance->user);
     }
 }

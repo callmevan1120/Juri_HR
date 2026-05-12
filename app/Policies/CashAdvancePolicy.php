@@ -6,6 +6,7 @@ use App\Helpers\Editions;
 use App\Models\CashAdvance;
 use App\Models\User;
 use App\Support\CashAdvanceApprovalService;
+use App\Support\MultiCompanyService;
 
 class CashAdvancePolicy
 {
@@ -16,6 +17,10 @@ class CashAdvancePolicy
 
     public function view(User $user, CashAdvance $cashAdvance): bool
     {
+        if (! $this->sameCompany($user, $cashAdvance)) {
+            return false;
+        }
+
         return ! Editions::cashAdvanceLocked()
             && ($cashAdvance->user_id === $user->id || $user->can('manageCashAdvances'));
     }
@@ -27,6 +32,10 @@ class CashAdvancePolicy
 
     public function approve(User $user, CashAdvance $cashAdvance): bool
     {
+        if (! $this->sameCompany($user, $cashAdvance)) {
+            return false;
+        }
+
         return ! Editions::cashAdvanceLocked()
             && app(CashAdvanceApprovalService::class)->canManage($cashAdvance, $user);
     }
@@ -38,6 +47,18 @@ class CashAdvancePolicy
 
     public function delete(User $user, CashAdvance $cashAdvance): bool
     {
+        if (! $this->sameCompany($user, $cashAdvance)) {
+            return false;
+        }
+
         return $user->can('manageCashAdvances');
+    }
+
+    protected function sameCompany(User $actor, CashAdvance $cashAdvance): bool
+    {
+        $cashAdvance->loadMissing('user');
+
+        return $cashAdvance->user !== null
+            && app(MultiCompanyService::class)->canAccessUser($actor, $cashAdvance->user);
     }
 }

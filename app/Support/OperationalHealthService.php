@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Helpers\Editions;
 use App\Models\SystemBackupRun;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -19,23 +20,29 @@ class OperationalHealthService
         $database = $this->databaseHealth();
         $backup = $this->backupHealth();
         $storageWritable = $this->storageWritable();
+        $queueHeartbeat = Cache::get('health:queue_heartbeat_at');
+        $schedulerHeartbeat = Cache::get('health:scheduler_heartbeat_at') ?? Cache::get('scheduler:last_run');
+        $failedJobsCount = $this->failedJobsCount();
+        $diskFreeBytes = $this->diskFreeBytes();
+        $alerts = $this->alerts($database, $backup, $queueHeartbeat, $schedulerHeartbeat, $failedJobsCount, $diskFreeBytes, $storageWritable);
 
         return [
-            'status' => $database['ok'] && $storageWritable ? 'ok' : 'attention',
+            'status' => $alerts === [] ? 'ok' : 'attention',
             'app_version' => $this->appVersion(),
             'database' => $database,
-            'failed_jobs_count' => $this->failedJobsCount(),
-            'queue_heartbeat_at' => Cache::get('health:queue_heartbeat_at'),
-            'scheduler_heartbeat_at' => Cache::get('health:scheduler_heartbeat_at') ?? Cache::get('scheduler:last_run'),
+            'failed_jobs_count' => $failedJobsCount,
+            'queue_heartbeat_at' => $queueHeartbeat,
+            'scheduler_heartbeat_at' => $schedulerHeartbeat,
             'backup' => $backup,
             'backup_last_success_at' => $backup['last_success_at'],
             'storage_writable' => $storageWritable,
-            'disk_free_bytes' => $this->diskFreeBytes(),
-            'disk_free_human' => $this->formatBytes($this->diskFreeBytes()),
+            'disk_free_bytes' => $diskFreeBytes,
+            'disk_free_human' => $this->formatBytes($diskFreeBytes),
             'cache_driver' => config('cache.default'),
             'session_driver' => config('session.driver'),
             'queue_connection' => config('queue.default'),
-            'scheduler_last_run' => Cache::get('health:scheduler_heartbeat_at') ?? Cache::get('scheduler:last_run'),
+            'scheduler_last_run' => $schedulerHeartbeat,
+            'alerts' => $alerts,
             'license' => [
                 'payroll_locked' => Editions::payrollLocked(),
                 'reporting_locked' => Editions::reportingLocked(),
@@ -80,13 +87,87 @@ class OperationalHealthService
             : 0;
     }
 
+    /**
+     * @param  array{ok:bool,latency_ms:float|null,error:string|null}  $database
+     * @param  array{last_success_at:mixed,file_present:bool,checksum_sha256:string|null,checksum_matches_meta:bool|null,last_failed_at:mixed}  $backup
+     * @return array<int, array{code:string,level:string,message:string}>
+     */
+    protected function alerts(
+        array $database,
+        array $backup,
+        mixed $queueHeartbeat,
+        mixed $schedulerHeartbeat,
+        int $failedJobsCount,
+        int $diskFreeBytes,
+        bool $storageWritable,
+    ): array {
+        $alerts = [];
+
+        if (! $database['ok']) {
+            $alerts[] = $this->alert('database_unreachable', 'critical', 'Database connectivity check failed.');
+        } elseif (($database['latency_ms'] ?? 0) > 500) {
+            $alerts[] = $this->alert('database_latency_high', 'warning', 'Database latency is above the operational baseline.');
+        }
+
+        if (! $storageWritable) {
+            $alerts[] = $this->alert('storage_not_writable', 'critical', 'Application storage is not writable.');
+        }
+
+        if ($diskFreeBytes > 0 && $diskFreeBytes < (1024 * 1024 * 1024)) {
+            $alerts[] = $this->alert('disk_low', 'warning', 'Storage free space is below 1 GB.');
+        }
+
+        if ($failedJobsCount >= 10) {
+            $alerts[] = $this->alert('failed_jobs_high', 'warning', 'Failed jobs count is above the support threshold.');
+        }
+
+        if ($this->isStaleHeartbeat($schedulerHeartbeat, 5)) {
+            $alerts[] = $this->alert('scheduler_stale', 'critical', 'Scheduler heartbeat has not been seen recently.');
+        }
+
+        if ($this->isStaleHeartbeat($queueHeartbeat, 5)) {
+            $alerts[] = $this->alert('queue_stale', 'critical', 'Queue heartbeat job has not completed recently.');
+        }
+
+        if ($backup['last_failed_at'] !== null) {
+            $alerts[] = $this->alert('backup_failed', 'warning', 'A backup run failed recently.');
+        }
+
+        if ($backup['checksum_matches_meta'] === false) {
+            $alerts[] = $this->alert('backup_checksum_mismatch', 'critical', 'Latest backup checksum does not match recorded metadata.');
+        }
+
+        return $alerts;
+    }
+
+    /**
+     * @return array{code:string,level:string,message:string}
+     */
+    protected function alert(string $code, string $level, string $message): array
+    {
+        return compact('code', 'level', 'message');
+    }
+
+    protected function isStaleHeartbeat(mixed $value, int $minutes): bool
+    {
+        if (! $value) {
+            return true;
+        }
+
+        try {
+            return Carbon::parse($value)->lt(now()->subMinutes($minutes));
+        } catch (\Throwable) {
+            return true;
+        }
+    }
+
     protected function storageWritable(): bool
     {
         return is_writable(storage_path('app'));
     }
 
     /**
-     * @return array{last_success_at:mixed,file_present:bool,checksum_sha256:string|null,checksum_matches_meta:bool|null}
+     * @return array{last_success_at:mixed,file_present:bool,checksum_sha256:string|null,checksum_matches_meta:bool|null,last_failed_at:mixed}
      */
     protected function backupHealth(): array
     {
@@ -101,6 +182,7 @@ class OperationalHealthService
                 'file_present' => false,
                 'checksum_sha256' => null,
                 'checksum_matches_meta' => null,
+                'last_failed_at' => $this->latestFailedBackupAt(),
             ];
         }
 
@@ -121,7 +203,16 @@ class OperationalHealthService
             'checksum_matches_meta' => is_string($storedChecksum) && $checksum !== null
                 ? hash_equals($storedChecksum, $checksum)
                 : null,
+            'last_failed_at' => $this->latestFailedBackupAt(),
         ];
+    }
+
+    protected function latestFailedBackupAt(): mixed
+    {
+        return SystemBackupRun::query()
+            ->where('status', 'failed')
+            ->latest('failed_at')
+            ->value('failed_at');
     }
 
     protected function diskFreeBytes(): int

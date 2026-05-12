@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Helpers\Editions;
 use App\Models\Payroll;
 use App\Models\User;
+use App\Support\MultiCompanyService;
 
 class PayrollPolicy
 {
@@ -20,6 +21,10 @@ class PayrollPolicy
 
     public function view(User $user, Payroll $payroll): bool
     {
+        if (! $this->sameCompany($user, $payroll)) {
+            return false;
+        }
+
         return ! Editions::payrollLocked()
             && ($user->can('viewAdminPayroll') || $payroll->user_id === $user->id);
     }
@@ -27,5 +32,13 @@ class PayrollPolicy
     public function download(User $user, Payroll $payroll): bool
     {
         return $this->view($user, $payroll) && $payroll->status === 'paid';
+    }
+
+    protected function sameCompany(User $actor, Payroll $payroll): bool
+    {
+        $payroll->loadMissing('user');
+
+        return $payroll->user !== null
+            && app(MultiCompanyService::class)->canAccessUser($actor, $payroll->user);
     }
 }

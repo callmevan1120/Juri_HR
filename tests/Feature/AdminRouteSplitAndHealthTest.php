@@ -1,8 +1,10 @@
 <?php
 
+use App\Jobs\RecordQueueHeartbeat;
 use App\Models\Role;
 use App\Models\SystemBackupRun;
 use App\Models\User;
+use App\Support\OperationalHealthService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -66,4 +68,23 @@ test('operational health page only allows maintenance viewers', function () {
         ->assertSee(__('Heartbeat'))
         ->assertSee(__('Checksum'))
         ->assertSee(__('OK'));
+});
+
+test('operational health distinguishes scheduler heartbeat from queue heartbeat', function () {
+    Cache::put('health:scheduler_heartbeat_at', now()->toIso8601String());
+    Cache::forget('health:queue_heartbeat_at');
+
+    $health = app(OperationalHealthService::class)->snapshot();
+    $codes = collect($health['alerts'])->pluck('code');
+
+    expect($codes)->toContain('queue_stale')
+        ->and($codes)->not->toContain('scheduler_stale');
+
+    (new RecordQueueHeartbeat)->handle();
+
+    $health = app(OperationalHealthService::class)->snapshot();
+    $codes = collect($health['alerts'])->pluck('code');
+
+    expect(Cache::get('health:queue_heartbeat_at'))->not->toBeNull()
+        ->and($codes)->not->toContain('queue_stale');
 });

@@ -1,4 +1,18 @@
 <x-admin.page-shell :title="__('Operational Health')" :description="__('Internal status checks for maintenance and support.')">
+    @if(! empty($health['alerts']))
+        <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-100">
+            <p class="font-semibold">{{ __('Active alerts') }}</p>
+            <ul class="mt-2 space-y-1">
+                @foreach($health['alerts'] as $alert)
+                    <li>
+                        <span class="font-mono text-xs uppercase">{{ $alert['level'] }}</span>
+                        · {{ __($alert['message']) }}
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <x-admin.insight-panel class="p-4">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Overall') }}</p>

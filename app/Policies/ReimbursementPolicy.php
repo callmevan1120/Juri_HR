@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Reimbursement;
 use App\Models\User;
 use App\Support\ApprovalMatrixService;
+use App\Support\MultiCompanyService;
 
 class ReimbursementPolicy
 {
@@ -20,6 +21,10 @@ class ReimbursementPolicy
 
     public function view(User $user, Reimbursement $reimbursement): bool
     {
+        if (! $this->sameCompany($user, $reimbursement)) {
+            return false;
+        }
+
         return $user->can('viewAdminReimbursements')
             || $reimbursement->user_id === $user->id
             || $this->canReview($user, $reimbursement);
@@ -32,6 +37,10 @@ class ReimbursementPolicy
 
     public function approve(User $user, Reimbursement $reimbursement): bool
     {
+        if (! $this->sameCompany($user, $reimbursement)) {
+            return false;
+        }
+
         return $user->allowsAdminPermission('admin.reimbursements.approve')
             || $this->canReview($user, $reimbursement);
     }
@@ -43,6 +52,10 @@ class ReimbursementPolicy
 
     private function canReview(User $user, Reimbursement $reimbursement): bool
     {
+        if (! $this->sameCompany($user, $reimbursement)) {
+            return false;
+        }
+
         if (app(ApprovalMatrixService::class)->canActorApprove($user, 'reimbursement', $reimbursement)) {
             return true;
         }
@@ -58,5 +71,13 @@ class ReimbursementPolicy
     {
         return (int) ($user->jobTitle?->jobLevel?->rank ?? 99) <= 2
             && strtolower((string) $user->division?->name) === 'finance';
+    }
+
+    private function sameCompany(User $actor, Reimbursement $reimbursement): bool
+    {
+        $reimbursement->loadMissing('user');
+
+        return $reimbursement->user !== null
+            && app(MultiCompanyService::class)->canAccessUser($actor, $reimbursement->user);
     }
 }

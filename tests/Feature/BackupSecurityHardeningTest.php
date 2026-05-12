@@ -254,6 +254,41 @@ test('backup artifact downloads and deletes require maintenance manager authoriz
         ->and(Storage::disk('local')->exists('backups/database.sql'))->toBeTrue();
 });
 
+test('backup restore drill verifies completed artifact presence and checksum', function () {
+    $audit = fakeAuditRecorder();
+    app()->instance(AuditServiceInterface::class, $audit);
+
+    Storage::fake('local');
+
+    $contents = 'select 1;';
+    Storage::disk('local')->put('backups/drill.sql', $contents);
+
+    $superadmin = User::factory()->admin(true)->create();
+
+    $backupRun = SystemBackupRun::create([
+        'type' => 'database',
+        'status' => 'queued',
+        'requested_by_user_id' => $superadmin->id,
+        'queue' => 'maintenance',
+        'file_disk' => 'local',
+    ]);
+
+    $backupRun->update([
+        'status' => 'completed',
+        'file_path' => 'backups/drill.sql',
+        'file_name' => 'drill.sql',
+        'size_bytes' => strlen($contents),
+        'meta' => ['checksum_sha256' => hash('sha256', $contents)],
+        'completed_at' => now(),
+    ]);
+
+    $this->artisan('maintenance:backup-restore-drill', ['--backup-id' => $backupRun->id])
+        ->expectsOutputToContain('Backup restore drill')
+        ->expectsOutputToContain('Artifact present: yes')
+        ->expectsOutputToContain('Checksum matches metadata: yes')
+        ->assertExitCode(0);
+});
+
 test('destructive update and maintenance flows require explicit confirmation controls', function () {
     $updateScript = File::get(base_path('update.sh'));
     $maintenanceView = File::get(resource_path('views/livewire/admin/system-maintenance.blade.php'));

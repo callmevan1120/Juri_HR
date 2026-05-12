@@ -3418,5 +3418,18 @@
     "Medium + high": "Medium + high",
     "High only": "High only",
     "Flagged": "Flagged",
-    "Download attachment": "Download attachment"
+    "Download attachment": "Download attachment",
+    "Active alerts": "Active alerts",
+    "Database connectivity check failed.": "Database connectivity check failed.",
+    "Database latency is above the operational baseline.": "Database latency is above the operational baseline.",
+    "Application storage is not writable.": "Application storage is not writable.",
+    "Storage free space is below 1 GB.": "Storage free space is below 1 GB.",
+    "Failed jobs count is above the support threshold.": "Failed jobs count is above the support threshold.",
+    "Scheduler heartbeat has not been seen recently.": "Scheduler heartbeat has not been seen recently.",
+    "Queue heartbeat job has not completed recently.": "Queue heartbeat job has not completed recently.",
+    "A backup run failed recently.": "A backup run failed recently.",
+    "Latest backup checksum does not match recorded metadata.": "Latest backup checksum does not match recorded metadata.",
+    "The uploaded file type is not allowed.": "The uploaded file type is not allowed.",
+    "The uploaded filename is not allowed.": "The uploaded filename is not allowed.",
+    "The uploaded file MIME type is not allowed.": "The uploaded file MIME type is not allowed."
 }

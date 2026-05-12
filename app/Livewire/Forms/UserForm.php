@@ -110,7 +110,7 @@ class UserForm extends Form
                     }
                 },
             ],
-            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+            'photo' => ['nullable', ...app(\App\Support\SecureUploadPolicy::class)->rules('image')],
             'basic_salary' => ['nullable', 'numeric', 'min:0'],
             'hourly_rate' => ['nullable', 'numeric', 'min:0'],
             'employment_status' => ['required', 'string', Rule::in(array_keys(User::employmentStatuses()))],

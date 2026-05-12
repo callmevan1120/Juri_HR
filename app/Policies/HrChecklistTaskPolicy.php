@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\HrChecklistTask;
 use App\Models\User;
+use App\Support\MultiCompanyService;
 
 class HrChecklistTaskPolicy
 {
@@ -14,6 +15,10 @@ class HrChecklistTaskPolicy
 
     public function view(User $user, HrChecklistTask $task): bool
     {
+        if (! $this->sameCompany($user, $task)) {
+            return false;
+        }
+
         return $user->can('viewHrChecklists')
             || $task->assigned_to === $user->id
             || $task->case?->user_id === $user->id
@@ -22,11 +27,21 @@ class HrChecklistTaskPolicy
 
     public function update(User $user, HrChecklistTask $task): bool
     {
-        return $user->can('manageHrChecklists') || $task->assigned_to === $user->id;
+        return $this->sameCompany($user, $task)
+            && ($user->can('manageHrChecklists') || $task->assigned_to === $user->id);
     }
 
     public function downloadAttachment(User $user, HrChecklistTask $task): bool
     {
         return $task->attachment_path !== null && $this->view($user, $task);
+    }
+
+    protected function sameCompany(User $actor, HrChecklistTask $task): bool
+    {
+        $task->loadMissing('case.user');
+        $employee = $task->case?->user;
+
+        return $employee !== null
+            && app(MultiCompanyService::class)->canAccessUser($actor, $employee);
     }
 }

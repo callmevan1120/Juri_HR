@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\HrChecklistCase;
 use App\Models\User;
+use App\Support\MultiCompanyService;
 
 class HrChecklistCasePolicy
 {
@@ -14,6 +15,10 @@ class HrChecklistCasePolicy
 
     public function view(User $user, HrChecklistCase $case): bool
     {
+        if (! $this->sameCompany($user, $case)) {
+            return false;
+        }
+
         return $user->can('viewHrChecklists')
             || $case->user_id === $user->id
             || $case->user?->manager_id === $user->id
@@ -27,11 +32,19 @@ class HrChecklistCasePolicy
 
     public function update(User $user, HrChecklistCase $case): bool
     {
-        return $user->can('manageHrChecklists');
+        return $this->sameCompany($user, $case) && $user->can('manageHrChecklists');
     }
 
     public function cancel(User $user, HrChecklistCase $case): bool
     {
-        return $user->can('manageHrChecklists');
+        return $this->sameCompany($user, $case) && $user->can('manageHrChecklists');
+    }
+
+    protected function sameCompany(User $actor, HrChecklistCase $case): bool
+    {
+        $case->loadMissing('user');
+
+        return $case->user !== null
+            && app(MultiCompanyService::class)->canAccessUser($actor, $case->user);
     }
 }

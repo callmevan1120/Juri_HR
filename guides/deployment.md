@@ -474,4 +474,9 @@ vercel --prod
 
 Jika attachment perlu persisten di Vercel, pindahkan storage ke S3-compatible object storage dan sesuaikan `FILESYSTEM_DISK`, konfigurasi disk, serta flow download/upload.
 
+### 13. Enterprise build artifact
+
+Enterprise packaging memakai tool internal di `secure_tools/` yang tidak dipublikasikan sebagai source OSS. Sebelum rilis enterprise, maintainer internal menjalankan obfuscator private, memastikan `ENTERPRISE_OBFUSCATOR_KEY` yang sama tersedia di build dan runtime, lalu hanya artifact obfuscated yang didistribusikan.
+
+Source audit OSS tetap harus bebas dari build cache, vendor, `node_modules`, dan generated artifact.
 

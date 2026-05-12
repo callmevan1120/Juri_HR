@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin\ImportExport;
 use App\Helpers\Editions;
 use App\Http\Controllers\Controller;
 use App\Support\ImportExportRunService;
+use App\Support\SecureUploadPolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ImportAttendancesController extends Controller
 {
-    public function __invoke(Request $request, ImportExportRunService $runService): RedirectResponse
+    public function __invoke(Request $request, ImportExportRunService $runService, SecureUploadPolicy $secureUploadPolicy): RedirectResponse
     {
         $this->authorize('importAttendances');
 
@@ -21,7 +22,7 @@ class ImportAttendancesController extends Controller
         }
 
         $validated = $request->validate([
-            'file' => ['required', 'file', 'mimes:csv,xls,xlsx,ods', 'max:10240'],
+            'file' => ['required', ...$secureUploadPolicy->rules('spreadsheet')],
         ]);
 
         $run = $runService->queueAttendanceImport($request->user(), $validated['file']);

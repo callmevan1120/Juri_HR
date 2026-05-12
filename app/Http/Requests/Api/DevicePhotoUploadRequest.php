@@ -17,7 +17,7 @@ class DevicePhotoUploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'photo' => ['required', 'image', 'max:5120'],
+            'photo' => ['required', ...app(\App\Support\SecureUploadPolicy::class)->rules('image')],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];

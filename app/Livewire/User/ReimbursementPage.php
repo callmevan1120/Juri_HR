@@ -3,6 +3,7 @@
 namespace App\Livewire\User;
 
 use App\Models\Reimbursement;
+use App\Support\SecureUploadPolicy;
 use App\Support\UserReimbursementService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
@@ -39,13 +40,16 @@ class ReimbursementPage extends Component
 
     public $attachment;
 
-    protected $rules = [
-        'date' => 'required|date',
-        'type' => 'required|string|in:medical,transport,optical,dental,project,other',
-        'amount' => 'required|numeric|min:1',
-        'description' => 'required|string|max:500',
-        'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240', // 10MB max
-    ];
+    protected function rules(): array
+    {
+        return [
+            'date' => 'required|date',
+            'type' => 'required|string|in:medical,transport,optical,dental,project,other',
+            'amount' => 'required|numeric|min:1',
+            'description' => 'required|string|max:500',
+            'attachment' => ['nullable', ...app(SecureUploadPolicy::class)->rules('document')],
+        ];
+    }
 
     public function boot(UserReimbursementService $reimbursementService): void
     {

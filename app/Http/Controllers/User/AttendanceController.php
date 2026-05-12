@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\LeaveType;
 use App\Services\Attendance\LeaveRequestService;
 use App\Support\FileAccessService;
+use App\Support\SecureUploadPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ class AttendanceController extends Controller
     public function __construct(
         protected LeaveRequestService $leaveRequestService,
         protected FileAccessService $fileAccessService,
+        protected SecureUploadPolicy $secureUploadPolicy,
     ) {}
 
     public function scan()
@@ -54,7 +56,7 @@ class AttendanceController extends Controller
             'note' => ['required', 'string', 'max:255'],
             'from' => ['required', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
-            'attachment' => [$attachmentRequired ? 'required' : 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:3072'],
+            'attachment' => [$attachmentRequired ? 'required' : 'nullable', ...$this->secureUploadPolicy->rules('document')],
             'lat' => ['nullable', 'numeric', 'between:-90,90'],
             'lng' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
