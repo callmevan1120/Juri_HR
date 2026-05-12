@@ -3,8 +3,6 @@
 namespace App\Support;
 
 use App\Models\ApprovalMatrixRule;
-use App\Models\CashAdvance;
-use App\Models\Reimbursement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -149,8 +147,12 @@ class ApprovalMatrixService
 
     private function requester(Model $subject): ?User
     {
-        if ($subject instanceof Reimbursement || $subject instanceof CashAdvance) {
-            return $subject->user;
+        if (method_exists($subject, 'user')) {
+            $subject->loadMissing('user');
+
+            $user = $subject->getRelation('user');
+
+            return $user instanceof User ? $user : null;
         }
 
         return null;
@@ -158,6 +160,14 @@ class ApprovalMatrixService
 
     private function amount(Model $subject): float
     {
-        return (float) ($subject->getAttribute('amount') ?? 0);
+        foreach (['amount', 'total_amount', 'net_salary', 'purchase_cost', 'duration'] as $attribute) {
+            $value = $subject->getAttribute($attribute);
+
+            if (is_numeric($value)) {
+                return (float) $value;
+            }
+        }
+
+        return 0.0;
     }
 }

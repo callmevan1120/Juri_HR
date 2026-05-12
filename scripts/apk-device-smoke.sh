@@ -6,6 +6,8 @@ ACTIVITY_NAME="${ACTIVITY_NAME:-com.pandanteknik.paspapan/.MainActivity}"
 APK_PATH="${APK_PATH:-android/app/build/outputs/apk/release/app-release.apk}"
 SCREENSHOT_PATH="${SCREENSHOT_PATH:-screenshots/apk-device-smoke.png}"
 LAUNCH_WAIT_SECONDS="${LAUNCH_WAIT_SECONDS:-8}"
+SMOKE_LATITUDE="${SMOKE_LATITUDE:-"-6.200000"}"
+SMOKE_LONGITUDE="${SMOKE_LONGITUDE:-"106.816666"}"
 
 if ! command -v adb >/dev/null 2>&1; then
   echo "adb is required but was not found in PATH." >&2
@@ -47,6 +49,30 @@ do
   adb shell pm grant "$PACKAGE_NAME" "$permission" >/dev/null 2>&1 || true
 done
 
+permission_dump="$(adb shell dumpsys package "$PACKAGE_NAME" 2>/dev/null || true)"
+
+for permission in \
+  android.permission.CAMERA \
+  android.permission.ACCESS_FINE_LOCATION \
+  android.permission.ACCESS_COARSE_LOCATION
+do
+  if ! printf '%s\n' "$permission_dump" | grep -q "$permission: granted=true"; then
+    echo "Warning: $permission is not granted. Runtime prompt may still appear during manual smoke." >&2
+  fi
+done
+
+if ! adb shell pm list features | grep -q 'android.hardware.camera'; then
+  echo "Warning: device does not advertise a camera feature; barcode/photo attendance smoke is limited." >&2
+fi
+
+adb shell settings put secure location_mode 3 >/dev/null 2>&1 || true
+adb shell appops set "$PACKAGE_NAME" COARSE_LOCATION allow >/dev/null 2>&1 || true
+adb shell appops set "$PACKAGE_NAME" FINE_LOCATION allow >/dev/null 2>&1 || true
+
+if [ "${SET_MOCK_GPS:-1}" = "1" ]; then
+  adb emu geo fix "$SMOKE_LONGITUDE" "$SMOKE_LATITUDE" >/dev/null 2>&1 || true
+fi
+
 adb logcat -c
 adb shell am force-stop "$PACKAGE_NAME" >/dev/null 2>&1 || true
 adb shell am start -W -n "$ACTIVITY_NAME" >/tmp/paspapan-apk-smoke-start.txt
@@ -83,3 +109,4 @@ fi
 echo "APK smoke test passed."
 echo "Package: $PACKAGE_NAME"
 echo "Screenshot: $SCREENSHOT_PATH"
+echo "Checked: launch, camera permission, GPS permission, barcode/photo camera readiness, crash log."

@@ -4,12 +4,17 @@ namespace App\Policies;
 
 use App\Models\ImportExportRun;
 use App\Models\User;
+use App\Support\MultiCompanyService;
 
 class ImportExportRunPolicy
 {
     public function download(User $user, ImportExportRun $run): bool
     {
         if (! $user->can('accessAdminPanel')) {
+            return false;
+        }
+
+        if (! $this->sameCompany($user, $run)) {
             return false;
         }
 
@@ -34,5 +39,17 @@ class ImportExportRunPolicy
             'attendance_report' => $user->can('viewAttendanceReports'),
             default => false,
         };
+    }
+
+    private function sameCompany(User $user, ImportExportRun $run): bool
+    {
+        if (! $run->requested_by_user_id) {
+            return true;
+        }
+
+        $run->loadMissing('requestedBy');
+
+        return $run->requestedBy !== null
+            && app(MultiCompanyService::class)->canAccessUser($user, $run->requestedBy);
     }
 }

@@ -3,10 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Livewire\Traits\AttendanceDetailTrait;
-use App\Models\Attendance;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use App\Queries\Attendance\AdminAttendanceGridQuery;
 use Illuminate\Support\Carbon;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Component;
@@ -56,49 +53,15 @@ class AttendanceComponent extends Component
         }
 
         $dates = $start->range($end)->toArray();
-
-        $employees = User::where('group', 'user')
-            ->managedBy(auth()->user())
-            ->when($this->search, function (Builder $q) {
-                return $q->where(function ($subQ) {
-                    $subQ->where('name', 'like', '%'.$this->search.'%')
-                        ->orWhere('nip', 'like', '%'.$this->search.'%');
-                });
-            })
-            ->when($this->division, fn (Builder $q) => $q->where('division_id', $this->division))
-            ->when($this->jobTitle, fn (Builder $q) => $q->where('job_title_id', $this->jobTitle))
-            ->when($this->riskFilter !== 'all', function (Builder $query) use ($start, $end): void {
-                $query->whereHas('attendances', function (Builder $attendanceQuery) use ($start, $end): void {
-                    $attendanceQuery->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')]);
-
-                    match ($this->riskFilter) {
-                        'high' => $attendanceQuery->where('risk_level', 'high'),
-                        'medium_high' => $attendanceQuery->whereIn('risk_level', ['medium', 'high']),
-                        'suspicious' => $attendanceQuery->where('is_suspicious', true),
-                        default => null,
-                    };
-                });
-            })
-            ->with(['division', 'jobTitle'])
-            ->orderBy('name')
-            ->paginate(20);
-
-        $userIds = $employees->getCollection()->pluck('id');
-        $attendancesByUser = $userIds->isEmpty()
-            ? collect()
-            : Attendance::query()
-                ->with('shift:id,name')
-                ->whereIn('user_id', $userIds)
-                ->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
-                ->get(['id', 'user_id', 'status', 'date', 'latitude_in', 'longitude_in', 'attachment', 'note', 'time_in', 'time_out', 'shift_id', 'is_suspicious', 'suspicious_reason', 'risk_score', 'risk_level', 'risk_factors'])
-                ->map(fn (Attendance $attendance) => $this->decorateAttendanceForGrid($attendance))
-                ->groupBy('user_id');
-
-        $employees->getCollection()->transform(function (User $user) use ($attendancesByUser) {
-            $user->setRelation('attendances', new EloquentCollection($attendancesByUser->get($user->id, collect())->all()));
-
-            return $user;
-        });
+        $employees = app(AdminAttendanceGridQuery::class)->employees(
+            auth()->user(),
+            $start,
+            $end,
+            $this->division,
+            $this->jobTitle,
+            $this->search,
+            $this->riskFilter,
+        );
 
         return view('livewire.admin.attendance', [
             'employees' => $employees,
@@ -106,22 +69,5 @@ class AttendanceComponent extends Component
             'recentReportRuns' => app(\App\Support\ImportExportRunViewService::class)
                 ->recentForResources(['attendance_report'], auth()->user(), 4),
         ]);
-    }
-
-    private function decorateAttendanceForGrid(Attendance $attendance): Attendance
-    {
-        $attendance->setAttribute('coordinates', $attendance->lat_lng);
-        $attendance->setAttribute('lat', $attendance->latitude_in);
-        $attendance->setAttribute('lng', $attendance->longitude_in);
-
-        if ($attendance->attachment) {
-            $attendance->setAttribute('attachment', $attendance->attachment_url);
-        }
-
-        if ($attendance->shift) {
-            $attendance->setAttribute('shift', $attendance->shift->name);
-        }
-
-        return $attendance;
     }
 }

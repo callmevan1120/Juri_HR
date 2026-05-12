@@ -13,6 +13,20 @@ class ApprovalMatrixRule extends Model
 
     public const WORKFLOW_CASH_ADVANCE = 'cash_advance';
 
+    public const WORKFLOW_LEAVE = 'leave';
+
+    public const WORKFLOW_OVERTIME = 'overtime';
+
+    public const WORKFLOW_ATTENDANCE_CORRECTION = 'attendance_correction';
+
+    public const WORKFLOW_SHIFT_SWAP = 'shift_swap';
+
+    public const WORKFLOW_ASSET = 'asset';
+
+    public const WORKFLOW_DOCUMENT_REQUEST = 'document_request';
+
+    public const WORKFLOW_PAYROLL_SENSITIVE_ACTION = 'payroll_sensitive_action';
+
     protected $fillable = [
         'workflow',
         'name',

@@ -32,6 +32,7 @@
     "scripts": {
         "dev": "vite",
         "build": "rm -f public/hot && BROWSERSLIST_IGNORE_OLD_DATA=true vite build",
+        "e2e:smoke": "bunx playwright test tests/e2e/main-smoke.spec.ts",
         "apk:smoke": "bash scripts/apk-device-smoke.sh",
         "apk:e2e:document-upload": "bash scripts/apk-document-upload-e2e.sh"
     },
