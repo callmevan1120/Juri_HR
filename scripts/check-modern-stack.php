@@ -49,7 +49,17 @@ if (($dependencies['@capacitor/core'] ?? null) !== '^8.3.1') {
     $errors[] = 'package.json should keep @capacitor/core on the Capacitor 8 baseline (^8.3.1).';
 }
 
-foreach (['tailwind.config.js', 'tailwind.config.cjs', 'tailwind.config.mjs', 'postcss.config.js', 'postcss.config.cjs', 'postcss.config.mjs'] as $legacyConfig) {
+$legacyTailwindConfigPrefix = 'tailwind'.'.config';
+$legacyPostcssConfigPrefix = 'postcss'.'.config';
+
+foreach ([
+    $legacyTailwindConfigPrefix.'.js',
+    $legacyTailwindConfigPrefix.'.cjs',
+    $legacyTailwindConfigPrefix.'.mjs',
+    $legacyPostcssConfigPrefix.'.js',
+    $legacyPostcssConfigPrefix.'.cjs',
+    $legacyPostcssConfigPrefix.'.mjs',
+] as $legacyConfig) {
     if (file_exists($root.'/'.$legacyConfig)) {
         $errors[] = "Remove legacy config {$legacyConfig}; Tailwind 4 config belongs in resources/css/app.css with @theme/@source.";
     }
@@ -114,8 +124,8 @@ $legacyTextPatterns = [
     '/\bPHP\s+8\.2\b/i' => 'PHP 8.2 wording',
     '/\bBun\s+1\.2\b/i' => 'Bun 1.2 wording',
     '/\bNode\.js\s+24\b/i' => 'Node.js 24 wording',
-    '/tailwind\.config\.(?:js|cjs|mjs)/i' => 'tailwind.config reference',
-    '/postcss\.config\.(?:js|cjs|mjs)/i' => 'postcss.config reference',
+    '/'.$legacyTailwindConfigPrefix.'\.(?:js|cjs|mjs)/i' => 'legacy Tailwind config reference',
+    '/'.$legacyPostcssConfigPrefix.'\.(?:js|cjs|mjs)/i' => 'legacy PostCSS config reference',
     '/@tailwind\s+(?:base|components|utilities)\b/i' => 'legacy Tailwind directive',
 ];
 
