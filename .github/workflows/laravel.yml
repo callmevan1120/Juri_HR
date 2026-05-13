@@ -9,6 +9,11 @@ jobs:
   test:
     name: Quality and Tests
     runs-on: ubuntu-latest
+    env:
+      PHP_VERSION: "8.3"
+      NODE_VERSION: "20"
+      BUN_VERSION: "1.3.6"
+      EVIDENCE_DIR: storage/review-evidence
 
     services:
       mysql:
@@ -33,15 +38,20 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: ${{ env.PHP_VERSION }}
           extensions: bcmath, gd, intl, mbstring, pdo_mysql, zip
           coverage: none
           tools: composer:v2
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: "1.2.21"
+          bun-version: ${{ env.BUN_VERSION }}
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -67,6 +77,7 @@ jobs:
 
       - name: Prepare environment
         run: |
+          mkdir -p "${EVIDENCE_DIR}"
           cp .env.example .env
           cat <<'EOF' >> .env
           APP_ENV=testing
@@ -114,16 +125,29 @@ jobs:
           QUEUE_CONNECTION: sync
           SESSION_DRIVER: array
           MAIL_MAILER: array
-        run: php artisan test --without-tty
+        run: |
+          set -o pipefail
+          php artisan test --without-tty 2>&1 | tee "${EVIDENCE_DIR}/php-artisan-test.log"
 
       - name: UI Rules Check
-        run: composer check:ui
+        run: |
+          set -o pipefail
+          composer check:ui 2>&1 | tee "${EVIDENCE_DIR}/composer-check-ui.log"
 
       - name: Enterprise boundary check
-        run: composer check:enterprise-boundary
+        run: |
+          set -o pipefail
+          composer check:enterprise-boundary 2>&1 | tee "${EVIDENCE_DIR}/composer-check-enterprise-boundary.log"
+
+      - name: Modern stack check
+        run: |
+          set -o pipefail
+          composer check:modern-stack 2>&1 | tee "${EVIDENCE_DIR}/composer-check-modern-stack.log"
 
       - name: Pint
-        run: ./vendor/bin/pint --test
+        run: |
+          set -o pipefail
+          ./vendor/bin/pint --test 2>&1 | tee "${EVIDENCE_DIR}/pint-test.log"
 
       - name: PHPStan
         env:
@@ -137,10 +161,67 @@ jobs:
           CACHE_STORE: array
           QUEUE_CONNECTION: sync
           SESSION_DRIVER: array
-        run: composer phpstan
+        run: |
+          set -o pipefail
+          composer phpstan 2>&1 | tee "${EVIDENCE_DIR}/composer-phpstan.log"
 
       - name: Composer audit
-        run: composer audit
+        run: |
+          set -o pipefail
+          composer audit 2>&1 | tee "${EVIDENCE_DIR}/composer-audit.log"
+
+      - name: Bun audit
+        run: |
+          set -o pipefail
+          bun audit 2>&1 | tee "${EVIDENCE_DIR}/bun-audit.log"
+
+      - name: RBAC audit
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: paspapan_ci
+          DB_USERNAME: paspapan
+          DB_PASSWORD: secret
+          CACHE_STORE: array
+          QUEUE_CONNECTION: sync
+          SESSION_DRIVER: array
+        run: |
+          set -o pipefail
+          php artisan rbac:audit 2>&1 | tee "${EVIDENCE_DIR}/php-artisan-rbac-audit.log"
 
       - name: Build frontend assets
-        run: bun run build
+        run: |
+          set -o pipefail
+          bun run build 2>&1 | tee "${EVIDENCE_DIR}/bun-run-build.log"
+
+      - name: Summarize review evidence
+        if: always()
+        run: |
+          {
+            echo "## PasPapan Review Evidence"
+            echo
+            echo "| Gate | Log |"
+            echo "| --- | --- |"
+            echo "| PHP tests | php-artisan-test.log |"
+            echo "| PHPStan | composer-phpstan.log |"
+            echo "| Pint | pint-test.log |"
+            echo "| Composer audit | composer-audit.log |"
+            echo "| Bun audit | bun-audit.log |"
+            echo "| Frontend build | bun-run-build.log |"
+            echo "| RBAC audit | php-artisan-rbac-audit.log |"
+            echo "| UI rules | composer-check-ui.log |"
+            echo "| Modern stack | composer-check-modern-stack.log |"
+            echo "| Enterprise boundary | composer-check-enterprise-boundary.log |"
+            echo
+            echo "Runtime baseline: PHP ${PHP_VERSION}, Node ${NODE_VERSION}+ compatible, Bun ${BUN_VERSION}."
+          } | tee "${EVIDENCE_DIR}/summary.md" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload review evidence bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-evidence-ci
+          path: storage/review-evidence
+          if-no-files-found: warn

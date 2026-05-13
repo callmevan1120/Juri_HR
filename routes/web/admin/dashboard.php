@@ -1,8 +1,5 @@
 <?php
 
-use App\Livewire\Admin\AnalyticsDashboard;
-use App\Livewire\Admin\ManagerInbox;
-use App\Livewire\Admin\NotificationsPage as AdminNotificationsPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -30,9 +27,9 @@ Route::get('/dashboard', function (Request $request) {
         ->header('X-Paspapan-Dashboard-Route', 'reached');
 })->name('admin.dashboard')->can('viewAdminDashboard');
 
-Route::get('/inbox', ManagerInbox::class)->name('admin.inbox')->can('accessAdminPanel');
-Route::get('/notifications', AdminNotificationsPage::class)->name('admin.notifications')->can('manageAdminNotifications');
-Route::get('/analytics', AnalyticsDashboard::class)
+Route::livewire('/inbox', 'admin.manager-inbox')->name('admin.inbox')->can('accessAdminPanel');
+Route::livewire('/notifications', 'admin.notifications-page')->name('admin.notifications')->can('manageAdminNotifications');
+Route::livewire('/analytics', 'admin.analytics-dashboard')
     ->name('admin.analytics')
     ->middleware('feature.lock:analytics,admin.analytics.view,admin.dashboard')
     ->can('viewAnalyticsDashboard');

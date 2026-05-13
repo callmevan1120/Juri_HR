@@ -271,6 +271,8 @@ Backend:
 
 - Laravel `13`
 - PHP `8.3+`
+- Node.js `20+`
+- Bun `1.3.6+`
 - Livewire `4`
 - Jetstream, Fortify, dan Sanctum
 - MySQL atau MariaDB
@@ -300,7 +302,7 @@ Testing dan tooling:
 
 - Pest `4`
 - Laravel Pint `1.29+`
-- Bun
+- Bun untuk dependency frontend dan build asset
 - Playwright smoke untuk browser E2E utama
 - ADB/WebView CDP smoke untuk APK dan screenshot mobile
 - feature tests untuk attendance enforcement, Dynamic QR, backup jobs, maintenance security, leave approval, media access, queued report export, import/export retention, template import, overtime manager, HR checklist, security matrix, multi-company isolation, approval matrix, risk scoring, operational health, dan koreksi absensi lintas hari

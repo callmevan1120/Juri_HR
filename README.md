@@ -33,7 +33,8 @@ Fokus utama aplikasi:
 - wrapper Android berbasis Capacitor untuk kebutuhan APK
 - modul enterprise-gated untuk fitur lanjutan tertentu
 
-Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Panduan integrasi mesin absensi ada di [guides/attendance-integration.md](./guides/attendance-integration.md). Coverage roadmap menuju 10/10 ada di [guides/roadmap-10-coverage.md](./guides/roadmap-10-coverage.md). Checklist rilis publik tersedia di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
+Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Panduan integrasi mesin absensi ada di [guides/attendance-integration.md](./guides/attendance-integration.md). Baseline stack modern ada di [guides/modern-stack.md](./guides/modern-stack.md). Coverage roadmap menuju 10/10 ada di [guides/roadmap-10-coverage.md](./guides/roadmap-10-coverage.md). Checklist rilis publik tersedia di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
+Evidence bundle untuk reviewer tersedia di [guides/reviewer-evidence.md](./guides/reviewer-evidence.md).
 
 ## Stack
 
@@ -42,8 +43,9 @@ Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Panduan 
 - Livewire `4`
 - Tailwind CSS `4`
 - Vite `7`
+- Node.js `20+`
+- Bun `1.3.6+`
 - MySQL atau MariaDB
-- Bun untuk dependency frontend dan build asset
 - Pest untuk test suite
 - Capacitor `8`
 - Android SDK `35` dengan minimum Android API `24`
@@ -122,6 +124,8 @@ git clone https://github.com/RiprLutuk/PasPapan.git
 cd PasPapan
 
 php -v
+node -v
+bun --version
 composer check-platform-reqs
 composer install
 bun install
@@ -205,6 +209,14 @@ Panduan deployment dipisahkan di [guides/deployment.md](./guides/deployment.md):
 - VPS dengan Nginx/Apache, Supervisor, dan cron
 - shared hosting dengan cron fallback
 - Vercel memakai [`vercel-community/php`](https://github.com/vercel-community/php)
+
+Ringkasan target deploy:
+
+| Target | Status | Catatan |
+| --- | --- | --- |
+| VPS | Production penuh | Target utama karena mendukung queue worker, scheduler, storage lokal/private, backup, Reverb, dan job background panjang. |
+| Shared hosting | Production terbatas | Aman untuk instalasi kecil jika PHP 8.3+, cron, MySQL, dan document root `public/` tersedia; Reverb dan worker permanen biasanya tidak tersedia. |
+| Vercel | Demo/staging/ringan | Aman untuk demo serverless; queue `sync`, storage `/tmp` ephemeral, tanpa scheduler/worker permanen, dan tidak cocok untuk backup/file-heavy production. |
 
 File pendukung Vercel yang sudah tersedia:
 

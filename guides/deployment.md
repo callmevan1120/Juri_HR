@@ -8,8 +8,9 @@ Minimum produksi:
 
 - PHP `8.3+`
 - Composer `2.x`
+- Node.js `20+`
+- Bun `1.3.6+`
 - MySQL `8+` atau MariaDB setara
-- Bun atau Node.js untuk build asset
 - ekstensi PHP umum Laravel 13: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `zip`, `ctype`, `json`, `tokenizer`, `xml`
 
 Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, dan shared hosting. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4. PHP 8.5 juga dapat berjalan; aplikasi sudah memakai constant MySQL SSL CA baru saat tersedia dengan fallback kompatibel untuk PHP 8.3.
@@ -20,6 +21,23 @@ Direkomendasikan untuk VPS:
 - Supervisor atau systemd untuk queue worker
 - cron
 - SSH
+
+## Matrix Deployment
+
+| Area | Vercel | Shared hosting | VPS |
+| --- | --- | --- | --- |
+| Target | Demo, staging, instalasi ringan | Production kecil/UMKM terbatas | Production penuh dan enterprise |
+| Runtime PHP | `vercel-php@0.7.4` PHP 8.3.x | PHP 8.3+ dari provider | PHP 8.3+; PHP 8.4 direkomendasikan |
+| Build frontend | CI/Vercel build dengan Node 20+ dan Bun 1.3.6+ | Build lokal atau host jika tersedia | Build di server/CI dengan Node 20+ dan Bun 1.3.6+ |
+| Queue | `sync`; tidak ada worker permanen | Database queue via cron pendek | Worker permanen via Supervisor/systemd |
+| Scheduler | Tidak native; butuh cron eksternal | Cron provider | Cron server |
+| Storage lokal/private | `/tmp` ephemeral; pakai object storage untuk persisten | Bisa lokal jika root aman dan disk cukup | Lokal/private penuh |
+| Backup lokal | Tidak disarankan | Terbatas sesuai quota dan cron | Didukung penuh dengan checksum/drill |
+| Import/export besar | Risiko timeout | Terbatas | Didukung worker panjang |
+| Reverb/WebSocket | Tidak disarankan | Umumnya tidak tersedia | Didukung dengan proses Reverb dan reverse proxy |
+| APK backend production | Hanya untuk demo/ringan | Bisa untuk tim kecil | Direkomendasikan |
+
+VPS adalah target production penuh PasPapan. Vercel dan shared hosting tetap didukung untuk skenario yang sadar batasan, tetapi fitur yang bergantung pada worker, scheduler, storage persisten, backup lokal, dan WebSocket harus divalidasi ulang di environment masing-masing.
 
 ## Deploy VPS
 
@@ -37,6 +55,8 @@ Preflight runtime sebelum install dependency:
 
 ```bash
 php -v
+node -v
+bun --version
 composer check-platform-reqs
 ```
 

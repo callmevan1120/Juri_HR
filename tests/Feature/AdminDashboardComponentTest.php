@@ -28,6 +28,8 @@ function fakeDashboardAuditRecorder(): object
 }
 
 test('admin dashboard renders recent activity and overdue checkout data', function () {
+    $this->travelTo(Carbon::parse('2026-05-14 12:00:00'));
+
     $admin = User::factory()->admin(true)->create();
     $employee = User::factory()->create(['name' => 'Dashboard Employee']);
     $shiftEnd = now()->subHour();

@@ -13,33 +13,46 @@ async function login(page, email: string, password: string) {
   await expect(page).not.toHaveURL(/\/login$/);
 }
 
+async function expectHealthyPage(page, path: string) {
+  await page.goto(path);
+  await expect(page.locator('body')).toBeVisible();
+  await expect(page.locator('body')).not.toContainText(/server error|exception|stack trace/i);
+}
+
 test('public login page renders', async ({ page }) => {
   await page.goto('/login');
   await expect(page.locator('input[name="email"]')).toBeVisible();
   await expect(page.locator('input[name="password"]')).toBeVisible();
 });
 
-test('admin smoke covers dashboard employees attendance HR payroll reports', async ({ page }) => {
+test('admin smoke covers RBAC menus approvals attendance QR HR payroll import export backup health', async ({ page }) => {
   test.skip(!adminEmail, 'Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD to run authenticated admin smoke.');
 
   await login(page, adminEmail!, adminPassword);
 
   for (const path of [
     '/admin/dashboard',
+    '/admin/inbox',
     '/admin/employees',
     '/admin/attendances',
+    '/admin/barcodes',
+    '/admin/import-export/users',
+    '/admin/import-export/attendances',
+    '/admin/leaves',
+    '/admin/overtime',
     '/admin/hr-checklists',
     '/admin/reimbursements',
+    '/admin/manage-kasbon',
     '/admin/payrolls',
     '/admin/reports',
+    '/admin/system-maintenance',
+    '/admin/operational-health',
   ]) {
-    await page.goto(path);
-    await expect(page.locator('body')).toBeVisible();
-    await expect(page.locator('body')).not.toContainText(/server error|exception|stack trace/i);
+    await expectHealthyPage(page, path);
   }
 });
 
-test('user smoke covers attendance leave reimbursement payslip documents approvals', async ({ page }) => {
+test('user smoke covers attendance check in out leave overtime reimbursement payslip documents approvals HR tasks', async ({ page }) => {
   test.skip(!userEmail, 'Set E2E_USER_EMAIL and E2E_USER_PASSWORD to run authenticated user smoke.');
 
   await login(page, userEmail!, userPassword);
@@ -47,14 +60,16 @@ test('user smoke covers attendance leave reimbursement payslip documents approva
   for (const path of [
     '/home',
     '/scan',
+    '/attendance-history',
     '/apply-leave',
+    '/overtime',
     '/reimbursement',
+    '/my-kasbon',
     '/payroll',
     '/document-requests',
+    '/hr-tasks',
     '/approvals',
   ]) {
-    await page.goto(path);
-    await expect(page.locator('body')).toBeVisible();
-    await expect(page.locator('body')).not.toContainText(/server error|exception|stack trace/i);
+    await expectHealthyPage(page, path);
   }
 });

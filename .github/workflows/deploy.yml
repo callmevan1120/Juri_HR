@@ -20,6 +20,9 @@ jobs:
       cancel-in-progress: false
 
     env:
+      PHP_VERSION: "8.3"
+      NODE_VERSION: "20"
+      BUN_VERSION: "1.3.6"
       APP_ROOT: /var/www/paspapan
       RELEASES_PATH: /var/www/paspapan/releases
       SHARED_PATH: /var/www/paspapan/shared
@@ -34,15 +37,20 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: ${{ env.PHP_VERSION }}
           extensions: bcmath, gd, intl, mbstring, pdo_mysql, zip
           coverage: none
           tools: composer:v2
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: "1.2.21"
+          bun-version: ${{ env.BUN_VERSION }}
 
       - name: Install PHP dependencies
         run: composer install --prefer-dist --no-interaction --no-progress

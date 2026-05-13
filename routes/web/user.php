@@ -4,21 +4,6 @@ use App\Http\Controllers\User\AppraisalExportPdfController;
 use App\Http\Controllers\User\AttendanceController;
 use App\Http\Controllers\User\EmployeeDocumentDownloadController;
 use App\Http\Controllers\User\HomeController;
-use App\Livewire\User\AttendanceCorrectionPage;
-use App\Livewire\User\EmployeeDocumentRequestPage;
-use App\Livewire\User\FaceEnrollment;
-use App\Livewire\User\Finance\MyCashAdvances;
-use App\Livewire\User\Finance\TeamCashAdvanceManager;
-use App\Livewire\User\HrTasksPage;
-use App\Livewire\User\MyAssets;
-use App\Livewire\User\MyPerformance;
-use App\Livewire\User\NotificationsPage as UserNotificationsPage;
-use App\Livewire\User\OvertimeRequest;
-use App\Livewire\User\ReimbursementPage;
-use App\Livewire\User\ShiftSchedulePage;
-use App\Livewire\User\ShiftSwapRequestPage;
-use App\Livewire\User\TeamApprovals;
-use App\Livewire\User\TeamApprovalsHistory;
 use App\Models\Appraisal;
 use App\Models\Attendance as AttendanceRecord;
 use App\Models\AttendanceCorrection;
@@ -36,7 +21,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/notifications', UserNotificationsPage::class)->name('notifications');
+    Route::livewire('/notifications', 'user.notifications-page')->name('notifications');
 
     Route::middleware('user')->group(function () {
         Route::get('/home', HomeController::class)->name('home');
@@ -48,19 +33,19 @@ Route::middleware([
             Route::get('/scan', 'scan')->name('scan')->can('create', AttendanceRecord::class);
         });
 
-        Route::get('/attendance-corrections', AttendanceCorrectionPage::class)
+        Route::livewire('/attendance-corrections', 'user.attendance-correction-page')
             ->name('attendance-corrections')
             ->can('viewAny', AttendanceCorrection::class);
 
-        Route::get('/reimbursement', ReimbursementPage::class)
+        Route::livewire('/reimbursement', 'user.reimbursement-page')
             ->name('reimbursement')
             ->can('viewAny', Reimbursement::class);
 
-        Route::get('/my-schedule', ShiftSchedulePage::class)->name('my-schedule');
-        Route::get('/shift-swap-requests', ShiftSwapRequestPage::class)
+        Route::livewire('/my-schedule', 'user.shift-schedule-page')->name('my-schedule');
+        Route::livewire('/shift-swap-requests', 'user.shift-swap-request-page')
             ->name('shift-swap-requests')
             ->can('viewAny', ShiftSwapRequest::class);
-        Route::get('/document-requests', EmployeeDocumentRequestPage::class)
+        Route::livewire('/document-requests', 'user.employee-document-request-page')
             ->name('document-requests')
             ->can('viewAny', EmployeeDocumentRequest::class);
         Route::get('/document-requests/{documentRequest}/download', [EmployeeDocumentDownloadController::class, 'generated'])
@@ -69,24 +54,24 @@ Route::middleware([
         Route::get('/document-requests/{documentRequest}/uploaded', [EmployeeDocumentDownloadController::class, 'uploaded'])
             ->name('document-requests.uploaded')
             ->can('downloadUpload', 'documentRequest');
-        Route::get('/hr-tasks', HrTasksPage::class)
+        Route::livewire('/hr-tasks', 'user.hr-tasks-page')
             ->name('hr-tasks')
             ->can('viewAny', HrChecklistTask::class);
-        Route::get('/approvals', TeamApprovals::class)
+        Route::livewire('/approvals', 'user.team-approvals')
             ->name('approvals')
             ->can('reviewSubordinateRequests');
-        Route::get('/approvals/history', TeamApprovalsHistory::class)
+        Route::livewire('/approvals/history', 'user.team-approvals-history')
             ->name('approvals.history')
             ->can('reviewSubordinateRequests');
-        Route::get('/overtime', OvertimeRequest::class)->name('overtime')->can('viewAny', Overtime::class);
-        Route::get('/my-kasbon', MyCashAdvances::class)->name('my-kasbon')->middleware('feature.lock:cash_advance,user,home')->can('viewAny', CashAdvance::class);
-        Route::get('/team-kasbon', TeamCashAdvanceManager::class)
+        Route::livewire('/overtime', 'user.overtime-request')->name('overtime')->can('viewAny', Overtime::class);
+        Route::livewire('/my-kasbon', 'user.finance.my-cash-advances')->name('my-kasbon')->middleware('feature.lock:cash_advance,user,home')->can('viewAny', CashAdvance::class);
+        Route::livewire('/team-kasbon', 'user.finance.team-cash-advance-manager')
             ->name('team-kasbon')
             ->middleware('feature.lock:cash_advance,gate:reviewSubordinateRequests,home')
             ->can('reviewSubordinateRequests');
-        Route::get('/face-enrollment', FaceEnrollment::class)->name('face.enrollment');
-        Route::get('/my-assets', MyAssets::class)->name('my-assets')->middleware('feature.lock:assets,user,home')->can('viewAny', CompanyAsset::class);
-        Route::get('/my-performance', MyPerformance::class)->name('my-performance')->middleware('feature.lock:appraisal,user,home')->can('viewAny', Appraisal::class);
+        Route::livewire('/face-enrollment', 'user.face-enrollment')->name('face.enrollment');
+        Route::livewire('/my-assets', 'user.my-assets')->name('my-assets')->middleware('feature.lock:assets,user,home')->can('viewAny', CompanyAsset::class);
+        Route::livewire('/my-performance', 'user.my-performance')->name('my-performance')->middleware('feature.lock:appraisal,user,home')->can('viewAny', Appraisal::class);
         Route::get('/appraisal/{appraisal}/export-pdf', AppraisalExportPdfController::class)
             ->name('appraisal.export-pdf')
             ->can('exportPdf', 'appraisal');

@@ -2,11 +2,6 @@
 
 use App\Http\Controllers\Admin\Attendance\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Admin\Barcode\BarcodeController;
-use App\Livewire\Admin\AttendanceCorrectionManager;
-use App\Livewire\Admin\LeaveApproval;
-use App\Livewire\Admin\OvertimeManager;
-use App\Livewire\Admin\ScheduleComponent;
-use App\Livewire\Admin\ShiftSwapApprovalManager;
 use App\Models\Attendance as AttendanceRecord;
 use App\Models\AttendanceCorrection;
 use Illuminate\Support\Facades\Route;
@@ -29,10 +24,10 @@ Route::get('/barcodes/{barcode}/dynamic-token', [BarcodeController::class, 'dyna
 Route::get('/barcodes/download/all', [BarcodeController::class, 'downloadAll'])->name('admin.barcodes.downloadall')->can('manageBarcodes');
 Route::get('/barcodes/{id}/download', [BarcodeController::class, 'download'])->name('admin.barcodes.download')->can('manageBarcodes');
 
-Route::get('/schedules', ScheduleComponent::class)->name('admin.schedules')->can('manageSchedules');
+Route::livewire('/schedules', 'admin.schedule-component')->name('admin.schedules')->can('manageSchedules');
 Route::get('/attendances', [AdminAttendanceController::class, 'index'])->name('admin.attendances')->can('viewAdminAny', AttendanceRecord::class);
 Route::get('/attendances/report', [AdminAttendanceController::class, 'report'])->name('admin.attendances.report')->can('viewAttendanceReports');
-Route::get('/attendance-corrections', AttendanceCorrectionManager::class)->name('admin.attendance-corrections')->can('viewAdminAny', AttendanceCorrection::class);
-Route::get('/leaves', LeaveApproval::class)->name('admin.leaves')->can('manageLeaveApprovals');
-Route::get('/shift-swaps', ShiftSwapApprovalManager::class)->name('admin.shift-swaps')->can('manageShiftSwapApprovals');
-Route::get('/overtime', OvertimeManager::class)->name('admin.overtime')->can('manageOvertime');
+Route::livewire('/attendance-corrections', 'admin.attendance-correction-manager')->name('admin.attendance-corrections')->can('viewAdminAny', AttendanceCorrection::class);
+Route::livewire('/leaves', 'admin.leave-approval')->name('admin.leaves')->can('manageLeaveApprovals');
+Route::livewire('/shift-swaps', 'admin.shift-swap-approval-manager')->name('admin.shift-swaps')->can('manageShiftSwapApprovals');
+Route::livewire('/overtime', 'admin.overtime-manager')->name('admin.overtime')->can('manageOvertime');

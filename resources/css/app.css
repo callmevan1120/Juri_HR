@@ -1,6 +1,38 @@
 @import "flatpickr/dist/flatpickr.css";
 @import "tailwindcss";
-@config "../../tailwind.config.js";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../vendor/laravel/jetstream/**/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../views/**/*.blade.php";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-primary-50: #e2f0df;
+    --color-primary-100: #d5ead1;
+    --color-primary-200: #badcb3;
+    --color-primary-300: #9fcf96;
+    --color-primary-400: #84c178;
+    --color-primary-500: #6ab45b;
+    --color-primary-600: #57944a;
+    --color-primary-700: #44733a;
+    --color-primary-800: #31542a;
+    --color-primary-900: #1e331a;
+    --color-primary-950: #152312;
+    --color-brand-50: #ecfeff;
+    --color-brand-100: #cffafe;
+    --color-brand-200: #a5f3fc;
+    --color-brand-300: #67e8f9;
+    --color-brand-400: #22d3ee;
+    --color-brand-500: #06b6d4;
+    --color-brand-600: #0891b2;
+    --color-brand-700: #0e7490;
+    --color-brand-800: #155e75;
+    --color-brand-900: #164e63;
+    --color-brand-950: #083344;
+}
 
 @layer base {
     [x-cloak] {

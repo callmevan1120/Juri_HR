@@ -223,9 +223,12 @@ bun run screenshots:apk
 
 Catatan runtime CI:
 
-- CI memakai PHP `8.3`, MySQL `8.0`, Bun `1.2.21`, `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=array`, `MAIL_MAILER=array`, dan `BROADCAST_CONNECTION=log`.
+- CI memakai PHP `8.3`, Node.js `20`, Bun `1.3.6`, MySQL `8.0`, `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=array`, `MAIL_MAILER=array`, dan `BROADCAST_CONNECTION=log`.
 - `composer check:ui` menjalankan `scripts/check-ui-rules.php`.
+- `composer check:modern-stack` memastikan baseline Laravel 13, Livewire 4, Tailwind 4 CSS-first, Capacitor 8, PHP 8.3+, Node 20+, dan Bun 1.3.6+ tidak tercampur wording/config lama.
 - `composer phpstan` menjalankan PHPStan dengan memory limit `1G`.
+- Review evidence bundle diupload dari workflow CI sebagai artifact `review-evidence-ci`, `review-evidence-playwright`, dan `review-evidence-apk-smoke`. Detail ada di `guides/reviewer-evidence.md`.
+- Bundle lokal dapat dibuat dengan `bun run evidence:review`; tambahkan `RUN_E2E=1` atau `RUN_APK_SMOKE=1` bila server E2E/device ADB sudah siap.
 
 ## Android Build
 

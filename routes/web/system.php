@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Auth\VerifyEmailCodeController;
 use App\Http\Controllers\System\LanguageController;
-use App\Livewire\Admin\SystemMaintenance;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\SystemBackupRun;
 use App\Models\User;
@@ -280,7 +279,7 @@ Route::middleware([
     Route::get('/', fn () => redirect()->route(Auth::user()?->preferredHomeRouteName() ?? 'home'));
 
     Route::prefix('admin')->middleware(['admin'])->group(function () {
-        Route::get('/system-maintenance', SystemMaintenance::class)
+        Route::livewire('/system-maintenance', 'admin.system-maintenance')
             ->name('admin.system-maintenance')
             ->can('viewAny', SystemBackupRun::class);
     });

@@ -2,6 +2,10 @@
     "private": true,
     "version": "4.3.0",
     "type": "module",
+    "engines": {
+        "node": ">=20",
+        "bun": ">=1.3.6"
+    },
     "resolutions": {
         "caniuse-lite": "latest",
         "esbuild": "^0.27.0",
@@ -32,6 +36,7 @@
     "scripts": {
         "dev": "vite",
         "build": "rm -f public/hot && BROWSERSLIST_IGNORE_OLD_DATA=true vite build",
+        "evidence:review": "bash scripts/collect-review-evidence.sh",
         "e2e:smoke": "bunx playwright test tests/e2e/main-smoke.spec.ts",
         "screenshots:desktop": "node scripts/desktop-page-screenshots.mjs",
         "screenshots:apk": "bash scripts/apk-page-screenshots.sh",
@@ -46,12 +51,10 @@
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/typography": "^0.5.19",
         "@tailwindcss/vite": "^4",
-        "autoprefixer": "^10.5.0",
         "axios": "^1.16.0",
         "browserslist": "^4.28.2",
         "caniuse-lite": "^1.0.30001788",
         "laravel-vite-plugin": "^2.1.0",
-        "postcss": "^8.5.13",
         "tailwindcss": "^4",
         "typescript": "^5.9.3",
         "vite": "^7.3.2"

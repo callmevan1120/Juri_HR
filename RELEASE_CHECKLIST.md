@@ -51,6 +51,9 @@ Status terakhir diverifikasi lokal pada 2026-05-13 Asia/Jakarta.
 - [x] `bun audit`
 - [x] `bun run build`
 - [x] `php artisan rbac:audit`
+- [x] `composer check:modern-stack`
+- [x] Review evidence bundle tersedia di CI.
+  Evidence: `.github/workflows/laravel.yml` upload `review-evidence-ci`; `.github/workflows/e2e.yml` upload `review-evidence-playwright`; `.github/workflows/apk-smoke.yml` upload `review-evidence-apk-smoke` dari self-hosted Android/ADB runner.
 - [x] Coverage baseline workflow reviewed.
 - [x] Playwright smoke utama.
 - [x] APK smoke pada device fisik.

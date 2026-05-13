@@ -22,6 +22,8 @@ jobs:
   preflight:
     name: Version and checklist preflight
     runs-on: ubuntu-latest
+    env:
+      PHP_VERSION: "8.3"
 
     steps:
       - name: Checkout code
@@ -30,11 +32,24 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: ${{ env.PHP_VERSION }}
           coverage: none
 
       - name: Verify release checklist exists
         run: test -f RELEASE_CHECKLIST.md
+
+      - name: Verify runtime baseline references
+        run: |
+          set -euo pipefail
+          test "$(cat .node-version)" = "20"
+          test "$(cat .bun-version)" = "1.3.6"
+          php -r '$package = json_decode(file_get_contents("package.json"), true, flags: JSON_THROW_ON_ERROR); exit(($package["engines"]["node"] ?? "") === ">=20" && ($package["engines"]["bun"] ?? "") === ">=1.3.6" ? 0 : 1);'
+          grep -q "PHP \`8.3+\`" README.md
+          grep -q "Node.js \`20+\`" README.md
+          grep -q "Bun \`1.3.6+\`" README.md
+          grep -q "PHP \`8.3+\`" guides/deployment.md
+          grep -q "Node.js \`20+\`" guides/deployment.md
+          grep -q "Bun \`1.3.6+\`" guides/deployment.md
 
       - name: Verify version references
         env:

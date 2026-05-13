@@ -2,9 +2,6 @@
 
 use App\Http\Controllers\Admin\Employees\EmployeeController;
 use App\Http\Controllers\User\EmployeeDocumentDownloadController;
-use App\Livewire\Admin\DocumentTemplateManager;
-use App\Livewire\Admin\EmployeeDocumentRequestManager;
-use App\Livewire\Admin\HrChecklistManager;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\HrChecklistCase;
 use Illuminate\Support\Facades\Route;
@@ -14,12 +11,12 @@ Route::resource('/employees', EmployeeController::class)
     ->middleware('can:viewEmployees')
     ->names(['index' => 'admin.employees']);
 
-Route::get('/hr-checklists', HrChecklistManager::class)
+Route::livewire('/hr-checklists', 'admin.hr-checklist-manager')
     ->name('admin.hr-checklists')
     ->can('viewAny', HrChecklistCase::class);
 
-Route::get('/document-requests', EmployeeDocumentRequestManager::class)->name('admin.document-requests')->can('viewAdminAny', EmployeeDocumentRequest::class);
-Route::get('/document-templates', DocumentTemplateManager::class)->name('admin.document-templates')->can('manageDocumentTemplates');
+Route::livewire('/document-requests', 'admin.employee-document-request-manager')->name('admin.document-requests')->can('viewAdminAny', EmployeeDocumentRequest::class);
+Route::livewire('/document-templates', 'admin.document-template-manager')->name('admin.document-templates')->can('manageDocumentTemplates');
 Route::redirect('/document-templates/library', '/admin/document-templates')
     ->name('admin.document-templates.library')
     ->middleware('can:manageDocumentTemplates');

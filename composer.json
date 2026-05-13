@@ -73,6 +73,9 @@
         "check:ui": [
             "@php scripts/check-ui-rules.php"
         ],
+        "check:modern-stack": [
+            "@php scripts/check-modern-stack.php"
+        ],
         "check:enterprise-boundary": [
             "@php scripts/check-enterprise-boundary.php"
         ],

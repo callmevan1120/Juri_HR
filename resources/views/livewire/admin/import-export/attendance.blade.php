@@ -2,9 +2,14 @@
     $canExportAttendances = auth()->user()->can('exportAttendances');
     $canImportAttendances = auth()->user()->can('importAttendances');
     $defaultTab = $canExportAttendances ? 'export' : 'import';
+    $defaultTabJson = \Illuminate\Support\Js::from($defaultTab);
+    $importLockedPayload = \Illuminate\Support\Js::from([
+        'title' => __('Import Locked'),
+        'message' => __('Importing attendance is an Enterprise feature. Please upgrade.'),
+    ]);
 @endphp
 
-<div x-data="{ activeTab: @js($defaultTab) }">
+<div x-data="{ activeTab: {{ $defaultTabJson }} }">
     <x-admin.page-shell
         :title="__('Attendance Data Management')"
         :description="__('Export and import attendance data in bulk.')"
@@ -29,6 +34,7 @@
                                 type="button"
                                 id="attendance-export-tab"
                                 role="tab"
+                                aria-label="{{ __('Export') }}"
                                 aria-controls="attendance-export-panel"
                                 x-bind:aria-selected="(activeTab === 'export').toString()"
                                 x-bind:tabindex="activeTab === 'export' ? 0 : -1"
@@ -47,6 +53,7 @@
                                 type="button"
                                 id="attendance-import-tab"
                                 role="tab"
+                                aria-label="{{ __('Import') }}"
                                 aria-controls="attendance-import-panel"
                                 x-bind:aria-selected="(activeTab === 'import').toString()"
                                 x-bind:tabindex="activeTab === 'import' ? 0 : -1"
@@ -143,6 +150,7 @@
                                     <button
                                         type="button"
                                         @click="expanded = !expanded"
+                                        aria-label="{{ __('Advanced Filters') }}"
                                         x-bind:aria-expanded="expanded.toString()"
                                         aria-controls="attendance-advanced-filters"
                                         class="wcag-touch-target flex items-center gap-2 rounded-lg text-sm font-medium text-gray-600 transition-colors hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-primary-400 dark:focus:ring-offset-gray-900"
@@ -313,7 +321,7 @@
                                         <x-actions.danger-button
                                             class="w-full justify-center gap-2 py-3 sm:w-auto"
                                             type="button"
-                                            @click.prevent="$dispatch('feature-lock', { title: @js(__('Import Locked')), message: @js(__('Importing attendance is an Enterprise feature. Please upgrade.')) })"
+                                            @click.prevent="$dispatch('feature-lock', {{ $importLockedPayload }})"
                                         >
                                             {{ __('Import') }}
                                             <x-heroicon-o-lock-closed class="h-4 w-4" />
