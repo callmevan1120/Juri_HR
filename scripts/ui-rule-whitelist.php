@@ -72,6 +72,15 @@ $legacyTableFiles = [
     'resources/views/livewire/user/team-approvals.blade.php',
 ];
 
+$legacyMobileLayoutFiles = [
+    'resources/views/admin/operational-health.blade.php',
+    'resources/views/components/sections/form-section.blade.php',
+    'resources/views/livewire/admin/asset-manager.blade.php',
+    'resources/views/livewire/admin/attendance-correction-manager.blade.php',
+    'resources/views/livewire/admin/attendance.blade.php',
+    'resources/views/livewire/user/employee-document-request-page.blade.php',
+];
+
 $legacyWarningFindings = [
     ['app/Livewire/Forms/UserForm.php', 'hardcoded_ui_text', 219, 'Possible hardcoded Livewire UI text: "Demo user password cannot be changed."'],
     ['lang/en.json', 'translation_file_drift', 1, 'Translation file drift detected: 194 key(s) exist in lang/id.json but not in lang/en.json. Blocking enforcement currently targets UI-used literal keys.'],
@@ -212,6 +221,14 @@ return array_merge(
             'reason' => 'Legacy table layout pending card-first mobile migration.',
         ],
         $legacyTableFiles,
+    ),
+    array_map(
+        static fn (string $file): array => [
+            'file' => $file,
+            'rule' => 'mobile_layout_red_flag',
+            'reason' => 'Known responsive layout debt; keep tracked while page-by-page mobile redesign is scheduled.',
+        ],
+        $legacyMobileLayoutFiles,
     ),
     array_map(
         static fn (array $finding): array => [

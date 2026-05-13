@@ -186,7 +186,7 @@
 
                             <div class="shrink-0 flex flex-col items-start gap-1 pl-0 text-left sm:items-end sm:pl-4 sm:text-right">
                                 <p class="text-sm sm:text-lg font-black text-gray-900 dark:text-white tracking-tight">
-                                    <span class="text-[10px] sm:text-xs text-gray-400 font-normal mr-0.5">Rp</span>{{ number_format($advance->amount, 0, ',', '.') }}
+                                    <span class="text-[10px] sm:text-xs text-gray-400 font-normal mr-0.5">{{ __('Rp') }}</span>{{ number_format($advance->amount, 0, ',', '.') }}
                                 </p>
                                 @if($advance->status === 'pending')
                                 <button wire:click="delete({{ $advance->id }})" wire:confirm="{{ __('Are you sure you want to cancel this request?') }}" class="text-[10px] font-medium text-red-500 hover:text-red-700 transition">

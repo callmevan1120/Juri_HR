@@ -55,6 +55,7 @@
 
                 @if (\App\Helpers\Editions::attendanceLocked())
                     <button type="button"
+                        aria-label="{{ __('Register Face ID Now') }}"
                         @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
                         class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition-all sm:w-auto">
                         <x-heroicon-m-camera class="w-5 h-5" />
@@ -63,6 +64,7 @@
                     </button>
                 @else
                     <a href="{{ route('face.enrollment') }}"
+                        aria-label="{{ __('Register Face ID Now') }}"
                         class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition-all hover:bg-primary-800 sm:w-auto">
                         <x-heroicon-m-camera class="w-5 h-5" />
                         {{ __('Register Face ID Now') }}
