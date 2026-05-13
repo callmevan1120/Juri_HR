@@ -2,6 +2,17 @@
 
 Dokumen ini memuat operasi harian, background job, update, testing, dan Android build.
 
+## Runtime Baseline
+
+Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, shared hosting, dan CI. PHP 8.4 direkomendasikan untuk production baru.
+
+Preflight install/update:
+
+```bash
+php -v
+composer check-platform-reqs
+```
+
 ## Queue
 
 Default project:

@@ -16,6 +16,8 @@ class ApiTokenPermission
 
     public const DEVICE_BARCODE = 'device:barcode';
 
+    public const DEVICE_OFFLINE_ATTENDANCE = 'device:offline-attendance';
+
     public const DEVICE_PHOTO = 'device:photo';
 
     public const DEVICE_PERMISSIONS = 'device:permissions';
@@ -32,6 +34,7 @@ class ApiTokenPermission
             self::DELETE,
             self::DEVICE_LOCATION,
             self::DEVICE_BARCODE,
+            self::DEVICE_OFFLINE_ATTENDANCE,
             self::DEVICE_PHOTO,
             self::DEVICE_PERMISSIONS,
         ];
@@ -55,6 +58,7 @@ class ApiTokenPermission
         return [
             self::DEVICE_LOCATION,
             self::DEVICE_BARCODE,
+            self::DEVICE_OFFLINE_ATTENDANCE,
             self::DEVICE_PHOTO,
             self::DEVICE_PERMISSIONS,
         ];

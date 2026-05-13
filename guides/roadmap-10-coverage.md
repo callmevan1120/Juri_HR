@@ -13,6 +13,19 @@ Dokumen ini mencatat area yang sudah punya implementasi/foundation dan area yang
 - Role preview: Roles & Permissions shows a human-readable module/action preview for each role.
 - Release hygiene: public release checklist, coverage baseline workflow, and release preflight workflow.
 - Security scans: CodeQL PHP/JS, Semgrep, gitleaks, and TruffleHog are present in CI.
+- Generic attendance integration: inbound HMAC API for Solution/SBG-style gateways with employee code mapping and idempotency.
+- Offline attendance API scope: offline sync uses the dedicated `device:offline-attendance` Sanctum ability instead of sharing barcode scan scope.
+
+## Proof Matrix
+
+- Manager Inbox: `tests/Feature/ManagerInboxAuthorizationTest.php`
+- Security matrix: `tests/Feature/SecurityMatrixTest.php`
+- Multi-company isolation: `tests/Feature/SecurityIsolationMatrixTest.php`
+- Operational Health: `tests/Feature/AdminRouteSplitAndHealthTest.php`
+- Attendance integration API: `tests/Feature/AttendanceIntegrationApiTest.php`
+- Offline attendance API scope: `tests/Feature/OfflineAttendanceSyncTest.php`
+- Public release checklist: `RELEASE_CHECKLIST.md`
+- Attendance integration guide: `guides/attendance-integration.md`
 
 ## Deferred For Explicit Product Pass
 

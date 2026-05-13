@@ -9,7 +9,7 @@ Platform manajemen tenaga kerja berbasis Laravel untuk absensi aman, approval, o
 [![Laravel 11](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
 [![Livewire 3](https://img.shields.io/badge/Livewire-3-4E56A6?style=flat-square&logo=livewire&logoColor=white)](https://livewire.laravel.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
-[![PHP 8.2+](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
+[![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 
 </div>
 
@@ -27,17 +27,18 @@ Fokus utama aplikasi:
 - panel admin untuk karyawan, absensi, cuti, lembur, reimbursement, kasbon, aset, payroll, reports, settings, dan maintenance
 - self-service karyawan untuk check-in/out, koreksi absensi, cuti, lembur, reimbursement, slip gaji, dokumen, jadwal, HR tasks, dan approval tim
 - approval matrix reusable untuk reimbursement, kasbon, koreksi absensi, cuti, lembur, asset/document/payroll-sensitive workflow foundation
+- generic attendance integration API untuk mesin absensi/gateway seperti Solution atau SBG
 - import/export background dengan progress run, ringkasan sukses/error, download hasil, dan cleanup otomatis
 - operational health dashboard untuk queue, scheduler, backup, disk, database, cache/session/queue driver, app version, Reverb/polling, dan license status
 - wrapper Android berbasis Capacitor untuk kebutuhan APK
 - modul enterprise-gated untuk fitur lanjutan tertentu
 
-Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Coverage roadmap menuju 10/10 ada di [guides/roadmap-10-coverage.md](./guides/roadmap-10-coverage.md). Checklist rilis publik tersedia di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
+Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Panduan integrasi mesin absensi ada di [guides/attendance-integration.md](./guides/attendance-integration.md). Coverage roadmap menuju 10/10 ada di [guides/roadmap-10-coverage.md](./guides/roadmap-10-coverage.md). Checklist rilis publik tersedia di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
 
 ## Stack
 
 - Laravel `11`
-- PHP `8.2+`
+- PHP `8.3+` minimum; PHP `8.4` direkomendasikan
 - Livewire `3`
 - Tailwind CSS `3.4`
 - Vite `7`
@@ -61,7 +62,7 @@ Runtime default aplikasi database-centric:
 
 Modul HR Checklist berjalan tanpa Redis, Horizon, atau Reverb sebagai baseline. Data checklist disimpan di database dan dapat dipakai di shared hosting selama migration, session, cache, dan queue database dasar tersedia.
 
-Catatan PHP 8.5: konfigurasi aplikasi sudah memakai `Pdo\Mysql::ATTR_SSL_CA` ketika tersedia. Entry point CLI/web sementara mengabaikan `E_DEPRECATED` pada PHP 8.5+ agar warning vendor Laravel untuk `PDO::MYSQL_ATTR_SSL_CA` tidak tampil sampai framework upstream memperbarui default config.
+Baseline runtime resmi PasPapan adalah PHP 8.3+. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Catatan PHP 8.5: konfigurasi aplikasi sudah memakai `Pdo\Mysql::ATTR_SSL_CA` ketika tersedia. Entry point CLI/web sementara mengabaikan `E_DEPRECATED` pada PHP 8.5+ agar warning vendor Laravel untuk `PDO::MYSQL_ATTR_SSL_CA` tidak tampil sampai framework upstream memperbarui default config.
 
 Vercel memakai runtime serverless, jadi default production-nya berbeda dari VPS/shared hosting:
 
@@ -120,6 +121,8 @@ Modul `HR Checklists` membantu HR UMKM memastikan onboarding dan offboarding tid
 git clone https://github.com/RiprLutuk/PasPapan.git
 cd PasPapan
 
+php -v
+composer check-platform-reqs
 composer install
 bun install
 cp .env.example .env

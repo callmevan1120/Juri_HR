@@ -4,6 +4,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceOfflineSubmission;
 use App\Models\Barcode;
 use App\Models\User;
+use App\Support\ApiTokenPermission;
 use Laravel\Sanctum\Sanctum;
 
 test('device offline attendance sync processes queued local submissions with risk flag', function () {
@@ -80,4 +81,30 @@ test('device offline attendance sync is idempotent per client uuid', function ()
 
     expect(AttendanceOfflineSubmission::count())->toBe(1)
         ->and(Attendance::count())->toBe(1);
+});
+
+test('device offline attendance sync requires dedicated offline attendance ability', function () {
+    $user = User::factory()->create();
+    $barcode = Barcode::factory()->create([
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+        'radius' => 5000,
+    ]);
+
+    Sanctum::actingAs($user, [ApiTokenPermission::DEVICE_BARCODE]);
+
+    $this->postJson('/api/device/offline-attendance', [
+        'items' => [
+            [
+                'client_uuid' => 'offline-barcode-only-001',
+                'barcode_data' => $barcode->value,
+                'latitude' => -6.2,
+                'longitude' => 106.8,
+                'timestamp' => '2026-05-11 08:00:00',
+            ],
+        ],
+    ])->assertForbidden();
+
+    expect(AttendanceOfflineSubmission::count())->toBe(0)
+        ->and(Attendance::count())->toBe(0);
 });

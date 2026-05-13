@@ -270,7 +270,7 @@ Beberapa halaman yang rawan lambat pada data besar memakai query ter-paginate da
 Backend:
 
 - Laravel `11`
-- PHP `8.2+`
+- PHP `8.3+`
 - Livewire `3`
 - Jetstream, Fortify, dan Sanctum
 - MySQL atau MariaDB

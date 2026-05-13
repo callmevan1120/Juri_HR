@@ -6,13 +6,13 @@ Target produksi paling lengkap untuk PasPapan adalah VPS. Shared hosting dan Ver
 
 Minimum produksi:
 
-- PHP `8.2+`
+- PHP `8.3+`
 - Composer `2.x`
 - MySQL `8+` atau MariaDB setara
 - Bun atau Node.js untuk build asset
 - ekstensi PHP umum Laravel 11: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `zip`, `ctype`, `json`, `tokenizer`, `xml`
 
-PHP 8.3 atau 8.4 adalah baseline produksi yang paling tenang untuk shared hosting/VPS saat ini. PHP 8.5 juga dapat berjalan; aplikasi sudah memakai constant MySQL SSL CA baru saat tersedia dan entrypoint sementara menahan deprecation vendor Laravel sampai upstream framework memperbarui config default.
+Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, dan shared hosting. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. PHP 8.5 juga dapat berjalan; aplikasi sudah memakai constant MySQL SSL CA baru saat tersedia dan entrypoint sementara menahan deprecation vendor Laravel sampai upstream framework memperbarui config default.
 
 Direkomendasikan untuk VPS:
 
@@ -32,6 +32,13 @@ cd /var/www/paspapan
 ```
 
 Install PHP, Composer, MySQL/MariaDB, Bun atau Node.js, web server, dan Supervisor.
+
+Preflight runtime sebelum install dependency:
+
+```bash
+php -v
+composer check-platform-reqs
+```
 
 ### 2. Ambil source dan install dependency
 
@@ -247,11 +254,13 @@ REVERB_SCHEME=https
 
 ## Deploy Shared Hosting
 
-Shared hosting bisa dipakai hanya jika provider memberi PHP 8.2+, MySQL/MariaDB, SSH atau terminal, cron, dan kemampuan mengarahkan document root ke `public/`.
+Shared hosting bisa dipakai hanya jika provider memberi PHP 8.3+, MySQL/MariaDB, SSH atau terminal, cron, dan kemampuan mengarahkan document root ke `public/`. PHP 8.4 direkomendasikan bila tersedia.
 
 ### 1. Build lokal
 
 ```bash
+php -v
+composer check-platform-reqs
 composer install --no-dev --optimize-autoloader
 bun install
 bun run build
@@ -346,7 +355,7 @@ Konfigurasi saat ini:
 }
 ```
 
-`vercel-php@0.7.4` memakai PHP 8.3.x dan cocok dengan requirement Composer project ini (`php: ^8.2`). Runtime `vercel-community/php` punya versi lebih baru, tetapi upgrade sebaiknya dites dulu.
+`vercel-php@0.7.4` memakai PHP 8.3.x dan cocok dengan requirement Composer project ini (`php: ^8.3`). Runtime `vercel-community/php` punya versi lebih baru, tetapi upgrade sebaiknya dites dulu. PHP 8.4 tetap direkomendasikan untuk runtime non-serverless yang mendukungnya.
 
 ### 4. Bagaimana routing Laravel di Vercel?
 

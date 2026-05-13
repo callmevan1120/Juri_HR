@@ -35,6 +35,7 @@ $legacyInlineSvgFiles = [
 ];
 
 $legacyTableFiles = [
+    'resources/views/admin/operational-health.blade.php',
     'resources/views/livewire/admin/activity-logs.blade.php',
     'resources/views/livewire/admin/announcement-manager.blade.php',
     'resources/views/livewire/admin/appraisal-manager.blade.php',
