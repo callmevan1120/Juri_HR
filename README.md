@@ -6,9 +6,9 @@
 
 Platform manajemen tenaga kerja berbasis Laravel untuk absensi aman, approval, onboarding/offboarding, payroll preparation, reporting, aset, dan operasi HR.
 
-[![Laravel 11](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
-[![Livewire 3](https://img.shields.io/badge/Livewire-3-4E56A6?style=flat-square&logo=livewire&logoColor=white)](https://livewire.laravel.com)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![Livewire 4](https://img.shields.io/badge/Livewire-4-4E56A6?style=flat-square&logo=livewire&logoColor=white)](https://livewire.laravel.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 
 </div>
@@ -37,15 +37,15 @@ Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Panduan 
 
 ## Stack
 
-- Laravel `11`
+- Laravel `13`
 - PHP `8.3+` minimum; PHP `8.4` direkomendasikan
-- Livewire `3`
-- Tailwind CSS `3.4`
+- Livewire `4`
+- Tailwind CSS `4`
 - Vite `7`
 - MySQL atau MariaDB
 - Bun untuk dependency frontend dan build asset
 - Pest untuk test suite
-- Capacitor untuk wrapper Android
+- Capacitor `8`
 - Android SDK `35` dengan minimum Android API `24`
 
 Runtime default aplikasi database-centric:
@@ -62,7 +62,7 @@ Runtime default aplikasi database-centric:
 
 Modul HR Checklist berjalan tanpa Redis, Horizon, atau Reverb sebagai baseline. Data checklist disimpan di database dan dapat dipakai di shared hosting selama migration, session, cache, dan queue database dasar tersedia.
 
-Baseline runtime resmi PasPapan adalah PHP 8.3+. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Catatan PHP 8.5: konfigurasi aplikasi sudah memakai `Pdo\Mysql::ATTR_SSL_CA` ketika tersedia. Entry point CLI/web sementara mengabaikan `E_DEPRECATED` pada PHP 8.5+ agar warning vendor Laravel untuk `PDO::MYSQL_ATTR_SSL_CA` tidak tampil sampai framework upstream memperbarui default config.
+Baseline runtime resmi PasPapan adalah PHP 8.3+. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4. Konfigurasi MySQL/MariaDB memakai `Pdo\Mysql::ATTR_SSL_CA` ketika tersedia dengan fallback kompatibel untuk runtime PHP 8.3.
 
 Vercel memakai runtime serverless, jadi default production-nya berbeda dari VPS/shared hosting:
 

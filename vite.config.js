@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 function resolveVendorChunk(id) {
     if (!id.includes('node_modules')) {
@@ -50,6 +51,7 @@ function resolveVendorChunk(id) {
 
 export default defineConfig({
     plugins: [
+        tailwindcss(),
         laravel({
             input: [
                 'resources/css/app.css',

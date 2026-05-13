@@ -149,7 +149,7 @@ php artisan test tests/Feature/HrChecklistFlowTest.php
 php artisan route:list --name=hr
 ```
 
-Catatan PHP 8.5: entrypoint CLI dan web menonaktifkan `E_DEPRECATED` pada PHP 8.5+ untuk menahan warning vendor Laravel `PDO::MYSQL_ATTR_SSL_CA`. Konfigurasi aplikasi sendiri sudah memakai constant baru saat tersedia. Hapus workaround entrypoint setelah versi Laravel yang dipakai tidak lagi memuat constant lama di default config vendor.
+Catatan PHP 8.5: Laravel 13 sudah memakai constant `Pdo\Mysql::ATTR_SSL_CA` di konfigurasi default vendor. Konfigurasi aplikasi PasPapan juga memakai constant baru saat tersedia, dengan fallback untuk PHP 8.3.
 
 ## Workflow Update
 

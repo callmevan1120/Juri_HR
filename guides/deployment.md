@@ -10,9 +10,9 @@ Minimum produksi:
 - Composer `2.x`
 - MySQL `8+` atau MariaDB setara
 - Bun atau Node.js untuk build asset
-- ekstensi PHP umum Laravel 11: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `zip`, `ctype`, `json`, `tokenizer`, `xml`
+- ekstensi PHP umum Laravel 13: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `zip`, `ctype`, `json`, `tokenizer`, `xml`
 
-Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, dan shared hosting. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. PHP 8.5 juga dapat berjalan; aplikasi sudah memakai constant MySQL SSL CA baru saat tersedia dan entrypoint sementara menahan deprecation vendor Laravel sampai upstream framework memperbarui config default.
+Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, dan shared hosting. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4. PHP 8.5 juga dapat berjalan; aplikasi sudah memakai constant MySQL SSL CA baru saat tersedia dengan fallback kompatibel untuk PHP 8.3.
 
 Direkomendasikan untuk VPS:
 

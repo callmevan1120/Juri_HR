@@ -1,6 +1,6 @@
 # Architecture
 
-PasPapan is a Laravel 11 and Livewire 3 HR operations app. The main runtime boundary is:
+PasPapan is a Laravel 13 and Livewire 4 HR operations app. The main runtime boundary is:
 
 - `routes/web/*`: route entrypoints grouped by user, admin, system, payroll, and secure file flows.
 - `app/Livewire/*`: UI state, validation, authorization calls, and component rendering.

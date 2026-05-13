@@ -4,7 +4,11 @@ Semua perubahan penting PasPapan dicatat di file ini.
 
 ## [Unreleased]
 
-Belum ada perubahan tercatat.
+### Dokumentasi & Runtime
+
+- Menyelaraskan dokumentasi stack resmi ke Laravel 13, Livewire 4, PHP 8.3+ minimum, dan PHP 8.4 rekomendasi.
+- Menaikkan Tailwind CSS ke versi 4 lewat plugin resmi `@tailwindcss/vite`.
+- Menghapus workaround entrypoint `E_DEPRECATED` PHP 8.5 yang sudah tidak diperlukan setelah Laravel 13 memakai constant `Pdo\Mysql::ATTR_SSL_CA`.
 
 ## [4.3.0] - 2026-05-12
 

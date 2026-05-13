@@ -14,8 +14,10 @@ Status terakhir diverifikasi lokal pada 2026-05-13 Asia/Jakarta.
 - [x] Update `android/app/build.gradle` `versionName` dan `versionCode`.
 - [x] Pastikan nama APK mengikuti versi rilis.
 - [x] Pastikan link GitHub Release, nama APK, dan checksum APK sinkron di README.
-- [x] Pastikan baseline PHP konsisten di `composer.json`, `composer.lock`, `README.md`, `guides/deployment.md`, `guides/operations.md`, dan `guides/features.md`.
-  Evidence: baseline runtime resmi adalah PHP 8.3+; PHP 8.4 direkomendasikan.
+- [x] Pastikan baseline runtime konsisten di `composer.json`, `composer.lock`, `README.md`, `guides/deployment.md`, `guides/operations.md`, dan `guides/features.md`.
+  Evidence: baseline runtime resmi adalah PHP 8.3+; PHP 8.4 direkomendasikan; stack framework resmi adalah Laravel 13 + Livewire 4.
+- [x] Pastikan baseline frontend/mobile konsisten di `package.json`, `README.md`, dan `guides/features.md`.
+  Evidence: Tailwind CSS 4, Vite 7, Capacitor 8, Android SDK 35, dan minimum Android API 24.
 - [x] Pastikan panduan integrasi attendance API tersedia untuk mesin Solution/SBG atau gateway sejenis.
   Evidence: `guides/attendance-integration.md` menjelaskan endpoint, HMAC, mapping `employee_code`, idempotency key, dan test coverage.
 

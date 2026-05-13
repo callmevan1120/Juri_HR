@@ -269,17 +269,18 @@ Beberapa halaman yang rawan lambat pada data besar memakai query ter-paginate da
 
 Backend:
 
-- Laravel `11`
+- Laravel `13`
 - PHP `8.3+`
-- Livewire `3`
+- Livewire `4`
 - Jetstream, Fortify, dan Sanctum
 - MySQL atau MariaDB
 - queue, cache, notification, dan session berbasis database sebagai default
 
 Frontend:
 
-- Tailwind CSS `3.4`
+- Tailwind CSS `4`
 - Vite `7`
+- Capacitor `8` untuk wrapper Android
 - Alpine via Blade dan Livewire screens
 - Tom Select
 - Chart.js
@@ -291,14 +292,14 @@ Tool dokumen dan data:
 
 - `maatwebsite/excel`
 - `barryvdh/laravel-dompdf`
-- `endroid/qr-code`
-- `intervention/image`
+- `endroid/qr-code` `6`
+- `intervention/image` `4`
 - `ballen/distical`
 
 Testing dan tooling:
 
 - Pest `4`
-- Laravel Pint
+- Laravel Pint `1.29+`
 - Bun
 - Playwright smoke untuk browser E2E utama
 - ADB/WebView CDP smoke untuk APK dan screenshot mobile
