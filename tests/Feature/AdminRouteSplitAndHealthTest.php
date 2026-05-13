@@ -68,6 +68,9 @@ test('operational health page only allows maintenance viewers', function () {
         ->assertSee(__('Operational Health'))
         ->assertSee(__('Subsystem Checks'))
         ->assertSee(__('Runtime Posture'))
+        ->assertSee(__('HR Compliance Reminders'))
+        ->assertSee(__('Probation'))
+        ->assertSee(__('Contracts'))
         ->assertSee(__('Backup Integrity Detail'))
         ->assertSee(__('Checksum'))
         ->assertSee(__('OK'));

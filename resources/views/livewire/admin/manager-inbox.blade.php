@@ -10,6 +10,7 @@
                     'cash_advances' => ['label' => __('Cash Advances'), 'icon' => 'heroicon-o-currency-dollar', 'color' => 'emerald'],
                     'shift_swaps' => ['label' => __('Shift Swaps'), 'icon' => 'heroicon-o-arrows-right-left', 'color' => 'purple'],
                     'document_requests' => ['label' => __('Documents'), 'icon' => 'heroicon-o-document-text', 'color' => 'gray'],
+                    'hr_tasks' => ['label' => __('HR Tasks'), 'icon' => 'heroicon-o-clipboard-document-check', 'color' => 'rose'],
                 ];
 
                 $tabs = array_intersect_key($tabConfigs, array_flip($availableTabs ?? []));
@@ -52,6 +53,7 @@
                             'green' => 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30',
                             'emerald' => 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/30',
                             'purple' => 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30',
+                            'rose' => 'text-rose-600 bg-rose-100 dark:text-rose-400 dark:bg-rose-900/30',
                             'gray' => 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700',
                             default => 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/30'
                         };
@@ -113,6 +115,11 @@
                             <button type="button" wire:click="setStatusFilter('overdue')" class="rounded-md px-3 py-1.5 text-xs font-semibold transition {{ $statusFilter === 'overdue' ? 'bg-amber-500 text-white' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800' }}">
                                 {{ __('Overdue') }}
                             </button>
+                            @if($activeTab === 'hr_tasks')
+                                <button type="button" wire:click="setStatusFilter('blocked')" class="rounded-md px-3 py-1.5 text-xs font-semibold transition {{ $statusFilter === 'blocked' ? 'bg-rose-600 text-white' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                                    {{ __('Blocked') }}
+                                </button>
+                            @endif
                         </div>
                     <div class="relative w-full sm:w-72">
                         <x-forms.input wire:model.live.debounce.300ms="search" placeholder="{{ __('Search employee...') }}" class="w-full text-sm pl-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm" />
@@ -145,8 +152,11 @@
                                     'cash_advances' => route('admin.manage-kasbon'),
                                     'shift_swaps' => route('admin.shift-swaps'),
                                     'document_requests' => route('admin.document-requests'),
+                                    'hr_tasks' => route('admin.hr-checklists'),
                                     default => '#'
                                 };
+
+                                $employee = $activeTab === 'hr_tasks' ? $item->case?->user : $item->user;
 
                                 $accentColor = match($tabs[$activeTab]['color']) {
                                     'blue' => 'bg-blue-500',
@@ -155,6 +165,7 @@
                                     'green' => 'bg-green-500',
                                     'emerald' => 'bg-emerald-500',
                                     'purple' => 'bg-purple-500',
+                                    'rose' => 'bg-rose-500',
                                     'gray' => 'bg-gray-500',
                                     default => 'bg-primary-500'
                                 };
@@ -165,10 +176,10 @@
                             
                             <div class="flex flex-1 flex-col p-4">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $item->user->profile_photo_url }}" alt="{{ $item->user->name }}" class="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800">
+                                    <img src="{{ $employee->profile_photo_url }}" alt="{{ $employee->name }}" class="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800">
                                     <div class="flex-1 min-w-0">
-                                        <h3 class="truncate text-base font-bold text-gray-900 dark:text-white">{{ $item->user->name }}</h3>
-                                        <p class="truncate text-xs font-medium text-gray-500">{{ $item->user->jobTitle?->name ?? 'Employee' }}</p>
+                                        <h3 class="truncate text-base font-bold text-gray-900 dark:text-white">{{ $employee->name }}</h3>
+                                        <p class="truncate text-xs font-medium text-gray-500">{{ $employee->jobTitle?->name ?? 'Employee' }}</p>
                                     </div>
                                     
                                     <a href="{{ $detailRoute }}" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors dark:bg-gray-800 dark:hover:bg-gray-700" title="{{ __('View Module') }}">
@@ -211,6 +222,13 @@
                                         @elseif($activeTab === 'document_requests')
                                             <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Document') }}</span> <span class="font-bold text-gray-900 dark:text-white">{{ $item->documentTypeLabel() }}</span></div>
                                             <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Due Date') }}</span> <span class="{{ $item->due_date && \Carbon\Carbon::parse($item->due_date)->isPast() ? 'text-danger-600 font-bold' : '' }}">{{ $item->due_date ? \Carbon\Carbon::parse($item->due_date)->translatedFormat('d M Y') : 'N/A' }}</span></div>
+                                        @elseif($activeTab === 'hr_tasks')
+                                            <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Task') }}</span> <span class="font-bold text-gray-900 dark:text-white">{{ $item->title }}</span></div>
+                                            <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Status') }}</span> <span class="{{ $item->status === \App\Models\HrChecklistTask::STATUS_BLOCKED ? 'font-bold text-rose-600 dark:text-rose-400' : 'font-bold text-amber-600 dark:text-amber-400' }}">{{ $item->statusLabel() }}</span></div>
+                                            <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Due Date') }}</span> <span class="{{ $item->isOverdue() ? 'text-danger-600 font-bold' : '' }}">{{ $item->due_date ? $item->due_date->translatedFormat('d M Y') : 'N/A' }}</span></div>
+                                            @if($item->dependency)
+                                                <div class="mt-2 text-xs text-gray-500 italic border-t border-gray-100 dark:border-gray-700 pt-2">{{ __('Depends on: :task', ['task' => $item->dependency->title]) }}</div>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
@@ -219,10 +237,10 @@
                             <div class="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700">
                                 @if($activeTab !== 'document_requests')
                                     <button wire:click="confirmReject({{ $item->id }})" class="flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-danger-600 transition-colors hover:bg-danger-50 hover:text-danger-700 focus:outline-none dark:bg-gray-800 dark:text-danger-400 dark:hover:bg-danger-900/20">
-                                        <x-heroicon-m-x-mark class="h-5 w-5" /> {{ __('Reject') }}
+                                        <x-heroicon-m-x-mark class="h-5 w-5" /> {{ $activeTab === 'hr_tasks' ? __('Block') : __('Reject') }}
                                     </button>
                                     <button wire:click="approve({{ $item->id }})" class="flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-success-600 transition-colors hover:bg-success-50 hover:text-success-700 focus:outline-none dark:bg-gray-800 dark:text-success-400 dark:hover:bg-success-900/20">
-                                        <x-heroicon-m-check class="h-5 w-5" /> {{ __('Approve') }}
+                                        <x-heroicon-m-check class="h-5 w-5" /> {{ $activeTab === 'hr_tasks' ? __('Mark Done') : __('Approve') }}
                                     </button>
                                 @else
                                     <a href="{{ $detailRoute }}" class="col-span-2 flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 focus:outline-none dark:bg-gray-800 dark:text-primary-400 dark:hover:bg-primary-900/20">

@@ -26,35 +26,35 @@
                     </div>
                 @endif
 
-                <div class="mb-3 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <div class="grid grid-cols-2 divide-x divide-y divide-gray-100 sm:grid-cols-4 sm:divide-y-0 dark:divide-gray-700">
-                        <div class="min-w-0 px-2 py-2.5 text-center">
-                            <div class="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
-                                <x-heroicon-m-folder-open class="h-4 w-4" />
+                <div class="mb-3 rounded-2xl border border-gray-100 bg-gray-50/70 p-1 shadow-sm backdrop-blur dark:border-gray-700/70 dark:bg-gray-900/25">
+                    <div class="grid grid-cols-4 gap-1">
+                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
+                                <x-heroicon-m-folder-open class="h-3.5 w-3.5" />
                             </div>
-                            <div class="mt-1 text-lg font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['total'] }}</div>
-                            <div class="mt-1 truncate text-[10px] font-semibold uppercase tracking-wide text-primary-800 dark:text-primary-200">{{ __('Total') }}</div>
+                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['total'] }}</div>
+                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-primary-800 dark:text-primary-200">{{ __('Total') }}</div>
                         </div>
-                        <div class="min-w-0 px-2 py-2.5 text-center">
-                            <div class="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
-                                <x-heroicon-m-clock class="h-4 w-4" />
+                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
+                                <x-heroicon-m-clock class="h-3.5 w-3.5" />
                             </div>
-                            <div class="mt-1 text-lg font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['in_progress'] }}</div>
-                            <div class="mt-1 truncate text-[10px] font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-200">{{ __('In Progress') }}</div>
+                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['in_progress'] }}</div>
+                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-200">{{ __('Process') }}</div>
                         </div>
-                        <div class="min-w-0 px-2 py-2.5 text-center">
-                            <div class="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
-                                <x-heroicon-m-check-circle class="h-4 w-4" />
+                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
+                                <x-heroicon-m-check-circle class="h-3.5 w-3.5" />
                             </div>
-                            <div class="mt-1 text-lg font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['ready'] }}</div>
-                            <div class="mt-1 truncate text-[10px] font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">{{ __('Ready') }}</div>
+                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['ready'] }}</div>
+                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">{{ __('Ready') }}</div>
                         </div>
-                        <div class="min-w-0 px-2 py-2.5 text-center">
-                            <div class="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
-                                <x-heroicon-m-arrow-up-tray class="h-4 w-4" />
+                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
+                                <x-heroicon-m-arrow-up-tray class="h-3.5 w-3.5" />
                             </div>
-                            <div class="mt-1 text-lg font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['needs_upload'] }}</div>
-                            <div class="mt-1 truncate text-[10px] font-semibold uppercase tracking-wide text-sky-800 dark:text-sky-200">{{ __('Upload') }}</div>
+                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['needs_upload'] }}</div>
+                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-sky-800 dark:text-sky-200">{{ __('Upload') }}</div>
                         </div>
                     </div>
                 </div>

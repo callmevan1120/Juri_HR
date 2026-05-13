@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
 use App\Models\EmployeeDocumentRequest;
+use App\Models\HrChecklistTask;
 use App\Models\Overtime;
 use App\Models\Reimbursement;
 use App\Models\ShiftSwapRequest;
@@ -49,6 +50,10 @@ class ManagerInboxService
 
         if ($admin->can('viewAdminAny', EmployeeDocumentRequest::class)) {
             $tabs[] = 'document_requests';
+        }
+
+        if ($admin->can('viewHrChecklists')) {
+            $tabs[] = 'hr_tasks';
         }
 
         return $tabs;
@@ -136,6 +141,15 @@ class ManagerInboxService
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->whereIn('status', [EmployeeDocumentRequest::STATUS_PENDING, EmployeeDocumentRequest::STATUS_REQUESTED])
                 ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
+                ->count(),
+
+            'hr_tasks' => HrChecklistTask::query()
+                ->whereHas('case.user', fn (Builder $q) => $q->managedBy($admin))
+                ->whereIn('status', [HrChecklistTask::STATUS_PENDING, HrChecklistTask::STATUS_BLOCKED])
+                ->when($overdueOnly, fn (Builder $query) => $query->where(function (Builder $overdueQuery): void {
+                    $overdueQuery->where('status', HrChecklistTask::STATUS_BLOCKED)
+                        ->orWhere(fn (Builder $pendingQuery) => $pendingQuery->reminderReady());
+                }))
                 ->count(),
         ];
 

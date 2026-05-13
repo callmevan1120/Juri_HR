@@ -6,12 +6,14 @@ use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
 use App\Models\EmployeeDocumentRequest;
+use App\Models\HrChecklistTask;
 use App\Models\Overtime;
 use App\Models\Reimbursement;
 use App\Models\ShiftSwapRequest;
 use App\Models\User;
 use App\Support\AttendanceCorrectionService;
 use App\Support\CashAdvanceApprovalService;
+use App\Support\HrChecklistService;
 use App\Support\LeaveApprovalService;
 use App\Support\ManagerInboxService;
 use App\Support\OvertimeApprovalService;
@@ -57,6 +59,8 @@ class ManagerInbox extends Component
 
     protected ShiftSwapRequestService $shiftSwapService;
 
+    protected HrChecklistService $hrChecklistService;
+
     public function boot(
         ManagerInboxService $inboxService,
         LeaveApprovalService $leaveService,
@@ -65,6 +69,7 @@ class ManagerInbox extends Component
         ReimbursementApprovalService $reimbursementService,
         CashAdvanceApprovalService $cashAdvanceService,
         ShiftSwapRequestService $shiftSwapService,
+        HrChecklistService $hrChecklistService,
     ): void {
         $this->inboxService = $inboxService;
         $this->leaveService = $leaveService;
@@ -73,6 +78,7 @@ class ManagerInbox extends Component
         $this->reimbursementService = $reimbursementService;
         $this->cashAdvanceService = $cashAdvanceService;
         $this->shiftSwapService = $shiftSwapService;
+        $this->hrChecklistService = $hrChecklistService;
     }
 
     public function mount(): void
@@ -92,6 +98,10 @@ class ManagerInbox extends Component
         if (! in_array($this->activeTab, $accessibleTabs, true)) {
             $this->activeTab = $accessibleTabs[0];
         }
+
+        if ($this->activeTab !== 'hr_tasks' && $this->statusFilter === 'blocked') {
+            $this->statusFilter = 'pending';
+        }
     }
 
     public function switchTab(string $tab): void
@@ -103,6 +113,9 @@ class ManagerInbox extends Component
         }
 
         $this->activeTab = $tab;
+        if ($tab !== 'hr_tasks' && $this->statusFilter === 'blocked') {
+            $this->statusFilter = 'pending';
+        }
         $this->resetPage();
         $this->selectedId = null;
         $this->confirmingRejection = false;
@@ -111,7 +124,7 @@ class ManagerInbox extends Component
 
     public function setStatusFilter(string $filter): void
     {
-        if (! in_array($filter, ['pending', 'overdue'], true)) {
+        if (! in_array($filter, ['pending', 'overdue', 'blocked'], true)) {
             return;
         }
 
@@ -191,6 +204,10 @@ class ManagerInbox extends Component
                 $message = $this->shiftSwapService->approve($item, $user);
                 $this->dispatch('toast', type: 'success', message: $message);
                 break;
+            case 'hr_tasks':
+                $this->hrChecklistService->updateTaskStatus($item, $user, HrChecklistTask::STATUS_DONE, $this->taskCompletionNote($item));
+                $this->dispatch('toast', type: 'success', message: __('HR task marked as done.'));
+                break;
         }
     }
 
@@ -245,6 +262,10 @@ class ManagerInbox extends Component
             case 'shift_swaps':
                 $message = $this->shiftSwapService->reject($item, $user, $this->rejectionReason);
                 $this->dispatch('toast', type: 'success', message: $message);
+                break;
+            case 'hr_tasks':
+                $this->hrChecklistService->updateTaskStatus($item, $user, HrChecklistTask::STATUS_BLOCKED, $this->rejectionReason);
+                $this->dispatch('toast', type: 'success', message: __('HR task marked as blocked.'));
                 break;
         }
 
@@ -323,6 +344,24 @@ class ManagerInbox extends Component
                 ->whereIn('status', [EmployeeDocumentRequest::STATUS_PENDING, EmployeeDocumentRequest::STATUS_REQUESTED])
                 ->tap($applyInboxFilters)
                 ->latest(),
+            'hr_tasks' => HrChecklistTask::query()
+                ->with(['case.user', 'assignee', 'dependency'])
+                ->whereHas('case.user', fn (Builder $query) => $query->managedBy($admin))
+                ->where(function (Builder $query): void {
+                    if ($this->statusFilter === 'blocked') {
+                        $query->where('status', HrChecklistTask::STATUS_BLOCKED);
+
+                        return;
+                    }
+
+                    $query->whereIn('status', [HrChecklistTask::STATUS_PENDING, HrChecklistTask::STATUS_BLOCKED]);
+                })
+                ->when($search !== '', fn (Builder $query) => $query->whereHas('case.user', fn (Builder $userQuery) => $userQuery->where('name', 'like', '%'.$search.'%')))
+                ->when($this->statusFilter === 'overdue', fn (Builder $query) => $query->where(function (Builder $overdueQuery): void {
+                    $overdueQuery->reminderReady()
+                        ->orWhere('status', HrChecklistTask::STATUS_BLOCKED);
+                }))
+                ->latest(),
             'leaves' => Attendance::query()
                 ->with(['user', 'leaveType'])
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
@@ -332,6 +371,11 @@ class ManagerInbox extends Component
                 ->latest(),
             default => abort(403, 'Unauthorized action.'),
         };
+    }
+
+    private function taskCompletionNote(HrChecklistTask $task): ?string
+    {
+        return $task->notes ?: __('Marked done from Manager Inbox.');
     }
 
     public function render()

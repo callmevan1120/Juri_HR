@@ -103,24 +103,29 @@
     ];
 @endphp
 
-<x-admin.page-shell
-    :title="__('Operational Health')"
-    :description="__('Monitor queue, scheduler, database, storage, backup integrity, and runtime posture.')"
-    :show-description="true">
-    <x-slot name="actions">
-        <a href="{{ route('admin.system-maintenance') }}"
-            class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
-            {{ __('Maintenance') }}
-        </a>
-        <a href="{{ route('admin.operational-health') }}"
-            class="inline-flex items-center justify-center rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950">
-            {{ __('Refresh') }}
-        </a>
-    </x-slot>
+<x-app-layout>
+    <x-admin.page-shell
+        :title="__('Operational Health')"
+        :description="__('Monitor queue, scheduler, database, storage, backup integrity, and runtime posture.')"
+        :show-description="true">
+        <x-slot name="actions">
+            <div class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
+                <a href="{{ route('admin.system-maintenance') }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+                    <x-heroicon-m-wrench-screwdriver class="h-4 w-4" />
+                    {{ __('Maintenance') }}
+                </a>
+                <a href="{{ route('admin.operational-health') }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950">
+                    <x-heroicon-m-arrow-path class="h-4 w-4" />
+                    {{ __('Refresh') }}
+                </a>
+            </div>
+        </x-slot>
 
     <div class="grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)]">
-        <x-admin.insight-panel class="overflow-hidden">
-            <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+        <x-admin.insight-panel class="overflow-hidden rounded-2xl bg-white/90 dark:bg-slate-900/90">
+            <div class="px-4 pb-2 pt-4">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Current State') }}</p>
@@ -132,20 +137,20 @@
                 </div>
             </div>
 
-            <dl class="grid divide-y divide-slate-200/70 dark:divide-slate-800 md:grid-cols-3 md:divide-x md:divide-y-0">
-                <div class="px-4 py-3">
+            <dl class="grid gap-2 p-3 md:grid-cols-3">
+                <div class="rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.035]">
                     <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Database') }}</dt>
                     <dd class="mt-1 text-xl font-bold text-slate-950 dark:text-white">
                         {{ $health['database']['latency_ms'] !== null ? $health['database']['latency_ms'].' ms' : __('Attention') }}
                     </dd>
                     <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $health['database']['ok'] ? __('Connectivity check passed') : __('Connectivity check failed') }}</p>
                 </div>
-                <div class="px-4 py-3">
+                <div class="rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.035]">
                     <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Queue') }}</dt>
                     <dd class="mt-1 text-xl font-bold text-slate-950 dark:text-white">{{ $health['queue_backlog_count'] }}</dd>
                     <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('pending jobs') }} · {{ $health['failed_jobs_count'] }} {{ __('failed') }}</p>
                 </div>
-                <div class="px-4 py-3">
+                <div class="rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.035]">
                     <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Disk Free') }}</dt>
                     <dd class="mt-1 text-xl font-bold text-slate-950 dark:text-white">{{ $health['disk_free_human'] }}</dd>
                     <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -158,21 +163,21 @@
             </dl>
         </x-admin.insight-panel>
 
-        <x-admin.insight-panel class="overflow-hidden">
-            <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+        <x-admin.insight-panel class="overflow-hidden rounded-2xl bg-white/90 dark:bg-slate-900/90">
+            <div class="px-4 pb-2 pt-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Alerts') }}</p>
                 <h2 class="mt-1 text-base font-bold text-slate-950 dark:text-white">{{ count($health['alerts']) }} {{ __('active') }}</h2>
             </div>
 
             @if(! empty($health['alerts']))
-                <ul class="divide-y divide-slate-200/70 dark:divide-slate-800">
+                <ul class="space-y-2 p-3 pt-1">
                     @foreach($health['alerts'] as $alert)
                         @php
                             $alertTone = $alert['level'] === 'critical'
                                 ? 'bg-rose-500'
                                 : ($alert['level'] === 'warning' ? 'bg-amber-500' : 'bg-slate-400');
                         @endphp
-                        <li class="px-4 py-3">
+                        <li class="rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.035]">
                             <div class="flex items-start gap-3">
                                 <span class="mt-1.5 h-2.5 w-2.5 flex-shrink-0 rounded-full {{ $alertTone }}"></span>
                                 <div class="min-w-0">
@@ -368,3 +373,4 @@
         @endif
     </x-admin.insight-panel>
 </x-admin.page-shell>
+</x-app-layout>

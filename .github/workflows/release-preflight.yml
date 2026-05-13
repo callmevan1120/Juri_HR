@@ -6,6 +6,17 @@ on:
       version:
         description: "Expected release version, for example 4.3.0"
         required: true
+      android_version_code:
+        description: "Expected Android versionCode, for example 43"
+        required: true
+      apk_path:
+        description: "Optional built APK path to verify filename/checksum"
+        required: false
+        default: ""
+      checksum_path:
+        description: "Optional sha256 checksum file path for apk_path"
+        required: false
+        default: ""
 
 jobs:
   preflight:
@@ -28,12 +39,37 @@ jobs:
       - name: Verify version references
         env:
           VERSION: ${{ inputs.version }}
+          ANDROID_VERSION_CODE: ${{ inputs.android_version_code }}
         run: |
           set -euo pipefail
+          EXPECTED_APK="PasPapan-v${VERSION}.apk"
+          EXPECTED_CHECKSUM="${EXPECTED_APK}.sha256"
           test "$(php -r 'echo json_decode(file_get_contents("package.json"), true)["version"] ?? "";')" = "${VERSION}"
+          grep -q "\[${VERSION}\]" CHANGELOG.md
+          grep -q "releases/tag/v${VERSION}" CHANGELOG.md
           grep -q "v${VERSION}" README.md
+          grep -q "${EXPECTED_APK}" README.md
+          grep -q "${EXPECTED_CHECKSUM}" README.md
           grep -q "versionName \"${VERSION}\"" android/app/build.gradle
+          grep -q "versionCode ${ANDROID_VERSION_CODE}" android/app/build.gradle
 
-      - name: Build APK checksum placeholder
+      - name: Verify optional APK artifact
+        env:
+          VERSION: ${{ inputs.version }}
+          APK_PATH: ${{ inputs.apk_path }}
+          CHECKSUM_PATH: ${{ inputs.checksum_path }}
         run: |
-          echo "Build APK on the release runner, then attach the APK and checksum to the GitHub Release."
+          set -euo pipefail
+          if [ -z "${APK_PATH}" ]; then
+            echo "No APK artifact supplied. Skipping local artifact verification."
+            exit 0
+          fi
+
+          EXPECTED_APK="PasPapan-v${VERSION}.apk"
+          test -f "${APK_PATH}"
+          test "$(basename "${APK_PATH}")" = "${EXPECTED_APK}"
+          test -n "${CHECKSUM_PATH}"
+          test -f "${CHECKSUM_PATH}"
+          grep -q "${EXPECTED_APK}" "${CHECKSUM_PATH}"
+          cd "$(dirname "${APK_PATH}")"
+          sha256sum -c "$(realpath "${CHECKSUM_PATH}")"

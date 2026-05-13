@@ -24,6 +24,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
             'feature.lock' => \App\Http\Middleware\RedirectLockedEnterpriseFeature::class,
             'throttle.ip' => \App\Http\Middleware\ThrottleRequestsByIP::class,
+            'attendance.integration.signature' => \App\Http\Middleware\VerifyAttendanceIntegrationSignature::class,
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\LogUserActivity::class,

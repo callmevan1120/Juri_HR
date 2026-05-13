@@ -79,6 +79,7 @@ Gunakan [`.env.vercel.example`](./.env.vercel.example) sebagai template environm
 Rilis terbaru: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0)
 
 - APK Android: [`PasPapan-v4.3.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk)
+- Checksum APK: [`PasPapan-v4.3.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk.sha256)
 - Changelog: [`CHANGELOG.md`](./CHANGELOG.md)
 - ID aplikasi Android: `com.pandanteknik.paspapan`
 - Versi Android: `4.3.0` (`versionCode 43`)
@@ -274,7 +275,7 @@ Akun demo:
 | Admin | `admin123@paspapan.com` | `12345678` |
 | User | `user123@paspapan.com` | `12345678` |
 
-Akun demo hanya boleh dipakai untuk environment lokal/staging yang sengaja disiapkan oleh operator. Kredensial demo tidak dipublikasikan di README dan tidak boleh digunakan ulang sebagai kredensial produksi. Demo Vercel berjalan di runtime serverless, sehingga fitur yang bergantung pada worker/background job panjang, storage lokal permanen, atau proses realtime long-running lebih cocok diuji di deployment VPS/shared hosting.
+Akun demo hanya boleh dipakai untuk environment lokal/staging atau demo publik yang sengaja disiapkan oleh operator. Kredensial di atas adalah kredensial demo dan tidak boleh digunakan ulang sebagai kredensial produksi. Demo Vercel berjalan di runtime serverless, sehingga fitur yang bergantung pada worker/background job panjang, storage lokal permanen, atau proses realtime long-running lebih cocok diuji di deployment VPS/shared hosting.
 
 ## Dukung Pengembangan
 

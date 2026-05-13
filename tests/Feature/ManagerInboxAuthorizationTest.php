@@ -3,6 +3,9 @@
 use App\Livewire\Admin\ManagerInbox;
 use App\Models\Attendance;
 use App\Models\CashAdvance;
+use App\Models\HrChecklistCase;
+use App\Models\HrChecklistTask;
+use App\Models\HrChecklistTemplate;
 use App\Models\LeaveType;
 use App\Models\Role;
 use App\Models\User;
@@ -125,4 +128,65 @@ test('manager inbox summarizes and filters overdue approvals', function () {
         ->call('setStatusFilter', 'overdue')
         ->assertSet('statusFilter', 'overdue')
         ->assertSee($employee->name);
+});
+
+test('manager inbox includes hr checklist blockers and quick actions', function () {
+    $admin = User::factory()->admin()->create();
+    $employee = User::factory()->create();
+    $role = Role::create([
+        'name' => 'HR Task Inbox Reviewer',
+        'slug' => 'hr_task_inbox_reviewer',
+        'description' => 'Can review HR checklist tasks from the manager inbox.',
+        'permissions' => [
+            'admin.dashboard.view',
+            'admin.hr_checklists.view',
+            'admin.hr_checklists.manage',
+        ],
+    ]);
+
+    $admin->roles()->sync([$role->id]);
+
+    $template = HrChecklistTemplate::create([
+        'type' => HrChecklistTemplate::TYPE_ONBOARDING,
+        'name' => 'Inbox HR Task Template',
+        'is_active' => true,
+        'created_by' => $admin->id,
+    ]);
+
+    $case = HrChecklistCase::create([
+        'template_id' => $template->id,
+        'user_id' => $employee->id,
+        'type' => HrChecklistTemplate::TYPE_ONBOARDING,
+        'status' => HrChecklistCase::STATUS_ACTIVE,
+        'effective_date' => now()->toDateString(),
+        'started_by' => $admin->id,
+    ]);
+
+    $task = HrChecklistTask::create([
+        'case_id' => $case->id,
+        'title' => 'Collect laptop return form',
+        'status' => HrChecklistTask::STATUS_PENDING,
+        'due_date' => now()->subDay()->toDateString(),
+    ]);
+
+    Livewire::actingAs($admin->fresh())
+        ->test(ManagerInbox::class)
+        ->assertSee(__('HR Tasks'))
+        ->call('switchTab', 'hr_tasks')
+        ->assertSee('Collect laptop return form')
+        ->assertSee(__('Mark Done'))
+        ->call('confirmReject', $task->id)
+        ->set('rejectionReason', 'Waiting for asset officer')
+        ->call('reject')
+        ->assertSee(__('Blocked'));
+
+    expect($task->fresh()->status)->toBe(HrChecklistTask::STATUS_BLOCKED);
+
+    Livewire::actingAs($admin->fresh())
+        ->test(ManagerInbox::class, ['activeTab' => 'hr_tasks'])
+        ->call('setStatusFilter', 'blocked')
+        ->assertSee('Collect laptop return form')
+        ->call('approve', $task->id);
+
+    expect($task->fresh()->status)->toBe(HrChecklistTask::STATUS_DONE);
 });

@@ -109,6 +109,7 @@ For production deployments, at minimum:
 - never expose the repository root as the document root; `.htaccess` blocks are a defense-in-depth fallback only
 - ensure `storage/` and `bootstrap/cache/` are writable but not publicly exposed
 - use `FILESYSTEM_ATTACHMENT_DISKS=local` for new production deployments; keep `public` only as a temporary legacy fallback after a migration review
+- before removing the `public` attachment fallback, monitor the warning log `Serving attachment from legacy public disk fallback.` until it is quiet for one normal operating cycle
 - set `SESSION_SECURE_COOKIE=true`, `SESSION_HTTP_ONLY=true`, `SESSION_SAME_SITE=lax` or `strict`, and `SESSION_ENCRYPT=true` after compatibility testing
 - run queue workers under a controlled service manager
 - install cron for `php artisan schedule:run`

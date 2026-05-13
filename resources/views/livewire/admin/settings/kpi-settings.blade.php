@@ -29,8 +29,9 @@
     }
 }">
     <x-slot name="actions">
-        <x-actions.button wire:click="createGroup" size="icon" label="{{ __('Add Category') }}">
+        <x-actions.button wire:click="createGroup" size="sm">
             <x-heroicon-m-plus class="h-5 w-5" />
+            <span>{{ __('Add Category') }}</span>
         </x-actions.button>
     </x-slot>
 
@@ -69,14 +70,14 @@
     <div class="w-full">
         {{-- Global Group Weight Indicator --}}
         <x-admin.alert :tone="$totalGroupWeight === 100 ? 'success' : 'danger'" class="mb-6">
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <x-heroicon-m-scale
                     class="h-5 w-5 {{ $totalGroupWeight === 100 ? 'text-green-500' : 'text-red-500' }}" />
                 <p
-                    class="text-sm font-medium {{ $totalGroupWeight === 100 ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300' }}">
+                    class="text-sm font-medium leading-relaxed {{ $totalGroupWeight === 100 ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300' }}">
                     {{ __('Total Active Category Weight:') }} <span
                         class="font-bold text-lg">{{ $totalGroupWeight }}%</span>
-                    <span class="ml-2">{{ $totalGroupWeight === 100 ? __('Balanced') : __('Must total exactly 100% for balanced calculation.') }}</span>
+                    <span class="block sm:ml-2 sm:inline">{{ $totalGroupWeight === 100 ? __('Balanced') : __('Must total exactly 100% for balanced calculation.') }}</span>
                 </p>
             </div>
         </x-admin.alert>
@@ -138,12 +139,12 @@
                             </span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                         @php
                             $childWeight = $group->kpiTemplates->where('is_active', true)->sum('weight');
                         @endphp
                         <span
-                            class="text-xs px-2 py-1 rounded-md font-bold {{ $childWeight === 100 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
+                            class="mr-auto rounded-md px-2 py-1 text-xs font-bold sm:mr-0 {{ $childWeight === 100 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
                             {{ __('Child Weight:') }} {{ $childWeight }}%
                         </span>
                         <x-actions.icon-button wire:click="createTemplate({{ $group->id }})" variant="primary"
@@ -163,7 +164,83 @@
                 </div>
 
                 {{-- Child KPI Templates --}}
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <div class="space-y-3 p-3 md:hidden">
+                    @forelse ($group->kpiTemplates as $kpi)
+                        @php
+                            $kpiSearchIndex = implode(
+                                ' ',
+                                array_filter([
+                                    $group->name,
+                                    $kpi->name,
+                                    $kpi->indicator_description,
+                                    $kpi->weight,
+                                    $kpi->is_active ? 'active' : 'inactive',
+                                ]),
+                            );
+                        @endphp
+                        <article
+                            x-show="matchesItem(@js($kpiSearchIndex), @js((bool) $kpi->is_active))"
+                            x-transition.opacity.duration.150ms
+                            class="rounded-2xl border border-gray-100 bg-white/80 p-3 shadow-sm dark:border-gray-700/70 dark:bg-white/[0.035]"
+                        >
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-bold leading-6 text-gray-950 dark:text-white">
+                                        {{ $kpi->name }}
+                                    </h4>
+                                    <div
+                                        class="mt-2 inline-flex items-center rounded-full bg-primary-50 px-2.5 py-1 text-xs font-bold text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
+                                        {{ __('Weight') }}: {{ $kpi->weight }}%
+                                    </div>
+                                </div>
+                                <x-forms.switch wire:click="toggleActive({{ $kpi->id }})" :checked="$kpi->is_active"
+                                    size="sm" :label="__('Toggle KPI component status') . ': ' . $kpi->name" />
+                            </div>
+
+                            @if ($kpi->indicator_description)
+                                <div class="mt-3 text-xs leading-5 text-gray-600 dark:text-gray-300">
+                                    @foreach (explode("\n", $kpi->indicator_description) as $line)
+                                        @php $line = trim($line); @endphp
+                                        @if (str_starts_with($line, '- '))
+                                            <div class="flex items-start gap-1.5 mt-1 first:mt-0">
+                                                <span class="mt-px text-gray-400">•</span>
+                                                <span>{{ ltrim($line, '- ') }}</span>
+                                            </div>
+                                        @elseif($line !== '')
+                                            <p class="mt-1 first:mt-0">{{ $line }}</p>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            <div class="mt-3 grid grid-cols-2 gap-2">
+                                <button
+                                    type="button"
+                                    wire:click="edit({{ $kpi->id }})"
+                                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-50 px-3 py-2 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:bg-primary-950/30 dark:text-primary-200 dark:hover:bg-primary-900/40"
+                                >
+                                    <x-heroicon-m-pencil-square class="h-4 w-4" />
+                                    {{ __('Edit') }}
+                                </button>
+                                <button
+                                    type="button"
+                                    wire:click="delete({{ $kpi->id }})"
+                                    wire:confirm="{{ __('Are you sure to delete?') }}"
+                                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-red-950/30 dark:text-red-200 dark:hover:bg-red-900/40"
+                                >
+                                    <x-heroicon-m-trash class="h-4 w-4" />
+                                    {{ __('Delete') }}
+                                </button>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-gray-200 p-5 text-center text-sm italic text-gray-400 dark:border-gray-700">
+                            {{ __('No KPI components yet. Click the (+) icon above to add.') }}
+                        </div>
+                    @endforelse
+                </div>
+
+                <table class="hidden min-w-full divide-y divide-gray-200 dark:divide-gray-700 md:table">
                     <thead class="bg-white dark:bg-gray-800">
                         <tr>
                             <th scope="col"

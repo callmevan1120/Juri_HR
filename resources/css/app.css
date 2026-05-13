@@ -2222,6 +2222,13 @@
         max-width: 42rem;
     }
 
+    .scan-attendance-page .scan-attendance-flow {
+        max-width: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+    }
+
     .scan-attendance-page .user-page-header--plain {
         border: 1px solid #e5e7eb !important;
         background-color: #ffffff !important;

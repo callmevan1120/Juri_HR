@@ -42,6 +42,11 @@ return [
         'support_number' => env('WHATSAPP_SUPPORT_NUMBER') ?: base64_decode('NjI4MjMyNDc3NDM4MA=='),
     ],
 
+    'attendance_integration' => [
+        'secret' => env('ATTENDANCE_INTEGRATION_SECRET', ''),
+        'signature_tolerance_seconds' => env('ATTENDANCE_INTEGRATION_SIGNATURE_TOLERANCE_SECONDS', 300),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Device\LocationController;
 use App\Http\Controllers\Api\Device\OfflineAttendanceSyncController;
 use App\Http\Controllers\Api\Device\PermissionsStatusController;
 use App\Http\Controllers\Api\Device\PhotoUploadController;
+use App\Http\Controllers\Api\Integrations\AttendanceEventController;
 use App\Http\Controllers\Api\WilayahController;
 use App\Support\ApiTokenPermission;
 use Illuminate\Http\Request;
@@ -33,3 +34,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('device')->group(fun
     Route::post('/photo', PhotoUploadController::class)->middleware('abilities:'.ApiTokenPermission::DEVICE_PHOTO);
     Route::get('/permissions', PermissionsStatusController::class)->middleware('abilities:'.ApiTokenPermission::DEVICE_PERMISSIONS);
 });
+
+Route::prefix('integrations')
+    ->middleware(['throttle:attendance-integrations', 'attendance.integration.signature'])
+    ->group(function () {
+        Route::post('/attendance-events', [AttendanceEventController::class, 'store']);
+    });
