@@ -881,6 +881,7 @@
     "Deleted data": "Deleted data",
     "Deleted employee": "Deleted employee",
     "Deleted successfully.": "Deleted successfully.",
+    "Demo user password cannot be changed.": "Demo user password cannot be changed.",
     "Deleting this role will also remove it from assigned users. This action cannot be undone.": "Deleting this role will also remove it from assigned users. This action cannot be undone.",
     "Deletion Reason": "Deletion Reason",
     "Deletion Requested": "Deletion Requested",

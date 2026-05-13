@@ -2,7 +2,10 @@
 
 namespace App\Livewire\Admin;
 
+use App\Console\Commands\EnterpriseHwId;
 use App\Models\Setting;
+use App\Services\Enterprise\LicenseGuard;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
@@ -41,7 +44,7 @@ class Settings extends Component
 
             // Vital: Clear Enterprise License Cache if Company Name, Email, or Key changes
             if (in_array($setting->key, ['app.company_name', 'app.support_contact', 'enterprise_license_key'])) {
-                \App\Services\Enterprise\LicenseGuard::clearLicenseCache();
+                LicenseGuard::clearLicenseCache();
                 $this->syncEnterpriseLicenseState($setting->key !== 'enterprise_license_key');
             }
 
@@ -65,7 +68,7 @@ class Settings extends Component
 
         $setting->update(['value' => trim($this->enterpriseLicenseDraft)]);
         Setting::flushCache($setting->key);
-        \App\Services\Enterprise\LicenseGuard::clearLicenseCache();
+        LicenseGuard::clearLicenseCache();
 
         $this->enterpriseLicenseSettingId = $setting->id;
         $this->syncEnterpriseLicenseState();
@@ -83,10 +86,10 @@ class Settings extends Component
             $this->enterpriseLicenseDraft = (string) ($setting?->value ?? '');
         }
 
-        $this->licenseValidation = \App\Services\Enterprise\LicenseGuard::validateDetailed($this->enterpriseLicenseDraft);
+        $this->licenseValidation = LicenseGuard::validateDetailed($this->enterpriseLicenseDraft);
 
         if (blank($this->enterpriseLicenseDraft)) {
-            \App\Services\Enterprise\LicenseGuard::clearLicenseCache();
+            LicenseGuard::clearLicenseCache();
 
             return;
         }
@@ -98,7 +101,7 @@ class Settings extends Component
         Cache::put('ent_lic_result', $this->licenseValidation, $cacheUntil);
     }
 
-    private function licenseValidationCacheExpiration(): \Carbon\Carbon
+    private function licenseValidationCacheExpiration(): Carbon
     {
         if (! ($this->licenseValidation['valid'] ?? false)) {
             return now()->addMinutes(5);
@@ -108,7 +111,7 @@ class Settings extends Component
 
         if (is_string($expiresAt) && trim($expiresAt) !== '') {
             try {
-                $licenseExpiry = \Carbon\Carbon::parse($expiresAt)->endOfDay();
+                $licenseExpiry = Carbon::parse($expiresAt)->endOfDay();
 
                 if ($licenseExpiry->isBefore(now()->addHours(24))) {
                     return $licenseExpiry;
@@ -131,7 +134,7 @@ class Settings extends Component
             ->get()
             ->groupBy('group');
         $licenseInfo = $this->licenseValidation['valid'] ?? false ? ($this->licenseValidation['license'] ?? null) : null;
-        $hwid = \App\Console\Commands\EnterpriseHwId::generate();
+        $hwid = EnterpriseHwId::generate();
 
         return view('livewire.admin.settings', [
             'groups' => $groups,

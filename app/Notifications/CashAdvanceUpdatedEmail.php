@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\CashAdvance;
 use App\Support\MailBranding;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -33,7 +34,7 @@ class CashAdvanceUpdatedEmail extends Notification implements ShouldQueue
         $appName = MailBranding::companyName();
         $statusLabel = __(ucfirst($this->advance->status));
 
-        $paymentMonthName = \Carbon\Carbon::create()->month((int) $this->advance->payment_month)->translatedFormat('F');
+        $paymentMonthName = Carbon::create()->month((int) $this->advance->payment_month)->translatedFormat('F');
 
         $details = [
             __('Purpose') => $this->advance->purpose ?? '-',

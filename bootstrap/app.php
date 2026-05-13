@@ -1,8 +1,24 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\CheckMaintenanceMode;
+use App\Http\Middleware\EnsureActiveAccount;
+use App\Http\Middleware\EnsureSecurityHeaders;
+use App\Http\Middleware\LogUserActivity;
+use App\Http\Middleware\RedirectLockedEnterpriseFeature;
+use App\Http\Middleware\SetUserLocale;
+use App\Http\Middleware\ThrottleRequestsByIP;
+use App\Http\Middleware\UserMiddleware;
+use App\Http\Middleware\VerifyAttendanceIntegrationSignature;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,31 +31,34 @@ $app = Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Trust Cloudflare proxies for HTTPS detection
         $middleware->trustProxies(at: '*');
-        $middleware->redirectUsersTo(fn (\Illuminate\Http\Request $request) => $request->user()?->preferredHomeUrl() ?? '/');
+        $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->preferredHomeUrl() ?? '/');
 
         $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'user' => \App\Http\Middleware\UserMiddleware::class,
-            'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
-            'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
-            'feature.lock' => \App\Http\Middleware\RedirectLockedEnterpriseFeature::class,
-            'throttle.ip' => \App\Http\Middleware\ThrottleRequestsByIP::class,
-            'attendance.integration.signature' => \App\Http\Middleware\VerifyAttendanceIntegrationSignature::class,
+            'admin' => AdminMiddleware::class,
+            'user' => UserMiddleware::class,
+            'ability' => CheckForAnyAbility::class,
+            'abilities' => CheckAbilities::class,
+            'feature.lock' => RedirectLockedEnterpriseFeature::class,
+            'throttle.ip' => ThrottleRequestsByIP::class,
+            'attendance.integration.signature' => VerifyAttendanceIntegrationSignature::class,
+        ]);
+        $middleware->preventRequestForgery(except: [
+            '__vercel-migrate',
         ]);
         $middleware->web(append: [
-            \App\Http\Middleware\LogUserActivity::class,
-            \App\Http\Middleware\EnsureSecurityHeaders::class,
-            \App\Http\Middleware\CheckMaintenanceMode::class,
-            \App\Http\Middleware\SetUserLocale::class,
-            \App\Http\Middleware\EnsureActiveAccount::class,
+            LogUserActivity::class,
+            EnsureSecurityHeaders::class,
+            CheckMaintenanceMode::class,
+            SetUserLocale::class,
+            EnsureActiveAccount::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e) {
+        $exceptions->render(function (AuthorizationException $e) {
             $request = request();
             $user = $request->user();
 
-            \Illuminate\Support\Facades\Log::warning('AuthorizationException rendered.', [
+            Log::warning('AuthorizationException rendered.', [
                 'path' => $request->path(),
                 'route' => $request->route()?->getName(),
                 'user_id' => $user?->id,
@@ -55,14 +74,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             return null;
         });
 
-        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+        $exceptions->render(function (HttpExceptionInterface $e) {
             $statusCode = $e->getStatusCode();
 
             if ($statusCode === 403) {
                 $request = request();
                 $user = $request->user();
 
-                \Illuminate\Support\Facades\Log::warning('HTTP 403 rendered.', [
+                Log::warning('HTTP 403 rendered.', [
                     'path' => $request->path(),
                     'route' => $request->route()?->getName(),
                     'user_id' => $user?->id,

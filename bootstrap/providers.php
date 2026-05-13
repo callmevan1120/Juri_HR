@@ -1,11 +1,19 @@
 <?php
 
+use App\Providers\AuditServiceProvider;
+use App\Providers\AuthServiceProvider;
+use App\Providers\EnterpriseServiceProvider;
+use App\Providers\FortifyServiceProvider;
+use App\Providers\JetstreamServiceProvider;
+use App\Providers\RateLimitServiceProvider;
+use App\Providers\SettingsServiceProvider;
+
 return [
-    App\Providers\EnterpriseServiceProvider::class,
-    App\Providers\SettingsServiceProvider::class,
-    App\Providers\AuditServiceProvider::class,
-    App\Providers\RateLimitServiceProvider::class,
-    App\Providers\AuthServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
-    App\Providers\JetstreamServiceProvider::class,
+    EnterpriseServiceProvider::class,
+    SettingsServiceProvider::class,
+    AuditServiceProvider::class,
+    RateLimitServiceProvider::class,
+    AuthServiceProvider::class,
+    FortifyServiceProvider::class,
+    JetstreamServiceProvider::class,
 ];

@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Contracts\AttendanceServiceInterface;
+use App\Helpers\Editions;
 use App\Models\ActivityLog;
 use App\Models\Attendance;
 use App\Models\Barcode;
@@ -179,13 +181,13 @@ class AttendanceScanService
             $shiftId = $this->resolveDefaultShiftId($user, $shifts);
         }
 
-        $attendanceLocked = \App\Helpers\Editions::attendanceLocked();
+        $attendanceLocked = Editions::attendanceLocked();
         $faceVerificationRequired = ! $attendanceLocked && filter_var(
             Setting::getValue('attendance.require_face_verification', true),
             FILTER_VALIDATE_BOOLEAN
         );
 
-        $attendanceService = app(\App\Contracts\AttendanceServiceInterface::class);
+        $attendanceService = app(AttendanceServiceInterface::class);
         $requiresFaceEnrollment = ! $attendanceLocked && (
             filter_var(
                 Setting::getValue('attendance.require_face_enrollment', false),
@@ -429,7 +431,7 @@ class AttendanceScanService
         }
 
         $imageName = $user->id.'_'.time().'.jpg';
-        $service = app(\App\Contracts\AttendanceServiceInterface::class);
+        $service = app(AttendanceServiceInterface::class);
 
         return $service->storeAttendancePhoto($photo, $imageName);
     }

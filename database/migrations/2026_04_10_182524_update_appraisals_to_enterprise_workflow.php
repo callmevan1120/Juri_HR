@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,10 +13,10 @@ return new class extends Migration
     public function up(): void
     {
         // Wipe existing legacy appraisal data to prevent structural conflicts
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
-            \Illuminate\Support\Facades\DB::table('appraisals')->delete();
+        if (DB::getDriverName() === 'sqlite') {
+            DB::table('appraisals')->delete();
         } else {
-            \Illuminate\Support\Facades\DB::table('appraisals')->truncate();
+            DB::table('appraisals')->truncate();
         }
 
         // 1. Create KPI Settings Table
@@ -34,15 +35,15 @@ return new class extends Migration
             $table->boolean('employee_acknowledgement')->default(false)->after('notes');
         });
 
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
+        if (DB::getDriverName() === 'sqlite') {
             Schema::table('appraisals', function (Blueprint $table) {
                 $table->enum('status', ['draft', 'self_assessment', 'manager_review', '1on1_scheduled', 'completed'])
                     ->default('draft')
                     ->after('period_year');
             });
         } else {
-            \Illuminate\Support\Facades\DB::statement('ALTER TABLE appraisals MODIFY evaluator_id CHAR(26) NULL');
-            \Illuminate\Support\Facades\DB::statement("ALTER TABLE appraisals ADD COLUMN status ENUM('draft', 'self_assessment', 'manager_review', '1on1_scheduled', 'completed') DEFAULT 'draft' AFTER period_year");
+            DB::statement('ALTER TABLE appraisals MODIFY evaluator_id CHAR(26) NULL');
+            DB::statement("ALTER TABLE appraisals ADD COLUMN status ENUM('draft', 'self_assessment', 'manager_review', '1on1_scheduled', 'completed') DEFAULT 'draft' AFTER period_year");
         }
 
         // 3. Create Evaluation Mapping Table

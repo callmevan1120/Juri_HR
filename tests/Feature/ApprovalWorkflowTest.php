@@ -13,6 +13,8 @@ use App\Models\Role;
 use App\Models\User;
 use App\Notifications\CashAdvanceUpdated;
 use App\Notifications\ReimbursementStatusUpdated;
+use App\Support\CashAdvanceApprovalService;
+use App\Support\ReimbursementApprovalService;
 use App\Support\TeamApprovalQueryService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
@@ -228,14 +230,14 @@ test('approval matrix can require manager finance and hr role for high value rei
         'status' => 'pending',
     ]);
 
-    app(\App\Support\ReimbursementApprovalService::class)->approve($reimbursement, $manager);
+    app(ReimbursementApprovalService::class)->approve($reimbursement, $manager);
     $reimbursement->refresh();
 
     expect($reimbursement->status)->toBe('pending_finance')
         ->and($reimbursement->approval_current_step)->toBe('finance_head')
         ->and($reimbursement->head_approved_by)->toBe($manager->id);
 
-    app(\App\Support\ReimbursementApprovalService::class)->approve($reimbursement, $financeHead);
+    app(ReimbursementApprovalService::class)->approve($reimbursement, $financeHead);
     $reimbursement->refresh();
 
     expect($reimbursement->status)->toBe('pending_matrix')
@@ -243,7 +245,7 @@ test('approval matrix can require manager finance and hr role for high value rei
         ->and($reimbursement->finance_approved_by)->toBe($financeHead->id)
         ->and(Gate::forUser($hr)->allows('approve', $reimbursement))->toBeTrue();
 
-    app(\App\Support\ReimbursementApprovalService::class)->approve($reimbursement, $hr);
+    app(ReimbursementApprovalService::class)->approve($reimbursement, $hr);
     $reimbursement->refresh();
 
     expect($reimbursement->status)->toBe('approved')
@@ -309,14 +311,14 @@ test('approval matrix can route cash advance through manager and finance', funct
         'status' => 'pending',
     ]);
 
-    app(\App\Support\CashAdvanceApprovalService::class)->approve($advance, $manager);
+    app(CashAdvanceApprovalService::class)->approve($advance, $manager);
     $advance->refresh();
 
     expect($advance->status)->toBe('pending_finance')
         ->and($advance->approval_current_step)->toBe('finance_head')
         ->and($advance->head_approved_by)->toBe($manager->id);
 
-    app(\App\Support\CashAdvanceApprovalService::class)->approve($advance, $financeHead);
+    app(CashAdvanceApprovalService::class)->approve($advance, $financeHead);
     $advance->refresh();
 
     expect($advance->status)->toBe('approved')

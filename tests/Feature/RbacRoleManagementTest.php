@@ -10,6 +10,9 @@ use App\Models\Appraisal;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\Division;
+use App\Models\JobLevel;
+use App\Models\JobTitle;
 use App\Models\Reimbursement;
 use App\Models\Role;
 use App\Models\SystemBackupRun;
@@ -17,8 +20,10 @@ use App\Models\User;
 use App\Notifications\CashAdvanceRequested;
 use App\Support\UserNotificationRecipientService;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -542,7 +547,7 @@ test('reimbursement admin page tolerates claims whose employee record is missing
     $this->actingAs($admin);
 
     $reimbursement = new Reimbursement([
-        'user_id' => (string) \Illuminate\Support\Str::ulid(),
+        'user_id' => (string) Str::ulid(),
         'date' => now()->toDateString(),
         'type' => 'Meal',
         'amount' => 75000,
@@ -553,7 +558,7 @@ test('reimbursement admin page tolerates claims whose employee record is missing
     $reimbursement->setRelation('user', null);
 
     $html = view('livewire.admin.reimbursement-manager', [
-        'reimbursements' => new \Illuminate\Pagination\LengthAwarePaginator([$reimbursement], 1, 10),
+        'reimbursements' => new LengthAwarePaginator([$reimbursement], 1, 10),
     ])->render();
 
     expect($html)->toContain(__('Deleted employee'))
@@ -626,17 +631,17 @@ test('admin without cash advance permission cannot manage cash advance approvals
 test('cash advance request notifications only target actual reviewers', function () {
     Notification::fake();
 
-    $operations = \App\Models\Division::create(['name' => 'Operations']);
-    $managerLevel = \App\Models\JobLevel::create(['name' => 'Manager', 'rank' => 2]);
-    $staffLevel = \App\Models\JobLevel::create(['name' => 'Staff', 'rank' => 4]);
+    $operations = Division::create(['name' => 'Operations']);
+    $managerLevel = JobLevel::create(['name' => 'Manager', 'rank' => 2]);
+    $staffLevel = JobLevel::create(['name' => 'Staff', 'rank' => 4]);
 
-    $managerTitle = \App\Models\JobTitle::create([
+    $managerTitle = JobTitle::create([
         'name' => 'Operations Manager',
         'job_level_id' => $managerLevel->id,
         'division_id' => $operations->id,
     ]);
 
-    $staffTitle = \App\Models\JobTitle::create([
+    $staffTitle = JobTitle::create([
         'name' => 'Operations Staff',
         'job_level_id' => $staffLevel->id,
         'division_id' => $operations->id,

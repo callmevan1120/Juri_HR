@@ -7,6 +7,7 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\ImageManager;
 
 class BarcodeGenerator
@@ -15,7 +16,6 @@ class BarcodeGenerator
      * Create a new class instance.
      */
     public function __construct(
-        protected $qrGenerator = new QrCode(''),
         protected $writer = new PngWriter,
         protected $manager = new ImageManager(Driver::class),
         protected $width = 720,
@@ -26,20 +26,21 @@ class BarcodeGenerator
 
     public function generateQrCode($value)
     {
-        $qrCode = $this->qrGenerator
-            ->create($value)
-            ->setSize(300)
-            ->setMargin(20)
-            ->setErrorCorrectionLevel(ErrorCorrectionLevel::Medium)
-            ->setForegroundColor(new Color(0, 0, 0))
-            ->setBackgroundColor(new Color(255, 255, 255));
+        $qrCode = new QrCode(
+            data: (string) $value,
+            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
+            size: 300,
+            margin: 20,
+            foregroundColor: new Color(0, 0, 0),
+            backgroundColor: new Color(255, 255, 255),
+        );
 
         $file = $this->writer->write(qrCode: $qrCode)->getString();
 
-        return $this->manager->create($this->width, $this->height)
+        return $this->manager->createImage($this->width, $this->height)
             ->fill('#fff')
-            ->place($this->manager->read($file)->scale($this->width), 'center')
-            ->toPng();
+            ->insert($this->manager->decodeBinary($file)->scale($this->width), alignment: 'center')
+            ->encode(new PngEncoder);
     }
 
     /**

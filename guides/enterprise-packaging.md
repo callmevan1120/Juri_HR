@@ -16,6 +16,7 @@ The enterprise obfuscator is an internal release tool under `secure_tools/` and 
 
 Readable OSS code, tests, docs, migrations, workflows, and public helper scripts are reviewed normally.
 Enterprise runtime files committed in obfuscated form are treated as release artifacts: reviewers verify that the internal build was run, the artifact list is expected, and no private `*.Source.php`, `secure_tools/`, or `enterprise_build/` content is included.
+CI runs `composer check:enterprise-boundary` to prove the private obfuscator, source mirrors, and generated enterprise build directory are not part of the OSS review surface.
 
 Do not move `secure_tools/build_enterprise.php` or private source mirrors into `scripts/`. If an OSS reviewer needs behavior assurance, add or update tests around the public boundary instead of exposing the private implementation.
 
@@ -24,9 +25,10 @@ Do not move `secure_tools/build_enterprise.php` or private source mirrors into `
 1. Run quality gates on readable source.
 2. Run the internal enterprise obfuscator.
 3. Run smoke tests with the runtime obfuscator key.
-4. Regenerate release evidence that is meant to be public, such as Playwright smoke output and screenshot manifests.
-5. Commit only intended obfuscated enterprise runtime files, readable source changes, tests, docs, and public screenshots.
-6. Never publish the obfuscator implementation.
+4. Run `composer check:enterprise-boundary` before staging files.
+5. Regenerate release evidence that is meant to be public, such as Playwright smoke output and screenshot manifests.
+6. Commit only intended obfuscated enterprise runtime files, readable source changes, tests, docs, and public screenshots.
+7. Never publish the obfuscator implementation.
 
 For `v4.3.0`, the public evidence set includes:
 

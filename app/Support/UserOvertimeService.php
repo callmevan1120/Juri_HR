@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Overtime;
 use App\Models\User;
+use App\Notifications\OvertimeRequested;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
@@ -66,7 +67,7 @@ class UserOvertimeService
 
         $overtime->loadMissing('user.jobTitle.jobLevel', 'user.division');
 
-        if (class_exists(\App\Notifications\OvertimeRequested::class)) {
+        if (class_exists(OvertimeRequested::class)) {
             $recipientCount = $this->notificationRecipients->notifyOvertimeRequested($overtime);
 
             if ($recipientCount > 0) {

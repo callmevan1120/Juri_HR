@@ -119,6 +119,9 @@ jobs:
       - name: UI Rules Check
         run: composer check:ui
 
+      - name: Enterprise boundary check
+        run: composer check:enterprise-boundary
+
       - name: Pint
         run: ./vendor/bin/pint --test
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -96,7 +97,7 @@ class Shift extends Model
             return null;
         }
 
-        return \App\Helpers::format_time($time);
+        return Helpers::format_time($time);
     }
 
     protected function parseTimeValue(string $time): Carbon

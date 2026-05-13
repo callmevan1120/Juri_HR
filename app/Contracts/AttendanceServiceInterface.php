@@ -3,6 +3,7 @@
 namespace App\Contracts;
 
 use App\Models\Attendance;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 
 interface AttendanceServiceInterface
@@ -32,10 +33,10 @@ interface AttendanceServiceInterface
     /**
      * Register a face descriptor for the user.
      */
-    public function registerFace(\App\Models\User $user, array $descriptor): void;
+    public function registerFace(User $user, array $descriptor): void;
 
     /**
      * Remove the user's face registration.
      */
-    public function removeFace(\App\Models\User $user): void;
+    public function removeFace(User $user): void;
 }

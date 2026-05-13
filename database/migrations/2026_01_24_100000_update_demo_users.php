@@ -2,7 +2,9 @@
 
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -12,13 +14,13 @@ return new class extends Migration
     public function up(): void
     {
         // Delete old demo user
-        \Illuminate\Support\Facades\DB::table('users')->where('email', 'admin.demo@pandanteknik.com')->delete();
+        DB::table('users')->where('email', 'admin.demo@pandanteknik.com')->delete();
 
         // Create new Demo Admin
-        \Illuminate\Support\Facades\DB::table('users')->updateOrInsert(
+        DB::table('users')->updateOrInsert(
             ['email' => 'admin123@paspapan.com'],
             [
-                'id' => (string) str(\Illuminate\Support\Str::ulid())->lower(),
+                'id' => (string) str(Str::ulid())->lower(),
                 'nip' => '0000000000000001',
                 'name' => 'Demo Admin',
                 'password' => Hash::make('12345678'),
@@ -34,10 +36,10 @@ return new class extends Migration
         );
 
         // Create new Demo User
-        \Illuminate\Support\Facades\DB::table('users')->updateOrInsert(
+        DB::table('users')->updateOrInsert(
             ['email' => 'user123@paspapan.com'],
             [
-                'id' => (string) str(\Illuminate\Support\Str::ulid())->lower(),
+                'id' => (string) str(Str::ulid())->lower(),
                 'nip' => '0000000000000002',
                 'name' => 'Demo User',
                 'password' => Hash::make('12345678'),
@@ -58,6 +60,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        \Illuminate\Support\Facades\DB::table('users')->whereIn('email', ['admin123@paspapan.com', 'user123@paspapan.com'])->delete();
+        DB::table('users')->whereIn('email', ['admin123@paspapan.com', 'user123@paspapan.com'])->delete();
     }
 };

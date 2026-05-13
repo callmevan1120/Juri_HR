@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 beforeEach(function () {
     enableEnterpriseAttendanceForTests();
@@ -139,7 +140,7 @@ test('notifications page only renders notifications for the current user', funct
     $otherEmployee = User::factory()->create();
 
     DatabaseNotification::create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Str::uuid(),
         'type' => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
         'notifiable_id' => $employee->id,
@@ -150,7 +151,7 @@ test('notifications page only renders notifications for the current user', funct
     ]);
 
     DatabaseNotification::create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Str::uuid(),
         'type' => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
         'notifiable_id' => $otherEmployee->id,

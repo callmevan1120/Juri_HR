@@ -4,6 +4,9 @@ namespace App\Services\Attendance;
 
 use App\Contracts\AttendanceServiceInterface;
 use App\Models\Attendance;
+use App\Models\FaceDescriptor;
+use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -56,7 +59,7 @@ class CommunityService implements AttendanceServiceInterface
     public function shouldEnforceFaceEnrollment(): bool
     {
         return filter_var(
-            \App\Models\Setting::getValue('attendance.require_face_enrollment', false),
+            Setting::getValue('attendance.require_face_enrollment', false),
             FILTER_VALIDATE_BOOLEAN
         );
     }
@@ -109,16 +112,16 @@ class CommunityService implements AttendanceServiceInterface
         return $filename;
     }
 
-    public function registerFace(\App\Models\User $user, array $descriptor): void
+    public function registerFace(User $user, array $descriptor): void
     {
         // Community Edition: Face ID Unlocked
-        \App\Models\FaceDescriptor::updateOrCreate(
+        FaceDescriptor::updateOrCreate(
             ['user_id' => $user->id],
             ['descriptor' => $descriptor]
         );
     }
 
-    public function removeFace(\App\Models\User $user): void
+    public function removeFace(User $user): void
     {
         // Community Edition: Face ID Unlocked
         $user->faceDescriptor()->delete();

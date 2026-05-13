@@ -54,10 +54,10 @@ test('backup run job marks application runs as failed when backup service throws
     $backupService = mock(SystemBackupService::class);
     $backupService->shouldReceive('createApplicationBackup')
         ->once()
-        ->andThrow(new \RuntimeException('ZipArchive is not available on this server.'));
+        ->andThrow(new RuntimeException('ZipArchive is not available on this server.'));
 
     expect(fn () => (new RunSystemBackup($backupRun->id))->handle($backupService))
-        ->toThrow(\RuntimeException::class, 'ZipArchive is not available on this server.');
+        ->toThrow(RuntimeException::class, 'ZipArchive is not available on this server.');
 
     $backupRun->refresh();
 

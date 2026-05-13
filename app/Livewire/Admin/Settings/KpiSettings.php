@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Settings;
 
 use App\Models\KpiGroup;
 use App\Models\KpiTemplate;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -54,10 +55,10 @@ class KpiSettings extends Component
         Gate::authorize('manageKpiSettings');
 
         $this->loadGroups();
-        $this->periodOpen = (bool) \App\Models\Setting::getValue('appraisal.period_open', false);
-        $this->periodLabel = \App\Models\Setting::getValue('appraisal.period_label', '');
-        $this->periodDeadline = \App\Models\Setting::getValue('appraisal.period_deadline', '');
-        $this->attendanceWeight = (int) \App\Models\Setting::getValue('appraisal.attendance_weight', 30);
+        $this->periodOpen = (bool) Setting::getValue('appraisal.period_open', false);
+        $this->periodLabel = Setting::getValue('appraisal.period_label', '');
+        $this->periodDeadline = Setting::getValue('appraisal.period_deadline', '');
+        $this->attendanceWeight = (int) Setting::getValue('appraisal.attendance_weight', 30);
     }
 
     public function loadGroups()
@@ -236,8 +237,8 @@ class KpiSettings extends Component
 
     private function updateSetting($key, $value)
     {
-        \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-        \App\Models\Setting::flushCache($key);
+        Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+        Setting::flushCache($key);
     }
 
     public function render()

@@ -44,7 +44,7 @@ test('vercel migrate endpoint requires a token and is rate limited', function ()
         ->assertNotFound();
 
     Log::shouldHaveReceived('warning')
-        ->with('Vercel maintenance endpoint rejected.', \Mockery::on(function (array $context): bool {
+        ->with('Vercel maintenance endpoint rejected.', Mockery::on(function (array $context): bool {
             return ($context['reason'] ?? null) === 'invalid_token'
                 && ! array_key_exists('token', $context)
                 && array_key_exists('ip', $context)
@@ -71,7 +71,7 @@ test('vercel migrate endpoint is disabled by default', function () {
         ->assertNotFound();
 
     Log::shouldHaveReceived('warning')
-        ->with('Vercel maintenance endpoint rejected.', \Mockery::on(fn (array $context): bool => ($context['reason'] ?? null) === 'endpoint_disabled'))
+        ->with('Vercel maintenance endpoint rejected.', Mockery::on(fn (array $context): bool => ($context['reason'] ?? null) === 'endpoint_disabled'))
         ->once();
 });
 
@@ -87,7 +87,7 @@ test('vercel migrate endpoint blocks web seeding unless explicitly allowed', fun
         ->assertForbidden();
 
     Log::shouldHaveReceived('warning')
-        ->with('Vercel maintenance endpoint rejected.', \Mockery::on(fn (array $context): bool => ($context['reason'] ?? null) === 'seed_not_allowed'))
+        ->with('Vercel maintenance endpoint rejected.', Mockery::on(fn (array $context): bool => ($context['reason'] ?? null) === 'seed_not_allowed'))
         ->once();
 });
 
@@ -120,11 +120,11 @@ test('vercel migrate endpoint runs only with the configured token and does not e
         ->not->toContain('database');
 
     Log::shouldHaveReceived('info')
-        ->with('Vercel maintenance migration started.', \Mockery::on(fn (array $context): bool => ($context['seed'] ?? null) === false && ! array_key_exists('token', $context)))
+        ->with('Vercel maintenance migration started.', Mockery::on(fn (array $context): bool => ($context['seed'] ?? null) === false && ! array_key_exists('token', $context)))
         ->once();
 
     Log::shouldHaveReceived('info')
-        ->with('Vercel maintenance migration finished.', \Mockery::on(fn (array $context): bool => ($context['ok'] ?? null) === true && ($context['migrate_exit_code'] ?? null) === 0))
+        ->with('Vercel maintenance migration finished.', Mockery::on(fn (array $context): bool => ($context['ok'] ?? null) === true && ($context['migrate_exit_code'] ?? null) === 0))
         ->once();
 });
 

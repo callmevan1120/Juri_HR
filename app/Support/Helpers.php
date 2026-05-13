@@ -2,6 +2,9 @@
 
 namespace App\Support;
 
+use App\Models\Setting;
+use Carbon\Carbon;
+
 class Helpers
 {
     public static function normalizeInternalUrl(?string $url): ?string
@@ -49,7 +52,7 @@ class Helpers
     /**
      * Format time based on application settings
      *
-     * @param  string|\Carbon\Carbon|null  $time
+     * @param  string|Carbon|null  $time
      * @return string
      */
     public static function format_time($time)
@@ -60,14 +63,14 @@ class Helpers
 
         if (is_string($time)) {
             try {
-                $time = \Carbon\Carbon::parse($time);
+                $time = Carbon::parse($time);
             } catch (\Exception $e) {
                 return $time;
             }
         }
 
-        $format = \App\Models\Setting::getValue('app.time_format', '24');
-        $showSeconds = (bool) \App\Models\Setting::getValue('app.show_seconds', false);
+        $format = Setting::getValue('app.time_format', '24');
+        $showSeconds = (bool) Setting::getValue('app.show_seconds', false);
 
         if ($format == '12') {
             $formatString = $showSeconds ? 'h:i:s A' : 'h:i A';

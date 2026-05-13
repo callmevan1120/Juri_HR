@@ -4,6 +4,7 @@ use App\Contracts\AttendanceServiceInterface;
 use App\Models\Attendance;
 use App\Models\Barcode;
 use App\Models\User;
+use App\Support\ApiTokenPermission;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -115,7 +116,7 @@ test('attendance photo public disk fallback is logged for legacy files', functio
         ->assertOk();
 
     Log::shouldHaveReceived('warning')
-        ->with('Serving attachment from legacy public disk fallback.', \Mockery::on(fn (array $context): bool => ($context['path_basename'] ?? null) === 'check-in.jpg'
+        ->with('Serving attachment from legacy public disk fallback.', Mockery::on(fn (array $context): bool => ($context['path_basename'] ?? null) === 'check-in.jpg'
             && ($context['audit_action'] ?? null) === 'Attendance Photo Viewed'))
         ->once();
 });
@@ -304,7 +305,7 @@ test('device barcode api rejects tokens without barcode ability', function () {
         'radius' => 5000,
     ]);
 
-    Sanctum::actingAs($user, [\App\Support\ApiTokenPermission::DEVICE_LOCATION]);
+    Sanctum::actingAs($user, [ApiTokenPermission::DEVICE_LOCATION]);
 
     $response = $this->postJson('/api/device/barcode', [
         'barcode_data' => $barcode->value,
@@ -321,12 +322,12 @@ test('device barcode api rejects tokens without barcode ability', function () {
 test('device permissions api requires explicit permissions ability', function () {
     $user = User::factory()->create();
 
-    Sanctum::actingAs($user, [\App\Support\ApiTokenPermission::DEVICE_BARCODE]);
+    Sanctum::actingAs($user, [ApiTokenPermission::DEVICE_BARCODE]);
 
     $this->getJson('/api/device/permissions')
         ->assertForbidden();
 
-    Sanctum::actingAs($user, [\App\Support\ApiTokenPermission::DEVICE_PERMISSIONS]);
+    Sanctum::actingAs($user, [ApiTokenPermission::DEVICE_PERMISSIONS]);
 
     $this->getJson('/api/device/permissions')
         ->assertOk()

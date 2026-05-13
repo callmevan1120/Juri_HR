@@ -1,6 +1,7 @@
 <?php
 
 use App\Contracts\AuditServiceInterface;
+use App\Livewire\Admin\SystemMaintenance;
 use App\Models\ActivityLog;
 use App\Models\Role;
 use App\Models\Setting;
@@ -242,11 +243,11 @@ test('backup artifact downloads and deletes require maintenance manager authoriz
 
     $this->actingAs($viewer);
 
-    Livewire::test(\App\Livewire\Admin\SystemMaintenance::class)
+    Livewire::test(SystemMaintenance::class)
         ->call('downloadExistingBackup', $backupRun->id)
         ->assertDispatched('error');
 
-    Livewire::test(\App\Livewire\Admin\SystemMaintenance::class)
+    Livewire::test(SystemMaintenance::class)
         ->call('deleteBackup', $backupRun->id)
         ->assertDispatched('error');
 

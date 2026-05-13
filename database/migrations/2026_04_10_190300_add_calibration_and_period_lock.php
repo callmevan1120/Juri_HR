@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,15 +17,15 @@ return new class extends Migration
         });
 
         // 2. Seed appraisal period lock settings
-        \App\Models\Setting::firstOrCreate(
+        Setting::firstOrCreate(
             ['key' => 'appraisal.period_open'],
             ['value' => '0', 'group' => 'Appraisal', 'type' => 'boolean', 'description' => 'Whether the appraisal window is currently open for submissions']
         );
-        \App\Models\Setting::firstOrCreate(
+        Setting::firstOrCreate(
             ['key' => 'appraisal.period_label'],
             ['value' => 'Q1 2026', 'group' => 'Appraisal', 'type' => 'text', 'description' => 'Label for the active appraisal period (e.g. Q1 2026, Semester 1)']
         );
-        \App\Models\Setting::firstOrCreate(
+        Setting::firstOrCreate(
             ['key' => 'appraisal.period_deadline'],
             ['value' => now()->endOfMonth()->toDateString(), 'group' => 'Appraisal', 'type' => 'date', 'description' => 'Deadline date for current appraisal window. After this date, submissions are locked.']
         );
@@ -36,7 +37,7 @@ return new class extends Migration
             $table->dropColumn(['calibrator_id', 'calibration_status', 'calibration_notes']);
         });
 
-        \App\Models\Setting::whereIn('key', [
+        Setting::whereIn('key', [
             'appraisal.period_open',
             'appraisal.period_label',
             'appraisal.period_deadline',

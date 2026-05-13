@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Appraisal;
 use App\Support\MailBranding;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -52,7 +53,7 @@ class AppraisalActionNotification extends Notification implements ShouldQueue
             ->greeting(__('Hello, :name!', ['name' => $notifiable->name]))
             ->line($this->messageStr)
             ->line(__('Appraisal Period: :period', [
-                'period' => \Carbon\Carbon::create(
+                'period' => Carbon::create(
                     $this->appraisal->period_year,
                     $this->appraisal->period_month,
                     1

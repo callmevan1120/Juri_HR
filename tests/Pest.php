@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use App\Services\Enterprise\LicenseGuard;
 use App\Support\ApiTokenPermission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
@@ -11,6 +12,7 @@ use Laravel\Fortify\Http\Controllers\EmailVerificationPromptController;
 use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 use Laravel\Fortify\RoutePath;
 use Laravel\Jetstream\Features as JetstreamFeatures;
+use PHPUnit\Framework\SkippedWithMessageException;
 use Tests\TestCase;
 
 /*
@@ -144,7 +146,7 @@ function requireEnterpriseTestPrivateKey(): string
     $key = getEnterpriseTestPrivateKey();
 
     if ($key === null) {
-        throw new \PHPUnit\Framework\SkippedWithMessageException(
+        throw new SkippedWithMessageException(
             'Enterprise license tests need TEST_ENTERPRISE_LICENSE_PRIVATE_KEY, TEST_ENTERPRISE_LICENSE_PRIVATE_KEY_PATH, or storage/license_test_private.key.'
         );
     }
@@ -216,5 +218,5 @@ function enableEnterpriseAttendanceForTests(): void
     Setting::flushCache('app.company_name');
     Setting::flushCache('app.support_contact');
     Setting::flushCache('enterprise_license_key');
-    \App\Services\Enterprise\LicenseGuard::clearLicenseCache();
+    LicenseGuard::clearLicenseCache();
 }

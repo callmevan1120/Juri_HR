@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\User\Finance\MyCashAdvances;
 use App\Models\CashAdvance;
 use App\Models\User;
 use Livewire\Livewire;
@@ -13,7 +14,7 @@ test('user can submit cash advance request within salary limit', function () {
 
     $this->actingAs($user);
 
-    Livewire::test(\App\Livewire\User\Finance\MyCashAdvances::class)
+    Livewire::test(MyCashAdvances::class)
         ->set('amount', '1.250.000')
         ->set('purpose', 'Laptop repair reimbursement bridge')
         ->set('payment_month', 5)
@@ -55,7 +56,7 @@ test('cash advance summary includes pending finance in unpaid total', function (
 
     $this->actingAs($user);
 
-    Livewire::test(\App\Livewire\User\Finance\MyCashAdvances::class)
+    Livewire::test(MyCashAdvances::class)
         ->assertViewHas('totalUnpaid', fn ($value) => (float) $value === 1000000.0)
         ->assertViewHas('totalPaid', fn ($value) => (float) $value === 500000.0);
 });

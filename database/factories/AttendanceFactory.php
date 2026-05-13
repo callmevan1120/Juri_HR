@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Attendance;
 use App\Models\Barcode;
 use App\Models\Shift;
 use App\Models\User;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Attendance>
+ * @extends Factory<Attendance>
  */
 class AttendanceFactory extends Factory
 {

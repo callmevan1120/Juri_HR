@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\JobLevel;
 use App\Models\JobTitle;
 use Illuminate\Database\Seeder;
 
@@ -18,7 +19,7 @@ class JobLevelSeeder extends Seeder
         ];
 
         foreach ($levels as $rank => $name) {
-            \App\Models\JobLevel::firstOrCreate(
+            JobLevel::firstOrCreate(
                 ['rank' => $rank],
                 ['name' => $name]
             );
@@ -28,7 +29,7 @@ class JobLevelSeeder extends Seeder
         $jobTitles = JobTitle::all();
         foreach ($jobTitles as $title) {
             if ($title->level) {
-                $jobLevel = \App\Models\JobLevel::where('rank', $title->level)->first();
+                $jobLevel = JobLevel::where('rank', $title->level)->first();
                 if ($jobLevel) {
                     $title->update(['job_level_id' => $jobLevel->id]);
                 }

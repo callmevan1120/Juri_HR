@@ -3,6 +3,9 @@
 namespace App\Livewire\User;
 
 use App\Models\Appraisal;
+use App\Models\Setting;
+use App\Notifications\AppraisalActionNotification;
+use App\Services\AppraisalService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -34,8 +37,8 @@ class MyPerformance extends Component
     public function openSelfAssessment($appraisalId)
     {
         // Check Period Lock
-        $periodOpen = (bool) \App\Models\Setting::getValue('appraisal.period_open', false);
-        $deadline = \App\Models\Setting::getValue('appraisal.period_deadline', '');
+        $periodOpen = (bool) Setting::getValue('appraisal.period_open', false);
+        $deadline = Setting::getValue('appraisal.period_deadline', '');
         if (! $periodOpen || ($deadline && now()->gt($deadline))) {
             session()->flash('error', __('The appraisal submission window is currently closed. Please contact HR.'));
 
@@ -46,7 +49,7 @@ class MyPerformance extends Component
         $this->authorize('selfAssess', $appraisal);
 
         // Auto-sync missing KPIs (in case HR added new KPI Groups after this appraisal was drafted)
-        $service = app(\App\Services\AppraisalService::class);
+        $service = app(AppraisalService::class);
         $service->initAppraisal(auth()->user(), $appraisal->period_month, $appraisal->period_year);
 
         // Re-fetch with loaded relations after syncing
@@ -86,7 +89,7 @@ class MyPerformance extends Component
 
         $supervisor = auth()->user()->supervisor;
         if ($supervisor) {
-            $supervisor->notify(new \App\Notifications\AppraisalActionNotification(
+            $supervisor->notify(new AppraisalActionNotification(
                 $appraisal,
                 __(':name has submitted their self-assessment and it is ready for your manager review.', [
                     'name' => auth()->user()->name,

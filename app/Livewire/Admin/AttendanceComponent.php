@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Livewire\Traits\AttendanceDetailTrait;
 use App\Queries\Attendance\AdminAttendanceGridQuery;
+use App\Support\ImportExportRunViewService;
 use Illuminate\Support\Carbon;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Component;
@@ -66,7 +67,7 @@ class AttendanceComponent extends Component
         return view('livewire.admin.attendance', [
             'employees' => $employees,
             'dates' => $dates,
-            'recentReportRuns' => app(\App\Support\ImportExportRunViewService::class)
+            'recentReportRuns' => app(ImportExportRunViewService::class)
                 ->recentForResources(['attendance_report'], auth()->user(), 4),
         ]);
     }

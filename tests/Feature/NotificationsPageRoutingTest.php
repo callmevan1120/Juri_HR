@@ -2,13 +2,14 @@
 
 use App\Models\User;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Str;
 
 test('regular user notifications page renders notification data', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
     DatabaseNotification::create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Str::uuid(),
         'type' => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
         'notifiable_id' => $user->id,
@@ -29,7 +30,7 @@ test('notifications page normalizes absolute notification urls to internal paths
     $this->actingAs($user);
 
     DatabaseNotification::create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Str::uuid(),
         'type' => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
         'notifiable_id' => $user->id,
@@ -50,7 +51,7 @@ test('admin notifications route uses dedicated admin page', function () {
     $this->actingAs($admin);
 
     DatabaseNotification::create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Str::uuid(),
         'type' => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
         'notifiable_id' => $admin->id,

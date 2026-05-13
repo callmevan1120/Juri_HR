@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\User\MyPayslips;
 use App\Models\Payroll;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
@@ -31,7 +32,7 @@ test('my payslips component only loads paid payrolls after password setup is val
 
     $this->actingAs($user);
 
-    Livewire::test(\App\Livewire\User\MyPayslips::class)
+    Livewire::test(MyPayslips::class)
         ->assertSet('needsSetup', false)
         ->assertViewHas('payrolls', function ($payrolls) {
             return $payrolls->count() === 1

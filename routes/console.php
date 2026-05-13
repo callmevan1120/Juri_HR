@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\RecordQueueHeartbeat;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -14,7 +15,7 @@ Schedule::command('import-export-runs:prune-expired --hours=12')->hourly()->with
 Schedule::call(fn () => Cache::put('health:scheduler_heartbeat_at', now()->toIso8601String(), now()->addMinutes(10)))
     ->name('health.scheduler-heartbeat')
     ->everyMinute();
-Schedule::job(new \App\Jobs\RecordQueueHeartbeat)
+Schedule::job(new RecordQueueHeartbeat)
     ->name('health.queue-heartbeat')
     ->everyMinute();
 Schedule::command('queue:work --queue=maintenance,default --stop-when-empty --max-time=55 --tries=1')

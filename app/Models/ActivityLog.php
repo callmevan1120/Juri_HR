@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\AuditServiceInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
@@ -49,7 +50,7 @@ class ActivityLog extends Model
     public static function record($action, $description = null)
     {
         // Open Core: Delegate to Service (Community = No-op, Enterprise = Logged)
-        $service = app(\App\Contracts\AuditServiceInterface::class);
+        $service = app(AuditServiceInterface::class);
 
         try {
             return $service->record($action, $description);

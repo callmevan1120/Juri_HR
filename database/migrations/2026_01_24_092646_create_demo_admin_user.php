@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -9,13 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \Illuminate\Support\Facades\DB::table('users')->updateOrInsert(
+        DB::table('users')->updateOrInsert(
             ['email' => 'admin.demo@pandanteknik.com'],
             [
-                'id' => (string) str(\Illuminate\Support\Str::ulid())->lower(),
+                'id' => (string) str(Str::ulid())->lower(),
                 'nip' => '0000000000000001',
                 'name' => 'Demo Admin',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => Hash::make('password'),
                 'group' => 'admin',
                 'email_verified_at' => now(),
                 'phone' => '081234567890',
@@ -33,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        \Illuminate\Support\Facades\DB::table('users')->where('email', 'admin.demo@pandanteknik.com')->delete();
+        DB::table('users')->where('email', 'admin.demo@pandanteknik.com')->delete();
     }
 };

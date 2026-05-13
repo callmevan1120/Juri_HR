@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\User\ScanComponent;
 use App\Models\Attendance;
 use App\Models\Barcode;
 use App\Models\Setting;
@@ -170,7 +171,7 @@ test('web dynamic barcode token is single use after successful scan', function (
     $token = app(DynamicBarcodeTokenService::class)->generateTokenPayload($barcode, now())['token'];
 
     Livewire::actingAs($user)
-        ->test(\App\Livewire\User\ScanComponent::class)
+        ->test(ScanComponent::class)
         ->set('shift_id', $shift->id)
         ->set('currentLiveCoords', [-6.2, 106.8])
         ->call('scan', $token, -6.2, 106.8)
@@ -434,7 +435,7 @@ test('web scan rejects check out from a different checkpoint without creating an
     ]);
 
     Livewire::actingAs($user)
-        ->test(\App\Livewire\User\ScanComponent::class)
+        ->test(ScanComponent::class)
         ->set('shift_id', $shift->id)
         ->set('currentLiveCoords', [-6.2, 106.8])
         ->call('scan', $otherBarcode->value, -6.2, 106.8)

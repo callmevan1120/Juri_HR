@@ -23,7 +23,7 @@
 
             <!-- Card Body -->
             <div class="relative z-10 bg-white/50 px-4 py-4 backdrop-blur-sm dark:bg-gray-800/50 sm:px-5">
-                <div class="grid grid-cols-6 gap-4">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-6">
                     {{ $form }}
                 </div>
             </div>

@@ -28,6 +28,7 @@ use App\Models\EmployeeDocumentRequest;
 use App\Models\HrChecklistTask;
 use App\Models\Overtime;
 use App\Models\Reimbursement;
+use App\Models\ShiftSwapRequest;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
@@ -58,7 +59,7 @@ Route::middleware([
         Route::get('/my-schedule', ShiftSchedulePage::class)->name('my-schedule');
         Route::get('/shift-swap-requests', ShiftSwapRequestPage::class)
             ->name('shift-swap-requests')
-            ->can('viewAny', \App\Models\ShiftSwapRequest::class);
+            ->can('viewAny', ShiftSwapRequest::class);
         Route::get('/document-requests', EmployeeDocumentRequestPage::class)
             ->name('document-requests')
             ->can('viewAny', EmployeeDocumentRequest::class);

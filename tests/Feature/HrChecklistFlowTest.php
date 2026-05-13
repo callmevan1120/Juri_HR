@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Support\HrChecklistService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 
 test('admin and hr roles can access hr checklists while employees cannot', function () {
@@ -175,7 +176,7 @@ test('hr checklist v2 exposes overdue reminder dependency attachment and clearan
         ->and($case->fresh('tasks')->clearanceSummary()['overdue'])->toBe(2);
 
     expect(fn () => $service->updateTaskStatus($dependentTask, $hr, HrChecklistTask::STATUS_DONE))
-        ->toThrow(\Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 
     $service->recordTaskAttachment($firstTask, 'hr-checklists/policy.pdf', 'policy.pdf');
     $service->updateTaskStatus($firstTask->fresh(), $employee, HrChecklistTask::STATUS_DONE);

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\User;
 
+use App\Contracts\AttendanceServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -36,7 +37,7 @@ class FaceEnrollment extends Component
         }
 
         try {
-            app(\App\Contracts\AttendanceServiceInterface::class)->registerFace($user, $descriptor);
+            app(AttendanceServiceInterface::class)->registerFace($user, $descriptor);
 
             $this->isEnrolled = true;
             $this->isCapturing = false;
@@ -62,7 +63,7 @@ class FaceEnrollment extends Component
     public function removeFace()
     {
         try {
-            app(\App\Contracts\AttendanceServiceInterface::class)->removeFace(Auth::user());
+            app(AttendanceServiceInterface::class)->removeFace(Auth::user());
 
             $this->isEnrolled = false;
             $this->dispatch('toast', type: 'success', message: __('Face ID removed.'));

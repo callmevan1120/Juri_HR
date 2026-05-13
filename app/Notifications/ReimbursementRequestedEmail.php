@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Reimbursement;
 use App\Support\MailBranding;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -31,7 +32,7 @@ class ReimbursementRequestedEmail extends Notification implements ShouldQueue
         $amount = number_format($this->reimbursement->amount ?? 0, 0, ',', '.');
         $appName = MailBranding::companyName();
         $date = $this->reimbursement->date;
-        $dateFormatted = $date ? \Carbon\Carbon::parse($date)->translatedFormat('d M Y') : '-';
+        $dateFormatted = $date ? Carbon::parse($date)->translatedFormat('d M Y') : '-';
 
         $details = [
             __('Staff') => $userName,

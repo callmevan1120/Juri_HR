@@ -3,6 +3,7 @@
 namespace App\Services\Attendance;
 
 use App\Contracts\AttendanceServiceInterface;
+use App\Models\Attendance;
 use App\Models\AttendanceOfflineSubmission;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -107,7 +108,7 @@ class OfflineAttendanceSyncService
         );
     }
 
-    private function attachPhotoPath(\App\Models\Attendance $attendance, string $photoPath, string $action): void
+    private function attachPhotoPath(Attendance $attendance, string $photoPath, string $action): void
     {
         $attachments = [];
 

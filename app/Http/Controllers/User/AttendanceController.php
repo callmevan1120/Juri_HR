@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\LeaveType;
+use App\Models\Setting;
 use App\Services\Attendance\LeaveRequestService;
 use App\Support\FileAccessService;
 use App\Support\SecureUploadPolicy;
@@ -47,7 +48,7 @@ class AttendanceController extends Controller
                 ->findOrFail($request->integer('leave_type_id'));
         }
 
-        $requireAttachment = \App\Models\Setting::getValue('leave.require_attachment', '1') === '1';
+        $requireAttachment = Setting::getValue('leave.require_attachment', '1') === '1';
         $attachmentRequired = $requireAttachment || (bool) $leaveType?->requires_attachment;
 
         $request->validate([

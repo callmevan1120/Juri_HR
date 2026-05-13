@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\MyAssets;
 use App\Models\CompanyAsset;
 use App\Models\User;
 use Livewire\Livewire;
@@ -22,7 +23,7 @@ test('user cannot request return otp for asset that is not assigned to them', fu
 
     $this->actingAs($user);
 
-    Livewire::test(\App\Livewire\MyAssets::class)
+    Livewire::test(MyAssets::class)
         ->call('openReturnModal', $asset->id)
         ->assertSet('returnAssetId', null)
         ->assertSet('showReturnModal', false);

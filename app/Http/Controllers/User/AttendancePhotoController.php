@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Support\FileAccessService;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttendancePhotoController extends Controller
 {
@@ -18,7 +19,7 @@ class AttendancePhotoController extends Controller
      * @param  Request  $request
      * @param  string  $type  'in' or 'out'
      * @param  int|null  $index  Index for multiple attachments
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return StreamedResponse
      */
     public function show(Attendance $attendance, string $type, string|int|null $index = null)
     {

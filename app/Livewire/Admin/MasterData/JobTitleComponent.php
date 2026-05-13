@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin\MasterData;
 
+use App\Models\Division;
+use App\Models\JobLevel;
 use App\Models\JobTitle;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Jetstream\InteractsWithBanner;
@@ -159,8 +161,8 @@ class JobTitleComponent extends Component
 
         return view('livewire.admin.master-data.job-title', [
             'jobTitles' => $jobTitles,
-            'jobLevels' => \App\Models\JobLevel::orderBy('rank')->get(),
-            'divisions' => \App\Models\Division::all(),
+            'jobLevels' => JobLevel::orderBy('rank')->get(),
+            'divisions' => Division::all(),
         ]);
     }
 }

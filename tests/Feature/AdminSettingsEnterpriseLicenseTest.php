@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\EnterpriseHwId;
 use App\Helpers\Editions;
 use App\Livewire\Admin\Settings as AdminSettings;
 use App\Models\Setting;
@@ -142,7 +143,7 @@ it('shows the server hardware id on the enterprise settings tab', function () {
 
     Livewire::test(AdminSettings::class)
         ->assertSee('Hardware ID (HWID)')
-        ->assertSee(\App\Console\Commands\EnterpriseHwId::generate());
+        ->assertSee(EnterpriseHwId::generate());
 });
 
 it('keeps enterprise license read only for non superadmin users', function () {

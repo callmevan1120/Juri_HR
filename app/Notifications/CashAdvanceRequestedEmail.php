@@ -3,9 +3,12 @@
 namespace App\Notifications;
 
 use App\Models\CashAdvance;
+use App\Models\User;
 use App\Support\MailBranding;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -31,7 +34,7 @@ class CashAdvanceRequestedEmail extends Notification implements ShouldQueue
         $amount = number_format($this->advance->amount ?? 0, 0, ',', '.');
 
         $appName = MailBranding::companyName();
-        $paymentMonthName = \Carbon\Carbon::create()->month((int) $this->advance->payment_month)->translatedFormat('F');
+        $paymentMonthName = Carbon::create()->month((int) $this->advance->payment_month)->translatedFormat('F');
 
         $details = [
             __('Staff') => $userName,
@@ -42,13 +45,13 @@ class CashAdvanceRequestedEmail extends Notification implements ShouldQueue
 
         $url = route('home');
 
-        if ($notifiable instanceof \App\Models\User) {
+        if ($notifiable instanceof User) {
             if ($notifiable->can('manageCashAdvances')) {
                 $url = route('admin.manage-kasbon');
             } elseif ($notifiable->can('reviewSubordinateRequests')) {
                 $url = route('team-kasbon');
             }
-        } elseif ($notifiable instanceof \Illuminate\Notifications\AnonymousNotifiable) {
+        } elseif ($notifiable instanceof AnonymousNotifiable) {
             $url = route('admin.manage-kasbon');
         }
 

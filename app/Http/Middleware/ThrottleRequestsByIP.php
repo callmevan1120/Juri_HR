@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ActivityLog;
+use App\Models\Setting;
 use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -15,7 +17,7 @@ class ThrottleRequestsByIP
      * Handle an incoming request.
      * Aggressive IP-based throttling for DDoS protection.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -28,7 +30,7 @@ class ThrottleRequestsByIP
         }
 
         // Aggressive rate limit: 100 requests per minute per IP
-        $maxAttempts = (int) \App\Models\Setting::getValue('security.rate_limit_ip', 100);
+        $maxAttempts = (int) Setting::getValue('security.rate_limit_ip', 100);
 
         $executed = RateLimiter::attempt(
             $key,
@@ -41,7 +43,7 @@ class ThrottleRequestsByIP
 
         if (! $executed) {
             // Log suspicious activity
-            \App\Models\ActivityLog::create([
+            ActivityLog::create([
                 'user_id' => $request->user()?->id,
                 'action' => 'Rate Limit Exceeded',
                 'description' => "IP {$ip} exceeded rate limit ({$maxAttempts}/min)",

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\LeaveStatusUpdated;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class LeaveApprovalService
 {
@@ -15,7 +16,7 @@ class LeaveApprovalService
     ) {}
 
     /**
-     * @return LengthAwarePaginator<int, \Illuminate\Support\Collection<int, Attendance>>
+     * @return LengthAwarePaginator<int, Collection<int, Attendance>>
      */
     public function groupedRequests(
         User $actor,

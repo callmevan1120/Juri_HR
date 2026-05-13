@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\SendPayrollPayslipEmail;
 use App\Notifications\QueuedResetPassword;
 use App\Notifications\QueuedVerifyEmail;
 use App\Support\MultiCompanyService;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -176,12 +178,12 @@ class User extends Authenticatable implements MustVerifyEmail
                 return;
             }
 
-            \App\Models\Payroll::query()
+            Payroll::query()
                 ->where('user_id', $user->id)
                 ->where('status', 'paid')
                 ->whereNull('pdf_emailed_at')
                 ->pluck('id')
-                ->each(fn ($payrollId) => \App\Jobs\SendPayrollPayslipEmail::dispatch((int) $payrollId));
+                ->each(fn ($payrollId) => SendPayrollPayslipEmail::dispatch((int) $payrollId));
         });
     }
 
@@ -713,7 +715,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
-        return \Illuminate\Support\Carbon::parse($this->payslip_password_set_at)->diffInMonths(now()) < 3;
+        return Carbon::parse($this->payslip_password_set_at)->diffInMonths(now()) < 3;
     }
 
     /**

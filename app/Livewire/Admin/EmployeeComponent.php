@@ -3,7 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Livewire\Forms\UserForm;
+use App\Models\JobTitle;
 use App\Models\User;
+use App\Models\Wilayah;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Jetstream\InteractsWithBanner;
@@ -196,7 +198,7 @@ class EmployeeComponent extends Component
     public function updated($property, $value)
     {
         if ($property === 'form.job_title_id' && $value) {
-            $jobTitle = \App\Models\JobTitle::find($value);
+            $jobTitle = JobTitle::find($value);
             if ($jobTitle && $jobTitle->division_id) {
                 $this->form->division_id = $jobTitle->division_id;
             }
@@ -260,17 +262,17 @@ class EmployeeComponent extends Component
             'pending_deletion' => (int) ($statusCounts[User::EMPLOYMENT_STATUS_DELETION_REQUESTED] ?? 0),
         ];
 
-        $availableJobTitles = \App\Models\JobTitle::query()
+        $availableJobTitles = JobTitle::query()
             ->when($this->form->division_id, function ($q) {
                 $q->where('division_id', $this->form->division_id)
                     ->orWhereNull('division_id'); // Include global titles if any
             })
             ->get();
 
-        $provinces = \App\Models\Wilayah::whereRaw('LENGTH(kode) = 2')->orderBy('nama')->get();
-        $regencies = $this->form->provinsi_kode ? \App\Models\Wilayah::where('kode', 'like', $this->form->provinsi_kode.'.%')->whereRaw('LENGTH(kode) = 5')->orderBy('nama')->get() : collect();
-        $districts = $this->form->kabupaten_kode ? \App\Models\Wilayah::where('kode', 'like', $this->form->kabupaten_kode.'.%')->whereRaw('LENGTH(kode) = 8')->orderBy('nama')->get() : collect();
-        $villages = $this->form->kecamatan_kode ? \App\Models\Wilayah::where('kode', 'like', $this->form->kecamatan_kode.'.%')->whereRaw('LENGTH(kode) = 13')->orderBy('nama')->get() : collect();
+        $provinces = Wilayah::whereRaw('LENGTH(kode) = 2')->orderBy('nama')->get();
+        $regencies = $this->form->provinsi_kode ? Wilayah::where('kode', 'like', $this->form->provinsi_kode.'.%')->whereRaw('LENGTH(kode) = 5')->orderBy('nama')->get() : collect();
+        $districts = $this->form->kabupaten_kode ? Wilayah::where('kode', 'like', $this->form->kabupaten_kode.'.%')->whereRaw('LENGTH(kode) = 8')->orderBy('nama')->get() : collect();
+        $villages = $this->form->kecamatan_kode ? Wilayah::where('kode', 'like', $this->form->kecamatan_kode.'.%')->whereRaw('LENGTH(kode) = 13')->orderBy('nama')->get() : collect();
 
         $managerOptions = collect();
 

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CompanyAsset;
+use App\Models\CompanyAssetHistory;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -80,7 +81,7 @@ class DemoAssetSeeder extends Seeder
             );
 
             // Seed a history event if not exists
-            \App\Models\CompanyAssetHistory::firstOrCreate(
+            CompanyAssetHistory::firstOrCreate(
                 [
                     'company_asset_id' => $asset->id,
                     'action' => 'created',
@@ -92,7 +93,7 @@ class DemoAssetSeeder extends Seeder
                 ]
             );
 
-            \App\Models\CompanyAssetHistory::firstOrCreate(
+            CompanyAssetHistory::firstOrCreate(
                 [
                     'company_asset_id' => $asset->id,
                     'action' => 'assigned',

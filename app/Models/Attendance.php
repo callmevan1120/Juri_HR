@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\AttendanceServiceInterface;
 use App\Support\ExtendedCarbon;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
@@ -227,7 +228,7 @@ class Attendance extends Model
             }
 
             // Open Core: Delegate to Service
-            $service = app(\App\Contracts\AttendanceServiceInterface::class);
+            $service = app(AttendanceServiceInterface::class);
 
             return $service->getAttachmentUrl($this);
         });

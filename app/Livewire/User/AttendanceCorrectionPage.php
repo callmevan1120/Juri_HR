@@ -7,6 +7,7 @@ use App\Models\AttendanceCorrection;
 use App\Models\Shift;
 use App\Support\AttendanceCorrectionService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -256,7 +257,7 @@ class AttendanceCorrectionPage extends Component
         ];
     }
 
-    private function inferRequestType(?Attendance $attendance, ?\Illuminate\Support\Carbon $requestedTimeIn, ?\Illuminate\Support\Carbon $requestedTimeOut): string
+    private function inferRequestType(?Attendance $attendance, ?Carbon $requestedTimeIn, ?Carbon $requestedTimeOut): string
     {
         if ($this->includeRequestedShift && ! $requestedTimeIn && ! $requestedTimeOut) {
             return AttendanceCorrection::TYPE_WRONG_SHIFT;
@@ -281,13 +282,13 @@ class AttendanceCorrectionPage extends Component
         return AttendanceCorrection::TYPE_WRONG_SHIFT;
     }
 
-    private function buildRequestedDateTime(?string $dateTime): ?\Illuminate\Support\Carbon
+    private function buildRequestedDateTime(?string $dateTime): ?Carbon
     {
         if (! $dateTime) {
             return null;
         }
 
-        return \Illuminate\Support\Carbon::parse($dateTime);
+        return Carbon::parse($dateTime);
     }
 
     private function currentAttendance(): ?Attendance
@@ -302,7 +303,7 @@ class AttendanceCorrectionPage extends Component
     private function defaultRequestedDateTime(string $direction): string
     {
         $attendance = $this->currentAttendance();
-        $date = \Illuminate\Support\Carbon::parse($this->attendanceDate);
+        $date = Carbon::parse($this->attendanceDate);
 
         $snapshotValue = $this->attendanceSnapshotDateTime($attendance, $direction);
 
@@ -328,7 +329,7 @@ class AttendanceCorrectionPage extends Component
         return $defaultOut->format('Y-m-d H:i');
     }
 
-    private function attendanceSnapshotDateTime(?Attendance $attendance, string $direction): ?\Illuminate\Support\Carbon
+    private function attendanceSnapshotDateTime(?Attendance $attendance, string $direction): ?Carbon
     {
         if (! $attendance) {
             return null;
@@ -340,8 +341,8 @@ class AttendanceCorrectionPage extends Component
             return null;
         }
 
-        $baseDate = \Illuminate\Support\Carbon::parse($attendance->date ?? $this->attendanceDate);
-        $rawDateTime = \Illuminate\Support\Carbon::parse($rawValue);
+        $baseDate = Carbon::parse($attendance->date ?? $this->attendanceDate);
+        $rawDateTime = Carbon::parse($rawValue);
         $normalized = $baseDate->copy()->setTime(
             (int) $rawDateTime->format('H'),
             (int) $rawDateTime->format('i'),

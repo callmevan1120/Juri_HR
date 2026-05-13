@@ -2,6 +2,10 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Schedule;
+use App\Models\Shift;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 
@@ -35,8 +39,8 @@ class ScheduleComponent extends Component
     {
         $this->month = (int) date('m');
         $this->year = (int) date('Y');
-        $this->users = \App\Models\User::orderBy('name')->get();
-        $this->shifts = \App\Models\Shift::all();
+        $this->users = User::orderBy('name')->get();
+        $this->shifts = Shift::all();
 
         // Auto-select first user if available
         if ($this->users->count() > 0) {
@@ -78,7 +82,7 @@ class ScheduleComponent extends Component
         $this->showModal = true;
 
         // Fetch existing schedule
-        $schedule = \App\Models\Schedule::where('user_id', $this->selectedUser)
+        $schedule = Schedule::where('user_id', $this->selectedUser)
             ->where('date', $date)
             ->first();
 
@@ -98,7 +102,7 @@ class ScheduleComponent extends Component
         }
 
         if ($this->selectedShiftId) {
-            \App\Models\Schedule::updateOrCreate(
+            Schedule::updateOrCreate(
                 [
                     'user_id' => $this->selectedUser,
                     'date' => $this->selectedDate,
@@ -110,7 +114,7 @@ class ScheduleComponent extends Component
             );
         } else {
             // If No shift selected, Delete any existing schedule (Revert to Auto)
-            \App\Models\Schedule::where('user_id', $this->selectedUser)
+            Schedule::where('user_id', $this->selectedUser)
                 ->where('date', $this->selectedDate)
                 ->delete();
         }
@@ -126,17 +130,17 @@ class ScheduleComponent extends Component
         $month = (int) ((filter_var($this->month, FILTER_VALIDATE_INT) !== false && $this->month >= 1 && $this->month <= 12) ? $this->month : date('m'));
 
         try {
-            $date = \Carbon\Carbon::createFromDate($year, $month, 1);
+            $date = Carbon::createFromDate($year, $month, 1);
         } catch (\Exception $e) {
-            $date = \Carbon\Carbon::now()->startOfMonth();
+            $date = Carbon::now()->startOfMonth();
             $this->year = $date->year;
             $this->month = $date->format('m');
         }
         $startOfMonth = $date->copy()->startOfMonth();
         $endOfMonth = $date->copy()->endOfMonth();
 
-        $startGrid = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
-        $endGrid = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+        $startGrid = $startOfMonth->copy()->startOfWeek(Carbon::SUNDAY);
+        $endGrid = $endOfMonth->copy()->endOfWeek(Carbon::SATURDAY);
 
         $dates = [];
         $current = $startGrid->copy();
@@ -147,7 +151,7 @@ class ScheduleComponent extends Component
 
         $schedules = [];
         if ($this->selectedUser) {
-            $schedules = \App\Models\Schedule::where('user_id', $this->selectedUser)
+            $schedules = Schedule::where('user_id', $this->selectedUser)
                 ->whereBetween('date', [$startGrid->toDateString(), $endGrid->toDateString()])
                 ->with('shift')
                 ->get()

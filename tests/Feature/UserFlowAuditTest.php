@@ -1,5 +1,8 @@
 <?php
 
+use App\Livewire\AttendanceHistoryComponent;
+use App\Livewire\NotificationsPage;
+use App\Livewire\ReimbursementPage;
 use App\Models\Announcement;
 use App\Models\Attendance;
 use App\Models\Reimbursement;
@@ -8,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 test('notifications page hides dismissed announcements for the current user', function () {
@@ -38,7 +42,7 @@ test('notifications page hides dismissed announcements for the current user', fu
         'dismissed_at' => now(),
     ]);
 
-    Livewire::test(\App\Livewire\NotificationsPage::class)
+    Livewire::test(NotificationsPage::class)
         ->assertSee($visibleAnnouncement->title)
         ->assertDontSee($dismissedAnnouncement->title);
 });
@@ -48,7 +52,7 @@ test('notifications page can mark all unread notifications as read', function ()
     $this->actingAs($user);
 
     DatabaseNotification::create([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
+        'id' => (string) Str::uuid(),
         'type' => 'App\\Notifications\\TestNotification',
         'notifiable_type' => User::class,
         'notifiable_id' => $user->id,
@@ -60,7 +64,7 @@ test('notifications page can mark all unread notifications as read', function ()
 
     expect($user->fresh()->unreadNotifications()->count())->toBe(1);
 
-    Livewire::test(\App\Livewire\NotificationsPage::class)
+    Livewire::test(NotificationsPage::class)
         ->call('markAllAsRead');
 
     expect($user->fresh()->unreadNotifications()->count())->toBe(0);
@@ -88,7 +92,7 @@ test('reimbursement page filters claims by status and type', function () {
         'status' => 'pending',
     ]);
 
-    Livewire::test(\App\Livewire\ReimbursementPage::class)
+    Livewire::test(ReimbursementPage::class)
         ->set('statusFilter', 'approved')
         ->set('typeFilter', 'medical')
         ->assertSee('Medical reimbursement')
@@ -102,7 +106,7 @@ test('reimbursement page stores uploaded attachments on private disk', function 
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    Livewire::test(\App\Livewire\ReimbursementPage::class)
+    Livewire::test(ReimbursementPage::class)
         ->set('date', now()->toDateString())
         ->set('type', 'medical')
         ->set('amount', 150000)
@@ -163,7 +167,7 @@ test('attendance history summary counts inferred absences for past working days'
         'approval_status' => Attendance::STATUS_APPROVED,
     ]);
 
-    Livewire::test(\App\Livewire\AttendanceHistoryComponent::class)
+    Livewire::test(AttendanceHistoryComponent::class)
         ->set('selectedYear', '2026')
         ->set('selectedMonth', '04')
         ->assertViewHas('counts', function ($counts) {

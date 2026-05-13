@@ -27,7 +27,7 @@
                 @endif
 
                 <div class="mb-3 rounded-2xl border border-gray-100 bg-gray-50/70 p-1 shadow-sm backdrop-blur dark:border-gray-700/70 dark:bg-gray-900/25">
-                    <div class="grid grid-cols-4 gap-1">
+                    <div class="grid grid-cols-2 gap-1 min-[420px]:grid-cols-4">
                         <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
                             <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
                                 <x-heroicon-m-folder-open class="h-3.5 w-3.5" />

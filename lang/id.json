@@ -881,6 +881,7 @@
     "Deleted data": "Data dihapus",
     "Deleted employee": "Karyawan dihapus",
     "Deleted successfully.": "Berhasil dihapus.",
+    "Demo user password cannot be changed.": "Password pengguna demo tidak dapat diubah.",
     "Deleting this role will also remove it from assigned users. This action cannot be undone.": "Hapus peran akan melepasnya dari pengguna terkait.",
     "Deletion Reason": "Alasan Penghapusan",
     "Deletion Requested": "Hapus Akun Diajukan",

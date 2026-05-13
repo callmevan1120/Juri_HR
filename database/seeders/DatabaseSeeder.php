@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Barcode;
 use App\Models\Division;
 use App\Models\Education;
+use App\Models\JobLevel;
 use App\Models\JobTitle;
 use App\Models\Shift;
 use Database\Factories\DivisionFactory;
@@ -39,7 +40,7 @@ class DatabaseSeeder extends Seeder
             }
             Education::create(['name' => $value]);
         }
-        $jobLevels = \App\Models\JobLevel::pluck('id', 'name')->toArray();
+        $jobLevels = JobLevel::pluck('id', 'name')->toArray();
 
         foreach (JobTitleFactory::$jobTitles as $value) {
             if (JobTitle::where('name', $value)->exists()) {

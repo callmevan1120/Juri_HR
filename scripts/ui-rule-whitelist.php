@@ -72,15 +72,6 @@ $legacyTableFiles = [
     'resources/views/livewire/user/team-approvals.blade.php',
 ];
 
-$legacyMobileLayoutFiles = [
-    'resources/views/admin/operational-health.blade.php',
-    'resources/views/components/sections/form-section.blade.php',
-    'resources/views/livewire/admin/asset-manager.blade.php',
-    'resources/views/livewire/admin/attendance-correction-manager.blade.php',
-    'resources/views/livewire/admin/attendance.blade.php',
-    'resources/views/livewire/user/employee-document-request-page.blade.php',
-];
-
 $legacyWarningFindings = [
     ['app/Livewire/Forms/UserForm.php', 'hardcoded_ui_text', 219, 'Possible hardcoded Livewire UI text: "Demo user password cannot be changed."'],
     ['lang/en.json', 'translation_file_drift', 1, 'Translation file drift detected: 194 key(s) exist in lang/id.json but not in lang/en.json. Blocking enforcement currently targets UI-used literal keys.'],
@@ -96,7 +87,6 @@ $legacyWarningFindings = [
     ['resources/views/components/branding/application-mark.blade.php', 'hardcoded_ui_text', 1, 'Possible hardcoded UI attribute text: "Logo"'],
     ['resources/views/components/branding/authentication-card-logo.blade.php', 'hardcoded_ui_text', 1, 'Possible hardcoded UI attribute text: "Logo"'],
     ['resources/views/components/navigation/theme-toggle.blade.php', 'missing_form_label', 2, 'Possible missing label or aria-label for <input>.'],
-    ['resources/views/components/sections/form-section.blade.php', 'mobile_layout_red_flag', 29, 'High default grid column count may be too dense for mobile.'],
     ['resources/views/components/shared/attendance-detail-modal.blade.php', 'hardcoded_ui_text', 107, 'Possible hardcoded UI attribute text: "Attachment"'],
     ['resources/views/components/shared/feature-lock-modal.blade.php', 'icon_only_button_accessibility', 174, 'Possible icon-only button without aria-label or visible text.'],
     ['resources/views/components/user/home-actions-card.blade.php', 'icon_only_button_accessibility', 67, 'Possible icon-only button without aria-label or visible text.'],
@@ -111,9 +101,6 @@ $legacyWarningFindings = [
     ['resources/views/livewire/admin/appraisal-manager.blade.php', 'mobile_layout_red_flag', 64, 'High default grid column count may be too dense for mobile.'],
     ['resources/views/livewire/admin/appraisal-manager.blade.php', 'mobile_layout_red_flag', 98, 'overflow-x-auto can hide underlying mobile layout issues.'],
     ['resources/views/livewire/admin/appraisal-manager.blade.php', 'hardcoded_ui_text', 502, 'Possible hardcoded UI attribute text: "https://meet.google.com/..."'],
-    ['resources/views/livewire/admin/asset-manager.blade.php', 'mobile_layout_red_flag', 86, 'overflow-x-auto can hide underlying mobile layout issues.'],
-    ['resources/views/livewire/admin/attendance-correction-manager.blade.php', 'mobile_layout_red_flag', 31, 'overflow-x-auto can hide underlying mobile layout issues.'],
-    ['resources/views/livewire/admin/attendance.blade.php', 'mobile_layout_red_flag', 137, 'overflow-x-auto can hide underlying mobile layout issues.'],
     ['resources/views/livewire/admin/dashboard.blade.php', 'mobile_layout_red_flag', 672, 'overflow-x-auto can hide underlying mobile layout issues.'],
     ['resources/views/livewire/admin/dashboard.blade.php', 'mobile_layout_red_flag', 819, 'overflow-x-auto can hide underlying mobile layout issues.'],
     ['resources/views/livewire/admin/employee-document-request-manager.blade.php', 'mobile_layout_red_flag', 36, 'overflow-x-auto can hide underlying mobile layout issues.'],
@@ -152,7 +139,6 @@ $legacyWarningFindings = [
     ['resources/views/livewire/user/attendance-history.blade.php', 'mobile_layout_red_flag', 45, 'High default grid column count may be too dense for mobile.'],
     ['resources/views/livewire/user/attendance-history.blade.php', 'hardcoded_ui_text', 123, 'Possible hardcoded UI text: "H"'],
     ['resources/views/livewire/user/employee-document-request-page.blade.php', 'icon_only_button_accessibility', 15, 'Possible icon-only button without aria-label or visible text.'],
-    ['resources/views/livewire/user/employee-document-request-page.blade.php', 'mobile_layout_red_flag', 31, 'overflow-x-auto can hide underlying mobile layout issues.'],
     ['resources/views/livewire/user/face-enrollment.blade.php', 'icon_only_button_accessibility', 26, 'Possible icon-only button without aria-label or visible text.'],
     ['resources/views/livewire/user/face-enrollment.blade.php', 'icon_only_button_accessibility', 33, 'Possible icon-only button without aria-label or visible text.'],
     ['resources/views/livewire/user/face-enrollment.blade.php', 'icon_only_button_accessibility', 40, 'Possible icon-only button without aria-label or visible text.'],
@@ -221,14 +207,6 @@ return array_merge(
             'reason' => 'Legacy table layout pending card-first mobile migration.',
         ],
         $legacyTableFiles,
-    ),
-    array_map(
-        static fn (string $file): array => [
-            'file' => $file,
-            'rule' => 'mobile_layout_red_flag',
-            'reason' => 'Known responsive layout debt; keep tracked while page-by-page mobile redesign is scheduled.',
-        ],
-        $legacyMobileLayoutFiles,
     ),
     array_map(
         static fn (array $finding): array => [

@@ -17,7 +17,7 @@ test('admin middleware omits raw email and roles unless auth debug logging is en
         ->assertOk();
 
     Log::shouldHaveReceived('info')
-        ->with('AdminMiddleware checked request.', \Mockery::on(fn (array $context): bool => ($context['user_id'] ?? null) === $admin->id
+        ->with('AdminMiddleware checked request.', Mockery::on(fn (array $context): bool => ($context['user_id'] ?? null) === $admin->id
             && ! array_key_exists('email', $context)
             && ! array_key_exists('roles', $context)))
         ->once();
@@ -36,7 +36,7 @@ test('admin middleware includes verbose identity fields when auth debug logging 
         ->assertOk();
 
     Log::shouldHaveReceived('info')
-        ->with('AdminMiddleware checked request.', \Mockery::on(fn (array $context): bool => ($context['user_id'] ?? null) === $admin->id
+        ->with('AdminMiddleware checked request.', Mockery::on(fn (array $context): bool => ($context['user_id'] ?? null) === $admin->id
             && ($context['email'] ?? null) === 'admin-debug@example.test'
             && array_key_exists('roles', $context)))
         ->once();

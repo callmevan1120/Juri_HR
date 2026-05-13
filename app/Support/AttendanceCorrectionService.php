@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
+use App\Models\Setting;
 use App\Models\Shift;
 use App\Models\User;
 use App\Notifications\AttendanceCorrectionStatusUpdated;
@@ -111,7 +112,7 @@ class AttendanceCorrectionService
             $attendance->status = $this->resolvedStatus(
                 $attendance->time_in ? Carbon::parse($attendance->time_in) : null,
                 $correction->requestedShift ?? $attendance->shift,
-                (int) \App\Models\Setting::getValue('attendance.grace_period', 10),
+                (int) Setting::getValue('attendance.grace_period', 10),
                 $attendance->status,
             );
 

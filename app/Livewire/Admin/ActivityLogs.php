@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\ActivityLog;
 use App\Support\ImportExportRunViewService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -72,10 +73,10 @@ class ActivityLogs extends Component
                 });
             })
             ->when($this->dateStart, function ($query) {
-                $query->where('created_at', '>=', \Illuminate\Support\Carbon::parse($this->dateStart)->startOfDay());
+                $query->where('created_at', '>=', Carbon::parse($this->dateStart)->startOfDay());
             })
             ->when($this->dateEnd, function ($query) {
-                $query->where('created_at', '<=', \Illuminate\Support\Carbon::parse($this->dateEnd)->endOfDay());
+                $query->where('created_at', '<=', Carbon::parse($this->dateEnd)->endOfDay());
             })
             ->latest()
             ->paginate(20);

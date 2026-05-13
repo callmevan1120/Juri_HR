@@ -2,6 +2,8 @@
 
 namespace App\Livewire\User;
 
+use App\Contracts\AttendanceServiceInterface;
+use App\Helpers\Editions;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Setting;
@@ -33,14 +35,14 @@ class HomeAttendanceStatus extends Component
     {
         $user = Auth::user();
         $today = now()->format('Y-m-d');
-        $attendanceLocked = \App\Helpers\Editions::attendanceLocked();
+        $attendanceLocked = Editions::attendanceLocked();
         $faceVerificationRequired = ! $attendanceLocked && filter_var(
             Setting::getValue('attendance.require_face_verification', true),
             FILTER_VALIDATE_BOOLEAN
         );
 
         // Check for mandatory face enrollment (Open Core Logic)
-        $service = app(\App\Contracts\AttendanceServiceInterface::class);
+        $service = app(AttendanceServiceInterface::class);
         $shouldRequireFaceEnrollment = ! $attendanceLocked && (
             filter_var(
                 Setting::getValue('attendance.require_face_enrollment', false),

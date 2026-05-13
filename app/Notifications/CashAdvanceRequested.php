@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\CashAdvance;
+use App\Models\User;
 use Illuminate\Notifications\Notification;
 
 class CashAdvanceRequested extends Notification
@@ -25,7 +26,7 @@ class CashAdvanceRequested extends Notification
 
         $url = route('home', absolute: false);
 
-        if ($notifiable instanceof \App\Models\User) {
+        if ($notifiable instanceof User) {
             if ($notifiable->can('manageCashAdvances')) {
                 $url = route('admin.manage-kasbon', absolute: false);
             } elseif ($notifiable->can('reviewSubordinateRequests')) {

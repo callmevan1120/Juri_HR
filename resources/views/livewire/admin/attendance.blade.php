@@ -208,7 +208,7 @@
     <!-- Content -->
     <x-admin.panel>
         <!-- Desktop Table -->
-        <div class="hidden lg:block overflow-x-auto">
+        <div class="hidden lg:block lg:overflow-x-auto">
             <table class="w-full whitespace-nowrap text-left text-sm">
                 <thead class="bg-gray-50 text-gray-500 dark:bg-gray-700/50 dark:text-gray-400">
                     <tr>

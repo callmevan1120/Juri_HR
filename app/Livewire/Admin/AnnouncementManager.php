@@ -4,10 +4,13 @@ namespace App\Livewire\Admin;
 
 use App\Events\AnnouncementsChanged;
 use App\Models\Announcement;
+use App\Models\User;
 use App\Support\AnnouncementRefresh;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -163,7 +166,7 @@ class AnnouncementManager extends Component
         $this->showStatusModal = true;
     }
 
-    #[\Livewire\Attributes\Computed]
+    #[Computed]
     public function acknowledgementStatus()
     {
         if (! $this->activeAnnouncementForStatus) {
@@ -176,7 +179,7 @@ class AnnouncementManager extends Component
         $dismissedAtMap = $announcement->dismissedByUsers->pluck('pivot.dismissed_at', 'id')->toArray();
 
         // Get all active users
-        $users = \App\Models\User::where('employment_status', \App\Models\User::EMPLOYMENT_STATUS_ACTIVE)->orderBy('name')->get();
+        $users = User::where('employment_status', User::EMPLOYMENT_STATUS_ACTIVE)->orderBy('name')->get();
 
         $acknowledged = [];
         $pending = [];
@@ -185,7 +188,7 @@ class AnnouncementManager extends Component
             if (in_array($user->id, $dismissedUserIds)) {
                 $acknowledged[] = [
                     'user' => $user,
-                    'dismissed_at' => \Carbon\Carbon::parse($dismissedAtMap[$user->id])->translatedFormat('d M Y H:i'),
+                    'dismissed_at' => Carbon::parse($dismissedAtMap[$user->id])->translatedFormat('d M Y H:i'),
                 ];
             } else {
                 $pending[] = [
@@ -212,7 +215,7 @@ class AnnouncementManager extends Component
 
     public function render()
     {
-        $totalActiveUsers = \App\Models\User::where('employment_status', \App\Models\User::EMPLOYMENT_STATUS_ACTIVE)->count();
+        $totalActiveUsers = User::where('employment_status', User::EMPLOYMENT_STATUS_ACTIVE)->count();
 
         return view('livewire.admin.announcement-manager', [
             'totalActiveUsers' => $totalActiveUsers,

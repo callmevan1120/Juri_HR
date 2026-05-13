@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\OvertimeRequest;
 use App\Models\Overtime;
 use App\Models\User;
 use Livewire\Livewire;
@@ -18,7 +19,7 @@ test('overtime request blocks overlapping pending or approved requests', functio
         'status' => 'approved',
     ]);
 
-    Livewire::test(\App\Livewire\OvertimeRequest::class)
+    Livewire::test(OvertimeRequest::class)
         ->set('date', '2026-04-16')
         ->set('start_time', '19:00')
         ->set('end_time', '21:00')

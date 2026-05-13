@@ -346,7 +346,7 @@
             <h2 class="text-sm font-bold text-slate-950 dark:text-white">{{ __('Database Table Summary') }}</h2>
         </div>
         @if(! empty($health['tables']))
-            <div class="overflow-x-auto">
+            <div class="md:overflow-x-auto">
                 <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-900">
                         <tr>

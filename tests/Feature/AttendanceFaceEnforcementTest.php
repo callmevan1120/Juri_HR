@@ -1,6 +1,10 @@
 <?php
 
 use App\Contracts\AttendanceServiceInterface;
+use App\Helpers\Editions;
+use App\Livewire\Admin\Settings;
+use App\Livewire\HomeAttendanceStatus;
+use App\Livewire\ScanComponent;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Setting;
@@ -32,7 +36,7 @@ test('admin settings shows face verification as the single face id attendance to
     );
 
     Livewire::actingAs($admin)
-        ->test(\App\Livewire\Admin\Settings::class)
+        ->test(Settings::class)
         ->assertSee('attendance.require_face_verification')
         ->assertDontSee('attendance.require_face_enrollment');
 });
@@ -101,9 +105,9 @@ test('home attendance status ignores face enrollment setting when enterprise att
         public function removeFace(User $user): void {}
     });
 
-    expect(\App\Helpers\Editions::attendanceLocked())->toBeTrue();
+    expect(Editions::attendanceLocked())->toBeTrue();
 
-    Livewire::test(\App\Livewire\HomeAttendanceStatus::class)
+    Livewire::test(HomeAttendanceStatus::class)
         ->assertSet('requiresFaceEnrollment', false);
 });
 
@@ -144,9 +148,9 @@ test('scan component does not redirect to face enrollment when enterprise attend
         public function removeFace(User $user): void {}
     });
 
-    expect(\App\Helpers\Editions::attendanceLocked())->toBeTrue();
+    expect(Editions::attendanceLocked())->toBeTrue();
 
-    Livewire::test(\App\Livewire\ScanComponent::class)
+    Livewire::test(ScanComponent::class)
         ->assertNoRedirect();
 });
 
@@ -193,7 +197,7 @@ test('home attendance status requires face enrollment when face verification is 
         public function removeFace(User $user): void {}
     });
 
-    Livewire::test(\App\Livewire\HomeAttendanceStatus::class)
+    Livewire::test(HomeAttendanceStatus::class)
         ->assertSet('requiresFaceEnrollment', true);
 });
 
@@ -240,7 +244,7 @@ test('scan component redirects to face enrollment when face verification is enab
         public function removeFace(User $user): void {}
     });
 
-    Livewire::test(\App\Livewire\ScanComponent::class)
+    Livewire::test(ScanComponent::class)
         ->assertRedirect(route('face.enrollment'));
 });
 
@@ -258,7 +262,7 @@ test('home attendance status ignores pending overtime for active overtime label'
         'status' => 'pending',
     ]);
 
-    Livewire::test(\App\Livewire\HomeAttendanceStatus::class)
+    Livewire::test(HomeAttendanceStatus::class)
         ->assertSet('hasApprovedOvertime', false);
 });
 
@@ -276,6 +280,6 @@ test('home attendance status keeps approved overtime for active overtime label',
         'status' => 'approved',
     ]);
 
-    Livewire::test(\App\Livewire\HomeAttendanceStatus::class)
+    Livewire::test(HomeAttendanceStatus::class)
         ->assertSet('hasApprovedOvertime', true);
 });

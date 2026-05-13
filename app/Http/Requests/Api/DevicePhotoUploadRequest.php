@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Support\SecureUploadPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 
 class DevicePhotoUploadRequest extends FormRequest
@@ -17,7 +18,7 @@ class DevicePhotoUploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'photo' => ['required', ...app(\App\Support\SecureUploadPolicy::class)->rules('image')],
+            'photo' => ['required', ...app(SecureUploadPolicy::class)->rules('image')],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];

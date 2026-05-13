@@ -15,7 +15,7 @@ use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Jetstream;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {

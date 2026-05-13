@@ -8,7 +8,9 @@ use App\Models\User;
 use App\Notifications\CashAdvanceUpdated;
 use App\Notifications\CashAdvanceUpdatedEmail;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class CashAdvanceApprovalService
 {
@@ -114,7 +116,7 @@ class CashAdvanceApprovalService
     }
 
     /**
-     * @return array{advances: \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection, userGrouped: \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection}
+     * @return array{advances: LengthAwarePaginator|Collection, userGrouped: LengthAwarePaginator|Collection}
      */
     public function managementViewData(User $user, string $activeTab, string $statusFilter = 'all', string $search = ''): array
     {

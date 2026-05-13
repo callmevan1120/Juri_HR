@@ -7,6 +7,7 @@ use App\Models\ImportExportRun;
 use App\Models\Shift;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
@@ -42,7 +43,7 @@ class AttendancesImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, With
     ) {}
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function model(array $row)
     {

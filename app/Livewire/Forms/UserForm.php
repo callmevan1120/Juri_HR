@@ -4,7 +4,9 @@ namespace App\Livewire\Forms;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Support\SecureUploadPolicy;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -110,7 +112,7 @@ class UserForm extends Form
                     }
                 },
             ],
-            'photo' => ['nullable', ...app(\App\Support\SecureUploadPolicy::class)->rules('image')],
+            'photo' => ['nullable', ...app(SecureUploadPolicy::class)->rules('image')],
             'basic_salary' => ['nullable', 'numeric', 'min:0'],
             'hourly_rate' => ['nullable', 'numeric', 'min:0'],
             'employment_status' => ['required', 'string', Rule::in(array_keys(User::employmentStatuses()))],
@@ -145,7 +147,7 @@ class UserForm extends Form
         $this->kelurahan_kode = $user->kelurahan_kode;
         $this->group = $user->group;
         $this->birth_date = $user->birth_date
-            ? \Illuminate\Support\Carbon::parse($user->birth_date)->format('Y-m-d')
+            ? Carbon::parse($user->birth_date)->format('Y-m-d')
             : null;
         $this->birth_place = $user->birth_place;
         $this->division_id = $user->division_id;
@@ -216,7 +218,7 @@ class UserForm extends Form
 
         // Demo User Protection: Cannot update password of Demo User
         if ($this->user->is_demo && $this->password) {
-            $this->addError('password', 'Demo user password cannot be changed.');
+            $this->addError('password', __('Demo user password cannot be changed.'));
 
             return;
         }
