@@ -15,11 +15,14 @@ Route::get('/user', function (Request $request) {
 })->middleware(['auth:sanctum', 'throttle:api']);
 
 // Wilayah Data Endpoints
-Route::prefix('wilayah')->middleware('throttle:api')->group(function () {
+Route::prefix('wilayah')->middleware('throttle:wilayah')->group(function () {
     Route::get('/provinces', [WilayahController::class, 'provinces']);
-    Route::get('/regencies/{provinceCode}', [WilayahController::class, 'regencies']);
-    Route::get('/districts/{regencyCode}', [WilayahController::class, 'districts']);
-    Route::get('/villages/{districtCode}', [WilayahController::class, 'villages']);
+    Route::get('/regencies/{provinceCode}', [WilayahController::class, 'regencies'])
+        ->where('provinceCode', '[0-9]{2}');
+    Route::get('/districts/{regencyCode}', [WilayahController::class, 'districts'])
+        ->where('regencyCode', '[0-9]{2}\.[0-9]{2}');
+    Route::get('/villages/{districtCode}', [WilayahController::class, 'villages'])
+        ->where('districtCode', '[0-9]{2}\.[0-9]{2}\.[0-9]{2}');
 });
 
 // Capacitor Device API Routes

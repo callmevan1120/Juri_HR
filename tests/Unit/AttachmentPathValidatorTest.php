@@ -15,5 +15,7 @@ test('attachment path validator rejects traversal absolute and remote paths', fu
     expect($validator->isSafeRelativePath('../secret.txt'))->toBeFalse()
         ->and($validator->isSafeRelativePath('/etc/passwd'))->toBeFalse()
         ->and($validator->isSafeRelativePath('https://example.com/file.jpg'))->toBeFalse()
-        ->and($validator->isSafeRelativePath('C:\\temp\\file.jpg'))->toBeFalse();
+        ->and($validator->isSafeRelativePath('C:\\temp\\file.jpg'))->toBeFalse()
+        ->and($validator->isSafeRelativePath('attendance_photos\\2026\\proof.jpg'))->toBeFalse()
+        ->and($validator->isSafeRelativePath("attendance_photos/2026/proof.jpg\n"))->toBeFalse();
 });

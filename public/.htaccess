@@ -5,6 +5,11 @@
 
     RewriteEngine On
 
+    # Temporary and sensitive artifacts must be served through authorized
+    # Laravel routes, never as direct public files.
+    RewriteRule ^temp(/|$) - [F,L]
+    RewriteRule \.(sql|zip|tar|gz|tgz|bak|old)$ - [F,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

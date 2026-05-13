@@ -14,6 +14,12 @@ class DemoAssetSeeder extends Seeder
      */
     public function run(): void
     {
+        if ($this->runningProduction() && ! $this->demoSeedingEnabled()) {
+            $this->command?->warn('Skipping demo assets in production. Set DEMO_SEEDING_ENABLED=true only for staging/demo.');
+
+            return;
+        }
+
         // Find the demo user
         $demoUser = User::where('email', 'user123@paspapan.com')->first();
 
@@ -100,5 +106,15 @@ class DemoAssetSeeder extends Seeder
         }
 
         $this->command->info('Assets seeded for Demo User!');
+    }
+
+    private function demoSeedingEnabled(): bool
+    {
+        return filter_var(config('paspapan.demo_seeding_enabled', false), FILTER_VALIDATE_BOOL);
+    }
+
+    private function runningProduction(): bool
+    {
+        return app()->environment('production') || config('app.env') === 'production';
     }
 }

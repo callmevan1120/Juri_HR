@@ -79,8 +79,11 @@ class AdminBarcodeService
             $this->downloadableBarcodeValues($barcodes)->toArray()
         );
 
+        $content = file_get_contents($zipFile);
+        @unlink($zipFile);
+
         return [
-            'content' => file_get_contents($zipFile),
+            'content' => $content,
             'filename' => 'barcodes.zip',
         ];
     }

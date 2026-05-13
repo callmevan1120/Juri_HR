@@ -232,7 +232,8 @@ REVERB_SCHEME=https
 
 ### 10. Checklist
 
-- domain mengarah ke `public/`
+- domain/document root wajib mengarah ke `public/`, bukan root repo
+- root repo tidak boleh bisa diakses langsung dari web; proteksi `.htaccess` hanya fallback, bukan kontrol utama
 - `storage/` dan `bootstrap/cache/` writable
 - migration terbaru sudah dijalankan, termasuk tabel HR Checklist
 - queue worker berjalan
@@ -354,7 +355,7 @@ Konfigurasi saat ini:
 ```json
 {
   "routes": [
-    { "src": "/(build|assets|js|models|temp)/(.*)", "dest": "/public/$1/$2" },
+    { "src": "/(build|assets|js|models)/(.*)", "dest": "/public/$1/$2" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }
@@ -479,4 +480,3 @@ Jika attachment perlu persisten di Vercel, pindahkan storage ke S3-compatible ob
 Enterprise packaging memakai tool internal di `secure_tools/` yang tidak dipublikasikan sebagai source OSS. Sebelum rilis enterprise, maintainer internal menjalankan obfuscator private, memastikan `ENTERPRISE_OBFUSCATOR_KEY` yang sama tersedia di build dan runtime, lalu hanya artifact obfuscated yang didistribusikan.
 
 Source audit OSS tetap harus bebas dari build cache, vendor, `node_modules`, dan generated artifact.
-

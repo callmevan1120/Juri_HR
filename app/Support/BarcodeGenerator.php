@@ -48,11 +48,11 @@ class BarcodeGenerator
     public function generateQrCodesZip(array $values)
     {
         $zip = new \ZipArchive;
-        $dir = public_path('temp');
+        $dir = storage_path('app/private/temp');
         if (! file_exists($dir)) {
             mkdir($dir, recursive: true);
         }
-        $zipFile = public_path('temp/barcodes.zip');
+        $zipFile = $dir.'/barcodes-'.bin2hex(random_bytes(8)).'.zip';
         $zip->open($zipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         $usedNames = [];
         foreach ($values as $name => $value) {

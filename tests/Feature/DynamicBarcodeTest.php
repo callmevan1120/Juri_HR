@@ -261,7 +261,41 @@ test('admin can fetch dynamic barcode token payload', function () {
             'data' => ['token', 'issued_at', 'expires_at', 'ttl_seconds', 'configured_ttl_seconds', 'grace_seconds', 'refresh_in_seconds'],
         ]);
 
-    expect($response->headers->get('Cache-Control'))->toContain('no-store');
+    expect($response->headers->get('Cache-Control'))
+        ->toContain('no-store')
+        ->toContain('private')
+        ->and($response->headers->get('Pragma'))->toBe('no-cache')
+        ->and($response->headers->get('Expires'))->toBe('0');
+});
+
+test('dynamic barcode token requires barcode management permission and is not cacheable', function () {
+    $user = User::factory()->create();
+    $barcode = Barcode::factory()->create([
+        'value' => 'CHK-DYNAMIC-PERMISSION',
+        'secret_key' => Str::random(64),
+        'dynamic_enabled' => true,
+        'dynamic_ttl_seconds' => 60,
+    ]);
+
+    $this
+        ->actingAs($user)
+        ->getJson(route('admin.barcodes.dynamic-token', $barcode))
+        ->assertForbidden();
+
+    $admin = User::factory()->admin()->create();
+
+    $response = $this
+        ->actingAs($admin)
+        ->get(route('admin.barcodes.dynamic-display', $barcode))
+        ->assertOk()
+        ->assertHeader('Pragma', 'no-cache')
+        ->assertHeader('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
+
+    expect($response->headers->get('Cache-Control'))
+        ->toContain('no-store')
+        ->toContain('no-cache')
+        ->toContain('must-revalidate')
+        ->toContain('private');
 });
 
 test('admin barcode validation rejects invalid coordinates and radius', function () {

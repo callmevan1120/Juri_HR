@@ -14,6 +14,12 @@ class AttendanceSeeder extends Seeder
      */
     public function run(): void
     {
+        if ($this->runningProduction() && ! $this->demoSeedingEnabled()) {
+            $this->command?->warn('Skipping generated attendance demo data in production. Set DEMO_SEEDING_ENABLED=true only for staging/demo.');
+
+            return;
+        }
+
         $start = Carbon::now()->subDays(131);
         $end = Carbon::now();
         $dates = $start->range($end)->toArray();
@@ -52,5 +58,15 @@ class AttendanceSeeder extends Seeder
                 }
             }
         }
+    }
+
+    private function demoSeedingEnabled(): bool
+    {
+        return filter_var(config('paspapan.demo_seeding_enabled', false), FILTER_VALIDATE_BOOL);
+    }
+
+    private function runningProduction(): bool
+    {
+        return app()->environment('production') || config('app.env') === 'production';
     }
 }

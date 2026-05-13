@@ -21,6 +21,12 @@ class FakeDataSeeder extends Seeder
      */
     public function run(): void
     {
+        if ($this->runningProduction() && ! $this->demoSeedingEnabled()) {
+            $this->command?->warn('Skipping fake demo employee data in production. Set DEMO_SEEDING_ENABLED=true only for staging/demo.');
+
+            return;
+        }
+
         $divisions = Division::query()->orderBy('name')->get();
         $jobTitles = JobTitle::query()->with('jobLevel')->get()->keyBy('name');
         $staffTitle = $jobTitles->get('Staff');
@@ -114,6 +120,16 @@ class FakeDataSeeder extends Seeder
             AttendanceSeeder::class,
             DemoAssetSeeder::class,
         ]);
+    }
+
+    private function demoSeedingEnabled(): bool
+    {
+        return filter_var(config('paspapan.demo_seeding_enabled', false), FILTER_VALIDATE_BOOL);
+    }
+
+    private function runningProduction(): bool
+    {
+        return app()->environment('production') || config('app.env') === 'production';
     }
 
     private function upsertEmployee(

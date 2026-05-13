@@ -106,7 +106,9 @@ For production deployments, at minimum:
 - keep `APP_KEY` secret and unique per installation
 - rotate credentials for mail, database, and admin accounts
 - point the web root to Laravel `public/`
+- never expose the repository root as the document root; `.htaccess` blocks are a defense-in-depth fallback only
 - ensure `storage/` and `bootstrap/cache/` are writable but not publicly exposed
+- set `SESSION_SECURE_COOKIE=true`, `SESSION_HTTP_ONLY=true`, `SESSION_SAME_SITE=lax` or `strict`, and `SESSION_ENCRYPT=true` after compatibility testing
 - run queue workers under a controlled service manager
 - install cron for `php artisan schedule:run`
 - keep Composer dependencies updated
@@ -135,10 +137,13 @@ A production environment should never expose backup artifacts through the public
 
 This codebase contains demo and bootstrap account behavior in migrations and seeders for evaluation workflows. Before public launch:
 
+- keep `DEMO_SEEDING_ENABLED=false` and `BOOTSTRAP_ADMIN_SEEDING_ENABLED=false` in production unless an operator intentionally creates a throwaway staging dataset
 - audit all existing users
 - remove demo users that should not exist
 - rotate passwords
 - avoid blind use of `--seed` in production
+
+Demo credentials are intentionally not published in repository documentation. Demo accounts must be provisioned out-of-band for local or staging environments only.
 
 ## Dependency and Release Hygiene
 

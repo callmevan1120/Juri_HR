@@ -18,8 +18,10 @@ class HrChecklistTaskAttachmentController extends Controller
         abort_unless($validator->isSafeRelativePath($path), 404);
         abort_unless(Storage::disk('local')->exists($path), 404);
 
-        $name = $task->attachment_original_name ?: basename($path);
+        $name = basename((string) ($task->attachment_original_name ?: basename($path)));
 
-        return Storage::disk('local')->download($path, $name);
+        return Storage::disk('local')->download($path, $name, [
+            'Content-Type' => 'application/octet-stream',
+        ]);
     }
 }

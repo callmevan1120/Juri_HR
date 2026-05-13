@@ -17,7 +17,7 @@ class DeviceBarcodeScanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'barcode_data' => ['required', 'string'],
+            'barcode_data' => ['required', 'string', 'max:2048'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'timestamp' => ['nullable', 'date_format:Y-m-d H:i:s'],

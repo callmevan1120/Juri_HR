@@ -267,12 +267,13 @@ Link akses:
 - Demo Vercel: [paspapan.vercel.app](https://paspapan.vercel.app)
 - Demo produksi: [paspapan.pandanteknik.com](https://paspapan.pandanteknik.com)
 
+Akun demo:
 | Role | Email Login | Password |
 | --- | --- | --- |
 | Admin | `admin123@paspapan.com` | `12345678` |
 | User | `user123@paspapan.com` | `12345678` |
 
-Anggap kredensial ini hanya untuk demo, bukan kredensial produksi. Demo Vercel berjalan di runtime serverless, sehingga fitur yang bergantung pada worker/background job panjang, storage lokal permanen, atau proses realtime long-running lebih cocok diuji di deployment VPS/shared hosting.
+Akun demo hanya boleh dipakai untuk environment lokal/staging yang sengaja disiapkan oleh operator. Kredensial demo tidak dipublikasikan di README dan tidak boleh digunakan ulang sebagai kredensial produksi. Demo Vercel berjalan di runtime serverless, sehingga fitur yang bergantung pada worker/background job panjang, storage lokal permanen, atau proses realtime long-running lebih cocok diuji di deployment VPS/shared hosting.
 
 ## Dukung Pengembangan
 
@@ -285,4 +286,4 @@ Kalau project ini membantu tim Anda dan Anda ingin mendukung pengembangannya, si
 
 ## Kredit
 
-Berangkat dari fondasi open source yang diprakarsai oleh [Ikhsan3adi](https://github.com/ikhsan3adi), lalu diperluas dan diarahkan ulang ke bentuk produk saat ini oleh [RiprLutuk](https://github.com/RiprLutuk).
+[RiprLutuk](https://github.com/RiprLutuk).

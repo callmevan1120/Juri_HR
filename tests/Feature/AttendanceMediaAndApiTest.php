@@ -279,6 +279,23 @@ test('device photo api stores attendance photo in attachment payload', function 
         ->and($attendance->longitude_in)->toBe(106.8);
 });
 
+test('device photo api rejects dangerous double extension and oversized uploads', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user, deviceApiAbilities());
+
+    $this->post('/api/device/photo', [
+        'photo' => UploadedFile::fake()->create('photo.php.jpg', 10, 'image/jpeg'),
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+    ])->assertInvalid(['photo']);
+
+    $this->post('/api/device/photo', [
+        'photo' => UploadedFile::fake()->image('too-large.jpg')->size(6 * 1024),
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+    ])->assertInvalid(['photo']);
+});
+
 test('device barcode api rejects tokens without barcode ability', function () {
     $user = User::factory()->create();
     $barcode = Barcode::factory()->create([

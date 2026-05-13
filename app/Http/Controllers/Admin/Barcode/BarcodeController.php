@@ -124,10 +124,10 @@ class BarcodeController extends Controller
                 ->with('flash.bannerStyle', 'danger');
         }
 
-        return view('admin.barcodes.dynamic-display', [
+        return response()->view('admin.barcodes.dynamic-display', [
             'barcode' => $barcode,
             'tokenPayload' => $dynamicBarcodeTokenService->generateTokenPayload($barcode),
-        ]);
+        ])->withHeaders($this->noStoreHeaders());
     }
 
     public function dynamicToken(Barcode $barcode, DynamicBarcodeTokenService $dynamicBarcodeTokenService)
@@ -136,10 +136,7 @@ class BarcodeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => __('Dynamic barcode mode is disabled for this checkpoint.'),
-            ], 422)->withHeaders([
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                'Pragma' => 'no-cache',
-            ]);
+            ], 422)->withHeaders($this->noStoreHeaders());
         }
 
         return response()->json([
@@ -150,10 +147,7 @@ class BarcodeController extends Controller
                 'radius' => $barcode->radius,
             ],
             'data' => $dynamicBarcodeTokenService->generateTokenPayload($barcode),
-        ])->withHeaders([
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-        ]);
+        ])->withHeaders($this->noStoreHeaders());
     }
 
     public function regenerateSecret(Barcode $barcode, AdminBarcodeService $barcodeService)
@@ -167,5 +161,14 @@ class BarcodeController extends Controller
         return redirect($targetRoute)
             ->with('flash.banner', __('Barcode secret regenerated successfully. Any previously displayed dynamic QR is now invalid.'))
             ->with('flash.bannerStyle', 'success');
+    }
+
+    private function noStoreHeaders(): array
+    {
+        return [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, private, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ];
     }
 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Wilayah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rule;
 
 class WilayahController extends Controller
 {
@@ -13,15 +15,13 @@ class WilayahController extends Controller
      */
     public function provinces(Request $request)
     {
-        $search = $request->input('search');
+        $search = $this->validatedSearch($request);
 
-        $query = Wilayah::whereRaw('LENGTH(kode) = 2');
+        return response()->json($this->remember('provinces', null, $search, function () use ($search) {
+            $query = Wilayah::whereRaw('LENGTH(kode) = 2');
 
-        if ($search) {
-            $query->where('nama', 'like', "%{$search}%");
-        }
-
-        return response()->json($query->orderBy('nama')->get());
+            return $this->applySearch($query, $search)->orderBy('nama')->get();
+        }));
     }
 
     /**
@@ -29,16 +29,16 @@ class WilayahController extends Controller
      */
     public function regencies(Request $request, $provinceCode)
     {
-        $search = $request->input('search');
+        abort_unless(preg_match('/^\d{2}$/', (string) $provinceCode) === 1, 404);
 
-        $query = Wilayah::where('kode', 'like', "{$provinceCode}.%")
-            ->whereRaw('LENGTH(kode) = 5');
+        $search = $this->validatedSearch($request);
 
-        if ($search) {
-            $query->where('nama', 'like', "%{$search}%");
-        }
+        return response()->json($this->remember('regencies', $provinceCode, $search, function () use ($provinceCode, $search) {
+            $query = Wilayah::where('kode', 'like', "{$provinceCode}.%")
+                ->whereRaw('LENGTH(kode) = 5');
 
-        return response()->json($query->orderBy('nama')->get());
+            return $this->applySearch($query, $search)->orderBy('nama')->get();
+        }));
     }
 
     /**
@@ -46,16 +46,16 @@ class WilayahController extends Controller
      */
     public function districts(Request $request, $regencyCode)
     {
-        $search = $request->input('search');
+        abort_unless(preg_match('/^\d{2}\.\d{2}$/', (string) $regencyCode) === 1, 404);
 
-        $query = Wilayah::where('kode', 'like', "{$regencyCode}.%")
-            ->whereRaw('LENGTH(kode) = 8');
+        $search = $this->validatedSearch($request);
 
-        if ($search) {
-            $query->where('nama', 'like', "%{$search}%");
-        }
+        return response()->json($this->remember('districts', $regencyCode, $search, function () use ($regencyCode, $search) {
+            $query = Wilayah::where('kode', 'like', "{$regencyCode}.%")
+                ->whereRaw('LENGTH(kode) = 8');
 
-        return response()->json($query->orderBy('nama')->get());
+            return $this->applySearch($query, $search)->orderBy('nama')->get();
+        }));
     }
 
     /**
@@ -63,15 +63,44 @@ class WilayahController extends Controller
      */
     public function villages(Request $request, $districtCode)
     {
-        $search = $request->input('search');
+        abort_unless(preg_match('/^\d{2}\.\d{2}\.\d{2}$/', (string) $districtCode) === 1, 404);
 
-        $query = Wilayah::where('kode', 'like', "{$districtCode}.%")
-            ->whereRaw('LENGTH(kode) = 13');
+        $search = $this->validatedSearch($request);
 
-        if ($search) {
-            $query->where('nama', 'like', "%{$search}%");
+        return response()->json($this->remember('villages', $districtCode, $search, function () use ($districtCode, $search) {
+            $query = Wilayah::where('kode', 'like', "{$districtCode}.%")
+                ->whereRaw('LENGTH(kode) = 13');
+
+            return $this->applySearch($query, $search)->orderBy('nama')->get();
+        }));
+    }
+
+    private function validatedSearch(Request $request): ?string
+    {
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:80', Rule::notIn(['%', '%%', '_'])],
+        ]);
+
+        $search = trim((string) ($validated['search'] ?? ''));
+
+        return $search !== '' ? $search : null;
+    }
+
+    private function applySearch($query, ?string $search)
+    {
+        if ($search !== null) {
+            $query->where('nama', 'like', '%'.addcslashes($search, '%_\\').'%');
         }
 
-        return response()->json($query->orderBy('nama')->get());
+        return $query;
+    }
+
+    private function remember(string $scope, ?string $code, ?string $search, \Closure $callback)
+    {
+        return Cache::remember(
+            'wilayah:'.implode(':', [$scope, $code ?: 'all', sha1((string) $search)]),
+            now()->addDay(),
+            $callback
+        );
     }
 }
