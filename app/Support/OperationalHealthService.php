@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Helpers\Editions;
+use App\Models\ImportExportRun;
 use App\Models\SystemBackupRun;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -24,6 +25,7 @@ class OperationalHealthService
         $schedulerHeartbeat = Cache::get('health:scheduler_heartbeat_at') ?? Cache::get('scheduler:last_run');
         $failedJobsCount = $this->failedJobsCount();
         $diskFreeBytes = $this->diskFreeBytes();
+        $diskTotalBytes = $this->diskTotalBytes();
         $alerts = $this->alerts($database, $backup, $queueHeartbeat, $schedulerHeartbeat, $failedJobsCount, $diskFreeBytes, $storageWritable);
 
         return [
@@ -31,16 +33,26 @@ class OperationalHealthService
             'app_version' => $this->appVersion(),
             'database' => $database,
             'failed_jobs_count' => $failedJobsCount,
+            'queue_backlog_count' => $this->queueBacklogCount(),
             'queue_heartbeat_at' => $queueHeartbeat,
             'scheduler_heartbeat_at' => $schedulerHeartbeat,
             'backup' => $backup,
             'backup_last_success_at' => $backup['last_success_at'],
             'storage_writable' => $storageWritable,
             'disk_free_bytes' => $diskFreeBytes,
+            'disk_total_bytes' => $diskTotalBytes,
             'disk_free_human' => $this->formatBytes($diskFreeBytes),
+            'disk_total_human' => $this->formatBytes($diskTotalBytes),
+            'disk_used_percent' => $this->diskUsedPercent($diskFreeBytes, $diskTotalBytes),
             'cache_driver' => config('cache.default'),
             'session_driver' => config('session.driver'),
             'queue_connection' => config('queue.default'),
+            'php_version' => PHP_VERSION,
+            'database_driver' => DB::connection()->getDriverName(),
+            'database_version' => $this->databaseVersion(),
+            'hr_compliance' => app(HrComplianceReminderService::class)->summary(),
+            'import_export' => $this->importExportHealth(),
+            'tables' => $this->tableSummary(),
             'scheduler_last_run' => $schedulerHeartbeat,
             'alerts' => $alerts,
             'license' => [
@@ -84,6 +96,13 @@ class OperationalHealthService
     {
         return Schema::hasTable('failed_jobs')
             ? DB::table('failed_jobs')->count()
+            : 0;
+    }
+
+    protected function queueBacklogCount(): int
+    {
+        return Schema::hasTable('jobs')
+            ? DB::table('jobs')->count()
             : 0;
     }
 
@@ -222,6 +241,22 @@ class OperationalHealthService
         return is_float($free) ? (int) $free : 0;
     }
 
+    protected function diskTotalBytes(): int
+    {
+        $total = @disk_total_space(storage_path('app'));
+
+        return is_float($total) ? (int) $total : 0;
+    }
+
+    protected function diskUsedPercent(int $freeBytes, int $totalBytes): ?int
+    {
+        if ($freeBytes <= 0 || $totalBytes <= 0) {
+            return null;
+        }
+
+        return (int) round((1 - ($freeBytes / $totalBytes)) * 100);
+    }
+
     protected function formatBytes(int $bytes): string
     {
         if ($bytes <= 0) {
@@ -245,5 +280,76 @@ class OperationalHealthService
         $package = json_decode((string) file_get_contents($packagePath), true);
 
         return (string) ($package['version'] ?? config('app.version', 'unknown'));
+    }
+
+    protected function databaseVersion(): string
+    {
+        try {
+            $result = DB::select('select version() as version');
+            $version = $result[0]->version ?? null;
+
+            return is_string($version) ? $version : 'unknown';
+        } catch (\Throwable) {
+            return 'unknown';
+        }
+    }
+
+    /**
+     * @return array{queued:int,running:int,failed:int,last_completed_at:mixed}
+     */
+    protected function importExportHealth(): array
+    {
+        if (! Schema::hasTable('import_export_runs')) {
+            return [
+                'queued' => 0,
+                'running' => 0,
+                'failed' => 0,
+                'last_completed_at' => null,
+            ];
+        }
+
+        return [
+            'queued' => ImportExportRun::query()->where('status', 'queued')->count(),
+            'running' => ImportExportRun::query()->where('status', 'running')->count(),
+            'failed' => ImportExportRun::query()->where('status', 'failed')->count(),
+            'last_completed_at' => ImportExportRun::query()
+                ->where('status', 'completed')
+                ->latest('completed_at')
+                ->value('completed_at'),
+        ];
+    }
+
+    /**
+     * @return array<int, array{name:string,rows:int|null,size:string}>
+     */
+    protected function tableSummary(): array
+    {
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            return [];
+        }
+
+        try {
+            $database = DB::connection()->getDatabaseName();
+            $rows = DB::select(
+                'select table_name, table_rows, data_length + index_length as total_bytes
+                from information_schema.tables
+                where table_schema = ?
+                order by total_bytes desc
+                limit 5',
+                [$database]
+            );
+
+            return collect($rows)
+                ->map(fn (object $row): array => [
+                    'name' => (string) ($row->table_name ?? ''),
+                    'rows' => isset($row->table_rows) ? (int) $row->table_rows : null,
+                    'size' => $this->formatBytes((int) ($row->total_bytes ?? 0)),
+                ])
+                ->filter(fn (array $row): bool => $row['name'] !== '')
+                ->values()
+                ->all();
+        } catch (\Throwable) {
+            return [];
+        }
     }
 }

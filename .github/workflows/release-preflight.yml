@@ -1,0 +1,39 @@
+name: Release Preflight
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Expected release version, for example 4.3.0"
+        required: true
+
+jobs:
+  preflight:
+    name: Version and checklist preflight
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Verify release checklist exists
+        run: test -f RELEASE_CHECKLIST.md
+
+      - name: Verify version references
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          test "$(php -r 'echo json_decode(file_get_contents("package.json"), true)["version"] ?? "";')" = "${VERSION}"
+          grep -q "v${VERSION}" README.md
+          grep -q "versionName \"${VERSION}\"" android/app/build.gradle
+
+      - name: Build APK checksum placeholder
+        run: |
+          echo "Build APK on the release runner, then attach the APK and checksum to the GitHub Release."

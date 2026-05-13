@@ -32,7 +32,7 @@ Fokus utama aplikasi:
 - wrapper Android berbasis Capacitor untuk kebutuhan APK
 - modul enterprise-gated untuk fitur lanjutan tertentu
 
-Detail fitur lengkap ada di [guides/features.md](./guides/features.md).
+Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Coverage roadmap menuju 10/10 ada di [guides/roadmap-10-coverage.md](./guides/roadmap-10-coverage.md). Checklist rilis publik tersedia di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
 
 ## Stack
 
@@ -54,6 +54,7 @@ Runtime default aplikasi database-centric:
 - `CACHE_STORE=database`
 - `SESSION_DRIVER=database`
 - `FILESYSTEM_DISK=local`
+- `FILESYSTEM_ATTACHMENT_DISKS=local`
 - realtime announcement hybrid: shared hosting memakai fallback polling ringan, VPS bisa memakai Reverb WebSocket
 - timezone `Asia/Jakarta`
 - locale `id`

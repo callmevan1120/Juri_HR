@@ -175,7 +175,7 @@
             'type' => 'group',
             'id' => 'system',
             'label' => __('System'),
-            'active' => $isRouteActive(['admin.settings', 'admin.settings.kpi', 'admin.system-maintenance', 'admin.reports.*', 'admin.import-export.*', 'admin.activity-logs', 'admin.roles.permissions']),
+            'active' => $isRouteActive(['admin.settings', 'admin.settings.kpi', 'admin.system-maintenance', 'admin.operational-health', 'admin.reports.*', 'admin.import-export.*', 'admin.activity-logs', 'admin.roles.permissions']),
             'items' => array_values(array_filter([
                 ['type' => 'link', 'label' => __('App Settings'), 'href' => route('admin.settings'), 'active' => $isRouteActive('admin.settings'), 'visible' => $can('viewAdminSettings')],
                 [
@@ -190,6 +190,9 @@
                 ],
                 $can('viewAny', \App\Models\SystemBackupRun::class)
                     ? ['type' => 'link', 'label' => __('Maintenance'), 'href' => route('admin.system-maintenance'), 'active' => $isRouteActive('admin.system-maintenance')]
+                    : null,
+                $can('viewAny', \App\Models\SystemBackupRun::class)
+                    ? ['type' => 'link', 'label' => __('Operational Health'), 'href' => route('admin.operational-health'), 'active' => $isRouteActive('admin.operational-health')]
                     : null,
                 ['type' => 'divider'],
                 ['type' => 'heading', 'label' => __('Data Management')],

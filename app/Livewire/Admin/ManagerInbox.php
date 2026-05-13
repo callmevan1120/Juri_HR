@@ -32,6 +32,9 @@ class ManagerInbox extends Component
     #[Url(history: true)]
     public string $activeTab = 'leaves';
 
+    #[Url(history: true)]
+    public string $statusFilter = 'pending';
+
     public string $search = '';
 
     public ?int $selectedId = null;
@@ -106,6 +109,16 @@ class ManagerInbox extends Component
         $this->rejectionReason = '';
     }
 
+    public function setStatusFilter(string $filter): void
+    {
+        if (! in_array($filter, ['pending', 'overdue'], true)) {
+            return;
+        }
+
+        $this->statusFilter = $filter;
+        $this->resetPage();
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -123,6 +136,22 @@ class ManagerInbox extends Component
         $user = Auth::user();
 
         return $user instanceof User ? $this->inboxService->accessibleTabs($user) : [];
+    }
+
+    public function getOverdueCountsProperty(): array
+    {
+        $user = Auth::user();
+
+        return $user instanceof User ? $this->inboxService->getOverdueCounts($user) : [];
+    }
+
+    public function getSummaryProperty(): array
+    {
+        $user = Auth::user();
+
+        return $user instanceof User
+            ? $this->inboxService->getSummary($user)
+            : ['pending' => 0, 'overdue' => 0, 'workflows' => 0];
     }
 
     // --- Approvals ---
@@ -249,50 +278,57 @@ class ManagerInbox extends Component
 
         $search = $withSearch ? trim($this->search) : '';
         $searchClosure = fn (Builder $query) => $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('name', 'like', '%'.$search.'%'));
+        $overdueAt = now()->subDays(ManagerInboxService::OVERDUE_AFTER_DAYS);
+        $overdueClosure = fn (Builder $query) => $query->where('created_at', '<=', $overdueAt);
+        $applyInboxFilters = function (Builder $query) use ($search, $searchClosure, $overdueClosure): Builder {
+            return $query
+                ->when($search !== '', $searchClosure)
+                ->when($this->statusFilter === 'overdue', $overdueClosure);
+        };
 
         return match ($this->activeTab) {
             'overtime' => Overtime::query()
                 ->with('user')
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
                 ->where('status', 'pending')
-                ->when($search !== '', $searchClosure)
+                ->tap($applyInboxFilters)
                 ->latest(),
             'attendance_corrections' => AttendanceCorrection::query()
                 ->with(['user', 'requestedShift'])
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
                 ->whereIn('status', [AttendanceCorrection::STATUS_PENDING, AttendanceCorrection::STATUS_PENDING_ADMIN])
-                ->when($search !== '', $searchClosure)
+                ->tap($applyInboxFilters)
                 ->latest(),
             'reimbursements' => Reimbursement::query()
                 ->with('user')
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
                 ->where('status', 'pending')
-                ->when($search !== '', $searchClosure)
+                ->tap($applyInboxFilters)
                 ->latest(),
             'cash_advances' => CashAdvance::query()
                 ->with('user')
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
                 ->where('status', 'pending')
-                ->when($search !== '', $searchClosure)
+                ->tap($applyInboxFilters)
                 ->latest(),
             'shift_swaps' => ShiftSwapRequest::query()
                 ->with(['user', 'schedule.shift', 'requestedShift'])
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
                 ->where('status', ShiftSwapRequest::STATUS_PENDING)
-                ->when($search !== '', $searchClosure)
+                ->tap($applyInboxFilters)
                 ->latest(),
             'document_requests' => EmployeeDocumentRequest::query()
                 ->with('user')
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
                 ->whereIn('status', [EmployeeDocumentRequest::STATUS_PENDING, EmployeeDocumentRequest::STATUS_REQUESTED])
-                ->when($search !== '', $searchClosure)
+                ->tap($applyInboxFilters)
                 ->latest(),
             'leaves' => Attendance::query()
                 ->with(['user', 'leaveType'])
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
                 ->where('approval_status', 'pending')
                 ->whereNotNull('leave_type_id')
-                ->when($search !== '', $searchClosure)
+                ->tap($applyInboxFilters)
                 ->latest(),
             default => abort(403, 'Unauthorized action.'),
         };
@@ -309,6 +345,7 @@ class ManagerInbox extends Component
         return view('livewire.admin.manager-inbox', [
             'availableTabs' => $this->tabs,
             'items' => $this->itemsQuery($admin)->paginate(15),
+            'overdueAfterDays' => ManagerInboxService::OVERDUE_AFTER_DAYS,
         ]);
     }
 }

@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ManagerInboxService
 {
+    public const OVERDUE_AFTER_DAYS = 2;
+
     /**
      * @return list<string>
      */
@@ -58,43 +60,82 @@ class ManagerInboxService
      */
     public function getPendingCounts(User $admin): array
     {
+        return $this->getScopedCounts($admin);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function getOverdueCounts(User $admin): array
+    {
+        return $this->getScopedCounts($admin, overdueOnly: true);
+    }
+
+    /**
+     * @return array{pending:int,overdue:int,workflows:int}
+     */
+    public function getSummary(User $admin): array
+    {
+        $pending = $this->getPendingCounts($admin);
+        $overdue = $this->getOverdueCounts($admin);
+
+        return [
+            'pending' => array_sum($pending),
+            'overdue' => array_sum($overdue),
+            'workflows' => count($pending),
+        ];
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getScopedCounts(User $admin, bool $overdueOnly = false): array
+    {
         $allowedTabs = array_flip($this->accessibleTabs($admin));
+        $overdueAt = now()->subDays(self::OVERDUE_AFTER_DAYS);
 
         $counts = [
             'leaves' => Attendance::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->where('approval_status', 'pending')
                 ->whereNotNull('leave_type_id')
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
 
             'overtime' => Overtime::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->where('status', 'pending')
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
 
             'attendance_corrections' => AttendanceCorrection::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->whereIn('status', [AttendanceCorrection::STATUS_PENDING, AttendanceCorrection::STATUS_PENDING_ADMIN])
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
 
             'reimbursements' => Reimbursement::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->where('status', 'pending')
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
 
             'cash_advances' => CashAdvance::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->where('status', 'pending')
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
 
             'shift_swaps' => ShiftSwapRequest::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->where('status', ShiftSwapRequest::STATUS_PENDING)
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
 
             'document_requests' => EmployeeDocumentRequest::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->whereIn('status', [EmployeeDocumentRequest::STATUS_PENDING, EmployeeDocumentRequest::STATUS_REQUESTED])
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
         ];
 

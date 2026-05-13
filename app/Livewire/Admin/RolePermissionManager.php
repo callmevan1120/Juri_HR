@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Role;
 use App\Queries\Security\RolePermissionManagementQuery;
 use App\Support\RbacRegistry;
+use App\Support\RoleAccessPreviewService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -143,10 +144,13 @@ class RolePermissionManager extends Component
 
     public function render()
     {
+        $roles = app(RolePermissionManagementQuery::class)->roles($this->search);
+
         return view('livewire.admin.role-permission-manager', [
-            'roles' => app(RolePermissionManagementQuery::class)->roles($this->search),
+            'roles' => $roles,
             'groupedModules' => RbacRegistry::groupedModules(),
             'allPermissions' => RbacRegistry::permissionKeys(),
+            'rolePreviews' => app(RoleAccessPreviewService::class)->forRoles($roles),
         ])->layout('layouts.app');
     }
 

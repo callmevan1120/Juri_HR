@@ -78,6 +78,29 @@
                                         <span>{{ __('Users assigned: :count', ['count' => $role->users_count]) }}</span>
                                         <span>{{ __('Permissions: :count', ['count' => count($role->permissions ?? $allPermissions)]) }}</span>
                                     </div>
+
+                                    @php
+                                        $previewModules = $rolePreviews[$role->id] ?? [];
+                                    @endphp
+
+                                    @if ($previewModules !== [])
+                                        <div class="rounded-lg border border-slate-100 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/50">
+                                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Role can access') }}</p>
+                                            <div class="mt-2 flex flex-wrap gap-2">
+                                                @foreach (array_slice($previewModules, 0, 6) as $module)
+                                                    <span class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
+                                                        {{ $module['label'] }}
+                                                        <span class="ml-1 text-slate-400">({{ implode(', ', array_slice($module['actions'], 0, 2)) }})</span>
+                                                    </span>
+                                                @endforeach
+                                                @if (count($previewModules) > 6)
+                                                    <span class="inline-flex items-center rounded-full bg-slate-200 px-2.5 py-1 text-xs font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
+                                                        +{{ count($previewModules) - 6 }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div class="flex shrink-0 gap-2">

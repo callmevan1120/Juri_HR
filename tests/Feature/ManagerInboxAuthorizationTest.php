@@ -1,7 +1,9 @@
 <?php
 
 use App\Livewire\Admin\ManagerInbox;
+use App\Models\Attendance;
 use App\Models\CashAdvance;
+use App\Models\LeaveType;
 use App\Models\Role;
 use App\Models\User;
 use App\Support\ManagerInboxService;
@@ -81,4 +83,46 @@ test('manager inbox rejects crafted tab changes outside admin rbac permissions',
         ->assertForbidden();
 
     expect($advance->fresh()->status)->toBe('pending');
+});
+
+test('manager inbox summarizes and filters overdue approvals', function () {
+    $admin = User::factory()->admin()->create();
+    $employee = User::factory()->create();
+    $leaveType = LeaveType::create([
+        'code' => 'special_approval_test',
+        'name' => 'Special Approval Test',
+        'category' => LeaveType::CATEGORY_OTHER,
+        'is_active' => true,
+    ]);
+    $role = Role::create([
+        'name' => 'Leave Overdue Inbox Reviewer',
+        'slug' => 'leave_overdue_inbox_reviewer',
+        'description' => 'Can review overdue leave requests from the manager inbox.',
+        'permissions' => [
+            'admin.dashboard.view',
+            'admin.leave_approvals.approve',
+        ],
+    ]);
+
+    $admin->roles()->sync([$role->id]);
+
+    $attendance = Attendance::create([
+        'user_id' => $employee->id,
+        'date' => now()->toDateString(),
+        'status' => 'excused',
+        'approval_status' => 'pending',
+        'leave_type_id' => $leaveType->id,
+    ]);
+    $attendance->forceFill([
+        'created_at' => now()->subDays(3),
+        'updated_at' => now()->subDays(3),
+    ])->save();
+
+    Livewire::actingAs($admin->fresh())
+        ->test(ManagerInbox::class)
+        ->assertSee(__('Overdue'))
+        ->assertSet('statusFilter', 'pending')
+        ->call('setStatusFilter', 'overdue')
+        ->assertSet('statusFilter', 'overdue')
+        ->assertSee($employee->name);
 });

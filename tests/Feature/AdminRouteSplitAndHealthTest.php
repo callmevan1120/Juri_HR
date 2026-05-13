@@ -22,6 +22,7 @@ test('split admin route files preserve important route names and middleware', fu
         'admin.reimbursements' => 'admin/reimbursements',
         'admin.assets' => 'admin/assets',
         'admin.settings' => 'admin/settings',
+        'admin.operational-health' => 'admin/operational-health',
         'admin.roles.permissions' => 'admin/roles-permissions',
     ] as $name => $uri) {
         expect($routes->get($name)?->uri())->toBe($uri);
@@ -65,9 +66,16 @@ test('operational health page only allows maintenance viewers', function () {
         ->get(route('admin.operational-health'))
         ->assertOk()
         ->assertSee(__('Operational Health'))
-        ->assertSee(__('Heartbeat'))
+        ->assertSee(__('Subsystem Checks'))
+        ->assertSee(__('Runtime Posture'))
+        ->assertSee(__('Backup Integrity Detail'))
         ->assertSee(__('Checksum'))
         ->assertSee(__('OK'));
+
+    $this->actingAs($healthAdmin)
+        ->get(route('admin.system-maintenance'))
+        ->assertOk()
+        ->assertSee(route('admin.operational-health'), false);
 });
 
 test('operational health distinguishes scheduler heartbeat from queue heartbeat', function () {

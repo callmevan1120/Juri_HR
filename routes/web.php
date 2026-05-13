@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HealthCheckController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -7,6 +8,7 @@ Route::get('/', function () {
 });
 
 Route::redirect('/offline', '/offline.html')->name('offline');
+Route::get('/health', HealthCheckController::class)->name('health');
 
 require __DIR__.'/web/system.php';
 require __DIR__.'/web/files.php';

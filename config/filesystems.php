@@ -28,7 +28,7 @@ return [
 
     'attachment_disks' => array_values(array_filter(array_map(
         'trim',
-        explode(',', env('FILESYSTEM_ATTACHMENT_DISKS', 'local,public'))
+        explode(',', env('FILESYSTEM_ATTACHMENT_DISKS', 'local'))
     ))),
 
     /*

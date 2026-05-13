@@ -108,6 +108,7 @@ For production deployments, at minimum:
 - point the web root to Laravel `public/`
 - never expose the repository root as the document root; `.htaccess` blocks are a defense-in-depth fallback only
 - ensure `storage/` and `bootstrap/cache/` are writable but not publicly exposed
+- use `FILESYSTEM_ATTACHMENT_DISKS=local` for new production deployments; keep `public` only as a temporary legacy fallback after a migration review
 - set `SESSION_SECURE_COOKIE=true`, `SESSION_HTTP_ONLY=true`, `SESSION_SAME_SITE=lax` or `strict`, and `SESSION_ENCRYPT=true` after compatibility testing
 - run queue workers under a controlled service manager
 - install cron for `php artisan schedule:run`
@@ -118,6 +119,7 @@ Recommended commands:
 
 ```bash
 composer audit
+php artisan rbac:audit
 php artisan queue:restart
 php artisan optimize:clear
 ```

@@ -14,7 +14,23 @@
 
                 $tabs = array_intersect_key($tabConfigs, array_flip($availableTabs ?? []));
                 $activeTabId = 'manager-inbox-tab-'.str_replace('_', '-', $activeTab);
+                $summary = $this->summary;
             @endphp
+
+            <dl class="grid grid-cols-3 gap-2">
+                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Pending') }}</dt>
+                    <dd class="mt-1 text-xl font-bold text-slate-950 dark:text-white">{{ $summary['pending'] }}</dd>
+                </div>
+                <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 shadow-sm dark:border-amber-900/40 dark:bg-amber-900/20">
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">{{ __('Overdue') }}</dt>
+                    <dd class="mt-1 text-xl font-bold text-amber-900 dark:text-amber-100">{{ $summary['overdue'] }}</dd>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Workflows') }}</dt>
+                    <dd class="mt-1 text-xl font-bold text-slate-950 dark:text-white">{{ $summary['workflows'] }}</dd>
+                </div>
+            </dl>
 
             <nav
                 class="grid grid-cols-2 gap-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:flex sm:flex-wrap"
@@ -24,6 +40,7 @@
                 @foreach($tabs as $key => $tab)
                     @php
                         $count = $this->counts[$key] ?? 0;
+                        $overdueCount = $this->overdueCounts[$key] ?? 0;
                         $isActive = $activeTab === $key;
                         $tabId = 'manager-inbox-tab-'.str_replace('_', '-', $key);
                         $statusLabel = $count > 0 ? $count.' '.__('pending') : __('Caught up');
@@ -63,6 +80,11 @@
                                 {{ $count > 99 ? '99+' : $count }}
                             </span>
                         @endif
+                        @if($overdueCount > 0)
+                            <span class="inline-flex min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 py-0.5 text-[10px] font-bold leading-none text-white ring-2 ring-white dark:ring-gray-800" title="{{ __('Overdue') }}" aria-hidden="true">
+                                {{ $overdueCount > 9 ? '9+' : $overdueCount }}
+                            </span>
+                        @endif
                         <span class="sr-only">{{ $statusLabel }}</span>
                     </button>
                 @endforeach
@@ -76,13 +98,28 @@
                 tabindex="0"
                 class="space-y-4"
             >
-                <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ $tabs[$activeTab]['label'] ?? __('Items') }}</h2>
+                <div class="mt-2 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ $tabs[$activeTab]['label'] ?? __('Items') }}</h2>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            {{ __('Overdue means pending for more than :days days.', ['days' => $overdueAfterDays]) }}
+                        </p>
+                    </div>
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div class="inline-flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                            <button type="button" wire:click="setStatusFilter('pending')" class="rounded-md px-3 py-1.5 text-xs font-semibold transition {{ $statusFilter === 'pending' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                                {{ __('Pending') }}
+                            </button>
+                            <button type="button" wire:click="setStatusFilter('overdue')" class="rounded-md px-3 py-1.5 text-xs font-semibold transition {{ $statusFilter === 'overdue' ? 'bg-amber-500 text-white' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                                {{ __('Overdue') }}
+                            </button>
+                        </div>
                     <div class="relative w-full sm:w-72">
                         <x-forms.input wire:model.live.debounce.300ms="search" placeholder="{{ __('Search employee...') }}" class="w-full text-sm pl-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm" />
                         <span class="absolute left-3 top-2.5 text-gray-400">
                             <x-heroicon-m-magnifying-glass class="h-5 w-5" />
                         </span>
+                    </div>
                     </div>
                 </div>
 
