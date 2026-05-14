@@ -7,7 +7,7 @@ use App\Models\SystemBackupRun;
 use App\Models\User;
 use App\Support\EmployeeDocumentRequestService;
 use App\Support\Helpers;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -269,7 +269,7 @@ Route::post('/__vercel-migrate', function (Request $request) {
 
     return response()->json($payload, $ok ? 200 : 500);
 })->middleware('throttle:3,1')
-    ->withoutMiddleware([VerifyCsrfToken::class]);
+    ->withoutMiddleware([PreventRequestForgery::class]);
 
 Route::middleware([
     'auth:sanctum',

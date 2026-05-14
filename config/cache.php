@@ -19,6 +19,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Serializable Cache Classes
+    |--------------------------------------------------------------------------
+    |
+    | PasPapan stores scalar and array payloads in cache. Keep object
+    | serialization disabled for Laravel 13 so cached models or arbitrary
+    | service instances cannot become an implicit cross-release contract.
+    |
+    */
+
+    'serializable_classes' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Cache Stores
     |--------------------------------------------------------------------------
     |

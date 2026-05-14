@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 test('modern stack guard blocks stale framework and frontend markers', function () {
@@ -66,6 +68,50 @@ test('tailwind four css first setup has no legacy config files or directives', f
         ->and(array_key_exists('@tailwindcss/vite', $devDependencies))->toBeTrue()
         ->and(array_key_exists('post'.'css', $devDependencies))->toBeFalse()
         ->and(array_key_exists('auto'.'prefixer', $devDependencies))->toBeFalse();
+});
+
+test('laravel thirteen and livewire four upgrade configuration stays current', function () {
+    $deprecatedMiddlewareMarkers = [
+        'Verify'.'CsrfToken',
+        'Validate'.'CsrfToken',
+    ];
+
+    foreach (trackedProjectFiles() as $file) {
+        if (! shouldScanModernStackFile($file) || $file === 'tests/Feature/ModernStackGuardTest.php') {
+            continue;
+        }
+
+        $contents = file_get_contents(base_path($file));
+
+        foreach ($deprecatedMiddlewareMarkers as $marker) {
+            expect($contents)->not->toContain($marker, "{$file} references deprecated CSRF middleware {$marker}");
+        }
+    }
+
+    $vercelRoute = collect(Route::getRoutes())
+        ->first(fn ($route): bool => $route->uri() === '__vercel-migrate' && in_array('POST', $route->methods(), true));
+
+    $excludedMiddleware = $vercelRoute !== null && method_exists($vercelRoute, 'excludedMiddleware')
+        ? $vercelRoute->excludedMiddleware()
+        : [];
+
+    expect(config('sanctum.middleware.validate_csrf_token'))->toBe(PreventRequestForgery::class)
+        ->and($excludedMiddleware)->toContain(PreventRequestForgery::class)
+        ->and(config('cache.serializable_classes'))->toBeFalse()
+        ->and(config('livewire.component_layout'))->toBe('layouts::app')
+        ->and(config('livewire.component_placeholder'))->toBeNull()
+        ->and(config('livewire.smart_wire_keys'))->toBeTrue()
+        ->and(config('livewire.csp_safe'))->toBeFalse()
+        ->and(config('livewire.component_locations'))->toContain(resource_path('views/livewire'))
+        ->and(config('livewire.component_namespaces'))->toHaveKey('layouts')
+        ->and(config('livewire.make_command.type'))->toBe('sfc');
+
+    $exampleEnv = file_get_contents(base_path('.env.example'));
+
+    expect($exampleEnv)
+        ->toContain('CACHE_PREFIX=paspapan_cache_')
+        ->toContain('REDIS_PREFIX=paspapan_database_')
+        ->toContain('SESSION_COOKIE=paspapan_session');
 });
 
 /**
