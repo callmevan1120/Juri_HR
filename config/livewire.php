@@ -54,9 +54,9 @@ return [
 
     'temporary_file_upload' => [
         'disk' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK'),
-        'rules' => 'file|max:12288',
-        'directory' => 'livewire-tmp',
-        'middleware' => 'throttle:60,1',
+        'rules' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_RULES', 'file|max:12288'),
+        'directory' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DIRECTORY', 'livewire-tmp'),
+        'middleware' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_MIDDLEWARE', 'throttle:60,1'),
         'preview_mimes' => [
             'png', 'gif', 'bmp', 'svg', 'wav', 'mp4',
             'mov', 'avi', 'wmv', 'mp3', 'm4a',

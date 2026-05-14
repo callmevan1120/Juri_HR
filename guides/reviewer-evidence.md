@@ -53,6 +53,30 @@ Feature/unit tests tetap menjadi bukti utama untuk domain kritikal:
 
 Playwright smoke menambahkan bukti browser untuk halaman utama admin/user. APK smoke menambahkan bukti device untuk launch, permission kamera/GPS, barcode/photo readiness, screenshot, dan crash log.
 
+## Package Smoke Scope
+
+Checklist ini dipakai saat review upgrade major Laravel/Livewire/Tailwind agar package kritikal tidak hanya lolos install:
+
+- Jetstream/Fortify: login, logout, profile page, password update, browser session page, dan role-based redirect.
+- Sanctum: `/api/user` token/session response, device token abilities, stateful web session, dan CSRF cookie flow bila dipakai WebView.
+- Reverb/Echo: broadcasting auth route, private channel auth, dan fallback polling saat `BROADCAST_CONNECTION=log`.
+- Maatwebsite Excel: user import, attendance import, report export, queued export run, dan cleanup temporary file.
+- DomPDF: payslip PDF, employee document PDF, logo/font fallback, serta access control download.
+- Intervention Image/media: attendance photo, profile/avatar/photo-like upload, JPG/PNG/WebP handling, dan unsafe filename rejection.
+- Endroid QR/Dynamic QR: token generation, short TTL/expiry, no-store response header, scan success, dan expired/replayed token rejection.
+
+## Manual Smoke Checklist
+
+Jalankan ini di staging/VPS sebelum release production penuh:
+
+- Authentication: login, logout, role-based redirect, active/inactive account guard.
+- Layout/UI: dashboard shell, sidebar/navbar, dark mode, focus ring form, table filter, modal open/close.
+- Livewire: search/filter, pagination, form submit, validation error, upload progress, upload completion.
+- Attendance: check-in, check-out, GPS permission, photo upload, Dynamic QR generate/scan/expired, APK WebView flow.
+- Security/RBAC: admin-only page, manager approval page, employee self-service page, private attachment owner access, unauthorized attachment denial, payslip privacy.
+- Payroll: payroll preparation, payslip PDF generation, payslip download, payroll access control.
+- Operations: Excel import/export, queued job status, operational health page, backup/maintenance page, queue worker, scheduler.
+
 ## Local Reproduction
 
 Untuk menghasilkan bundle lokal dengan struktur log yang sama:

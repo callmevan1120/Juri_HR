@@ -138,7 +138,10 @@ test('laravel thirteen and livewire four upgrade configuration stays current', f
     expect($exampleEnv)
         ->toContain('CACHE_PREFIX=paspapan_cache_')
         ->toContain('REDIS_PREFIX=paspapan_database_')
-        ->toContain('SESSION_COOKIE=paspapan_session');
+        ->toContain('SESSION_COOKIE=paspapan_session')
+        ->toContain('LIVEWIRE_TEMPORARY_FILE_UPLOAD_RULES=file|max:12288')
+        ->toContain('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DIRECTORY=livewire-tmp')
+        ->toContain('LIVEWIRE_TEMPORARY_FILE_UPLOAD_MIDDLEWARE=throttle:60,1');
 });
 
 /**

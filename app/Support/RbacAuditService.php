@@ -138,11 +138,20 @@ class RbacAuditService
     {
         $policyFiles = glob(app_path('Policies/*Policy.php')) ?: [];
         $testFiles = glob(base_path('tests/Feature/*Policy*Test.php')) ?: [];
-        $testHaystack = strtolower(implode(' ', array_map('basename', $testFiles)));
+        $testHaystack = strtolower(implode(' ', array_map(
+            fn (string $path): string => basename($path).' '.((string) file_get_contents($path)),
+            $testFiles,
+        )));
 
         return collect($policyFiles)
             ->map(fn (string $path): string => basename($path, '.php'))
-            ->reject(fn (string $policy): bool => str_contains($testHaystack, strtolower(str_replace('Policy', '', $policy))))
+            ->reject(function (string $policy) use ($testHaystack): bool {
+                $policyName = strtolower($policy);
+                $policySubject = strtolower(str_replace('Policy', '', $policy));
+
+                return str_contains($testHaystack, $policyName)
+                    || str_contains($testHaystack, $policySubject);
+            })
             ->values()
             ->all();
     }

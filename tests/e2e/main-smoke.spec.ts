@@ -1,11 +1,20 @@
 import { expect, test } from '@playwright/test';
 
-const adminEmail = process.env.E2E_ADMIN_EMAIL;
-const adminPassword = process.env.E2E_ADMIN_PASSWORD ?? 'password';
-const userEmail = process.env.E2E_USER_EMAIL;
-const userPassword = process.env.E2E_USER_PASSWORD ?? 'password';
+const adminEmail = process.env.E2E_ADMIN_EMAIL ?? 'apk.demo.superadmin@paspapan.test';
+const adminPassword = process.env.E2E_ADMIN_PASSWORD ?? '12345678';
+const userEmail = process.env.E2E_USER_EMAIL ?? 'apk.demo.user@paspapan.test';
+const userPassword = process.env.E2E_USER_PASSWORD ?? '12345678';
 
 async function login(page, email: string, password: string) {
+  const loginToken = process.env.E2E_LOGIN_TOKEN;
+
+  if (loginToken) {
+    await page.goto(`/__e2e-login?token=${encodeURIComponent(loginToken)}&email=${encodeURIComponent(email)}&to=/home`);
+    await expect(page).not.toHaveURL(/\/login$/);
+
+    return;
+  }
+
   await page.goto('/login');
   await page.locator('input[name="email"]').fill(email);
   await page.locator('input[name="password"]').fill(password);
@@ -26,9 +35,7 @@ test('public login page renders', async ({ page }) => {
 });
 
 test('admin smoke covers RBAC menus approvals attendance QR HR payroll import export backup health', async ({ page }) => {
-  test.skip(!adminEmail, 'Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD to run authenticated admin smoke.');
-
-  await login(page, adminEmail!, adminPassword);
+  await login(page, adminEmail, adminPassword);
 
   for (const path of [
     '/admin/dashboard',
@@ -53,9 +60,7 @@ test('admin smoke covers RBAC menus approvals attendance QR HR payroll import ex
 });
 
 test('user smoke covers attendance check in out leave overtime reimbursement payslip documents approvals HR tasks', async ({ page }) => {
-  test.skip(!userEmail, 'Set E2E_USER_EMAIL and E2E_USER_PASSWORD to run authenticated user smoke.');
-
-  await login(page, userEmail!, userPassword);
+  await login(page, userEmail, userPassword);
 
   for (const path of [
     '/home',
