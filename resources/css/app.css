@@ -1,11 +1,13 @@
-@import "flatpickr/dist/flatpickr.css";
 @import "tailwindcss";
+@import "flatpickr/dist/flatpickr.css";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../vendor/laravel/jetstream/**/*.blade.php";
 @source "../../storage/framework/views/*.php";
 @source "../views/**/*.blade.php";
+@source "../js/**/*.js";
+@source "../js/**/*.ts";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
