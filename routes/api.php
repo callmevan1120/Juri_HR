@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\Device\BarcodeScanController;
 use App\Http\Controllers\Api\Device\LocationController;
 use App\Http\Controllers\Api\Device\OfflineAttendanceSyncController;
@@ -8,12 +9,9 @@ use App\Http\Controllers\Api\Device\PhotoUploadController;
 use App\Http\Controllers\Api\Integrations\AttendanceEventController;
 use App\Http\Controllers\Api\WilayahController;
 use App\Support\ApiTokenPermission;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware(['auth:sanctum', 'throttle:api']);
+Route::get('/user', AuthenticatedUserController::class)->middleware(['auth:sanctum', 'throttle:api']);
 
 // Wilayah Data Endpoints
 Route::prefix('wilayah')->middleware('throttle:wilayah')->group(function () {

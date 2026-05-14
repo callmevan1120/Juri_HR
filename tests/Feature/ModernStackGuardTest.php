@@ -43,6 +43,20 @@ test('full page livewire routes use livewire aliases instead of class route moun
     }
 });
 
+test('route files keep business logic in controllers or route macros', function () {
+    foreach (trackedProjectFiles('routes/') as $file) {
+        if (! str_ends_with($file, '.php')) {
+            continue;
+        }
+
+        $contents = file_get_contents(base_path($file));
+
+        expect($contents)
+            ->not->toMatch('/Route::(?:get|post|put|patch|delete|match|any)\([^;]+function\s*\(/s', "{$file} contains an inline route closure")
+            ->not->toMatch('/Route::(?:get|post|put|patch|delete|match|any)\([^;]+fn\s*\(/s', "{$file} contains an inline route arrow function");
+    }
+});
+
 test('tailwind four css first setup has no legacy config files or directives', function () {
     $legacyConfigFiles = [
         'tailwind'.'.config.js',
@@ -60,9 +74,17 @@ test('tailwind four css first setup has no legacy config files or directives', f
     $css = file_get_contents(resource_path('css/app.css'));
     $package = json_decode(file_get_contents(base_path('package.json')), true, flags: JSON_THROW_ON_ERROR);
     $devDependencies = $package['devDependencies'] ?? [];
+    $tailwindPrefix = '@import "tailwindcss";'."\n"
+        .'@import "flatpickr/dist/flatpickr.css";'."\n"
+        .'@plugin "@tailwindcss/forms";'."\n"
+        .'@plugin "@tailwindcss/typography";'."\n";
 
     expect($css)
         ->toContain('@import "tailwindcss";')
+        ->toStartWith($tailwindPrefix)
+        ->toContain('@source "../views/**/*.blade.php";')
+        ->toContain('@source "../js/**/*.js";')
+        ->toContain('@source "../js/**/*.ts";')
         ->toContain('@theme')
         ->not->toMatch('/@tailwind\s+(base|components|utilities)\b/')
         ->and(array_key_exists('@tailwindcss/vite', $devDependencies))->toBeTrue()
