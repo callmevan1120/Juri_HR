@@ -104,7 +104,12 @@ test('laravel thirteen and livewire four upgrade configuration stays current', f
         ->and(config('livewire.csp_safe'))->toBeFalse()
         ->and(config('livewire.component_locations'))->toContain(resource_path('views/livewire'))
         ->and(config('livewire.component_namespaces'))->toHaveKey('layouts')
-        ->and(config('livewire.make_command.type'))->toBe('sfc');
+        ->and(config('livewire.make_command.type'))->toBe('class')
+        ->and(config('livewire.make_command.with.test'))->toBeTrue()
+        ->and(config('livewire.temporary_file_upload.rules'))->toBe('file|max:12288')
+        ->and(config('livewire.temporary_file_upload.directory'))->toBe('livewire-tmp')
+        ->and(config('livewire.temporary_file_upload.middleware'))->toBe('throttle:60,1')
+        ->and(config('livewire.temporary_file_upload.cleanup'))->toBeTrue();
 
     $exampleEnv = file_get_contents(base_path('.env.example'));
 

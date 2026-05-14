@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Wilayah;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
@@ -20,7 +21,7 @@ class WilayahController extends Controller
         return response()->json($this->remember('provinces', null, $search, function () use ($search) {
             $query = Wilayah::whereRaw('LENGTH(kode) = 2');
 
-            return $this->applySearch($query, $search)->orderBy('nama')->get();
+            return $this->arrayResults($this->applySearch($query, $search)->orderBy('nama')->get());
         }));
     }
 
@@ -37,7 +38,7 @@ class WilayahController extends Controller
             $query = Wilayah::where('kode', 'like', "{$provinceCode}.%")
                 ->whereRaw('LENGTH(kode) = 5');
 
-            return $this->applySearch($query, $search)->orderBy('nama')->get();
+            return $this->arrayResults($this->applySearch($query, $search)->orderBy('nama')->get());
         }));
     }
 
@@ -54,7 +55,7 @@ class WilayahController extends Controller
             $query = Wilayah::where('kode', 'like', "{$regencyCode}.%")
                 ->whereRaw('LENGTH(kode) = 8');
 
-            return $this->applySearch($query, $search)->orderBy('nama')->get();
+            return $this->arrayResults($this->applySearch($query, $search)->orderBy('nama')->get());
         }));
     }
 
@@ -71,7 +72,7 @@ class WilayahController extends Controller
             $query = Wilayah::where('kode', 'like', "{$districtCode}.%")
                 ->whereRaw('LENGTH(kode) = 13');
 
-            return $this->applySearch($query, $search)->orderBy('nama')->get();
+            return $this->arrayResults($this->applySearch($query, $search)->orderBy('nama')->get());
         }));
     }
 
@@ -102,5 +103,17 @@ class WilayahController extends Controller
             now()->addDay(),
             $callback
         );
+    }
+
+    /**
+     * @param  EloquentCollection<int, Wilayah>  $wilayah
+     * @return list<array<string, mixed>>
+     */
+    private function arrayResults(EloquentCollection $wilayah): array
+    {
+        return $wilayah
+            ->map(fn (Wilayah $item): array => $item->getAttributes())
+            ->values()
+            ->all();
     }
 }

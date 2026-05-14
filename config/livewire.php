@@ -26,12 +26,13 @@ return [
     'component_placeholder' => null,
 
     'make_command' => [
-        'type' => 'sfc',
+        // PasPapan keeps production components class-based in app/Livewire.
+        'type' => 'class',
         'emoji' => false,
         'with' => [
             'js' => false,
             'css' => false,
-            'test' => false,
+            'test' => true,
         ],
     ],
 
@@ -53,9 +54,9 @@ return [
 
     'temporary_file_upload' => [
         'disk' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK'),
-        'rules' => null,
-        'directory' => null,
-        'middleware' => null,
+        'rules' => 'file|max:12288',
+        'directory' => 'livewire-tmp',
+        'middleware' => 'throttle:60,1',
         'preview_mimes' => [
             'png', 'gif', 'bmp', 'svg', 'wav', 'mp4',
             'mov', 'avi', 'wmv', 'mp3', 'm4a',
