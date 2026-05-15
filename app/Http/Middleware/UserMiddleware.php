@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,12 +16,13 @@ class UserMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $user = $request->user();
+
         // Check if the user is authenticated and belongs to the 'user' group
-        if (Auth::check() && Auth::user()->isUser) {
+        if ($user?->isUser) {
             return $next($request);
         }
 
-        $user = Auth::user();
         $context = [
             'path' => $request->path(),
             'route' => $request->route()?->getName(),

@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,7 +16,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = Auth::user();
+        $user = $request->user();
         $context = [
             'path' => $request->path(),
             'route' => $request->route()?->getName(),
@@ -35,7 +34,7 @@ class AdminMiddleware
 
         Log::info('AdminMiddleware checked request.', $context);
 
-        if (Auth::check() && $user?->can('accessAdminPanel')) {
+        if ($user?->can('accessAdminPanel')) {
             $response = $next($request);
 
             Log::info('AdminMiddleware completed request.', [

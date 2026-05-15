@@ -1,3 +1,3 @@
 <x-app-layout>
-    @livewire('admin.employee-component')
+    <livewire:admin.employee-component />
 </x-app-layout>

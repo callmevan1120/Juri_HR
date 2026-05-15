@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\Setting;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckMaintenanceMode
@@ -17,7 +16,7 @@ class CheckMaintenanceMode
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()?->can('accessAdminPanel')) {
+        if ($request->user()?->can('accessAdminPanel')) {
             return $next($request);
         }
 

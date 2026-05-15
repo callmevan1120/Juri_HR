@@ -15,6 +15,8 @@ class MyPerformance extends Component
 {
     use AuthorizesRequests;
 
+    protected AppraisalService $appraisalService;
+
     public $showSelfAssessmentModal = false;
 
     public $activeAppraisalId = null;
@@ -34,6 +36,11 @@ class MyPerformance extends Component
         'employeeNotes' => 'nullable|string',
     ];
 
+    public function boot(AppraisalService $appraisalService): void
+    {
+        $this->appraisalService = $appraisalService;
+    }
+
     public function openSelfAssessment($appraisalId)
     {
         // Check Period Lock
@@ -49,8 +56,7 @@ class MyPerformance extends Component
         $this->authorize('selfAssess', $appraisal);
 
         // Auto-sync missing KPIs (in case HR added new KPI Groups after this appraisal was drafted)
-        $service = app(AppraisalService::class);
-        $service->initAppraisal(auth()->user(), $appraisal->period_month, $appraisal->period_year);
+        $this->appraisalService->initAppraisal(auth()->user(), $appraisal->period_month, $appraisal->period_year);
 
         // Re-fetch with loaded relations after syncing
         $appraisal = Appraisal::with('evaluations.kpiTemplate.kpiGroup')->find($appraisalId);

@@ -66,7 +66,7 @@
                                 <li class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors duration-200">
                                     <div class="p-4 flex gap-4">
                                         <!-- Icon -->
-                                        <div class="flex-shrink-0 mt-0.5">
+                                        <div class="shrink-0 mt-0.5">
                                             <span class="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none">
                                                 <x-heroicon-o-bell class="h-5 w-5" />
                                             </span>
@@ -101,7 +101,7 @@
                                 <li class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors duration-200">
                                     <div class="p-4 flex gap-4">
                                         <!-- Icon / Status -->
-                                        <div class="flex-shrink-0 mt-0.5">
+                                        <div class="shrink-0 mt-0.5">
                                             <span class="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 text-white shadow-md shadow-primary-200 dark:shadow-none">
                                                 <x-heroicon-o-megaphone class="h-5 w-5" />
                                             </span>

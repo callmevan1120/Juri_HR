@@ -20,7 +20,7 @@
                 </x-user.page-header>
 
                 <div class="user-page-body">
-                    @livewire('user.attendance-history-component')
+                    <livewire:user.attendance-history-component />
                 </div>
             </section>
         </div>

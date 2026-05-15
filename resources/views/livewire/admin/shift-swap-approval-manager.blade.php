@@ -106,7 +106,7 @@
                             @endif
                         </div>
 
-                        <div class="flex items-center justify-end gap-2 lg:flex-shrink-0">
+                        <div class="flex items-center justify-end gap-2 lg:shrink-0">
                             @if ($swapRequest->status === \App\Models\ShiftSwapRequest::STATUS_PENDING)
                                 <x-actions.icon-button wire:click="approve({{ $swapRequest->id }})" variant="success"
                                     label="{{ __('Approve shift swap request') }}">

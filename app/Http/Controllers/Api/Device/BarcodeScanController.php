@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Device;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\DeviceBarcodeScanRequest;
 use App\Services\Attendance\DeviceAttendanceService;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 class BarcodeScanController extends Controller
@@ -14,13 +14,15 @@ class BarcodeScanController extends Controller
         protected DeviceAttendanceService $deviceAttendanceService,
     ) {}
 
-    public function __invoke(DeviceBarcodeScanRequest $request)
+    public function __invoke(DeviceBarcodeScanRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $userId = $request->user()?->getAuthIdentifier();
+        abort_unless(is_int($userId) || is_string($userId), 401);
 
         try {
             $result = $this->deviceAttendanceService->saveBarcodeScan(
-                userId: Auth::id(),
+                userId: $userId,
                 barcodePayload: $validated['barcode_data'],
                 latitude: (float) $validated['latitude'],
                 longitude: (float) $validated['longitude'],
@@ -47,7 +49,7 @@ class BarcodeScanController extends Controller
             ]);
         } catch (\Throwable $e) {
             Log::warning('Failed to save device barcode data.', [
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'exception' => $e->getMessage(),
             ]);
 

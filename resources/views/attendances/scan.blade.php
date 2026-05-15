@@ -37,7 +37,7 @@
                 </x-slot>
             </x-user.page-header>
 
-            @livewire('user.scan-component')
+            <livewire:user.scan-component />
         </div>
     </div>
 </x-app-layout>

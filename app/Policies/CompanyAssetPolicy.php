@@ -9,6 +9,10 @@ use App\Support\MultiCompanyService;
 
 class CompanyAssetPolicy
 {
+    public function __construct(
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
     public function viewAny(User $user): bool
     {
         return ! Editions::assetLocked();
@@ -49,6 +53,6 @@ class CompanyAssetPolicy
         $companyAsset->loadMissing('user');
 
         return $companyAsset->user !== null
-            && app(MultiCompanyService::class)->canAccessUser($actor, $companyAsset->user);
+            && $this->multiCompany->canAccessUser($actor, $companyAsset->user);
     }
 }

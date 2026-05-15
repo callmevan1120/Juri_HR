@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthenticateLoginAttempt
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): ?User
     {
         if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
             $user = User::where('email', $request->email)->first();
@@ -19,5 +19,7 @@ class AuthenticateLoginAttempt
         if ($user && Hash::check($request->password, $user->password) && $user->canAuthenticate()) {
             return $user;
         }
+
+        return null;
     }
 }

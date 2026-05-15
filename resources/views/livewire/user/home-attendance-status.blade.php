@@ -27,7 +27,7 @@
             <div
                 class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700/50 dark:bg-gray-700/30">
                 <div
-                    class="flex-shrink-0 rounded-xl bg-white p-2.5 text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-200">
+                    class="shrink-0 rounded-xl bg-white p-2.5 text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-200">
                     <x-heroicon-m-document-text class="w-6 h-6" />
                 </div>
                 <div>

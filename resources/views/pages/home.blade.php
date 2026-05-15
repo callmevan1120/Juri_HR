@@ -24,13 +24,13 @@
          {{-- Attendance Command Center (Floating) --}}
          <section aria-labelledby="attendance-summary-heading">
              <h2 id="attendance-summary-heading" class="sr-only">{{ __('Today attendance summary') }}</h2>
-             @livewire('user.home-attendance-status')
+             <livewire:user.home-attendance-status />
          </section>
 
          {{-- Quick Actions Grid --}}
          <section aria-labelledby="my-menu-heading">
             <h2 id="my-menu-heading" class="sr-only">{{ __('Quick Access') }}</h2>
-            @livewire('user.quick-actions')
+            <livewire:user.quick-actions />
          </section>
 
          {{-- Widgets --}}
@@ -39,7 +39,7 @@
                 <h2 id="happening-now-heading" class="text-base font-semibold text-gray-900 dark:text-white">{{ __('Happening Now') }}</h2>
                 <a href="{{ route('notifications') }}" class="text-sm font-semibold text-primary-700 transition hover:text-primary-800 dark:text-primary-300 dark:hover:text-primary-200">{{ __('View All') }}</a>
             </div>
-            @livewire('user.upcoming-events-widget')
+            <livewire:user.upcoming-events-widget />
          </section>
     </div>
 

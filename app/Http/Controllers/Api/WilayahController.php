@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Wilayah;
+use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
@@ -14,7 +17,7 @@ class WilayahController extends Controller
     /**
      * Get list of provinces (kode length 2)
      */
-    public function provinces(Request $request)
+    public function provinces(Request $request): JsonResponse
     {
         $search = $this->validatedSearch($request);
 
@@ -28,7 +31,7 @@ class WilayahController extends Controller
     /**
      * Get list of regencies (kabupaten/kota) by province
      */
-    public function regencies(Request $request, $provinceCode)
+    public function regencies(Request $request, string $provinceCode): JsonResponse
     {
         abort_unless(preg_match('/^\d{2}$/', (string) $provinceCode) === 1, 404);
 
@@ -45,7 +48,7 @@ class WilayahController extends Controller
     /**
      * Get list of districts (kecamatan) by regency
      */
-    public function districts(Request $request, $regencyCode)
+    public function districts(Request $request, string $regencyCode): JsonResponse
     {
         abort_unless(preg_match('/^\d{2}\.\d{2}$/', (string) $regencyCode) === 1, 404);
 
@@ -62,7 +65,7 @@ class WilayahController extends Controller
     /**
      * Get list of villages (kelurahan/desa) by district
      */
-    public function villages(Request $request, $districtCode)
+    public function villages(Request $request, string $districtCode): JsonResponse
     {
         abort_unless(preg_match('/^\d{2}\.\d{2}\.\d{2}$/', (string) $districtCode) === 1, 404);
 
@@ -87,7 +90,7 @@ class WilayahController extends Controller
         return $search !== '' ? $search : null;
     }
 
-    private function applySearch($query, ?string $search)
+    private function applySearch(Builder $query, ?string $search): Builder
     {
         if ($search !== null) {
             $query->where('nama', 'like', '%'.addcslashes($search, '%_\\').'%');
@@ -96,7 +99,10 @@ class WilayahController extends Controller
         return $query;
     }
 
-    private function remember(string $scope, ?string $code, ?string $search, \Closure $callback)
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function remember(string $scope, ?string $code, ?string $search, Closure $callback): array
     {
         return Cache::remember(
             'wilayah:'.implode(':', [$scope, $code ?: 'all', sha1((string) $search)]),

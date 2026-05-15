@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Api\Device;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\DeviceLocationRequest;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 class LocationController extends Controller
 {
-    public function __invoke(DeviceLocationRequest $request)
+    public function __invoke(DeviceLocationRequest $request): JsonResponse
     {
         $validated = $request->validated();
 
@@ -25,7 +25,7 @@ class LocationController extends Controller
             ]);
         } catch (\Throwable $e) {
             Log::warning('Failed to process device location data.', [
-                'user_id' => Auth::id(),
+                'user_id' => $request->user()?->getAuthIdentifier(),
                 'exception' => $e->getMessage(),
             ]);
 

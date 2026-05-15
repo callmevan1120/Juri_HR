@@ -33,7 +33,7 @@
     aria-checked="{{ $checked ? 'true' : 'false' }}"
     @if ($label) aria-label="{{ $label }}" @endif
     {{ $attributes->merge([
-        'class' => 'relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ' . $focusClass . ' ' . $sizeClasses['track'] . ' ' . ($checked ? $checkedClass : $uncheckedClass),
+        'class' => 'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ' . $focusClass . ' ' . $sizeClasses['track'] . ' ' . ($checked ? $checkedClass : $uncheckedClass),
     ]) }}
 >
     <span class="pointer-events-none inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $sizeClasses['thumb'] }} {{ $checked ? $sizeClasses['translate'] : 'translate-x-0' }}"></span>

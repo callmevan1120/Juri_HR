@@ -144,6 +144,21 @@ test('laravel thirteen and livewire four upgrade configuration stays current', f
         ->toContain('LIVEWIRE_TEMPORARY_FILE_UPLOAD_MIDDLEWARE=throttle:60,1');
 });
 
+test('blade views use livewire four component tags and tailwind four safe utilities', function () {
+    foreach (trackedProjectFiles('resources/views/') as $file) {
+        if (! str_ends_with($file, '.blade.php')) {
+            continue;
+        }
+
+        $contents = file_get_contents(base_path($file));
+
+        expect($contents)
+            ->not->toContain('@livewire(', "{$file} should use Livewire component tags instead of @livewire directives")
+            ->not->toContain('flex-shrink-0', "{$file} should use Tailwind 4 shrink-0 utility")
+            ->not->toContain('ring-opacity-', "{$file} should use slash opacity utilities");
+    }
+});
+
 /**
  * @return list<string>
  */

@@ -125,33 +125,33 @@
                             @if (Laravel\Fortify\Features::canUpdateProfileInformation())
                                 <section x-cloak x-show="activePanel === 'details'" x-transition.opacity.duration.150ms>
                                     <h3 class="sr-only">{{ __('Profile Information') }}</h3>
-                                    @livewire('profile.update-profile-information-form')
+                                    <livewire:profile.update-profile-information-form />
                                 </section>
                             @endif
 
                             @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
                                 <section x-cloak x-show="activePanel === 'password'" x-transition.opacity.duration.150ms>
                                     <h3 class="sr-only">{{ __('Update Password') }}</h3>
-                                    @livewire('profile.update-password-form')
+                                    <livewire:profile.update-password-form />
                                 </section>
                             @endif
 
                             @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
                                 <section x-cloak x-show="activePanel === 'security'" x-transition.opacity.duration.150ms>
                                     <h3 class="sr-only">{{ __('Two Factor Authentication') }}</h3>
-                                    @livewire('profile.two-factor-authentication-form')
+                                    <livewire:profile.two-factor-authentication-form />
                                 </section>
                             @endif
 
                             <section x-cloak x-show="activePanel === 'sessions'" x-transition.opacity.duration.150ms>
                                 <h3 class="sr-only">{{ __('Browser Sessions') }}</h3>
-                                @livewire('profile.logout-other-browser-sessions-form')
+                                <livewire:profile.logout-other-browser-sessions-form />
                             </section>
 
                             @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
                                 <section x-cloak x-show="activePanel === 'danger'" x-transition.opacity.duration.150ms>
                                     <h3 class="sr-only">{{ __('Delete Account') }}</h3>
-                                    @livewire('profile.request-account-deletion-form')
+                                    <livewire:profile.request-account-deletion-form />
                                 </section>
                             @endif
                         </div>

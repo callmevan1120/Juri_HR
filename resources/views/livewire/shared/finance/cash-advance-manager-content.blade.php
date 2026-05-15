@@ -53,7 +53,7 @@
                     <tr>
                         <td class="whitespace-nowrap px-4 py-3">
                             <div class="flex items-center">
-                                <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
+                                <div class="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                                     <img class="h-10 w-10 rounded-full object-cover" src="{{ $advance->user->profile_photo_url }}" alt="{{ $advance->user->name }}">
                                 </div>
                                 <div class="ml-4">
@@ -251,7 +251,7 @@
                     <tr>
                         <td class="px-4 py-3 align-top">
                             <div class="flex items-center">
-                                <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
+                                <div class="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                                     <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
                                 </div>
                                 <div class="ml-4">

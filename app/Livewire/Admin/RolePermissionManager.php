@@ -16,6 +16,10 @@ class RolePermissionManager extends Component
 {
     use InteractsWithBanner;
 
+    protected RolePermissionManagementQuery $rolePermissionQuery;
+
+    protected RoleAccessPreviewService $roleAccessPreview;
+
     public ?Role $editingRole = null;
 
     public ?string $deleteRoleId = null;
@@ -34,9 +38,12 @@ class RolePermissionManager extends Component
 
     public bool $confirmingDeletion = false;
 
-    public function boot(): void
+    public function boot(RolePermissionManagementQuery $rolePermissionQuery, RoleAccessPreviewService $roleAccessPreview): void
     {
         Gate::authorize('manageRbac');
+
+        $this->rolePermissionQuery = $rolePermissionQuery;
+        $this->roleAccessPreview = $roleAccessPreview;
     }
 
     public function updatedName(string $value): void
@@ -144,13 +151,13 @@ class RolePermissionManager extends Component
 
     public function render()
     {
-        $roles = app(RolePermissionManagementQuery::class)->roles($this->search);
+        $roles = $this->rolePermissionQuery->roles($this->search);
 
         return view('livewire.admin.role-permission-manager', [
             'roles' => $roles,
             'groupedModules' => RbacRegistry::groupedModules(),
             'allPermissions' => RbacRegistry::permissionKeys(),
-            'rolePreviews' => app(RoleAccessPreviewService::class)->forRoles($roles),
+            'rolePreviews' => $this->roleAccessPreview->forRoles($roles),
         ])->layout('layouts.app');
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Reimbursement;
 use App\Support\FileAccessService;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReimbursementAttachmentController extends Controller
 {
@@ -12,7 +13,7 @@ class ReimbursementAttachmentController extends Controller
         protected FileAccessService $fileAccessService,
     ) {}
 
-    public function show(Reimbursement $reimbursement)
+    public function show(Reimbursement $reimbursement): StreamedResponse
     {
         $this->authorize('view', $reimbursement);
 

@@ -8,6 +8,10 @@ use App\Support\MultiCompanyService;
 
 class AttendancePolicy
 {
+    public function __construct(
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
     public function viewAny(User $user): bool
     {
         return true;
@@ -66,6 +70,6 @@ class AttendancePolicy
         $attendance->loadMissing('user');
 
         return $attendance->user !== null
-            && app(MultiCompanyService::class)->canAccessUser($actor, $attendance->user);
+            && $this->multiCompany->canAccessUser($actor, $attendance->user);
     }
 }

@@ -8,6 +8,10 @@ use App\Support\MultiCompanyService;
 
 class ImportExportRunPolicy
 {
+    public function __construct(
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
     public function download(User $user, ImportExportRun $run): bool
     {
         if (! $user->can('accessAdminPanel')) {
@@ -50,6 +54,6 @@ class ImportExportRunPolicy
         $run->loadMissing('requestedBy');
 
         return $run->requestedBy !== null
-            && app(MultiCompanyService::class)->canAccessUser($user, $run->requestedBy);
+            && $this->multiCompany->canAccessUser($user, $run->requestedBy);
     }
 }

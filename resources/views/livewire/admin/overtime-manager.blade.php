@@ -117,7 +117,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-2 sm:flex-shrink-0">
+                            <div class="flex items-center gap-2 sm:shrink-0">
                                 @if ($overtime->status === 'pending')
                                     <div class="flex justify-end gap-2">
                                         <x-actions.icon-button wire:click="approve('{{ $overtime->id }}')"

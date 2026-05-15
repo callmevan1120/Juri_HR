@@ -179,7 +179,7 @@
                         @endphp
                         <li class="rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.035]">
                             <div class="flex items-start gap-3">
-                                <span class="mt-1.5 h-2.5 w-2.5 flex-shrink-0 rounded-full {{ $alertTone }}"></span>
+                                <span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full {{ $alertTone }}"></span>
                                 <div class="min-w-0">
                                     <p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ $alert['level'] }} · {{ $alert['code'] }}</p>
                                     <p class="mt-1 text-sm font-medium text-slate-900 dark:text-white">{{ __($alert['message']) }}</p>

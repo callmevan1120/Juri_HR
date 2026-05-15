@@ -8,6 +8,10 @@ use App\Support\MultiCompanyService;
 
 class HrChecklistTaskPolicy
 {
+    public function __construct(
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
     public function viewAny(User $user): bool
     {
         return true;
@@ -42,6 +46,6 @@ class HrChecklistTaskPolicy
         $employee = $task->case?->user;
 
         return $employee !== null
-            && app(MultiCompanyService::class)->canAccessUser($actor, $employee);
+            && $this->multiCompany->canAccessUser($actor, $employee);
     }
 }

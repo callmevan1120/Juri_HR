@@ -15,6 +15,10 @@ class AttendanceComponent extends Component
     use AttendanceDetailTrait;
     use InteractsWithBanner, WithPagination;
 
+    protected AdminAttendanceGridQuery $attendanceGrid;
+
+    protected ImportExportRunViewService $importExportRuns;
+
     // filter
     public $startDate;
 
@@ -27,6 +31,12 @@ class AttendanceComponent extends Component
     public ?string $search = null;
 
     public string $riskFilter = 'all';
+
+    public function boot(AdminAttendanceGridQuery $attendanceGrid, ImportExportRunViewService $importExportRuns): void
+    {
+        $this->attendanceGrid = $attendanceGrid;
+        $this->importExportRuns = $importExportRuns;
+    }
 
     public function mount()
     {
@@ -54,7 +64,7 @@ class AttendanceComponent extends Component
         }
 
         $dates = $start->range($end)->toArray();
-        $employees = app(AdminAttendanceGridQuery::class)->employees(
+        $employees = $this->attendanceGrid->employees(
             auth()->user(),
             $start,
             $end,
@@ -67,7 +77,7 @@ class AttendanceComponent extends Component
         return view('livewire.admin.attendance', [
             'employees' => $employees,
             'dates' => $dates,
-            'recentReportRuns' => app(ImportExportRunViewService::class)
+            'recentReportRuns' => $this->importExportRuns
                 ->recentForResources(['attendance_report'], auth()->user(), 4),
         ]);
     }

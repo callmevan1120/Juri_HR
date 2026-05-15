@@ -315,7 +315,7 @@
             <x-admin.insight-panel class="p-4">
                 <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Attendance Rate') }}</h3>
                 <div class="flex items-center gap-4">
-                    <div class="relative flex-shrink-0">
+                    <div class="relative shrink-0">
                         <svg viewBox="0 0 120 120" class="w-24 h-24">
                             <circle cx="60" cy="60" r="52" fill="none" stroke-width="10" class="stroke-slate-100 dark:stroke-slate-800" />
                             <circle cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round"

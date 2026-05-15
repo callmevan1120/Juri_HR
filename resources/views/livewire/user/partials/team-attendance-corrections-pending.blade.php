@@ -15,7 +15,7 @@
                     <tr>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
+                                <div class="shrink-0 h-10 w-10">
                                     <img class="h-10 w-10 rounded-full object-cover"
                                         src="{{ $correction->user->profile_photo_url }}"
                                         alt="{{ $correction->user->name }}">

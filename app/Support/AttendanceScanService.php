@@ -23,6 +23,7 @@ class AttendanceScanService
         private readonly DynamicBarcodeTokenService $dynamicBarcodeTokenService,
         private readonly AttendanceRiskScoringService $attendanceRiskScoring,
         private readonly AttendanceRiskScorer $attendanceRiskScorer,
+        private readonly AttendanceServiceInterface $attendanceService,
     ) {}
 
     /**
@@ -187,12 +188,11 @@ class AttendanceScanService
             FILTER_VALIDATE_BOOLEAN
         );
 
-        $attendanceService = app(AttendanceServiceInterface::class);
         $requiresFaceEnrollment = ! $attendanceLocked && (
             filter_var(
                 Setting::getValue('attendance.require_face_enrollment', false),
                 FILTER_VALIDATE_BOOLEAN
-            ) || $attendanceService->shouldEnforceFaceEnrollment() || $faceVerificationRequired
+            ) || $this->attendanceService->shouldEnforceFaceEnrollment() || $faceVerificationRequired
         );
 
         return [
@@ -431,9 +431,8 @@ class AttendanceScanService
         }
 
         $imageName = $user->id.'_'.time().'.jpg';
-        $service = app(AttendanceServiceInterface::class);
 
-        return $service->storeAttendancePhoto($photo, $imageName);
+        return $this->attendanceService->storeAttendancePhoto($photo, $imageName);
     }
 
     private function calculateDistance(LatLong $a, LatLong $b): int

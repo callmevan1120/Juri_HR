@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ApprovalMatrixService
 {
+    public function __construct(
+        private readonly ApprovalActorService $approvalActor,
+    ) {}
+
     public function matchingRule(string $workflow, Model $subject): ?ApprovalMatrixRule
     {
         return ApprovalMatrixRule::query()
@@ -61,7 +65,7 @@ class ApprovalMatrixService
 
         return match ((string) ($step['approver_type'] ?? '')) {
             'direct_manager' => $this->requester($subject)?->supervisor?->id === $actor->id,
-            'finance_head' => app(ApprovalActorService::class)->isFinanceHead($actor),
+            'finance_head' => $this->approvalActor->isFinanceHead($actor),
             'permission' => $actor->allowsAdminPermission((string) ($step['permission'] ?? '')),
             'role' => $actor->hasRole((string) ($step['role'] ?? '')),
             'admin_permission' => $actor->allowsAdminPermission((string) ($step['permission'] ?? '')),

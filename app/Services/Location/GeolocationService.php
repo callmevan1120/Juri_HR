@@ -2,6 +2,7 @@
 
 namespace App\Services\Location;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -83,16 +84,24 @@ class GeolocationService
     /**
      * Log geolocation data for security audit
      */
-    public static function logGeolocation($userId, float $latitude, float $longitude, string $action = 'attendance', ?array $metadata = null)
-    {
+    public static function logGeolocation(
+        int|string|null $userId,
+        float $latitude,
+        float $longitude,
+        string $action = 'attendance',
+        ?array $metadata = null,
+        ?Request $request = null,
+    ): void {
+        $request ??= request();
+
         try {
             DB::table('geolocation_logs')->insert([
                 'user_id' => $userId,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'action' => $action,
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->header('User-Agent'),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
                 'metadata' => $metadata ? json_encode($metadata) : null,
                 'created_at' => now(),
             ]);

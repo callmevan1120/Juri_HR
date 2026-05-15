@@ -16,12 +16,10 @@ class AttendancePhotoController extends Controller
     /**
      * Serve attendance photo securely.
      *
-     * @param  Request  $request
      * @param  string  $type  'in' or 'out'
      * @param  int|null  $index  Index for multiple attachments
-     * @return StreamedResponse
      */
-    public function show(Attendance $attendance, string $type, string|int|null $index = null)
+    public function show(Attendance $attendance, string $type, string|int|null $index = null): StreamedResponse
     {
         $this->authorize('view', $attendance);
 

@@ -17,6 +17,8 @@ class ReimbursementPage extends Component
 
     protected UserReimbursementService $reimbursementService;
 
+    protected SecureUploadPolicy $secureUploadPolicy;
+
     public $claims;
 
     public $limit = 5;
@@ -47,13 +49,14 @@ class ReimbursementPage extends Component
             'type' => 'required|string|in:medical,transport,optical,dental,project,other',
             'amount' => 'required|numeric|min:1',
             'description' => 'required|string|max:500',
-            'attachment' => ['nullable', ...app(SecureUploadPolicy::class)->rules('document')],
+            'attachment' => ['nullable', ...$this->secureUploadPolicy->rules('document')],
         ];
     }
 
-    public function boot(UserReimbursementService $reimbursementService): void
+    public function boot(UserReimbursementService $reimbursementService, SecureUploadPolicy $secureUploadPolicy): void
     {
         $this->reimbursementService = $reimbursementService;
+        $this->secureUploadPolicy = $secureUploadPolicy;
     }
 
     public function mount()

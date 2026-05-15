@@ -118,7 +118,7 @@
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-4">
                                         <div
-                                            class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700 ring-2 ring-white dark:ring-gray-800">
+                                            class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700 ring-2 ring-white dark:ring-gray-800">
                                             <img class="h-full w-full object-cover"
                                                 src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
                                         </div>
@@ -240,7 +240,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700 ring-2 ring-white dark:ring-gray-800">
+                                    class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700 ring-2 ring-white dark:ring-gray-800">
                                     <img class="h-full w-full object-cover" src="{{ $user->profile_photo_url }}"
                                         alt="{{ $user->name }}">
                                 </div>
@@ -417,13 +417,13 @@
                                                 class="px-4 py-3 flex items-center justify-between bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                                                 <div class="flex items-center gap-2 min-w-0">
                                                     <span
-                                                        class="flex-shrink-0 h-2 w-2 rounded-full bg-primary-400"></span>
+                                                        class="shrink-0 h-2 w-2 rounded-full bg-primary-400"></span>
                                                     <h4
                                                         class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
                                                         {{ $eval->kpiTemplate->name ?? __('KPI') }}</h4>
                                                 </div>
                                                 <span
-                                                    class="flex-shrink-0 text-[11px] font-mono font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{ $eval->kpiTemplate->weight ?? 0 }}%</span>
+                                                    class="shrink-0 text-[11px] font-mono font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{ $eval->kpiTemplate->weight ?? 0 }}%</span>
                                             </div>
 
                                             @if ($eval->kpiTemplate && $eval->kpiTemplate->indicator_description)

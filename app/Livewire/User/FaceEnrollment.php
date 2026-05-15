@@ -9,9 +9,16 @@ use Livewire\Component;
 
 class FaceEnrollment extends Component
 {
+    protected AttendanceServiceInterface $attendanceService;
+
     public bool $isEnrolled = false;
 
     public bool $isCapturing = false;
+
+    public function boot(AttendanceServiceInterface $attendanceService): void
+    {
+        $this->attendanceService = $attendanceService;
+    }
 
     public function mount()
     {
@@ -37,7 +44,7 @@ class FaceEnrollment extends Component
         }
 
         try {
-            app(AttendanceServiceInterface::class)->registerFace($user, $descriptor);
+            $this->attendanceService->registerFace($user, $descriptor);
 
             $this->isEnrolled = true;
             $this->isCapturing = false;
@@ -63,7 +70,7 @@ class FaceEnrollment extends Component
     public function removeFace()
     {
         try {
-            app(AttendanceServiceInterface::class)->removeFace(Auth::user());
+            $this->attendanceService->removeFace(Auth::user());
 
             $this->isEnrolled = false;
             $this->dispatch('toast', type: 'success', message: __('Face ID removed.'));

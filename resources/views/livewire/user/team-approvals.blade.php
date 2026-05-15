@@ -59,7 +59,7 @@
             <div
                 class="mb-4 rounded-xl bg-green-50 p-4 border border-green-100 dark:bg-green-900/20 dark:border-green-800">
                 <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <x-heroicon-s-check-circle class="h-5 w-5 text-green-400" />
                     </div>
                     <div class="ml-3">
@@ -107,7 +107,7 @@
                                     <tr>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="shrink-0 h-10 w-10">
                                                     <img class="h-10 w-10 rounded-full object-cover"
                                                         src="{{ $leave->user->profile_photo_url }}"
                                                         alt="{{ $leave->user->name }}">
@@ -320,7 +320,7 @@
                                     <tr>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="shrink-0 h-10 w-10">
                                                     <img class="h-10 w-10 rounded-full object-cover"
                                                         src="{{ $reimbursement->user->profile_photo_url }}"
                                                         alt="{{ $reimbursement->user->name }}">
@@ -528,7 +528,7 @@
                                     <tr>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="shrink-0 h-10 w-10">
                                                     <img class="h-10 w-10 rounded-full object-cover"
                                                         src="{{ $overtime->user->profile_photo_url }}"
                                                         alt="{{ $overtime->user->name }}">
@@ -710,7 +710,7 @@
                                     <tr>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="shrink-0 h-10 w-10">
                                                     <img class="h-10 w-10 rounded-full object-cover"
                                                         src="{{ $kasbon->user->profile_photo_url }}"
                                                         alt="{{ $kasbon->user->name }}">

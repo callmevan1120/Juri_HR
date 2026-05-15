@@ -1,3 +1,3 @@
 <x-app-layout>
-    @livewire('admin.dashboard-component')
+    <livewire:admin.dashboard-component />
 </x-app-layout>

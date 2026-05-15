@@ -114,7 +114,7 @@
 
     <div class="flex flex-col gap-4 xl:flex-row">
         <!-- Sidebar Navigation -->
-        <aside class="w-full flex-shrink-0 xl:sticky xl:top-24 xl:w-64 xl:self-start">
+        <aside class="w-full shrink-0 xl:sticky xl:top-24 xl:w-64 xl:self-start">
             <nav class="grid grid-cols-2 gap-2 pb-1 sm:grid-cols-3 xl:block xl:space-y-1 xl:pb-0" role="tablist" aria-label="{{ __('Settings categories') }}">
                 <template x-for="tab in tabs" :key="tab.id">
                     <button type="button" role="tab" @click="activeTab = tab.id" :id="'settings-tab-' + tab.id"
@@ -277,7 +277,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="w-full flex-shrink-0 md:w-auto">
+                                                <div class="w-full shrink-0 md:w-auto">
                                                     @if ($setting->key === 'enterprise_license_key')
                                                         <div class="w-full max-w-3xl space-y-3 md:min-w-[18rem]">
 

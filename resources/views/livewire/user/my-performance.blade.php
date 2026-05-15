@@ -4,7 +4,7 @@
         @if (session()->has('error'))
             <div class="mb-4 rounded-xl border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/30 p-4">
                 <div class="flex">
-                    <x-heroicon-m-x-circle class="h-5 w-5 text-red-500 flex-shrink-0" />
+                    <x-heroicon-m-x-circle class="h-5 w-5 text-red-500 shrink-0" />
                     <p class="ml-3 text-sm font-medium text-red-800 dark:text-red-300">{{ session('error') }}</p>
                 </div>
             </div>
@@ -12,7 +12,7 @@
         @if (session()->has('success'))
             <div class="mb-4 rounded-xl border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-900/30 p-4">
                 <div class="flex">
-                    <x-heroicon-m-check-circle class="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <x-heroicon-m-check-circle class="h-5 w-5 text-green-500 shrink-0" />
                     <p class="ml-3 text-sm font-medium text-green-800 dark:text-green-300">{{ session('success') }}</p>
                 </div>
             </div>
@@ -170,10 +170,10 @@
                             <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 transition hover:shadow-md">
                                 <div class="px-4 py-3 flex items-center justify-between bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                                     <div class="flex items-center gap-2 min-w-0">
-                                        <span class="flex-shrink-0 h-2 w-2 rounded-full bg-primary-400"></span>
+                                        <span class="shrink-0 h-2 w-2 rounded-full bg-primary-400"></span>
                                         <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{{ $evaluation->kpiTemplate->name ?? __('KPI') }}</h4>
                                     </div>
-                                    <span class="flex-shrink-0 text-[11px] font-mono font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{ $evaluation->kpiTemplate->weight ?? 0 }}%</span>
+                                    <span class="shrink-0 text-[11px] font-mono font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{ $evaluation->kpiTemplate->weight ?? 0 }}%</span>
                                 </div>
 
                                 @if($evaluation->kpiTemplate && $evaluation->kpiTemplate->indicator_description)

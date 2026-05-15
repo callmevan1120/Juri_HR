@@ -72,7 +72,7 @@
                             @php($targetUrl = \App\Support\Helpers::normalizeInternalUrl($notification->data['url'] ?? $notification->data['action_url'] ?? null))
                             <article class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
                                 <div class="flex gap-4 p-4">
-                                    <div class="mt-0.5 flex-shrink-0">
+                                    <div class="mt-0.5 shrink-0">
                                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white shadow-md shadow-primary-500/25 dark:bg-primary-500 dark:shadow-none" aria-hidden="true">
                                             <x-heroicon-o-bell class="h-5 w-5" />
                                         </span>
@@ -138,7 +138,7 @@
                         @foreach($announcements as $announcement)
                             <article class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
                                 <div class="flex gap-4 p-4">
-                                    <div class="mt-0.5 flex-shrink-0">
+                                    <div class="mt-0.5 shrink-0">
                                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white shadow-md shadow-amber-500/25 dark:bg-amber-500 dark:shadow-none" aria-hidden="true">
                                             <x-heroicon-o-megaphone class="h-5 w-5" />
                                         </span>

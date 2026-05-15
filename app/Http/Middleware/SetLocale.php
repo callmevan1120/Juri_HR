@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
@@ -17,8 +16,8 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check()) {
-            $language = Auth::user()->language ?? 'id';
+        if ($request->user()) {
+            $language = $request->user()->language ?? 'id';
             App::setLocale($language);
         }
 

@@ -47,7 +47,7 @@
                 @foreach ($otpNotifications as $notif)
                     <x-admin.alert tone="warning" class="flex items-center justify-between shadow-sm">
                         <div class="flex items-start gap-3">
-                            <div class="flex-shrink-0 mt-0.5">
+                            <div class="shrink-0 mt-0.5">
                                 <x-heroicon-o-exclamation-triangle class="h-5 w-5 text-amber-600 dark:text-amber-500" />
                             </div>
                             <div>

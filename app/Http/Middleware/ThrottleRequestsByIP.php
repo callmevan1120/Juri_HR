@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\ActivityLog;
 use App\Models\Setting;
 use Closure;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
@@ -21,7 +20,7 @@ class ThrottleRequestsByIP
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $ip = $request->ip();
+        $ip = $request->ip() ?? 'unknown';
         $key = 'throttle_ip_'.$ip;
 
         // Check if IP is temporarily blocked

@@ -97,24 +97,24 @@
             <div class="min-w-0 space-y-4">
                 @if (Laravel\Fortify\Features::canUpdateProfileInformation())
                     <section x-cloak x-show="activeTab === 'details'" x-transition.opacity.duration.150ms>
-                        @livewire('profile.update-profile-information-form')
+                        <livewire:profile.update-profile-information-form />
                     </section>
                 @endif
 
                 @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
                     <section x-cloak x-show="activeTab === 'password'" x-transition.opacity.duration.150ms>
-                        @livewire('profile.update-password-form')
+                        <livewire:profile.update-password-form />
                     </section>
                 @endif
 
                 @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
                     <section x-cloak x-show="activeTab === 'security'" x-transition.opacity.duration.150ms>
-                        @livewire('profile.two-factor-authentication-form')
+                        <livewire:profile.two-factor-authentication-form />
                     </section>
                 @endif
 
                 <section x-cloak x-show="activeTab === 'sessions'" x-transition.opacity.duration.150ms>
-                    @livewire('profile.logout-other-browser-sessions-form')
+                    <livewire:profile.logout-other-browser-sessions-form />
                 </section>
             </div>
         </div>

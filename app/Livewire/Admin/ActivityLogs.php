@@ -15,6 +15,8 @@ class ActivityLogs extends Component
 
     private const ACTOR_GROUPS = ['all', 'user', 'admin', 'superadmin'];
 
+    protected ImportExportRunViewService $importExportRuns;
+
     public $search = '';
 
     public $dateStart = '';
@@ -22,6 +24,11 @@ class ActivityLogs extends Component
     public $dateEnd = '';
 
     public string $actorGroup = 'all';
+
+    public function boot(ImportExportRunViewService $importExportRuns): void
+    {
+        $this->importExportRuns = $importExportRuns;
+    }
 
     public function mount()
     {
@@ -83,7 +90,7 @@ class ActivityLogs extends Component
 
         return view('livewire.admin.activity-logs', [
             'logs' => $logs,
-            'recentExportRuns' => app(ImportExportRunViewService::class)
+            'recentExportRuns' => $this->importExportRuns
                 ->recentForResources(['activity_logs'], auth()->user(), 6),
         ])->layout('layouts.app');
     }

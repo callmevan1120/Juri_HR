@@ -23,7 +23,7 @@
         x-transition:leave="transition ease-in duration-75"
         x-transition:leave-start="transform opacity-100 scale-100"
         x-transition:leave-end="transform opacity-0 scale-95"
-        class="fixed inset-x-4 top-16 mt-2 z-50 w-auto origin-top rounded-xl bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:absolute sm:right-0 sm:inset-x-auto sm:top-full sm:mt-2 sm:w-80 sm:origin-top-right"
+        class="fixed inset-x-4 top-16 mt-2 z-50 w-auto origin-top rounded-xl bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black/5 focus:outline-none sm:absolute sm:right-0 sm:inset-x-auto sm:top-full sm:mt-2 sm:w-80 sm:origin-top-right"
         style="display: none;">
         
         <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-700">
@@ -50,7 +50,7 @@
                             <a href="{{ $targetUrl }}" wire:click="markAsRead('{{ $notification->id }}')" @click="open = false" class="block pr-16">
                                 <h4 class="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-300">
                                     @if(is_null($notification->read_at))
-                                        <span class="h-2 w-2 flex-shrink-0 rounded-full bg-blue-500"></span>
+                                        <span class="h-2 w-2 shrink-0 rounded-full bg-blue-500"></span>
                                     @endif
                                     {{ $notification->data['title'] ?? 'Notification' }}
                                 </h4>

@@ -9,6 +9,8 @@ use Livewire\Component;
 
 class ScanComponent extends Component
 {
+    protected AttendanceScanService $attendanceScan;
+
     public ?Attendance $attendance = null;
 
     public $shift_id = null;
@@ -40,13 +42,18 @@ class ScanComponent extends Component
 
     public ?float $gpsVariance = null;
 
+    public function boot(AttendanceScanService $attendanceScan): void
+    {
+        $this->attendanceScan = $attendanceScan;
+    }
+
     public function validateBarcode(string $barcode, ?float $lat = null, ?float $lng = null)
     {
         if ($lat !== null && $lng !== null) {
             $this->currentLiveCoords = [$lat, $lng];
         }
 
-        return app(AttendanceScanService::class)->validateScan(
+        return $this->attendanceScan->validateScan(
             Auth::user(),
             $this->shift_id,
             $this->currentLiveCoords,
@@ -62,7 +69,7 @@ class ScanComponent extends Component
             $this->currentLiveCoords = [$lat, $lng];
         }
 
-        $result = app(AttendanceScanService::class)->performScan(
+        $result = $this->attendanceScan->performScan(
             user: Auth::user(),
             shiftId: $this->shift_id,
             coords: $this->currentLiveCoords,
@@ -114,7 +121,7 @@ class ScanComponent extends Component
     public function mount()
     {
         $user = Auth::user();
-        $state = app(AttendanceScanService::class)->bootstrap($user);
+        $state = $this->attendanceScan->bootstrap($user);
 
         $this->shifts = $state['shifts'];
         $this->shift_id = $state['shift_id'];

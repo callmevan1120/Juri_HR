@@ -9,6 +9,10 @@ use App\Support\MultiCompanyService;
 
 class PayrollPolicy
 {
+    public function __construct(
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
     public function viewAny(User $user): bool
     {
         return ! Editions::payrollLocked();
@@ -39,6 +43,6 @@ class PayrollPolicy
         $payroll->loadMissing('user');
 
         return $payroll->user !== null
-            && app(MultiCompanyService::class)->canAccessUser($actor, $payroll->user);
+            && $this->multiCompany->canAccessUser($actor, $payroll->user);
     }
 }

@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnsureNoOtherActiveSessions
 {
@@ -15,7 +16,7 @@ class EnsureNoOtherActiveSessions
         protected ActiveSessionGuard $activeSessionGuard
     ) {}
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $login = (string) $request->input('email');
 

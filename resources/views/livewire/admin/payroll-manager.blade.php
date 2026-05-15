@@ -249,7 +249,7 @@
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3">
                                     <div class="flex items-center">
-                                        <div class="h-10 w-10 flex-shrink-0">
+                                        <div class="h-10 w-10 shrink-0">
                                             <img class="h-10 w-10 rounded-full object-cover"
                                                 src="{{ $payroll->user?->profile_photo_url }}"
                                                 alt="{{ $payroll->user?->name ?? __('Unknown User') }}">

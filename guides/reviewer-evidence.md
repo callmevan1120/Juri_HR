@@ -52,6 +52,7 @@ Feature/unit tests tetap menjadi bukti utama untuk domain kritikal:
 - multi-company isolation
 
 Playwright smoke menambahkan bukti browser untuk halaman utama admin/user. APK smoke menambahkan bukti device untuk launch, permission kamera/GPS, barcode/photo readiness, screenshot, dan crash log.
+Authenticated Playwright smoke memakai akun demo `apk.demo.superadmin@paspapan.test` dan `apk.demo.user@paspapan.test` secara default. Jalankan `php scripts/prepare-apk-screenshots-demo.php` sebelum smoke lokal, atau override dengan `E2E_ADMIN_EMAIL`, `E2E_ADMIN_PASSWORD`, `E2E_USER_EMAIL`, dan `E2E_USER_PASSWORD`.
 
 ## Package Smoke Scope
 
@@ -104,6 +105,7 @@ bun audit
 bun run build
 php artisan rbac:audit
 composer check:modern-stack
+php scripts/prepare-apk-screenshots-demo.php
 bun run e2e:smoke
 ```
 

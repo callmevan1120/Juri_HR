@@ -10,6 +10,11 @@ use App\Support\MultiCompanyService;
 
 class CashAdvancePolicy
 {
+    public function __construct(
+        private readonly CashAdvanceApprovalService $cashAdvanceApprovals,
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
     public function viewAny(User $user): bool
     {
         return ! Editions::cashAdvanceLocked() && $user->isUser;
@@ -37,7 +42,7 @@ class CashAdvancePolicy
         }
 
         return ! Editions::cashAdvanceLocked()
-            && app(CashAdvanceApprovalService::class)->canManage($cashAdvance, $user);
+            && $this->cashAdvanceApprovals->canManage($cashAdvance, $user);
     }
 
     public function reject(User $user, CashAdvance $cashAdvance): bool
@@ -59,6 +64,6 @@ class CashAdvancePolicy
         $cashAdvance->loadMissing('user');
 
         return $cashAdvance->user !== null
-            && app(MultiCompanyService::class)->canAccessUser($actor, $cashAdvance->user);
+            && $this->multiCompany->canAccessUser($actor, $cashAdvance->user);
     }
 }

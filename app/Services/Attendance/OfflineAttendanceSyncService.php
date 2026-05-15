@@ -12,6 +12,7 @@ class OfflineAttendanceSyncService
 {
     public function __construct(
         private readonly DeviceAttendanceService $deviceAttendanceService,
+        private readonly AttendanceServiceInterface $attendanceService,
     ) {}
 
     /**
@@ -102,7 +103,7 @@ class OfflineAttendanceSyncService
             return null;
         }
 
-        return app(AttendanceServiceInterface::class)->storeAttendancePhoto(
+        return $this->attendanceService->storeAttendancePhoto(
             $photoBase64,
             $user->id.'_offline_'.time().'.jpg',
         );

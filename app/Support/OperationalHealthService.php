@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Storage;
 
 class OperationalHealthService
 {
+    public function __construct(
+        private readonly HrComplianceReminderService $hrComplianceReminder,
+    ) {}
+
     /**
      * @return array<string, mixed>
      */
@@ -50,7 +54,7 @@ class OperationalHealthService
             'php_version' => PHP_VERSION,
             'database_driver' => DB::connection()->getDriverName(),
             'database_version' => $this->databaseVersion(),
-            'hr_compliance' => app(HrComplianceReminderService::class)->summary(),
+            'hr_compliance' => $this->hrComplianceReminder->summary(),
             'import_export' => $this->importExportHealth(),
             'tables' => $this->tableSummary(),
             'scheduler_last_run' => $schedulerHeartbeat,

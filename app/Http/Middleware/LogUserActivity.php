@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\ActivityLog;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class LogUserActivity
@@ -19,8 +18,10 @@ class LogUserActivity
     {
         $response = $next($request);
 
+        $user = $request->user();
+
         // Only log for authenticated users
-        if (Auth::check()) {
+        if ($user !== null) {
             $method = $request->method();
             $path = $request->path();
 

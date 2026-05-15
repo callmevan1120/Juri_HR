@@ -123,7 +123,7 @@
                         <ul class="space-y-1.5 px-4 py-3 text-xs text-slate-600 dark:text-slate-300">
                             @foreach ($recommendedActions as $action)
                                 <li wire:key="recommended-action-{{ md5($action) }}" class="flex items-start gap-2">
-                                    <span class="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400 dark:bg-slate-500"></span>
+                                    <span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400 dark:bg-slate-500"></span>
                                     <span>{{ $action }}</span>
                                 </li>
                             @endforeach

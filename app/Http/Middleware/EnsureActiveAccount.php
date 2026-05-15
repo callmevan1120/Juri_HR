@@ -3,12 +3,16 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureActiveAccount
 {
+    public function __construct(
+        private readonly StatefulGuard $guard,
+    ) {}
+
     /**
      * Handle an incoming request.
      *
@@ -16,10 +20,10 @@ class EnsureActiveAccount
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = Auth::user();
+        $user = $request->user();
 
         if ($user !== null && ! $user->canAuthenticate()) {
-            Auth::logout();
+            $this->guard->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 

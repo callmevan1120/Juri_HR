@@ -122,7 +122,7 @@
                                 <tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                     <td class="whitespace-nowrap px-4 py-3">
                                         <div class="flex items-center">
-                                            <div class="h-8 w-8 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs dark:bg-blue-900/30 dark:text-blue-400">
+                                            <div class="h-8 w-8 shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs dark:bg-blue-900/30 dark:text-blue-400">
                                                 {{ substr($log->user->name ?? '?', 0, 1) }}
                                             </div>
                                             <div class="ml-4">

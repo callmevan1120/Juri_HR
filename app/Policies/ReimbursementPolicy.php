@@ -9,6 +9,11 @@ use App\Support\MultiCompanyService;
 
 class ReimbursementPolicy
 {
+    public function __construct(
+        private readonly ApprovalMatrixService $approvalMatrix,
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
     public function viewAny(User $user): bool
     {
         return true;
@@ -56,7 +61,7 @@ class ReimbursementPolicy
             return false;
         }
 
-        if (app(ApprovalMatrixService::class)->canActorApprove($user, 'reimbursement', $reimbursement)) {
+        if ($this->approvalMatrix->canActorApprove($user, 'reimbursement', $reimbursement)) {
             return true;
         }
 
@@ -78,6 +83,6 @@ class ReimbursementPolicy
         $reimbursement->loadMissing('user');
 
         return $reimbursement->user !== null
-            && app(MultiCompanyService::class)->canAccessUser($actor, $reimbursement->user);
+            && $this->multiCompany->canAccessUser($actor, $reimbursement->user);
     }
 }

@@ -12,6 +12,8 @@ use Livewire\Component;
 
 class HomeAttendanceStatus extends Component
 {
+    protected AttendanceServiceInterface $attendanceService;
+
     public $hasCheckedIn = false;
 
     public $hasCheckedOut = false;
@@ -25,6 +27,11 @@ class HomeAttendanceStatus extends Component
     public $overtime = null;
 
     public bool $hasApprovedOvertime = false;
+
+    public function boot(AttendanceServiceInterface $attendanceService): void
+    {
+        $this->attendanceService = $attendanceService;
+    }
 
     public function mount()
     {
@@ -42,12 +49,11 @@ class HomeAttendanceStatus extends Component
         );
 
         // Check for mandatory face enrollment (Open Core Logic)
-        $service = app(AttendanceServiceInterface::class);
         $shouldRequireFaceEnrollment = ! $attendanceLocked && (
             filter_var(
                 Setting::getValue('attendance.require_face_enrollment', false),
                 FILTER_VALIDATE_BOOLEAN
-            ) || $service->shouldEnforceFaceEnrollment() || $faceVerificationRequired
+            ) || $this->attendanceService->shouldEnforceFaceEnrollment() || $faceVerificationRequired
         );
 
         if ($shouldRequireFaceEnrollment && ! $user->hasFaceRegistered()) {

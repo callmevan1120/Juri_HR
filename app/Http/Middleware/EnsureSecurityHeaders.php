@@ -3,11 +3,16 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureSecurityHeaders
 {
+    public function __construct(
+        private readonly Application $app,
+    ) {}
+
     /**
      * Handle an incoming request.
      *
@@ -45,7 +50,7 @@ class EnsureSecurityHeaders
         ];
 
         // Allow Vite dev server in local environment
-        if (app()->environment('local')) {
+        if ($this->app->environment('local')) {
             // Browsers are strict about wildcard ports. We allow common localhost variants
             // and the specific host if we're accessing via LAN IP.
             $host = $request->getHost();

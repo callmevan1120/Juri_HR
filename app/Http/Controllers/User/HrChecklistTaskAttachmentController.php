@@ -12,6 +12,8 @@ class HrChecklistTaskAttachmentController extends Controller
 {
     public function show(HrChecklistTask $task, AttachmentPathValidator $validator): Response
     {
+        $this->authorize('downloadAttachment', $task);
+
         abort_unless($task->attachment_path, 404);
 
         $path = (string) $task->attachment_path;

@@ -119,9 +119,9 @@
                         <div id="barcode-value-field">
                             <x-forms.label for="value" value="{{ __('Static Barcode Value') }}" />
                             @if ($isEdit)
-                                @livewire('admin.barcode-value-input-component', ['value' => old('value', $barcode?->value)])
+                                <livewire:admin.barcode-value-input-component :value="old('value', $barcode?->value)" />
                             @else
-                                @livewire('admin.barcode-value-input-component')
+                                <livewire:admin.barcode-value-input-component />
                             @endif
                             <p class="sr-only">
                                 {{ __('Used only when dynamic QR is off.') }}

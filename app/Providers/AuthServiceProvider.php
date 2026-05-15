@@ -69,12 +69,11 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * Register any authentication / authorization services.
      */
-    public function boot(): void
+    public function boot(ApprovalActorService $approvalActors): void
     {
         $this->registerPolicies();
 
         $adminPermission = fn (User $user, string|array $permissions): bool => $user->allowsAdminPermission($permissions);
-        $approvalActors = app(ApprovalActorService::class);
 
         Gate::define('accessAdminPanel', fn (User $user): bool => $user->canAccessAdminPanel());
         Gate::define('reviewSubordinateRequests', fn (User $user): bool => $approvalActors->hasSubordinates($user));

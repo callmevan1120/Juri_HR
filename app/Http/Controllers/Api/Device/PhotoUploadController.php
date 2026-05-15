@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Device;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\DevicePhotoUploadRequest;
 use App\Services\Attendance\DeviceAttendanceService;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 class PhotoUploadController extends Controller
@@ -14,13 +14,15 @@ class PhotoUploadController extends Controller
         protected DeviceAttendanceService $deviceAttendanceService,
     ) {}
 
-    public function __invoke(DevicePhotoUploadRequest $request)
+    public function __invoke(DevicePhotoUploadRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $userId = $request->user()?->getAuthIdentifier();
+        abort_unless(is_int($userId) || is_string($userId), 401);
 
         try {
             $result = $this->deviceAttendanceService->uploadPhoto(
-                userId: Auth::id(),
+                userId: $userId,
                 photo: $request->file('photo'),
                 latitude: isset($validated['latitude']) ? (float) $validated['latitude'] : null,
                 longitude: isset($validated['longitude']) ? (float) $validated['longitude'] : null,
@@ -37,7 +39,7 @@ class PhotoUploadController extends Controller
             ]);
         } catch (\Throwable $e) {
             Log::warning('Failed to upload device attendance photo.', [
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'exception' => $e->getMessage(),
             ]);
 

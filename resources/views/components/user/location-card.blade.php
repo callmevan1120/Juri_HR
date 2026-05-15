@@ -33,7 +33,7 @@
             <div class="flex items-center gap-2 mt-1">
                 <a href="#" onclick="window.openMap({{ $latitude }}, {{ $longitude }}); return false;"
                     class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md border border-gray-100 dark:border-gray-700">
-                    <x-heroicon-o-map-pin class="h-3.5 w-3.5 flex-shrink-0 text-primary-500" />
+                    <x-heroicon-o-map-pin class="h-3.5 w-3.5 shrink-0 text-primary-500" />
                     {{ $latitude . ', ' . $longitude }}
                 </a>
             </div>
