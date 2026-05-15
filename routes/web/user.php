@@ -45,7 +45,7 @@ Route::middleware([
         Route::livewire('/shift-swap-requests', 'user.shift-swap-request-page')
             ->name('shift-swap-requests')
             ->can('viewAny', ShiftSwapRequest::class);
-        Route::livewire('/document-requests', 'user.employee-document-request-page')
+        enterprise_livewire_route('/document-requests', 'user.employee-document-request-page')
             ->name('document-requests')
             ->can('viewAny', EmployeeDocumentRequest::class);
         Route::get('/document-requests/{documentRequest}/download', [EmployeeDocumentDownloadController::class, 'generated'])
@@ -64,14 +64,14 @@ Route::middleware([
             ->name('approvals.history')
             ->can('reviewSubordinateRequests');
         Route::livewire('/overtime', 'user.overtime-request')->name('overtime')->can('viewAny', Overtime::class);
-        Route::livewire('/my-kasbon', 'user.finance.my-cash-advances')->name('my-kasbon')->middleware('feature.lock:cash_advance,user,home')->can('viewAny', CashAdvance::class);
-        Route::livewire('/team-kasbon', 'user.finance.team-cash-advance-manager')
+        enterprise_livewire_route('/my-kasbon', 'user.finance.my-cash-advances')->name('my-kasbon')->middleware('feature.lock:cash_advance,user,home')->can('viewAny', CashAdvance::class);
+        enterprise_livewire_route('/team-kasbon', 'user.finance.team-cash-advance-manager')
             ->name('team-kasbon')
             ->middleware('feature.lock:cash_advance,gate:reviewSubordinateRequests,home')
             ->can('reviewSubordinateRequests');
         Route::livewire('/face-enrollment', 'user.face-enrollment')->name('face.enrollment');
-        Route::livewire('/my-assets', 'user.my-assets')->name('my-assets')->middleware('feature.lock:assets,user,home')->can('viewAny', CompanyAsset::class);
-        Route::livewire('/my-performance', 'user.my-performance')->name('my-performance')->middleware('feature.lock:appraisal,user,home')->can('viewAny', Appraisal::class);
+        enterprise_livewire_route('/my-assets', 'user.my-assets')->name('my-assets')->middleware('feature.lock:assets,user,home')->can('viewAny', CompanyAsset::class);
+        enterprise_livewire_route('/my-performance', 'user.my-performance')->name('my-performance')->middleware('feature.lock:appraisal,user,home')->can('viewAny', Appraisal::class);
         Route::get('/appraisal/{appraisal}/export-pdf', AppraisalExportPdfController::class)
             ->name('appraisal.export-pdf')
             ->can('exportPdf', 'appraisal');

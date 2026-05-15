@@ -1,8 +1,113 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+
+class EnterpriseHwId extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'enterprise:hwid';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Generate secure Hardware ID for Enterprise Licensing';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(): int
+    {
+        $this->info('Scanning hardware fingerprint...');
+        $hwid = self::generate();
+
+        $this->info('========================================');
+        $this->info('Your Server Hardware ID is:');
+        $this->line("<fg=green;options=bold>{$hwid}</>");
+        $this->info('========================================');
+        $this->line('Please copy this ID and give it to the author to receive your Enterprise License.');
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Generate the HWID.
+     * This is also called by LicenseGuard to verify.
+     */
+    public static function generate(): string
+    {
+        $mac = self::discoverMacAddress();
+
+        $fallback = php_uname('n').'_'.php_uname('m');
+        $raw = ! empty($mac) ? $mac : $fallback;
+
+        // Hash it with a salt to make it opaque and uniform in length
+        return md5('riprlutuk_enterprise_'.strtolower(trim($raw)));
+    }
+
+    private static function discoverMacAddress(): ?string
+    {
+        foreach (self::macAddressesFromNativeInterfaces() as $mac) {
+            return $mac;
+        }
+
+        foreach (self::macAddressesFromSysfs() as $mac) {
+            return $mac;
+        }
+
+        return null;
+    }
+
+    private static function macAddressesFromNativeInterfaces(): array
+    {
+        if (! function_exists('net_get_interfaces')) {
+            return [];
+        }
+
+        $macs = [];
+
+        foreach (net_get_interfaces() ?: [] as $interface) {
+            $mac = $interface['mac'] ?? null;
+
+            if (is_string($mac) && self::isUsableMacAddress($mac)) {
+                $macs[] = strtolower($mac);
+            }
+        }
+
+        sort($macs);
+
+        return array_values(array_unique($macs));
+    }
+
+    private static function macAddressesFromSysfs(): array
+    {
+        $macs = [];
+
+        foreach (glob('/sys/class/net/*/address') ?: [] as $addressFile) {
+            $mac = @file_get_contents($addressFile);
+
+            if (is_string($mac) && self::isUsableMacAddress($mac)) {
+                $macs[] = strtolower(trim($mac));
+            }
+        }
+
+        sort($macs);
+
+        return array_values(array_unique($macs));
+    }
+
+    private static function isUsableMacAddress(string $mac): bool
+    {
+        $mac = strtolower(trim($mac));
+
+        return preg_match('/^[0-9a-f]{2}(:[0-9a-f]{2}){5}$/', $mac) === 1
+            && $mac !== '00:00:00:00:00:00';
+    }
+}

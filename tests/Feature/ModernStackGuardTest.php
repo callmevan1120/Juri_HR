@@ -159,6 +159,43 @@ test('blade views use livewire four component tags and tailwind four safe utilit
     }
 });
 
+test('feature lock modal backdrop stays behind the interactive form', function () {
+    $contents = file_get_contents(resource_path('views/components/shared/feature-lock-modal.blade.php'));
+
+    expect($contents)
+        ->toContain('fixed inset-0 z-0')
+        ->toContain('absolute inset-0 z-0')
+        ->toContain('relative z-10 mx-auto')
+        ->toContain('normalizeWhatsapp(value)')
+        ->toContain('isValidDomain(value)')
+        ->toContain('x-bind:disabled="!isFormValid()"')
+        ->toContain('x-on:blur="touch(\'email\')"')
+        ->toContain('x-on:blur="touch(\'whatsapp\')"')
+        ->toContain('x-show="showError(\'jumlahKaryawan\')"')
+        ->not->toMatch('/x-model="(?:nama|email|perusahaan|whatsapp|domain|jumlahKaryawan|catatan)"[^>]*\sdisabled\b/');
+});
+
+test('pull to refresh uses animated pill surface and safe mobile guards', function () {
+    $script = file_get_contents(public_path('js/pulltorefresh.js'));
+    $layout = file_get_contents(resource_path('views/layouts/app.blade.php'));
+
+    expect($script)
+        ->toContain('@keyframes __PREFIX__pill')
+        ->toContain('calc(var(--ptr-progress) * 100%)')
+        ->toContain('.__PREFIX__refresh .__PREFIX__surface')
+        ->toContain('data-ptr-state')
+        ->toContain('Pull to sync this page')
+        ->not->toContain('__PREFIX__spinner')
+        ->not->toContain('conic-gradient')
+        ->not->toContain('__PREFIX__rail-fill')
+        ->and($layout)
+        ->toContain('PullToRefresh.init')
+        ->toContain('is-native-scanning')
+        ->toContain('document.body.dataset.pullToRefreshReady')
+        ->toContain('hasVisibleDialog')
+        ->toContain('@js(__(\'Pull to sync this page\'))');
+});
+
 /**
  * @return list<string>
  */

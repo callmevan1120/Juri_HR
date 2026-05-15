@@ -6,13 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\LeaveType;
 use App\Models\Setting;
+use App\Models\User;
 use App\Services\Attendance\LeaveRequestService;
 use App\Support\FileAccessService;
 use App\Support\SecureUploadPolicy;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttendanceController extends Controller
 {
@@ -22,23 +25,29 @@ class AttendanceController extends Controller
         protected SecureUploadPolicy $secureUploadPolicy,
     ) {}
 
-    public function scan()
+    public function scan(): View
     {
         $this->authorize('create', Attendance::class);
 
         return view('attendances.scan');
     }
 
-    public function applyLeave()
+    public function applyLeave(Request $request): View
     {
         $this->authorize('create', Attendance::class);
 
-        return view('attendances.apply-leave', $this->leaveRequestService->getApplyLeaveData(Auth::user()));
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+
+        return view('attendances.apply-leave', $this->leaveRequestService->getApplyLeaveData($user));
     }
 
-    public function storeLeaveRequest(Request $request)
+    public function storeLeaveRequest(Request $request): RedirectResponse
     {
         $this->authorize('create', Attendance::class);
+
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
 
         $leaveType = null;
 
@@ -67,7 +76,7 @@ class AttendanceController extends Controller
             $toDate = Carbon::parse($request->input('to', $fromDate->toDateString()));
 
             $result = $this->leaveRequestService->submitLeaveRequest(
-                user: Auth::user(),
+                user: $user,
                 status: $request->string('status', 'excused')->toString(),
                 note: $request->string('note')->toString(),
                 fromDate: $fromDate,
@@ -88,7 +97,7 @@ class AttendanceController extends Controller
                 ->with('success', __('Pengajuan izin berhasil dibuat.'));
         } catch (\Throwable $th) {
             Log::error('Failed to submit leave request.', [
-                'user_id' => Auth::id(),
+                'user_id' => $user?->getAuthIdentifier(),
                 'exception' => $th->getMessage(),
             ]);
 
@@ -98,7 +107,7 @@ class AttendanceController extends Controller
         }
     }
 
-    public function downloadAttachment(Attendance $attendance)
+    public function downloadAttachment(Attendance $attendance): StreamedResponse
     {
         $this->authorize('view', $attendance);
 
@@ -113,7 +122,7 @@ class AttendanceController extends Controller
         );
     }
 
-    public function history()
+    public function history(): View
     {
         $this->authorize('viewAny', Attendance::class);
 

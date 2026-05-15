@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Console\Commands\EnterpriseHwId;
 use App\Models\Setting;
 use App\Services\Enterprise\LicenseGuard;
+use App\Support\DefaultApplicationSettings;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -52,15 +53,7 @@ class SettingsManagementService
      */
     public function applyEnterpriseLicense(string $draft): array
     {
-        $setting = Setting::query()->firstOrCreate(
-            ['key' => 'enterprise_license_key'],
-            [
-                'value' => '',
-                'group' => 'enterprise',
-                'type' => 'textarea',
-                'description' => 'Enterprise License Key',
-            ],
-        );
+        $setting = $this->enterpriseLicenseSetting();
 
         $setting->update(['value' => trim($draft)]);
         Setting::flushCache($setting->key);
@@ -77,7 +70,7 @@ class SettingsManagementService
      */
     public function enterpriseLicenseState(bool $reloadDraft = true, ?string $currentDraft = null): array
     {
-        $setting = Setting::query()->where('key', 'enterprise_license_key')->first();
+        $setting = $this->enterpriseLicenseSetting();
         $draft = $reloadDraft ? (string) ($setting?->value ?? '') : (string) $currentDraft;
         $validation = LicenseGuard::validateDetailed($draft);
 
@@ -87,7 +80,7 @@ class SettingsManagementService
             $cacheUntil = $this->licenseValidationCacheExpiration($validation);
 
             Cache::put('ent_lic_status', ($validation['valid'] ?? false) ? 'valid' : 'invalid', $cacheUntil);
-            Cache::put('ent_lic_hash', hash('sha256', $draft), $cacheUntil);
+            Cache::put('ent_lic_hash', LicenseGuard::cacheFingerprint($draft), $cacheUntil);
             Cache::put('ent_lic_result', $validation, $cacheUntil);
         }
 
@@ -103,6 +96,8 @@ class SettingsManagementService
      */
     public function groupedSettings(): Collection
     {
+        $this->ensureDefaultSettings();
+
         return Setting::query()
             // Verification already implies enrollment when the user has no Face ID.
             // Keep the enrollment setting for backward compatibility, but avoid
@@ -147,5 +142,47 @@ class SettingsManagementService
     private function shouldRefreshEnterpriseLicense(string $settingKey): bool
     {
         return in_array($settingKey, ['app.company_name', 'app.support_contact', 'enterprise_license_key'], true);
+    }
+
+    private function enterpriseLicenseSetting(): Setting
+    {
+        $setting = Setting::query()->firstOrNew(['key' => 'enterprise_license_key']);
+
+        if (! $setting->exists || blank($setting->value)) {
+            $setting->value = config('app.enterprise_license_key') ?: '';
+        }
+
+        $setting->group = 'enterprise';
+        $setting->type = 'textarea';
+        $setting->description = 'Enterprise License Key';
+
+        if (! $setting->exists || $setting->isDirty()) {
+            $setting->save();
+        }
+
+        return $setting;
+    }
+
+    private function ensureDefaultSettings(): void
+    {
+        foreach (DefaultApplicationSettings::all() as $default) {
+            $setting = Setting::query()->firstOrNew(['key' => $default['key']]);
+
+            if (! $setting->exists) {
+                $setting->value = $default['value'];
+            }
+
+            if ($default['key'] === 'enterprise_license_key' && blank($setting->value)) {
+                $setting->value = config('app.enterprise_license_key') ?: '';
+            }
+
+            $setting->group = $default['group'];
+            $setting->type = $default['type'];
+            $setting->description = $default['description'];
+
+            if (! $setting->exists || $setting->isDirty()) {
+                $setting->save();
+            }
+        }
     }
 }

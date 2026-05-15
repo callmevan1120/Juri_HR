@@ -1,8 +1,131 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Policies;
+
+use App\Models\EmployeeDocumentRequest;
+use App\Models\User;
+use App\Support\MultiCompanyService;
+
+class EmployeeDocumentRequestPolicy
+{
+    public function __construct(
+        private readonly MultiCompanyService $multiCompany,
+    ) {}
+
+    public function viewAny(User $user): bool
+    {
+        return $user->isUser;
+    }
+
+    public function viewAdminAny(User $user): bool
+    {
+        return $user->can('viewAdminDocumentRequests');
+    }
+
+    public function view(User $user, EmployeeDocumentRequest $request): bool
+    {
+        if (! $this->sameCompany($user, $request)) {
+            return false;
+        }
+
+        return $user->can('viewAdminDocumentRequests') || $request->user_id === $user->id;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->isUser;
+    }
+
+    public function createForEmployee(User $user): bool
+    {
+        return $user->allowsAdminPermission([
+            'admin.document_requests.request',
+            'admin.document_requests.fulfill',
+        ]);
+    }
+
+    public function upload(User $user, EmployeeDocumentRequest $request): bool
+    {
+        if (! $this->sameCompany($user, $request)) {
+            return false;
+        }
+
+        return $request->user_id === $user->id
+            && in_array($request->status, [
+                EmployeeDocumentRequest::STATUS_REQUESTED,
+                EmployeeDocumentRequest::STATUS_REJECTED,
+            ], true);
+    }
+
+    public function fulfill(User $user, EmployeeDocumentRequest $request): bool
+    {
+        if (! $this->sameCompany($user, $request)) {
+            return false;
+        }
+
+        return $user->allowsAdminPermission('admin.document_requests.fulfill')
+            && in_array($request->status, [
+                EmployeeDocumentRequest::STATUS_PENDING,
+                EmployeeDocumentRequest::STATUS_UPLOADED,
+                EmployeeDocumentRequest::STATUS_GENERATED,
+            ], true);
+    }
+
+    public function generate(User $user, EmployeeDocumentRequest $request): bool
+    {
+        if (! $this->sameCompany($user, $request)) {
+            return false;
+        }
+
+        return $user->allowsAdminPermission([
+            'admin.document_requests.generate',
+            'admin.document_requests.fulfill',
+        ])
+            && in_array($request->status, [
+                EmployeeDocumentRequest::STATUS_PENDING,
+                EmployeeDocumentRequest::STATUS_REQUESTED,
+                EmployeeDocumentRequest::STATUS_UPLOADED,
+            ], true);
+    }
+
+    public function reject(User $user, EmployeeDocumentRequest $request): bool
+    {
+        if (! $this->sameCompany($user, $request)) {
+            return false;
+        }
+
+        return $user->allowsAdminPermission('admin.document_requests.fulfill')
+            && ! in_array($request->status, [
+                EmployeeDocumentRequest::STATUS_READY,
+                EmployeeDocumentRequest::STATUS_EXPIRED,
+            ], true);
+    }
+
+    public function download(User $user, EmployeeDocumentRequest $request): bool
+    {
+        if (! $this->sameCompany($user, $request)) {
+            return false;
+        }
+
+        return $request->generated_path !== null
+            && ($request->user_id === $user->id || $user->can('viewAdminDocumentRequests'));
+    }
+
+    public function downloadUpload(User $user, EmployeeDocumentRequest $request): bool
+    {
+        if (! $this->sameCompany($user, $request)) {
+            return false;
+        }
+
+        return $request->uploaded_path !== null
+            && ($request->user_id === $user->id || $user->can('viewAdminDocumentRequests'));
+    }
+
+    private function sameCompany(User $actor, EmployeeDocumentRequest $request): bool
+    {
+        $request->loadMissing('user');
+
+        return $request->user !== null
+            && $this->multiCompany->canAccessUser($actor, $request->user);
+    }
+}

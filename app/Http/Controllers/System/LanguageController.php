@@ -3,29 +3,28 @@
 namespace App\Http\Controllers\System;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 
 class LanguageController extends Controller
 {
     /**
      * Update the user's language preference.
      */
-    public function update(Request $request)
+    public function update(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'language' => 'required|in:id,en',
         ]);
 
         // Always update session for immediate effect (guests & users)
-        session(['locale' => $request->language]);
-        App::setLocale($request->language);
+        session(['locale' => $validated['language']]);
+        App::setLocale($validated['language']);
 
         // If user is logged in, save preference to database
-        if (Auth::check()) {
-            $user = Auth::user();
-            $user->language = $request->language;
+        if ($user = $request->user()) {
+            $user->language = $validated['language'];
             $user->save();
         }
 

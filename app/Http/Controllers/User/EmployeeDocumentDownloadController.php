@@ -1,8 +1,35 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Http\Controllers\User;
+
+use App\Http\Controllers\Controller;
+use App\Models\EmployeeDocumentRequest;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+class EmployeeDocumentDownloadController extends Controller
+{
+    public function generated(EmployeeDocumentRequest $documentRequest): StreamedResponse
+    {
+        $this->authorize('download', $documentRequest);
+
+        abort_if(! $documentRequest->generated_path || ! Storage::disk('local')->exists($documentRequest->generated_path), 404);
+
+        return Storage::disk('local')->download(
+            $documentRequest->generated_path,
+            'document-request-'.$documentRequest->id.'.pdf',
+        );
+    }
+
+    public function uploaded(EmployeeDocumentRequest $documentRequest): StreamedResponse
+    {
+        $this->authorize('downloadUpload', $documentRequest);
+
+        abort_if(! $documentRequest->uploaded_path || ! Storage::disk('local')->exists($documentRequest->uploaded_path), 404);
+
+        return Storage::disk('local')->download(
+            $documentRequest->uploaded_path,
+            $documentRequest->uploaded_original_name ?: 'uploaded-document-'.$documentRequest->id,
+        );
+    }
+}

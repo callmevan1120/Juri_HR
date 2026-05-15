@@ -5,8 +5,10 @@ use App\Helpers\Editions;
 use App\Livewire\Admin\Settings as AdminSettings;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\Admin\SettingsManagementService;
 use App\Services\Enterprise\LicenseGuard;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -132,7 +134,112 @@ it('applies enterprise license from admin settings and refreshes validation stat
 
     expect(Setting::where('key', 'enterprise_license_key')->value('value'))->toBe($licenseKey)
         ->and(Cache::get('ent_lic_status'))->toBe('valid')
-        ->and(Cache::get('ent_lic_hash'))->toBe(hash('sha256', $licenseKey));
+        ->and(Cache::get('ent_lic_hash'))->toBe(LicenseGuard::cacheFingerprint($licenseKey));
+});
+
+it('invalidates cached enterprise status when the licensed company context changes', function () {
+    seedEnterpriseSettings();
+
+    User::factory()->admin(true)->create();
+
+    $licenseKey = makeEnterpriseLicense(['max_users' => 10]);
+    Setting::query()->where('key', 'enterprise_license_key')->firstOrFail()->update(['value' => $licenseKey]);
+    LicenseGuard::clearLicenseCache();
+
+    expect(LicenseGuard::hasValidLicense())->toBeTrue()
+        ->and(Cache::get('ent_lic_status'))->toBe('valid');
+
+    Setting::query()->where('key', 'app.company_name')->firstOrFail()->update(['value' => 'PT. Changed Company']);
+
+    expect(LicenseGuard::hasValidLicense())->toBeFalse()
+        ->and(Cache::get('ent_lic_status'))->toBe('invalid')
+        ->and(Cache::get('ent_lic_result')['code'] ?? null)->toBe('company_mismatch');
+});
+
+it('shows settings groups that have stored settings instead of leaving them unreachable', function () {
+    seedEnterpriseSettings();
+    Setting::updateOrCreate(
+        ['key' => 'payroll.country'],
+        ['value' => 'ID', 'group' => 'payroll', 'type' => 'text', 'description' => 'Payroll localization country code']
+    );
+    Setting::updateOrCreate(
+        ['key' => 'appraisal.attendance_weight'],
+        ['value' => '30', 'group' => 'appraisal', 'type' => 'number', 'description' => 'Bobot Skor Absensi dalam Penilaian Appraisal (%)']
+    );
+    Setting::updateOrCreate(
+        ['key' => 'appraisal.period_label'],
+        ['value' => 'Q1 2026', 'group' => 'Appraisal', 'type' => 'text', 'description' => 'Appraisal period label']
+    );
+
+    $superadmin = User::factory()->admin(true)->create();
+    $this->actingAs($superadmin);
+
+    Livewire::test(AdminSettings::class)
+        ->assertSee('payroll.country')
+        ->assertSee('appraisal.attendance_weight')
+        ->assertSee('appraisal.period_label')
+        ->assertSee(__('Payroll'))
+        ->assertSee(__('Appraisal'));
+});
+
+it('keeps core app settings visible when the settings table is incomplete', function () {
+    Setting::query()->whereIn('key', [
+        'app.name',
+        'app.company_name',
+        'app.company_address',
+        'app.support_contact',
+        'app.time_format',
+        'app.show_seconds',
+        'feature.require_photo',
+    ])->delete();
+
+    $superadmin = User::factory()->admin(true)->create();
+    $this->actingAs($superadmin);
+
+    Livewire::test(AdminSettings::class)
+        ->assertSee(__('General'))
+        ->assertSee('app.name')
+        ->assertSee('app.company_name')
+        ->assertSee('app.company_address')
+        ->assertSee('app.support_contact')
+        ->assertSee('app.time_format')
+        ->assertSee('feature.require_photo');
+});
+
+it('normalizes legacy enterprise license setting metadata without clearing the license', function () {
+    Setting::query()->updateOrCreate(
+        ['key' => 'enterprise_license_key'],
+        [
+            'value' => 'saved-enterprise-license',
+            'group' => 'system',
+            'type' => 'text',
+            'description' => 'Legacy Enterprise License Key',
+        ],
+    );
+
+    app(SettingsManagementService::class)->enterpriseLicenseState();
+
+    $setting = Setting::query()->where('key', 'enterprise_license_key')->firstOrFail();
+
+    expect($setting->value)->toBe('saved-enterprise-license')
+        ->and($setting->group)->toBe('enterprise')
+        ->and($setting->type)->toBe('textarea')
+        ->and($setting->description)->toBe('Enterprise License Key');
+});
+
+it('allows optional env enterprise license key when the stored setting is blank', function () {
+    seedEnterpriseSettings(licenseKey: '');
+    User::factory()->admin(true)->create();
+
+    $licenseKey = makeEnterpriseLicense(['max_users' => 10]);
+    Config::set('app.enterprise_license_key', $licenseKey);
+    LicenseGuard::clearLicenseCache();
+
+    expect(LicenseGuard::hasValidLicense())->toBeTrue();
+
+    app(SettingsManagementService::class)->enterpriseLicenseState();
+
+    expect(Setting::query()->where('key', 'enterprise_license_key')->value('value'))->toBe($licenseKey);
 });
 
 it('shows the server hardware id on the enterprise settings tab', function () {

@@ -1,8 +1,154 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Console\Commands;
+
+use App\Jobs\RunSystemBackup;
+use App\Models\Setting;
+use App\Models\SystemBackupRun;
+use App\Services\Enterprise\LicenseGuard;
+use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+
+class RunScheduledBackups extends Command
+{
+    protected $signature = 'maintenance:scheduled-backups {--force : Dispatch backup jobs regardless of the configured schedule window}';
+
+    protected $description = 'Dispatch scheduled maintenance backups and prune expired retained artifacts';
+
+    public function handle(): int
+    {
+        if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
+            $this->warn('Enterprise backup automation is locked because ENTERPRISE_OBFUSCATOR_KEY is not configured. Free/open-source runtime remains available.');
+
+            return self::SUCCESS;
+        }
+
+        if (! Schema::hasTable('system_backup_runs')) {
+            $this->warn('The system_backup_runs table is missing. Apply the latest migrations before enabling scheduled backups.');
+
+            return self::SUCCESS;
+        }
+
+        $retentionDays = max(1, (int) Setting::getValue('maintenance.backup_retention_days', 14));
+        $prunedCount = $this->pruneExpiredBackups($retentionDays);
+
+        $enabled = (bool) Setting::getValue('maintenance.backup_schedule_enabled', 0);
+        $force = (bool) $this->option('force');
+
+        if (! $enabled && ! $force) {
+            $this->info("Backup automation is disabled. Pruned {$prunedCount} expired backups.");
+
+            return self::SUCCESS;
+        }
+
+        $type = (string) Setting::getValue('maintenance.backup_schedule_type', 'database');
+        $frequency = (string) Setting::getValue('maintenance.backup_schedule_frequency', 'daily');
+        $time = (string) Setting::getValue('maintenance.backup_schedule_time', '02:00');
+        $day = (string) Setting::getValue('maintenance.backup_schedule_day', 'sunday');
+
+        $slotKey = $force ? now()->format('Y-m-d H:i:s') : $this->dueSlotKey(now(), $frequency, $day, $time);
+
+        if (! $force && $slotKey === null) {
+            $this->info("No scheduled backup due right now. Pruned {$prunedCount} expired backups.");
+
+            return self::SUCCESS;
+        }
+
+        $lastRunSlot = (string) Setting::getValue('maintenance.backup_schedule_last_run_slot', '');
+
+        if (! $force && $lastRunSlot === $slotKey) {
+            $this->info("Scheduled backup for slot {$slotKey} already dispatched.");
+
+            return self::SUCCESS;
+        }
+
+        $dispatched = 0;
+
+        foreach ($this->scheduledTypes($type) as $backupType) {
+            $backupRun = SystemBackupRun::create([
+                'type' => $backupType,
+                'status' => 'queued',
+                'requested_by_user_id' => null,
+                'queue' => 'maintenance',
+                'file_disk' => 'local',
+                'meta' => [
+                    'execution' => $force ? 'forced-schedule' : 'scheduled',
+                    'scheduled_slot' => $slotKey,
+                ],
+            ]);
+
+            RunSystemBackup::dispatch($backupRun->id)->onQueue('maintenance');
+            $dispatched++;
+        }
+
+        if (! $force) {
+            Setting::updateOrCreate(
+                ['key' => 'maintenance.backup_schedule_last_run_slot'],
+                ['value' => $slotKey, 'group' => 'maintenance', 'type' => 'text', 'description' => 'Last dispatched scheduled backup slot']
+            );
+            Setting::flushCache('maintenance.backup_schedule_last_run_slot');
+        }
+
+        $this->info("Dispatched {$dispatched} backup job(s). Pruned {$prunedCount} expired backups.");
+
+        return self::SUCCESS;
+    }
+
+    private function dueSlotKey(Carbon $now, string $frequency, string $day, string $time): ?string
+    {
+        [$hour, $minute] = array_pad(explode(':', $time, 2), 2, '00');
+        $slot = $now->copy()->setTime((int) $hour, (int) $minute, 0);
+
+        if ($now->format('H:i') !== $slot->format('H:i')) {
+            return null;
+        }
+
+        if ($frequency === 'weekly' && strtolower($now->englishDayOfWeek) !== strtolower($day)) {
+            return null;
+        }
+
+        return $slot->format('Y-m-d H:i');
+    }
+
+    private function scheduledTypes(string $type): array
+    {
+        return match ($type) {
+            'application' => ['application'],
+            'both' => ['database', 'application'],
+            default => ['database'],
+        };
+    }
+
+    private function pruneExpiredBackups(int $retentionDays): int
+    {
+        $cutoff = now()->subDays($retentionDays);
+        $runs = SystemBackupRun::query()
+            ->where('status', 'completed')
+            ->whereNull('deleted_at')
+            ->whereNotNull('file_path')
+            ->where('completed_at', '<', $cutoff)
+            ->get();
+
+        $pruned = 0;
+
+        foreach ($runs as $run) {
+            $disk = $run->file_disk ?? 'local';
+
+            if (Storage::disk($disk)->exists($run->file_path)) {
+                Storage::disk($disk)->delete($run->file_path);
+            }
+
+            $run->update([
+                'status' => 'deleted',
+                'deleted_at' => now(),
+                'file_path' => null,
+            ]);
+
+            $pruned++;
+        }
+
+        return $pruned;
+    }
+}

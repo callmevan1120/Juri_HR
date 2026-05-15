@@ -101,8 +101,8 @@ Status terakhir diverifikasi lokal pada 2026-05-13 Asia/Jakarta.
 
 ## Release
 
-- [x] Jalankan enterprise obfuscator sesuai SOP private sebelum commit rilis.
-  Evidence: `php secure_tools/build_enterprise.php` pass in salted key mode.
+- [x] Untuk rilis enterprise internal saja: jalankan enterprise obfuscator salted sesuai SOP private sebelum commit artifact enterprise.
+  Evidence: rilis OSS tidak boleh membutuhkan obfuscator/key saat `composer install`; artifact enterprise customer wajib dibuild salted dengan `ENTERPRISE_OBFUSCATOR_KEY`, dan runtime harus memiliki key yang sama.
 - [x] Buat tag dan GitHub Release.
   Evidence: Git tag/release `v4.3.0` exists and is published.
 - [x] Attach APK dan checksum.

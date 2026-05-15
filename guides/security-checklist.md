@@ -15,7 +15,7 @@
 
 - Verify no `APP_DEBUG=true` in production.
 - Verify `secure_tools/`, `.env`, build cache, backups, and generated artifacts are not committed.
-- Verify `ENTERPRISE_OBFUSCATOR_KEY` exists only in trusted runtime/build environments.
+- Verify OSS install paths do not require enterprise obfuscator secrets; private enterprise artifacts must be built salted and must decrypt only with `ENTERPRISE_OBFUSCATOR_KEY`.
 - Verify local/public disk fallback is disabled for new private attachments where object storage is configured.
 - Verify backup restore requires MFA/maintenance permission and a signed backup.
 

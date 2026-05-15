@@ -133,7 +133,7 @@
 
     <div class="space-y-4">
         <!-- Finance & HR Banner -->
-        <div class="grid grid-cols-2 lg:grid-cols-5 divide-x divide-y lg:divide-y-0 divide-slate-200 dark:divide-slate-800 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <div class="grid grid-cols-2 lg:grid-cols-5 divide-x divide-y lg:divide-y-0 divide-slate-200 dark:divide-slate-800/45 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800/55 bg-white dark:bg-slate-900 shadow-sm">
             @foreach ($summaryCards as $card)
                 <div class="flex flex-col justify-center p-3.5">
                     <p class="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">
@@ -182,7 +182,7 @@
             <x-admin.insight-panel class="flex flex-col overflow-hidden p-4">
                 <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Geographical Distribution') }}</h3>
                 <div class="min-h-[280px] w-full flex-1">
-                    <div id="employeeOriginsMap" x-ref="employeeOriginsMap" wire:ignore class="h-full w-full rounded-xl border border-slate-200 dark:border-slate-800 z-0"></div>
+                    <div id="employeeOriginsMap" x-ref="employeeOriginsMap" wire:ignore class="h-full w-full rounded-xl border border-slate-200 dark:border-slate-800/55 z-0"></div>
                 </div>
             </x-admin.insight-panel>
 
@@ -195,7 +195,7 @@
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">{{ __('Top Performing Divisions') }}</h3>
                     <div class="space-y-2">
                         @forelse ($divisionLeaders as $index => $division)
-                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/45 border border-slate-100 dark:border-slate-700/35">
                                 <div class="flex items-center gap-2">
                                     <span class="flex h-5 w-5 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">{{ $index + 1 }}</span>
                                     <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">{{ $division['label'] }}</span>
@@ -243,7 +243,7 @@
                 </div>
                 <div class="space-y-2">
                     @forelse ($topDiligent as $employee)
-                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/50 dark:bg-slate-800">
+                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/35 dark:bg-slate-800/70">
                             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $employee->name }}</span>
                             <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ gmdate('H:i', $employee->avg_check_in) }}</span>
                         </div>
@@ -260,7 +260,7 @@
                 </div>
                 <div class="space-y-2">
                     @forelse ($topLate as $employee)
-                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/50 dark:bg-slate-800">
+                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/35 dark:bg-slate-800/70">
                             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $employee->name }}</span>
                             <span class="text-xs font-bold text-amber-600 dark:text-amber-400">{{ $employee->late_count }}x</span>
                         </div>
@@ -277,7 +277,7 @@
                 </div>
                 <div class="space-y-2">
                     @forelse ($topEarlyLeavers as $employee)
-                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/50 dark:bg-slate-800">
+                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm dark:border-slate-700/35 dark:bg-slate-800/70">
                             <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $employee->name }}</span>
                             <span class="text-xs font-bold text-rose-600 dark:text-rose-400">{{ $employee->early_leave_count }}x</span>
                         </div>
@@ -369,6 +369,16 @@
                     return dict[key.toLowerCase()] || (key.charAt(0).toUpperCase() + key.slice(1));
                 },
 
+                chartTheme() {
+                    const dark = document.documentElement.classList.contains('dark');
+
+                    return {
+                        grid: dark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(226, 232, 240, 0.9)',
+                        tick: dark ? 'rgba(203, 213, 225, 0.74)' : 'rgba(71, 85, 105, 0.82)',
+                        legend: dark ? 'rgba(226, 232, 240, 0.84)' : 'rgba(51, 65, 85, 0.86)',
+                    };
+                },
+
                 init() {
                     this.$nextTick(() => {
                         this.renderCharts();
@@ -434,6 +444,11 @@
                         return;
                     }
 
+                    const theme = this.chartTheme();
+
+                    Chart.defaults.color = theme.legend;
+                    Chart.defaults.borderColor = theme.grid;
+
                     this.renderTrendChart();
                     this.renderDivisionChart();
                     this.renderStatusChart();
@@ -447,6 +462,7 @@
                 renderTrendChart() {
                     const ctx = this.$refs.trendChart;
                     if (!ctx) return;
+                    const theme = this.chartTheme();
 
                     if (Chart.getChart(ctx)) {
                         Chart.getChart(ctx).destroy();
@@ -505,7 +521,8 @@
                                     align: 'end',
                                     labels: {
                                         usePointStyle: true,
-                                        boxWidth: 8
+                                        boxWidth: 8,
+                                        color: theme.legend
                                     }
                                 },
                                 tooltip: {
@@ -515,14 +532,24 @@
                             },
                             scales: {
                                 x: {
+                                    ticks: {
+                                        color: theme.tick
+                                    },
                                     grid: {
                                         display: false
                                     }
                                 },
                                 y: {
                                     beginAtZero: true,
+                                    border: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: theme.tick
+                                    },
                                     grid: {
-                                        color: '#e2e8f0'
+                                        color: theme.grid,
+                                        drawTicks: false
                                     }
                                 }
                             }
@@ -533,6 +560,7 @@
                 renderDivisionChart() {
                     const ctx = this.$refs.divisionChart;
                     if (!ctx) return;
+                    const theme = this.chartTheme();
 
                     if (Chart.getChart(ctx)) {
                         Chart.getChart(ctx).destroy();
@@ -562,14 +590,24 @@
                             },
                             scales: {
                                 x: {
+                                    ticks: {
+                                        color: theme.tick
+                                    },
                                     grid: {
                                         display: false
                                     }
                                 },
                                 y: {
                                     beginAtZero: true,
+                                    border: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: theme.tick
+                                    },
                                     grid: {
-                                        color: '#e2e8f0'
+                                        color: theme.grid,
+                                        drawTicks: false
                                     }
                                 }
                             }
@@ -580,6 +618,7 @@
                 renderStatusChart() {
                     const ctx = this.$refs.statusChart;
                     if (!ctx) return;
+                    const theme = this.chartTheme();
 
                     if (Chart.getChart(ctx)) {
                         Chart.getChart(ctx).destroy();
@@ -614,7 +653,8 @@
                                     labels: {
                                         usePointStyle: true,
                                         boxWidth: 8,
-                                        padding: 14
+                                        padding: 14,
+                                        color: theme.legend
                                     }
                                 }
                             }
@@ -625,6 +665,7 @@
                 renderLateChart() {
                     const ctx = this.$refs.lateChart;
                     if (!ctx) return;
+                    const theme = this.chartTheme();
 
                     if (Chart.getChart(ctx)) {
                         Chart.getChart(ctx).destroy();
@@ -656,7 +697,8 @@
                                     labels: {
                                         usePointStyle: true,
                                         boxWidth: 8,
-                                        padding: 14
+                                        padding: 14,
+                                        color: theme.legend
                                     }
                                 }
                             }
@@ -667,6 +709,7 @@
                 renderGenderChart() {
                     const ctx = this.$refs.genderChart;
                     if (!ctx) return;
+                    const theme = this.chartTheme();
 
                     if (Chart.getChart(ctx)) {
                         Chart.getChart(ctx).destroy();
@@ -699,7 +742,8 @@
                                     labels: {
                                         usePointStyle: true,
                                         boxWidth: 8,
-                                        padding: 14
+                                        padding: 14,
+                                        color: theme.legend
                                     }
                                 }
                             }
@@ -710,6 +754,7 @@
                 renderAbsentChart() {
                     const ctx = this.$refs.absentChart;
                     if (!ctx) return;
+                    const theme = this.chartTheme();
 
                     if (Chart.getChart(ctx)) {
                         Chart.getChart(ctx).destroy();
@@ -746,7 +791,8 @@
                                     labels: {
                                         usePointStyle: true,
                                         boxWidth: 8,
-                                        padding: 14
+                                        padding: 14,
+                                        color: theme.legend
                                     }
                                 }
                             }
@@ -757,6 +803,7 @@
                 renderHeadcountChart() {
                     const ctx = this.$refs.headcountChart;
                     if (!ctx) return;
+                    const theme = this.chartTheme();
 
                     if (Chart.getChart(ctx)) {
                         Chart.getChart(ctx).destroy();
@@ -786,14 +833,24 @@
                             },
                             scales: {
                                 x: {
+                                    ticks: {
+                                        color: theme.tick
+                                    },
                                     grid: {
                                         display: false
                                     }
                                 },
                                 y: {
                                     beginAtZero: true,
+                                    border: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: theme.tick
+                                    },
                                     grid: {
-                                        color: '#e2e8f0'
+                                        color: theme.grid,
+                                        drawTicks: false
                                     }
                                 }
                             }

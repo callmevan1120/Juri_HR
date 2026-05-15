@@ -16,8 +16,8 @@ return new class extends Migration
                 ['key' => 'enterprise_license_key'],
                 [
                     'value' => config('app.enterprise_license_key'),
-                    'group' => 'system',
-                    'type' => 'text',
+                    'group' => 'enterprise',
+                    'type' => 'textarea',
                     'description' => 'Enterprise License Key',
                     'created_at' => now(),
                     'updated_at' => now(),

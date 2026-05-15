@@ -4,9 +4,10 @@ const adminEmail = process.env.E2E_ADMIN_EMAIL ?? 'apk.demo.superadmin@paspapan.
 const adminPassword = process.env.E2E_ADMIN_PASSWORD ?? '12345678';
 const userEmail = process.env.E2E_USER_EMAIL ?? 'apk.demo.user@paspapan.test';
 const userPassword = process.env.E2E_USER_PASSWORD ?? '12345678';
+const localLoginToken = process.env.CI ? undefined : 'local-apk-e2e';
 
 async function login(page, email: string, password: string) {
-  const loginToken = process.env.E2E_LOGIN_TOKEN;
+  const loginToken = process.env.E2E_LOGIN_TOKEN ?? localLoginToken;
 
   if (loginToken) {
     await page.goto(`/__e2e-login?token=${encodeURIComponent(loginToken)}&email=${encodeURIComponent(email)}&to=/home`);

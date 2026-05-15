@@ -506,6 +506,8 @@ Jika attachment perlu persisten di Vercel, pindahkan storage ke S3-compatible ob
 
 ### 13. Enterprise build artifact
 
-Enterprise packaging memakai tool internal di `secure_tools/` yang tidak dipublikasikan sebagai source OSS. Sebelum rilis enterprise, maintainer internal menjalankan obfuscator private, memastikan `ENTERPRISE_OBFUSCATOR_KEY` yang sama tersedia di build dan runtime, lalu hanya artifact obfuscated yang didistribusikan.
+Enterprise packaging memakai tool internal di `secure_tools/` yang tidak dipublikasikan sebagai source OSS. Instalasi open source tidak membutuhkan obfuscator secret: `composer install`, `composer dump-autoload`, dan `php artisan package:discover` harus berhasil tanpa key enterprise. Sebelum rilis enterprise internal, maintainer wajib menjalankan obfuscator private dengan `ENTERPRISE_OBFUSCATOR_KEY` di environment trusted lalu hanya artifact obfuscated salted yang didistribusikan. Runtime enterprise customer juga harus memiliki `ENTERPRISE_OBFUSCATOR_KEY` yang sama. `ENTERPRISE_LICENSE_KEY` hanya untuk validasi lisensi dan tidak dipakai sebagai secret obfuscator. Jangan simpan key private ini di repo, `.env.example`, atau dokumen publik.
+
+Jika runtime enterprise kehilangan `ENTERPRISE_OBFUSCATOR_KEY`, fitur Enterprise saja yang fail-closed: halaman OSS/community tetap bisa dipakai, route Enterprise diarahkan ke modal/halaman terkunci, dan pekerjaan CLI Enterprise dilewati dengan pesan konfigurasi singkat. File obfuscated tetap tidak bisa dibuka tanpa key yang cocok. Jangan aktifkan `APP_DEBUG=true` di server customer.
 
 Source audit OSS tetap harus bebas dari build cache, vendor, `node_modules`, dan generated artifact.

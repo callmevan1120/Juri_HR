@@ -1,8 +1,731 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Services\Enterprise;
+
+use App\Console\Commands\EnterpriseHwId;
+use App\Models\Setting;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
+final class LicenseGuard
+{
+    private const PUB = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUExRGFtV0wrK21aQjFvQVRrNXFrSwpNQnJiMWJ6emJqalJnekZnZkY2VWJPTlRKcm9uVGV5eXlIeHRkTzdWc0ttOTdxdUsyM3ZXNzFWekxNbnhCbnJ0CjhTN3lpaGNXNWZGaVIvQ3kzUWt2dVJaVWNOcEp3c2NuTi9QK081QVNtVWNOUktOWjVvYUhVc2VoNkwrbDhWUGwKaFZ1c3FmMDd4eUlGdm1nclcrLzE2TlRyaUs3VmU0R0U2eldWamJnZEpiNE9jMHdROGlZem5vY2NwZkd1Q2pqeQpyeEFwYk41blBDakVzZElUT0RsNklpaC9LektQdWdoOFA2RUx6MEs3TmZEcUI1QXdaOElGNmpZTi9sWTdHdHZpCndWdHFNYXJBc0J6ME1YcGZVV3Buekp0dlhaL1dGMFBJZTJSbWFnZFM5M3E0dXVZQ094dlVKcnZUWE9QMU5NWTEKOVFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==';
+
+    private const CACHE_STATUS_KEY = 'ent_lic_status';
+
+    private const CACHE_HASH_KEY = 'ent_lic_hash';
+
+    private const CACHE_RESULT_KEY = 'ent_lic_result';
+
+    private static ?string $requestLicenseHash = null;
+
+    private static ?array $requestValidationResult = null;
+
+    private static ?array $requestFeatureMap = null;
+
+    public static function check()
+    {
+        if (! self::hasValidLicense()) {
+            abort(403, 'Invalid Enterprise License Key');
+        }
+
+        return true;
+    }
+
+    public static function hasValidLicense()
+    {
+        $licenseKey = self::configuredLicenseKey();
+        if (trim($licenseKey) === '') {
+            return false;
+        }
+
+        $currentHash = self::licenseHash($licenseKey);
+        $cachedHash = Cache::get(self::CACHE_HASH_KEY);
+
+        if ($cachedHash !== null && $cachedHash !== $currentHash) {
+            self::clearLicenseCache();
+        }
+
+        $cached = Cache::get(self::CACHE_STATUS_KEY);
+        if ($cached === 'valid') {
+            return true;
+        }
+
+        if ($cached === 'invalid') {
+            return false;
+        }
+
+        $result = self::cachedValidationResult();
+
+        $cacheUntil = $result['valid'] ? self::validCacheExpiration($result) : now()->addMinutes(5);
+
+        Cache::put(self::CACHE_STATUS_KEY, $result['valid'] ? 'valid' : 'invalid', $cacheUntil);
+        Cache::put(self::CACHE_HASH_KEY, $currentHash, $cacheUntil);
+        Cache::put(self::CACHE_RESULT_KEY, $result, $cacheUntil);
+
+        return $result['valid'];
+    }
+
+    public static function clearLicenseCache()
+    {
+        Cache::forget(self::CACHE_STATUS_KEY);
+        Cache::forget(self::CACHE_HASH_KEY);
+        Cache::forget(self::CACHE_RESULT_KEY);
+
+        self::$requestLicenseHash = null;
+        self::$requestValidationResult = null;
+        self::$requestFeatureMap = null;
+    }
+
+    public static function cacheFingerprint(?string $rawKey = null, array $context = []): string
+    {
+        $licenseKey = self::configuredLicenseKey($rawKey);
+
+        return self::licenseHash($licenseKey, $context);
+    }
+
+    public static function validateDetailed(?string $rawKey = null, array $context = []): array
+    {
+        $licenseKey = self::configuredLicenseKey($rawKey);
+
+        if ($licenseKey === '') {
+            return self::result(
+                valid: false,
+                code: 'missing_key',
+                message: self::publicMessageFor('missing_key'),
+            );
+        }
+
+        try {
+            $parts = explode('.', $licenseKey);
+            if (count($parts) !== 2) {
+                return self::fail('invalid_format', 'License key format is invalid.', [], 'LicenseGuard: Invalid license format (not 2 parts).');
+            }
+
+            $payload = base64_decode(trim($parts[0]), true);
+            $signature = base64_decode(trim($parts[1]), true);
+
+            if ($payload === false || $signature === false) {
+                return self::fail('invalid_format', 'License key format is invalid.', [], 'LicenseGuard: Invalid base64 payload or signature.');
+            }
+
+            if (openssl_verify($payload, $signature, base64_decode(self::PUB), OPENSSL_ALGO_SHA256) !== 1) {
+                return self::fail('invalid_signature', 'License signature verification failed.', [], 'LicenseGuard: Signature verification failed.');
+            }
+
+            $license = json_decode($payload, true);
+            if (! is_array($license)) {
+                return self::fail('invalid_payload', 'License payload could not be read.', [], 'LicenseGuard: Payload is not valid JSON.');
+            }
+
+            $schemaCheck = self::validateSchema($license);
+            if ($schemaCheck !== null) {
+                return $schemaCheck;
+            }
+
+            if (($license['author'] ?? '') !== 'RiprLutuk(https://riprlutuk.github.io)') {
+                return self::fail(
+                    'invalid_author',
+                    'License author does not match the expected issuer.',
+                    ['author' => $license['author'] ?? ''],
+                    'LicenseGuard: Author mismatch.',
+                    ['author' => $license['author'] ?? '']
+                );
+            }
+
+            $domainCheck = self::validateDomain($license, $context);
+            if ($domainCheck !== null) {
+                return $domainCheck;
+            }
+
+            $hwidCheck = self::validateHardwareId($license, $context);
+            if ($hwidCheck !== null) {
+                return $hwidCheck;
+            }
+
+            $expiryCheck = self::validateExpiry($license, $context);
+            if ($expiryCheck !== null) {
+                return $expiryCheck;
+            }
+
+            $notBeforeCheck = self::validateNotBefore($license, $context);
+            if ($notBeforeCheck !== null) {
+                return $notBeforeCheck;
+            }
+
+            $companyCheck = self::validateCompany($license, $context);
+            if ($companyCheck !== null) {
+                return $companyCheck;
+            }
+
+            $contactCheck = self::validateSupportContact($license, $context);
+            if ($contactCheck !== null) {
+                return $contactCheck;
+            }
+
+            $userCountCheck = self::validateUserCount($license, $context);
+            if ($userCountCheck !== null) {
+                return $userCountCheck;
+            }
+
+            return self::result(
+                valid: true,
+                code: 'valid',
+                message: self::publicMessageFor('valid'),
+                details: [
+                    'current_company' => self::currentCompany($context),
+                    'current_support_contact' => self::currentSupportContact($context),
+                    'current_users' => self::currentUserCount($context),
+                    'current_host' => self::currentHost($context),
+                    'current_hwid' => self::currentHardwareId($context),
+                ],
+                license: $license,
+            );
+        } catch (\Throwable $e) {
+            Log::error('LicenseGuard: Exception during validation.', ['error' => $e->getMessage()]);
+
+            return self::result(
+                valid: false,
+                code: 'exception',
+                message: self::publicMessageFor('exception'),
+                details: [],
+            );
+        }
+    }
+
+    public static function getLicenseInfo()
+    {
+        $result = self::cachedValidationResult();
+
+        return $result['valid'] ? $result['license'] : null;
+    }
+
+    public static function hasFeature(string $feature, array $context = []): bool
+    {
+        if (! self::hasRuntimeObfuscatorKey()) {
+            return false;
+        }
+
+        $feature = self::normalizeFeatureKey($feature);
+        if ($feature === '') {
+            return false;
+        }
+
+        $result = $context === [] ? self::cachedValidationResult() : self::validateDetailed(null, $context);
+        if (! ($result['valid'] ?? false)) {
+            return false;
+        }
+
+        $features = $context === [] ? self::cachedFeatureMap($result) : self::featureMapFromResult($result);
+
+        return isset($features['*']) || isset($features[$feature]);
+    }
+
+    public static function hasAnyFeature(array $features, array $context = []): bool
+    {
+        foreach ($features as $feature) {
+            if (self::hasFeature((string) $feature, $context)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function cachedValidationResult(): array
+    {
+        $licenseKey = self::configuredLicenseKey();
+        if ($licenseKey === '') {
+            return self::validateDetailed('');
+        }
+
+        $currentHash = self::licenseHash($licenseKey);
+        if (self::$requestLicenseHash === $currentHash && self::$requestValidationResult !== null) {
+            return self::$requestValidationResult;
+        }
+
+        $cachedHash = Cache::get(self::CACHE_HASH_KEY);
+        if ($cachedHash !== null && $cachedHash !== $currentHash) {
+            self::clearLicenseCache();
+        } elseif ($cachedHash === $currentHash) {
+            $cachedResult = Cache::get(self::CACHE_RESULT_KEY);
+            if (is_array($cachedResult)) {
+                self::$requestLicenseHash = $currentHash;
+                self::$requestValidationResult = $cachedResult;
+                self::$requestFeatureMap = null;
+
+                return $cachedResult;
+            }
+        }
+
+        $result = self::validateDetailed($licenseKey);
+        $cacheUntil = ($result['valid'] ?? false) ? self::validCacheExpiration($result) : now()->addMinutes(5);
+
+        Cache::put(self::CACHE_STATUS_KEY, ($result['valid'] ?? false) ? 'valid' : 'invalid', $cacheUntil);
+        Cache::put(self::CACHE_HASH_KEY, $currentHash, $cacheUntil);
+        Cache::put(self::CACHE_RESULT_KEY, $result, $cacheUntil);
+
+        self::$requestLicenseHash = $currentHash;
+        self::$requestValidationResult = $result;
+        self::$requestFeatureMap = null;
+
+        return $result;
+    }
+
+    private static function configuredLicenseKey(?string $rawKey = null): string
+    {
+        if ($rawKey !== null) {
+            return trim($rawKey);
+        }
+
+        $settingKey = trim((string) Setting::getValue('enterprise_license_key', ''));
+
+        return $settingKey !== ''
+            ? $settingKey
+            : trim((string) config('app.enterprise_license_key', ''));
+    }
+
+    public static function hasRuntimeObfuscatorKey(): bool
+    {
+        $key = getenv('ENTERPRISE_OBFUSCATOR_KEY') ?: ($_ENV['ENTERPRISE_OBFUSCATOR_KEY'] ?? $_SERVER['ENTERPRISE_OBFUSCATOR_KEY'] ?? null);
+
+        if (is_string($key) && strlen(trim($key)) >= 32) {
+            return true;
+        }
+
+        $envPath = base_path('.env');
+        if (! is_file($envPath)) {
+            return false;
+        }
+
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (! is_array($lines)) {
+            return false;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if ($line === '' || str_starts_with($line, '#') || ! str_contains($line, '=')) {
+                continue;
+            }
+
+            [$name, $rawValue] = explode('=', $line, 2);
+            if (trim($name) !== 'ENTERPRISE_OBFUSCATOR_KEY') {
+                continue;
+            }
+
+            $rawValue = trim($rawValue);
+            if (
+                (str_starts_with($rawValue, '"') && str_ends_with($rawValue, '"'))
+                || (str_starts_with($rawValue, "'") && str_ends_with($rawValue, "'"))
+            ) {
+                $rawValue = substr($rawValue, 1, -1);
+            }
+
+            return strlen(trim($rawValue)) >= 32;
+        }
+
+        return false;
+    }
+
+    private static function cachedFeatureMap(array $result): array
+    {
+        if (self::$requestFeatureMap !== null) {
+            return self::$requestFeatureMap;
+        }
+
+        self::$requestFeatureMap = self::featureMapFromResult($result);
+
+        return self::$requestFeatureMap;
+    }
+
+    private static function featureMapFromResult(array $result): array
+    {
+        $features = $result['license']['features'] ?? [];
+        if (! is_array($features)) {
+            return [];
+        }
+
+        $map = [];
+        foreach ($features as $feature) {
+            $key = self::normalizeFeatureKey((string) $feature);
+            if ($key !== '') {
+                $map[$key] = true;
+            }
+        }
+
+        return $map;
+    }
+
+    private static function validateDomain(array $license, array $context): ?array
+    {
+        $domain = trim((string) ($license['domain'] ?? '*'));
+        if ($domain === '*' || $domain === 'localhost' || $domain === '127.0.0.1') {
+            return null;
+        }
+
+        $currentHost = self::currentHost($context);
+        if ($currentHost === '') {
+            return null;
+        }
+
+        $cleanHost = preg_replace('/^www\./', '', mb_strtolower($currentHost));
+        $cleanDomain = preg_replace('/^www\./', '', mb_strtolower($domain));
+
+        if ($cleanHost === $cleanDomain) {
+            return null;
+        }
+
+        return self::fail(
+            'domain_mismatch',
+            'License domain does not match this server host.',
+            [
+                'expected_domain' => $domain,
+                'current_host' => $currentHost,
+            ],
+            'LicenseGuard: Domain binding mismatch.',
+            ['license_domain' => $domain, 'host' => $currentHost]
+        );
+    }
+
+    private static function validateSchema(array $license): ?array
+    {
+        $schemaVersion = $license['schema_version'] ?? 1;
+        if ((int) $schemaVersion !== 1) {
+            return self::fail(
+                'unsupported_schema',
+                'License schema version is not supported.',
+                ['schema_version' => $schemaVersion],
+                'LicenseGuard: Unsupported license schema.',
+                ['schema_version' => $schemaVersion]
+            );
+        }
+
+        if (array_key_exists('license_id', $license) && trim((string) $license['license_id']) === '') {
+            return self::fail(
+                'invalid_payload',
+                'License payload could not be read.',
+                ['field' => 'license_id'],
+                'LicenseGuard: Empty license ID.'
+            );
+        }
+
+        if (! isset($license['features']) || ! is_array($license['features']) || $license['features'] === []) {
+            return self::fail(
+                'invalid_payload',
+                'License payload could not be read.',
+                ['field' => 'features'],
+                'LicenseGuard: Missing enterprise features.'
+            );
+        }
+
+        return null;
+    }
+
+    private static function validateHardwareId(array $license, array $context): ?array
+    {
+        $licenseHwid = trim((string) ($license['hwid'] ?? '*'));
+        if ($licenseHwid === '*') {
+            return null;
+        }
+
+        $currentHardwareId = self::currentHardwareId($context);
+        if ($currentHardwareId === $licenseHwid) {
+            return null;
+        }
+
+        return self::fail(
+            'hwid_mismatch',
+            'License hardware ID does not match this server.',
+            [
+                'expected_hwid' => $licenseHwid,
+                'current_hwid' => $currentHardwareId,
+            ],
+            'LicenseGuard: Hardware ID mismatch.',
+            ['license_hwid' => $licenseHwid, 'current' => $currentHardwareId]
+        );
+    }
+
+    private static function validateExpiry(array $license, array $context): ?array
+    {
+        if (! isset($license['expires_at']) || trim((string) $license['expires_at']) === '') {
+            return null;
+        }
+
+        $verificationTime = self::verificationTime($context);
+        $expiry = Carbon::parse($license['expires_at']);
+
+        if (! $verificationTime->startOfDay()->isAfter($expiry->copy()->endOfDay())) {
+            return null;
+        }
+
+        return self::fail(
+            'expired',
+            'License has expired.',
+            [
+                'expires_at' => $license['expires_at'],
+                'verified_at' => $verificationTime->toDateTimeString(),
+            ],
+            'LicenseGuard: License has expired.',
+            ['expires_at' => $license['expires_at'], 'verified_time' => $verificationTime->toDateTimeString()]
+        );
+    }
+
+    private static function validateNotBefore(array $license, array $context): ?array
+    {
+        if (! isset($license['not_before']) || trim((string) $license['not_before']) === '') {
+            return null;
+        }
+
+        $verificationTime = self::verificationTime($context);
+        $notBefore = Carbon::parse($license['not_before']);
+
+        if (! $verificationTime->isBefore($notBefore)) {
+            return null;
+        }
+
+        return self::fail(
+            'not_yet_valid',
+            'License is not valid yet.',
+            [
+                'not_before' => $license['not_before'],
+                'verified_at' => $verificationTime->toDateTimeString(),
+            ],
+            'LicenseGuard: License is not valid yet.',
+            ['not_before' => $license['not_before'], 'verified_time' => $verificationTime->toDateTimeString()]
+        );
+    }
+
+    private static function validateCompany(array $license, array $context): ?array
+    {
+        $expectedCompany = trim((string) ($license['client'] ?? ''));
+        $currentCompany = self::currentCompany($context);
+
+        if (self::normalizeCompany($expectedCompany) === self::normalizeCompany($currentCompany)) {
+            return null;
+        }
+
+        return self::fail(
+            'company_mismatch',
+            'License company name does not match the current setting.',
+            [
+                'expected_company' => $expectedCompany,
+                'current_company' => $currentCompany,
+            ],
+            'LicenseGuard: Client name mismatch.',
+            ['license_client' => $expectedCompany, 'setting_company' => $currentCompany]
+        );
+    }
+
+    private static function validateSupportContact(array $license, array $context): ?array
+    {
+        $expectedContact = trim((string) ($license['support_contact'] ?? ''));
+        if ($expectedContact === '') {
+            return null;
+        }
+
+        $currentContact = self::currentSupportContact($context);
+        if (self::normalizeSupportContact($expectedContact) === self::normalizeSupportContact($currentContact)) {
+            return null;
+        }
+
+        return self::fail(
+            'support_contact_mismatch',
+            'License support contact does not match the current setting.',
+            [
+                'expected_support_contact' => $expectedContact,
+                'current_support_contact' => $currentContact,
+            ],
+            'LicenseGuard: Support contact mismatch.',
+            ['license_contact' => $expectedContact, 'setting_contact' => $currentContact]
+        );
+    }
+
+    private static function validateUserCount(array $license, array $context): ?array
+    {
+        $maxUsers = (int) ($license['max_users'] ?? 0);
+        if ($maxUsers <= 0) {
+            return null;
+        }
+
+        $currentUsers = self::currentUserCount($context);
+        if ($currentUsers <= $maxUsers) {
+            return null;
+        }
+
+        return self::fail(
+            'max_users_exceeded',
+            'Current user count exceeds the licensed limit.',
+            [
+                'max_users' => $maxUsers,
+                'current_users' => $currentUsers,
+            ],
+            'LicenseGuard: MAX USERS limit exceeded.',
+            ['max_users' => $maxUsers, 'current' => $currentUsers]
+        );
+    }
+
+    private static function verificationTime(array $context): Carbon
+    {
+        if (array_key_exists('current_time', $context)) {
+            return Carbon::parse($context['current_time']);
+        }
+
+        $verificationTime = now();
+        $shouldTryRemoteTime = ($context['enable_remote_time'] ?? false) && ! app()->runningUnitTests();
+
+        if (! $shouldTryRemoteTime) {
+            return $verificationTime;
+        }
+
+        try {
+            $streamContext = stream_context_create(['http' => ['timeout' => 2]]);
+            $headers = @get_headers('https://google.com', true, $streamContext);
+            if (! empty($headers['Date'])) {
+                $dateHeader = is_array($headers['Date']) ? $headers['Date'][0] : $headers['Date'];
+                $verificationTime = Carbon::parse($dateHeader);
+            }
+        } catch (\Throwable $e) {
+            // Fall back to local server time silently.
+        }
+
+        return $verificationTime;
+    }
+
+    private static function currentCompany(array $context): string
+    {
+        return trim((string) ($context['current_company'] ?? Setting::getValue('app.company_name', '')));
+    }
+
+    private static function currentSupportContact(array $context): string
+    {
+        return trim((string) ($context['current_support_contact'] ?? Setting::getValue('app.support_contact', '')));
+    }
+
+    private static function currentHost(array $context): string
+    {
+        if (array_key_exists('current_host', $context)) {
+            return trim((string) $context['current_host']);
+        }
+
+        if (app()->runningInConsole()) {
+            return '';
+        }
+
+        return trim((string) request()->getHost());
+    }
+
+    private static function currentHardwareId(array $context): string
+    {
+        return trim((string) ($context['current_hwid'] ?? EnterpriseHwId::generate()));
+    }
+
+    private static function currentUserCount(array $context): int
+    {
+        return array_key_exists('user_count', $context) ? (int) $context['user_count'] : User::count();
+    }
+
+    private static function normalizeCompany(string $value): string
+    {
+        $value = mb_strtolower(trim($value));
+        $value = preg_replace('/^(pt|cv)\b\.?\s*/u', '', $value);
+        $value = preg_replace('/[^\pL\pN]+/u', '', $value);
+
+        return $value ?? '';
+    }
+
+    private static function normalizeSupportContact(string $value): string
+    {
+        $value = mb_strtolower(trim($value));
+
+        if ($value === '') {
+            return '';
+        }
+
+        if (str_starts_with($value, 'https://t.me/')) {
+            $value = substr($value, strlen('https://t.me/'));
+        } elseif (str_starts_with($value, 'http://t.me/')) {
+            $value = substr($value, strlen('http://t.me/'));
+        } elseif (str_starts_with($value, 't.me/')) {
+            $value = substr($value, strlen('t.me/'));
+        }
+
+        $value = explode('?', $value)[0];
+        $value = trim($value, '/');
+
+        if ($value !== '' && ! str_contains($value, '@') && ! str_contains($value, ':')) {
+            $value = '@'.$value;
+        }
+
+        return $value;
+    }
+
+    private static function normalizeFeatureKey(string $feature): string
+    {
+        $feature = mb_strtolower(trim($feature));
+        $feature = str_replace(['-', ' '], '_', $feature);
+
+        return preg_replace('/[^a-z0-9_*]+/', '', $feature) ?? '';
+    }
+
+    private static function licenseHash(string $licenseKey, array $context = []): string
+    {
+        return hash('sha256', implode('|', [
+            $licenseKey,
+            self::normalizeCompany(self::currentCompany($context)),
+            self::normalizeSupportContact(self::currentSupportContact($context)),
+            mb_strtolower(self::currentHost($context)),
+            self::currentHardwareId($context),
+            (string) self::currentUserCount($context),
+        ]));
+    }
+
+    private static function validCacheExpiration(array $result): Carbon
+    {
+        $expiresAt = $result['license']['expires_at'] ?? null;
+
+        if (is_string($expiresAt) && trim($expiresAt) !== '') {
+            try {
+                $licenseExpiry = Carbon::parse($expiresAt)->endOfDay();
+
+                if ($licenseExpiry->isBefore(now()->addHours(24))) {
+                    return $licenseExpiry;
+                }
+            } catch (\Throwable $e) {
+                // Keep the default cache TTL if the already validated date cannot be parsed here.
+            }
+        }
+
+        return now()->addHours(24);
+    }
+
+    private static function fail(string $code, string $message, array $details, string $logMessage, array $logContext = []): array
+    {
+        Log::warning('LicenseGuard: Validation failed.', ['code' => $code]);
+
+        return self::result(valid: false, code: $code, message: self::publicMessageFor($code), details: $details);
+    }
+
+    private static function result(bool $valid, string $code, string $message, array $details = [], ?array $license = null): array
+    {
+        return [
+            'valid' => $valid,
+            'code' => $code,
+            'message' => $message,
+            'details' => $details,
+            'license' => $license,
+        ];
+    }
+
+    private static function publicMessageFor(string $code): string
+    {
+        return match ($code) {
+            'missing_key' => 'No enterprise license key saved yet.',
+            'valid' => 'Enterprise license is active.',
+            default => 'The enterprise license could not be validated on this server.',
+        };
+    }
+}

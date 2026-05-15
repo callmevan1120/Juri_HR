@@ -1,8 +1,85 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Helpers;
+
+use App\Contracts\AttendanceServiceInterface;
+use App\Contracts\AuditServiceInterface;
+use App\Contracts\PayrollServiceInterface;
+use App\Contracts\ReportingServiceInterface;
+use App\Services\Enterprise\LicenseGuard;
+
+class Editions
+{
+    /**
+     * Check if a specific feature service is running in Community Mode (Locked).
+     */
+    public static function isLocked(string $contractClass): bool
+    {
+        $feature = self::featureForContract($contractClass);
+
+        return $feature === null
+            ? ! LicenseGuard::hasValidLicense()
+            : ! LicenseGuard::hasFeature($feature);
+    }
+
+    public static function payrollLocked(): bool
+    {
+        return self::isLocked(PayrollServiceInterface::class);
+    }
+
+    public static function reportingLocked(): bool
+    {
+        return self::isLocked(ReportingServiceInterface::class);
+    }
+
+    public static function auditLocked(): bool
+    {
+        return self::isLocked(AuditServiceInterface::class);
+    }
+
+    public static function attendanceLocked(): bool
+    {
+        return self::isLocked(AttendanceServiceInterface::class);
+    }
+
+    public static function assetLocked(): bool
+    {
+        return ! LicenseGuard::hasFeature('asset_management');
+    }
+
+    public static function appraisalLocked(): bool
+    {
+        return ! LicenseGuard::hasFeature('appraisal');
+    }
+
+    public static function analyticsLocked(): bool
+    {
+        return ! LicenseGuard::hasFeature('analytics');
+    }
+
+    public static function cashAdvanceLocked(): bool
+    {
+        return ! LicenseGuard::hasFeature('cash_advance');
+    }
+
+    public static function systemBackupLocked(): bool
+    {
+        return ! LicenseGuard::hasFeature('system_backup');
+    }
+
+    public static function documentRequestsLocked(): bool
+    {
+        return ! LicenseGuard::hasFeature('document_requests');
+    }
+
+    private static function featureForContract(string $contractClass): ?string
+    {
+        return match ($contractClass) {
+            AttendanceServiceInterface::class => 'attendance',
+            PayrollServiceInterface::class => 'payroll',
+            ReportingServiceInterface::class => 'reporting',
+            AuditServiceInterface::class => 'audit',
+            default => null,
+        };
+    }
+}

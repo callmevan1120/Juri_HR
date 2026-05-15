@@ -8,7 +8,8 @@
         'security' => 'security',
         'leave' => 'leave',
         'notification' => 'notif',
-        'payroll' => null,
+        'payroll' => 'payroll',
+        'appraisal' => 'appraisal',
         'enterprise' => 'enterprise',
     ];
 
@@ -18,11 +19,14 @@
         'security' => 0,
         'leave' => 0,
         'notif' => 0,
+        'payroll' => 0,
+        'appraisal' => 0,
         'enterprise' => 0,
     ];
 
     foreach ($groups as $group => $settings) {
-        $targetTab = $tabMap[$group] ?? null;
+        $normalizedGroup = str($group)->lower()->replace([' ', '-'], '_')->toString();
+        $targetTab = $tabMap[$normalizedGroup] ?? $tabMap[$group] ?? null;
 
         if ($targetTab) {
             $tabCounts[$targetTab] += $settings->count();
@@ -49,6 +53,8 @@
         { id: 'security', label: '{{ __('Security') }}', icon: 'shield-check', count: {{ $tabCounts['security'] }} },
         { id: 'leave', label: '{{ __('Leave & Time Off') }}', icon: 'calendar', count: {{ $tabCounts['leave'] }} },
         { id: 'notif', label: '{{ __('Notifications') }}', icon: 'bell', count: {{ $tabCounts['notif'] }} },
+        { id: 'payroll', label: '{{ __('Payroll') }}', icon: 'banknotes', count: {{ $tabCounts['payroll'] }} },
+        { id: 'appraisal', label: '{{ __('Appraisal') }}', icon: 'chart', count: {{ $tabCounts['appraisal'] }} },
         { id: 'enterprise', label: '{{ __('Enterprise') }}', icon: 'briefcase', count: {{ $tabCounts['enterprise'] }} }
     ],
     normalize(value) {
@@ -135,6 +141,8 @@
                             <x-heroicon-o-shield-check x-show="tab.icon === 'shield-check'" class="h-5 w-5" />
                             <x-heroicon-o-calendar-days x-show="tab.icon === 'calendar'" class="h-5 w-5" />
                             <x-heroicon-o-bell x-show="tab.icon === 'bell'" class="h-5 w-5" />
+                            <x-heroicon-o-banknotes x-show="tab.icon === 'banknotes'" class="h-5 w-5" />
+                            <x-heroicon-o-chart-bar-square x-show="tab.icon === 'chart'" class="h-5 w-5" />
                             <x-heroicon-o-briefcase x-show="tab.icon === 'briefcase'" class="h-5 w-5" />
                         </span>
                         <span class="min-w-0 flex-1 truncate text-left" x-text="tab.label"></span>
@@ -156,7 +164,8 @@
                     x-transition:enter-end="opacity-100 translate-y-0">
                     @foreach ($groups as $group => $settings)
                         @php
-                            $targetTab = $tabMap[$group] ?? null;
+                            $normalizedGroup = str($group)->lower()->replace([' ', '-'], '_')->toString();
+                            $targetTab = $tabMap[$normalizedGroup] ?? $tabMap[$group] ?? null;
                             $groupSearchIndex = $settings
                                 ->map(
                                     fn($setting) => implode(

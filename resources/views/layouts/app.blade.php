@@ -177,13 +177,38 @@
             const isNative = window.isNativeApp();
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-            /* PullToRefresh disabled globally per user request
-            if (isPWA || isNative || isTouch) {
-                if (!document.body.classList.contains('is-native-scanning')) {
-                     PullToRefresh.init({...}); 
-                }
+            if ((isPWA || isNative || isTouch) && window.PullToRefresh && !document.body.dataset.pullToRefreshReady) {
+                document.body.dataset.pullToRefreshReady = '1';
+
+                PullToRefresh.init({
+                    mainElement: 'body',
+                    triggerElement: 'body',
+                    instructionsPullToRefresh: @js(__('Pull to sync this page')),
+                    instructionsReleaseToRefresh: @js(__('Release to refresh data')),
+                    instructionsRefreshing: @js(__('Syncing data')),
+                    instructionsPullHint: @js(__('Start from the very top of the page.')),
+                    instructionsReleaseHint: @js(__('Release now to update the content.')),
+                    instructionsRefreshingHint: @js(__('Content is refreshing for a moment.')),
+                    statusPull: @js(__('Ready')),
+                    statusRelease: @js(__('Release')),
+                    statusRefreshing: @js(__('Syncing')),
+                    shouldPullToRefresh() {
+                        const active = document.activeElement;
+                        const activeTag = active?.tagName || '';
+                        const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag) || active?.isContentEditable;
+                        const hasVisibleDialog = Array.from(document.querySelectorAll('[role="dialog"], [aria-modal="true"]'))
+                            .some((dialog) => dialog.offsetParent !== null || dialog.getClientRects().length > 0);
+
+                        return !document.body.classList.contains('is-native-scanning') &&
+                            !isTyping &&
+                            !hasVisibleDialog &&
+                            Math.max(window.scrollY || 0, document.documentElement.scrollTop || 0, document.body.scrollTop || 0) <= 0;
+                    },
+                    onRefresh() {
+                        window.location.reload();
+                    },
+                });
             }
-            */
         });
     </script>
 

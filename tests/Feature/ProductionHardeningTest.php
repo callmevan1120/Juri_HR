@@ -1,11 +1,14 @@
 <?php
 
+use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\AdminSeeder;
 use Database\Seeders\AttendanceSeeder;
 use Database\Seeders\DemoAssetSeeder;
 use Database\Seeders\FakeDataSeeder;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 test('demo and bootstrap seeders skip known accounts in production by default', function () {
@@ -42,6 +45,45 @@ test('demo and bootstrap seeders skip known accounts in production by default', 
     Config::set('app.env', 'testing');
 });
 
+test('bootstrap admin seeder can repair default admin credentials idempotently', function () {
+    app(AdminSeeder::class)->run();
+    app(AdminSeeder::class)->run();
+
+    $superadmin = User::query()->where('email', 'superadmin@example.com')->firstOrFail();
+    $admin = User::query()->where('email', 'admin@example.com')->firstOrFail();
+
+    expect(User::query()->where('email', 'superadmin@example.com')->count())->toBe(1)
+        ->and(User::query()->where('email', 'admin@example.com')->count())->toBe(1)
+        ->and($superadmin->group)->toBe('superadmin')
+        ->and(Hash::check('superadmin', $superadmin->password))->toBeTrue()
+        ->and($superadmin->roles()->where('slug', 'super_admin')->exists())->toBeTrue()
+        ->and($admin->group)->toBe('admin')
+        ->and(Hash::check('admin', $admin->password))->toBeTrue()
+        ->and($admin->roles()->where('slug', 'admin')->exists())->toBeTrue();
+});
+
+test('setting seeder preserves saved enterprise license when env seed is blank', function () {
+    Config::set('app.enterprise_license_key', null);
+
+    Setting::query()->updateOrCreate(
+        ['key' => 'enterprise_license_key'],
+        [
+            'value' => 'saved-enterprise-license',
+            'group' => 'system',
+            'type' => 'text',
+            'description' => 'Legacy Enterprise License Key',
+        ],
+    );
+
+    app(SettingSeeder::class)->run();
+
+    $setting = Setting::query()->where('key', 'enterprise_license_key')->firstOrFail();
+
+    expect($setting->value)->toBe('saved-enterprise-license')
+        ->and($setting->group)->toBe('enterprise')
+        ->and($setting->type)->toBe('textarea');
+});
+
 test('repository and public htaccess block sensitive paths as defense in depth', function () {
     $rootHtaccess = file_get_contents(base_path('.htaccess'));
     $publicHtaccess = file_get_contents(public_path('.htaccess'));
@@ -62,4 +104,33 @@ test('wilayah routes use dedicated throttle middleware', function () {
         ->first(fn ($route) => $route->uri() === 'api/wilayah/provinces');
 
     expect($route?->gatherMiddleware())->toContain('throttle:wilayah');
+});
+
+test('missing enterprise obfuscator key fails closed instead of rendering a raw runtime exception', function () {
+    Route::middleware('web')->get('/__test/enterprise-runtime-missing', function () {
+        throw new \RuntimeException('Enterprise obfuscator key is missing.');
+    })->name('test.enterprise-runtime-missing');
+
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin)
+        ->get('/__test/enterprise-runtime-missing')
+        ->assertRedirect(route('admin.dashboard'))
+        ->assertSessionHas('show-feature-lock', fn (array $payload): bool => $payload['title'] === __('Enterprise Runtime Locked'));
+});
+
+test('missing enterprise obfuscator key returns a locked json response', function () {
+    Route::middleware('web')->get('/__test/enterprise-runtime-missing-json', function () {
+        throw new \RuntimeException('Enterprise obfuscator key is missing.');
+    })->name('test.enterprise-runtime-missing-json');
+
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin)
+        ->getJson('/__test/enterprise-runtime-missing-json')
+        ->assertStatus(423)
+        ->assertJson([
+            'feature_locked' => true,
+            'enterprise_runtime_locked' => true,
+        ]);
 });

@@ -54,7 +54,7 @@ Route::middleware([
     Route::get('/', RootRedirectController::class);
 
     Route::prefix('admin')->middleware(['admin'])->group(function () {
-        Route::livewire('/system-maintenance', 'admin.system-maintenance')
+        enterprise_livewire_route('/system-maintenance', 'admin.system-maintenance')
             ->name('admin.system-maintenance')
             ->can('viewAny', SystemBackupRun::class);
     });

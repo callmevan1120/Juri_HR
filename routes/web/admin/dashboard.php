@@ -11,7 +11,7 @@ Route::get('/dashboard', DashboardController::class)->name('admin.dashboard')->c
 
 Route::livewire('/inbox', 'admin.manager-inbox')->name('admin.inbox')->can('accessAdminPanel');
 Route::livewire('/notifications', 'admin.notifications-page')->name('admin.notifications')->can('manageAdminNotifications');
-Route::livewire('/analytics', 'admin.analytics-dashboard')
+enterprise_livewire_route('/analytics', 'admin.analytics-dashboard')
     ->name('admin.analytics')
     ->middleware('feature.lock:analytics,admin.analytics.view,admin.dashboard')
     ->can('viewAnalyticsDashboard');

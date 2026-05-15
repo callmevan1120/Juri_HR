@@ -11,12 +11,12 @@ Route::resource('/employees', EmployeeController::class)
     ->middleware('can:viewEmployees')
     ->names(['index' => 'admin.employees']);
 
-Route::livewire('/hr-checklists', 'admin.hr-checklist-manager')
+enterprise_livewire_route('/hr-checklists', 'admin.hr-checklist-manager')
     ->name('admin.hr-checklists')
     ->can('viewAny', HrChecklistCase::class);
 
-Route::livewire('/document-requests', 'admin.employee-document-request-manager')->name('admin.document-requests')->can('viewAdminAny', EmployeeDocumentRequest::class);
-Route::livewire('/document-templates', 'admin.document-template-manager')->name('admin.document-templates')->can('manageDocumentTemplates');
+enterprise_livewire_route('/document-requests', 'admin.employee-document-request-manager')->name('admin.document-requests')->can('viewAdminAny', EmployeeDocumentRequest::class);
+enterprise_livewire_route('/document-templates', 'admin.document-template-manager')->name('admin.document-templates')->can('manageDocumentTemplates');
 Route::redirect('/document-templates/library', '/admin/document-templates')
     ->name('admin.document-templates.library')
     ->middleware('can:manageDocumentTemplates');

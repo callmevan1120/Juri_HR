@@ -1,8 +1,24 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Http\Controllers\Admin\ImportExport;
+
+use App\Http\Controllers\Controller;
+use App\Models\ImportExportRun;
+use App\Support\FileAccessService;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+class DownloadImportExportRunController extends Controller
+{
+    public function __invoke(ImportExportRun $run, FileAccessService $fileAccessService): StreamedResponse
+    {
+        $this->authorize('download', $run);
+
+        abort_if($run->status !== 'completed' || blank($run->file_path), 404);
+
+        return $fileAccessService->downloadRelativePath(
+            $run->file_path,
+            'Import Export Download',
+            $run->resource.' '.$run->operation.' artifact'
+        );
+    }
+}
