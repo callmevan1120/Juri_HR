@@ -1,8 +1,61 @@
 <?php
 
-/**
- * Enterprise Core Secured
- * (c) RiprLutuk
- * Unauthorized modification of this file is prohibited.
- */
-eval(gzinflate(base64_decode('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')));
+namespace App\Support;
+
+use App\Models\ImportExportRun;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
+
+class ImportExportRunViewService
+{
+    /**
+     * @param  array<int, string>  $resources
+     * @return array<int, array<string, mixed>>
+     */
+    public function recentForResources(array $resources, ?User $requester = null, int $limit = 8): array
+    {
+        $runs = ImportExportRun::query()
+            ->with('requestedBy:id,name')
+            ->whereIn('resource', $resources)
+            ->when($requester, fn (Builder $query) => $query->where('requested_by_user_id', $requester->id))
+            ->latest('id')
+            ->limit($limit)
+            ->get();
+
+        return $runs->map(fn (ImportExportRun $run): array => $this->present($run))->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function present(ImportExportRun $run): array
+    {
+        return [
+            'id' => $run->id,
+            'resource' => $run->resource,
+            'operation' => $run->operation,
+            'status' => $run->status,
+            'progress_percentage' => (int) $run->progress_percentage,
+            'processed_rows' => (int) $run->processed_rows,
+            'total_rows' => $run->total_rows,
+            'file_name' => $run->file_name,
+            'download_url' => $run->status === 'completed' && $run->file_path
+                ? route('admin.import-export.runs.download', $run)
+                : null,
+            'size_human' => $run->size_bytes ? $this->humanBytes($run->size_bytes) : null,
+            'requested_by' => $run->requestedBy?->name,
+            'error_message' => $run->error_message,
+            'created_at_human' => $run->created_at?->diffForHumans(),
+            'updated_at_human' => $run->updated_at?->diffForHumans(),
+            'started_at_human' => $run->started_at?->diffForHumans(),
+            'completed_at_human' => $run->completed_at?->diffForHumans(),
+            'label' => Str::headline($run->resource.' '.$run->operation),
+        ];
+    }
+
+    private function humanBytes(int $bytes): string
+    {
+        return number_format($bytes / 1024 / 1024, 2).' MB';
+    }
+}
