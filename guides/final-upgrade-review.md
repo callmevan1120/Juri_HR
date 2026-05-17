@@ -1,6 +1,6 @@
 # Final Upgrade Review
 
-Reviewed commit: `99cde52`
+Reviewed commit: `c4d69fe`
 
 Branch: `chore/major-upgrade-audit`
 
@@ -8,11 +8,11 @@ Suggested final PR/merge title: `chore(app): upgrade Laravel 13 and Livewire 4`
 
 ## Files Changed In Final Pass
 
-The final reviewed branch head is `99cde52`.
+The final reviewed branch head is `c4d69fe`.
 
 The major stabilization commit is `9ab163e` (`129 files changed, 12889 insertions(+), 61 deletions(-)`). It expanded PasPapan into broader HR, operations, commercial, accounting, payroll, leave entitlement, WFH, custom form, command center, and multi-company foundations while keeping the Laravel 13, Livewire 4, Tailwind 4 upgrade gates green.
 
-The follow-up evidence commit is `99cde52`, which updated APK smoke screenshots after running the physical device smoke suite.
+The follow-up evidence commits are `99cde52`, which updated APK smoke screenshots after running the physical device smoke suite, `0ed8b9f`, which refreshed release evidence docs, and `c4d69fe`, which synced the README summary.
 
 The final pass covered:
 
@@ -112,4 +112,4 @@ Still physical-device or staging only:
 
 ## Merge Recommendation
 
-Code review ready. Backend, frontend, browser smoke, RBAC audit, queue smoke, dependency audits, and physical APK smoke all passed at branch head `99cde52`.
+Code review ready. Backend, frontend, browser smoke, RBAC audit, queue smoke, dependency audits, and physical APK smoke all passed before the docs-only README sync at branch head `c4d69fe`.
