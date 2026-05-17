@@ -18,7 +18,7 @@
     </x-slot>
 
     <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <x-admin.panel>
+        <x-admin.panel class="order-2 xl:order-1">
             <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                 <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Employee Leave Allocation') }}</h2>
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Expired entitlement keeps history visible but blocks new annual leave requests beyond the expiry date.') }}</p>
@@ -67,7 +67,7 @@
                         @endif
                     </article>
                 @empty
-                    <x-admin.empty-state :title="__('No leave entitlements yet')" :description="__('Create annual leave allocation from the form on the right.')" class="border-0 bg-transparent shadow-none" />
+                    <x-admin.empty-state :title="__('No leave entitlements yet')" :description="__('Create annual leave allocation from the active action panel.')" class="border-0 bg-transparent shadow-none" />
                 @endforelse
             </div>
 
@@ -78,17 +78,18 @@
             @endif
         </x-admin.panel>
 
-        <x-admin.panel>
+        <x-admin.panel class="order-1 xl:order-2">
             <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                 <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Assign Entitlement') }}</h2>
+                <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Select the employee and allocation period, then set carry-over and expiry in one focused form.') }}</p>
             </div>
             <form wire:submit.prevent="save" class="space-y-3 p-4">
-                <select wire:model.live="userId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                <x-forms.select id="leave-entitlement-user" wire:model.live="userId" class="w-full" aria-label="{{ __('Employee') }}">
                     <option value="">{{ __('Employee') }}</option>
                     @foreach ($employees as $employee)
                         <option value="{{ $employee->id }}">{{ $employee->name }} · {{ $employee->email }}</option>
                     @endforeach
-                </select>
+                </x-forms.select>
                 <x-forms.input-error for="userId" />
 
                 <x-forms.input type="number" min="2020" max="2100" wire:model.live="year" placeholder="{{ __('Year') }}" />

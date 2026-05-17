@@ -49,12 +49,12 @@
                                 @if ($field['type'] === \App\Models\CustomFormTemplate::TYPE_TEXTAREA)
                                     <x-forms.textarea :id="'custom-form-'.$field['key']" wire:model.live="responseValues.{{ $field['key'] }}" rows="3" />
                                 @elseif ($field['type'] === \App\Models\CustomFormTemplate::TYPE_SELECT)
-                                    <select id="custom-form-{{ $field['key'] }}" wire:model.live="responseValues.{{ $field['key'] }}" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                    <x-forms.select id="custom-form-{{ $field['key'] }}" wire:model.live="responseValues.{{ $field['key'] }}" class="w-full" aria-label="{{ $field['label'] }}">
                                         <option value="">{{ __('Select') }}</option>
                                         @foreach (($field['options'] ?? []) as $option)
                                             <option value="{{ $option }}">{{ $option }}</option>
                                         @endforeach
-                                    </select>
+                                    </x-forms.select>
                                 @else
                                     <x-forms.input :id="'custom-form-'.$field['key']" :type="$field['type']" wire:model.live="responseValues.{{ $field['key'] }}" />
                                 @endif

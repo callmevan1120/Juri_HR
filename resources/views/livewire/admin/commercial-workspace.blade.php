@@ -11,7 +11,7 @@
             </div>
 
             <div class="lg:col-span-5">
-                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 text-sm font-semibold dark:bg-slate-800 md:grid-cols-6">
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 text-xs font-semibold dark:bg-slate-800 sm:text-sm md:grid-cols-6">
                     @foreach ([
                         'pipeline' => __('Pipeline'),
                         'products' => __('Products'),
@@ -23,7 +23,7 @@
                         <button
                             type="button"
                             wire:click="$set('activeTab', '{{ $tab }}')"
-                            class="rounded-lg px-3 py-2 transition {{ $activeTab === $tab ? 'bg-white text-primary-700 shadow-sm dark:bg-slate-950 dark:text-primary-300' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white' }}"
+                            class="rounded-lg px-2.5 py-2 transition sm:px-3 {{ $activeTab === $tab ? 'bg-white text-primary-700 shadow-sm dark:bg-slate-950 dark:text-primary-300' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white' }}"
                         >
                             {{ $label }}
                         </button>
@@ -55,7 +55,7 @@
     </div>
 
     <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div class="space-y-4">
+        <div class="order-2 space-y-4 xl:order-1">
             @if ($activeTab === 'pipeline')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
@@ -169,7 +169,7 @@
                                 @endif
                             </article>
                         @empty
-                            <x-admin.empty-state :title="__('No sales opportunities yet')" :description="__('Create opportunities from the form on the right to start sales tracking.')" class="border-0 bg-transparent shadow-none" />
+                            <x-admin.empty-state :title="__('No sales opportunities yet')" :description="__('Create opportunities from the active action panel to start sales tracking.')" class="border-0 bg-transparent shadow-none" />
                         @endforelse
                     </div>
                 </x-admin.panel>
@@ -239,7 +239,7 @@
                                 @endif
                             </article>
                         @empty
-                            <x-admin.empty-state :title="__('No products yet')" :description="__('Create products from the form on the right.')" class="border-0 bg-transparent shadow-none">
+                            <x-admin.empty-state :title="__('No products yet')" :description="__('Create products from the active action panel.')" class="border-0 bg-transparent shadow-none">
                                 <x-slot name="icon">
                                     <x-heroicon-o-cube class="h-12 w-12 text-slate-300 dark:text-slate-600" />
                                 </x-slot>
@@ -308,7 +308,7 @@
                                 @endif
                             </article>
                         @empty
-                            <x-admin.empty-state :title="__('No vendor bills yet')" :description="__('Create vendor bills from the form on the right to start AP tracking.')" class="border-0 bg-transparent shadow-none" />
+                            <x-admin.empty-state :title="__('No vendor bills yet')" :description="__('Create vendor bills from the active action panel to start AP tracking.')" class="border-0 bg-transparent shadow-none" />
                         @endforelse
                     </div>
                 </x-admin.panel>
@@ -413,11 +413,22 @@
             @endif
         </div>
 
-        <div class="space-y-4">
+        <div class="order-1 space-y-4 xl:order-2">
             @if ($canManage)
+                <x-admin.panel class="border-primary-200 bg-primary-50/60 dark:border-primary-900/60 dark:bg-primary-950/20">
+                    <div class="space-y-1 p-3.5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-primary-800 dark:text-primary-200">{{ __('Quick action') }}</p>
+                        <p class="text-sm leading-5 text-primary-700 dark:text-primary-100">
+                            {{ __('The form follows your selected tab so you only see the action you need right now.') }}
+                        </p>
+                    </div>
+                </x-admin.panel>
+
+                @if ($activeTab === 'pipeline')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Opportunity') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Track a lead, expected value, close date, and next follow-up in one step.') }}</p>
                     </div>
                     <form wire:submit.prevent="createOpportunity" class="space-y-3 p-4">
                         <x-forms.select id="opportunity-company" wire:model.live="opportunityCompanyId" class="w-full" aria-label="{{ __('Company') }}">
@@ -459,9 +470,11 @@
                     </form>
                 </x-admin.panel>
 
+                @elseif ($activeTab === 'products')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Product') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Add a sellable item with pricing, cost, unit, and reorder threshold.') }}</p>
                     </div>
                     <form wire:submit.prevent="createProduct" class="space-y-3 p-4">
                         <x-forms.select id="product-company" wire:model.live="productCompanyId" class="w-full" aria-label="{{ __('Company') }}">
@@ -489,9 +502,11 @@
                     </form>
                 </x-admin.panel>
 
+                @elseif ($activeTab === 'stock')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Record Stock') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Record stock in, stock out, or adjustment with an accounting cost when needed.') }}</p>
                     </div>
                     <form wire:submit.prevent="recordStockMovement" class="space-y-3 p-4">
                         <x-forms.select id="stock-product" wire:model.live="stockProductId" class="w-full" aria-label="{{ __('Product') }}">
@@ -514,9 +529,11 @@
                     </form>
                 </x-admin.panel>
 
+                @elseif ($activeTab === 'purchases')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Vendor') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Add supplier contacts once, then reuse them for bills and AP tracking.') }}</p>
                     </div>
                     <form wire:submit.prevent="createVendor" class="space-y-3 p-4">
                         <x-forms.select id="vendor-company" wire:model.live="vendorCompanyId" class="w-full" aria-label="{{ __('Company') }}">
@@ -540,6 +557,7 @@
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Post Vendor Bill') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Post a vendor bill to accounts payable and optionally connect it to stock.') }}</p>
                     </div>
                     <form wire:submit.prevent="createVendorBill" class="space-y-3 p-4">
                         <x-forms.select id="bill-vendor" wire:model.live="billVendorId" class="w-full" aria-label="{{ __('Vendor') }}">
@@ -568,9 +586,11 @@
                     </form>
                 </x-admin.panel>
 
+                @elseif (in_array($activeTab, ['quotations', 'invoices'], true))
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Quotation / Invoice') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Choose the customer, project, product line, and whether this should become a quotation or invoice.') }}</p>
                     </div>
                     <div class="space-y-3 p-4">
                         <x-forms.select id="document-company" wire:model.live="documentCompanyId" class="w-full" aria-label="{{ __('Company') }}">
@@ -610,6 +630,7 @@
                         </div>
                     </div>
                 </x-admin.panel>
+                @endif
             @else
                 <x-admin.alert tone="info">
                     {{ __('You can view commercial records, but need manage permission to create products, stock movements, quotations, or invoices.') }}

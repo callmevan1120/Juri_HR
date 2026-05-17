@@ -10,7 +10,7 @@
                 <x-forms.input id="custom-form-search" type="search" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search title or category...') }}" />
             </div>
             <div class="lg:col-span-5">
-                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 text-sm font-semibold dark:bg-slate-800">
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 text-xs font-semibold dark:bg-slate-800 sm:text-sm">
                     @foreach ([
                         'templates' => __('Templates'),
                         'submissions' => __('Submissions'),
@@ -18,7 +18,7 @@
                         <button
                             type="button"
                             wire:click="$set('activeTab', '{{ $tab }}')"
-                            class="rounded-lg px-3 py-2 transition {{ $activeTab === $tab ? 'bg-white text-primary-700 shadow-sm dark:bg-slate-950 dark:text-primary-300' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white' }}"
+                            class="rounded-lg px-2.5 py-2 transition sm:px-3 {{ $activeTab === $tab ? 'bg-white text-primary-700 shadow-sm dark:bg-slate-950 dark:text-primary-300' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white' }}"
                         >
                             {{ $label }}
                         </button>
@@ -29,7 +29,7 @@
     </x-slot>
 
     <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <div class="space-y-4">
+        <div class="order-2 space-y-4 xl:order-1">
             @if ($activeTab === 'templates')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
@@ -117,19 +117,20 @@
             @endif
         </div>
 
-        <div class="space-y-4">
+        <div class="order-1 space-y-4 xl:order-2">
             @if ($canManage)
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Template') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Build reusable forms with fields, automation, and company scope from one focused panel.') }}</p>
                     </div>
                     <form wire:submit.prevent="createTemplate" class="space-y-3 p-4">
-                        <select wire:model.live="templateCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <x-forms.select id="template-company" wire:model.live="templateCompanyId" class="w-full" aria-label="{{ __('Company') }}">
                             <option value="">{{ __('Company') }}</option>
                             @foreach ($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
                         <x-forms.input-error for="templateCompanyId" />
                         <x-forms.input wire:model.live="templateTitle" placeholder="{{ __('Form title') }}" />
                         <x-forms.input-error for="templateTitle" />
@@ -151,19 +152,19 @@
 
                             @if ($automationEnabled)
                                 <div class="mt-3 space-y-3">
-                                    <select wire:model.live="automationProjectId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                    <x-forms.select id="automation-project" wire:model.live="automationProjectId" class="w-full" aria-label="{{ __('Project') }}">
                                         <option value="">{{ __('Project') }}</option>
                                         @foreach ($projects as $project)
                                             <option value="{{ $project->id }}">{{ $project->name }}</option>
                                         @endforeach
-                                    </select>
+                                    </x-forms.select>
                                     <x-forms.input-error for="automationProjectId" />
                                     <x-forms.input wire:model.live="automationTaskTitle" placeholder="{{ __('Task title optional') }}" />
-                                    <select wire:model.live="automationTaskPriority" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                    <x-forms.select id="automation-task-priority" wire:model.live="automationTaskPriority" class="w-full" aria-label="{{ __('Priority') }}">
                                         <option value="{{ \App\Models\ProjectTask::PRIORITY_LOW }}">{{ __('Low') }}</option>
                                         <option value="{{ \App\Models\ProjectTask::PRIORITY_NORMAL }}">{{ __('Normal') }}</option>
                                         <option value="{{ \App\Models\ProjectTask::PRIORITY_HIGH }}">{{ __('High') }}</option>
-                                    </select>
+                                    </x-forms.select>
                                 </div>
                             @endif
                         </div>

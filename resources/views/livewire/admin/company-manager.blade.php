@@ -30,15 +30,16 @@
 
             <div class="lg:col-span-3">
                 <x-forms.label for="company-status-filter" value="{{ __('Status') }}" class="mb-1.5 block" />
-                <select
+                <x-forms.select
                     id="company-status-filter"
                     wire:model.live="statusFilter"
-                    class="w-full rounded-xl border-gray-300 bg-white text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                    class="w-full"
+                    aria-label="{{ __('Status') }}"
                 >
                     <option value="">{{ __('All statuses') }}</option>
                     <option value="{{ \App\Models\Company::STATUS_ACTIVE }}">{{ __('Active') }}</option>
                     <option value="{{ \App\Models\Company::STATUS_SUSPENDED }}">{{ __('Suspended') }}</option>
-                </select>
+                </x-forms.select>
             </div>
 
             <div class="lg:col-span-2">
@@ -166,14 +167,15 @@
 
                     <div>
                         <x-forms.label for="company-status" value="{{ __('Status') }}" />
-                        <select
+                        <x-forms.select
                             id="company-status"
                             wire:model.live="status"
-                            class="mt-1 w-full rounded-xl border-gray-300 bg-white text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                            class="mt-1 w-full"
+                            aria-label="{{ __('Status') }}"
                         >
                             <option value="{{ \App\Models\Company::STATUS_ACTIVE }}">{{ __('Active') }}</option>
                             <option value="{{ \App\Models\Company::STATUS_SUSPENDED }}">{{ __('Suspended') }}</option>
-                        </select>
+                        </x-forms.select>
                         <x-forms.input-error for="status" class="mt-2" />
                     </div>
 
@@ -200,25 +202,27 @@
                 <form wire:submit.prevent="assignUser" class="space-y-4 p-4">
                     <div>
                         <x-forms.label for="assign-company" value="{{ __('Company') }}" />
-                        <select
+                        <x-forms.select
                             id="assign-company"
                             wire:model.live="selectedCompanyId"
-                            class="mt-1 w-full rounded-xl border-gray-300 bg-white text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                            class="mt-1 w-full"
+                            aria-label="{{ __('Company') }}"
                         >
                             <option value="">{{ __('Choose company') }}</option>
                             @foreach ($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
                         <x-forms.input-error for="selectedCompanyId" class="mt-2" />
                     </div>
 
                     <div>
                         <x-forms.label for="assign-user" value="{{ __('User') }}" />
-                        <select
+                        <x-forms.select
                             id="assign-user"
                             wire:model.live="selectedUserId"
-                            class="mt-1 w-full rounded-xl border-gray-300 bg-white text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                            class="mt-1 w-full"
+                            aria-label="{{ __('User') }}"
                         >
                             <option value="">{{ __('Choose user') }}</option>
                             @foreach ($assignableUsers as $assignableUser)
@@ -231,7 +235,7 @@
                                     @endif
                                 </option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
                         <x-forms.input-error for="selectedUserId" class="mt-2" />
                     </div>
 

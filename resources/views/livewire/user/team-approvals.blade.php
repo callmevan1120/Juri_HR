@@ -81,7 +81,7 @@
                 <!-- Desktop Table -->
                 <div
                     class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div class="overflow-x-auto">
+                    <div >
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -294,7 +294,7 @@
                 <!-- Desktop Table -->
                 <div
                     class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div class="overflow-x-auto">
+                    <div >
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -507,7 +507,7 @@
                 <!-- Overtime Table -->
                 <div
                     class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div class="overflow-x-auto">
+                    <div >
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -628,7 +628,7 @@
                                     </div>
                                 </div>
                                 <span
-                                    class="shrink-0 rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">SPL</span>
+                                    class="shrink-0 rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">{{ __("SPL") }}</span>
                             </div>
                             <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                                 <div>
@@ -743,7 +743,7 @@
                 <!-- Kasbons Table -->
                 <div
                     class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div class="overflow-x-auto">
+                    <div >
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -866,7 +866,7 @@
                                     </div>
                                 </div>
                                 <span
-                                    class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-900 dark:text-amber-200">Rp</span>
+                                    class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-900 dark:text-amber-200">{{ __("Rp") }}</span>
                             </div>
                             <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                                 <div>

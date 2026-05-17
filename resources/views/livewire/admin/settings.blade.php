@@ -124,6 +124,7 @@
             <nav class="grid grid-cols-2 gap-2 pb-1 sm:grid-cols-3 xl:block xl:space-y-1 xl:pb-0" role="tablist" aria-label="{{ __('Settings categories') }}">
                 <template x-for="tab in tabs" :key="tab.id">
                     <button type="button" role="tab" @click="activeTab = tab.id" :id="'settings-tab-' + tab.id"
+                        aria-label="{{ __('Settings category') }}"
                         :aria-controls="'settings-panel-' + tab.id" :aria-selected="(activeTab === tab.id).toString()"
                         :tabindex="activeTab === tab.id ? 0 : -1"
                         :class="{

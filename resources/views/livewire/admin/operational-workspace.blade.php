@@ -16,7 +16,7 @@
             </div>
 
             <div class="lg:col-span-5">
-                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 text-sm font-semibold dark:bg-slate-800 md:grid-cols-4">
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 text-xs font-semibold dark:bg-slate-800 sm:text-sm md:grid-cols-4">
                     @foreach ([
                         'projects' => __('Projects'),
                         'tasks' => __('Tasks'),
@@ -26,7 +26,7 @@
                         <button
                             type="button"
                             wire:click="$set('activeTab', '{{ $tab }}')"
-                            class="rounded-lg px-3 py-2 transition {{ $activeTab === $tab ? 'bg-white text-primary-700 shadow-sm dark:bg-slate-950 dark:text-primary-300' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white' }}"
+                            class="rounded-lg px-2.5 py-2 transition sm:px-3 {{ $activeTab === $tab ? 'bg-white text-primary-700 shadow-sm dark:bg-slate-950 dark:text-primary-300' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white' }}"
                         >
                             {{ $label }}
                         </button>
@@ -37,7 +37,7 @@
     </x-slot>
 
     <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div class="space-y-4">
+        <div class="order-2 space-y-4 xl:order-1">
             @if ($activeTab === 'projects')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
@@ -101,7 +101,7 @@
                                 </dl>
                             </article>
                         @empty
-                            <x-admin.empty-state :title="__('No projects yet')" :description="__('Create your first project from the form on the right.')" class="border-0 bg-transparent shadow-none">
+                            <x-admin.empty-state :title="__('No projects yet')" :description="__('Create your first project from the active action panel.')" class="border-0 bg-transparent shadow-none">
                                 <x-slot name="icon">
                                     <x-heroicon-o-rectangle-stack class="h-12 w-12 text-slate-300 dark:text-slate-600" />
                                 </x-slot>
@@ -200,7 +200,7 @@
                                 </article>
                             @endforeach
                         @empty
-                            <x-admin.empty-state :title="__('No tasks yet')" :description="__('Create a project and add tasks from the form on the right.')" class="border-0 bg-transparent shadow-none">
+                            <x-admin.empty-state :title="__('No tasks yet')" :description="__('Create a project and add tasks from the active action panel.')" class="border-0 bg-transparent shadow-none">
                                 <x-slot name="icon">
                                     <x-heroicon-o-check-badge class="h-12 w-12 text-slate-300 dark:text-slate-600" />
                                 </x-slot>
@@ -224,7 +224,7 @@
                                 @endif
                             </article>
                         @empty
-                            <x-admin.empty-state :title="__('No clients yet')" :description="__('Create clients from the form on the right.')" class="border-0 bg-transparent shadow-none" />
+                            <x-admin.empty-state :title="__('No clients yet')" :description="__('Create clients from the active action panel.')" class="border-0 bg-transparent shadow-none" />
                         @endforelse
                     </div>
                 </x-admin.panel>
@@ -247,51 +247,62 @@
                                 @endif
                             </article>
                         @empty
-                            <x-admin.empty-state :title="__('No branches yet')" :description="__('Create company branches, stores, or field locations from the form on the right.')" class="border-0 bg-transparent shadow-none" />
+                            <x-admin.empty-state :title="__('No branches yet')" :description="__('Create company branches, stores, or field locations from the active action panel.')" class="border-0 bg-transparent shadow-none" />
                         @endforelse
                     </div>
                 </x-admin.panel>
             @endif
         </div>
 
-        <div class="space-y-4">
+        <div class="order-1 space-y-4 xl:order-2">
             @if ($canManage)
+                <x-admin.panel class="border-primary-200 bg-primary-50/60 dark:border-primary-900/60 dark:bg-primary-950/20">
+                    <div class="space-y-1 p-3.5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-primary-800 dark:text-primary-200">{{ __('Quick action') }}</p>
+                        <p class="text-sm leading-5 text-primary-700 dark:text-primary-100">
+                            {{ __('The operations form follows the selected tab so each workflow stays focused.') }}
+                        </p>
+                    </div>
+                </x-admin.panel>
+
+                @if ($activeTab === 'projects')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Project') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Start from company, client, location, and manager so tasks have clear ownership.') }}</p>
                     </div>
                     <form wire:submit.prevent="createProject" class="space-y-3 p-4">
-                        <select wire:model.live="projectCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <x-forms.select id="project-company" wire:model.live="projectCompanyId" class="w-full" aria-label="{{ __('Company') }}">
                             <option value="">{{ __('Company') }}</option>
                             @foreach ($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
                         <x-forms.input-error for="projectCompanyId" />
 
                         <x-forms.input wire:model.live="projectName" placeholder="{{ __('Project name') }}" />
                         <x-forms.input-error for="projectName" />
 
-                        <select wire:model.live="projectClientId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <x-forms.select id="project-client" wire:model.live="projectClientId" class="w-full" aria-label="{{ __('Client optional') }}">
                             <option value="">{{ __('Client optional') }}</option>
                             @foreach ($clients as $client)
                                 <option value="{{ $client->id }}">{{ $client->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
 
-                        <select wire:model.live="projectBranchId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <x-forms.select id="project-branch" wire:model.live="projectBranchId" class="w-full" aria-label="{{ __('Branch/location optional') }}">
                             <option value="">{{ __('Branch/location optional') }}</option>
                             @foreach ($branches as $branch)
                                 <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
 
-                        <select wire:model.live="projectManagerId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <x-forms.select id="project-manager" wire:model.live="projectManagerId" class="w-full" aria-label="{{ __('Manager optional') }}">
                             <option value="">{{ __('Manager optional') }}</option>
                             @foreach ($users as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
 
                         <x-forms.textarea wire:model.live="projectDescription" rows="2" placeholder="{{ __('Short project description') }}" />
 
@@ -302,35 +313,37 @@
                     </form>
                 </x-admin.panel>
 
+                @elseif ($activeTab === 'tasks')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Task') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Assign work, priority, due date, and checklist items without leaving the task tab.') }}</p>
                     </div>
                     <form wire:submit.prevent="createTask" class="space-y-3 p-4">
-                        <select wire:model.live="taskProjectId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <x-forms.select id="task-project" wire:model.live="taskProjectId" class="w-full" aria-label="{{ __('Project') }}">
                             <option value="">{{ __('Project') }}</option>
                             @foreach ($projects as $project)
                                 <option value="{{ $project->id }}">{{ $project->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
                         <x-forms.input-error for="taskProjectId" />
 
                         <x-forms.input wire:model.live="taskTitle" placeholder="{{ __('Task title') }}" />
                         <x-forms.input-error for="taskTitle" />
 
-                        <select wire:model.live="taskAssignedTo" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <x-forms.select id="task-assignee" wire:model.live="taskAssignedTo" class="w-full" aria-label="{{ __('Assignee optional') }}">
                             <option value="">{{ __('Assignee optional') }}</option>
                             @foreach ($users as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
-                        </select>
+                        </x-forms.select>
 
-                        <div class="grid grid-cols-2 gap-2">
-                            <select wire:model.live="taskPriority" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            <x-forms.select id="task-priority" wire:model.live="taskPriority" class="w-full" aria-label="{{ __('Priority') }}">
                                 <option value="{{ \App\Models\ProjectTask::PRIORITY_LOW }}">{{ __('Low') }}</option>
                                 <option value="{{ \App\Models\ProjectTask::PRIORITY_NORMAL }}">{{ __('Normal') }}</option>
                                 <option value="{{ \App\Models\ProjectTask::PRIORITY_HIGH }}">{{ __('High') }}</option>
-                            </select>
+                            </x-forms.select>
                             <x-forms.input type="date" wire:model.live="taskDueDate" />
                         </div>
 
@@ -343,38 +356,46 @@
                     </form>
                 </x-admin.panel>
 
+                @elseif ($activeTab === 'clients')
                 <x-admin.panel>
                     <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
-                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Client / Branch') }}</h2>
+                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Client') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Save client contacts once so projects, quotations, and invoices can reuse them.') }}</p>
                     </div>
-                    <div class="grid grid-cols-1 gap-4 p-4">
-                        <form wire:submit.prevent="createClient" class="space-y-3">
-                            <select wire:model.live="clientCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
-                                <option value="">{{ __('Company') }}</option>
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </select>
-                            <x-forms.input wire:model.live="clientName" placeholder="{{ __('Client name') }}" />
-                            <x-forms.input wire:model.live="clientContactName" placeholder="{{ __('Contact name') }}" />
-                            <x-forms.input wire:model.live="clientContactPhone" placeholder="{{ __('Contact phone') }}" />
-                            <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Create Client') }}</x-actions.button>
-                        </form>
-
-                        <form wire:submit.prevent="createBranch" class="space-y-3 border-t border-slate-200 pt-4 dark:border-slate-800">
-                            <select wire:model.live="branchCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
-                                <option value="">{{ __('Company') }}</option>
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </select>
-                            <x-forms.input wire:model.live="branchName" placeholder="{{ __('Branch / store / location name') }}" />
-                            <x-forms.input wire:model.live="branchType" placeholder="{{ __('branch, store, site') }}" />
-                            <x-forms.textarea wire:model.live="branchAddress" rows="2" placeholder="{{ __('Address') }}" />
-                            <x-actions.button type="submit" variant="soft-success" class="w-full">{{ __('Create Branch') }}</x-actions.button>
-                        </form>
-                    </div>
+                    <form wire:submit.prevent="createClient" class="space-y-3 p-4">
+                        <x-forms.select id="client-company" wire:model.live="clientCompanyId" class="w-full" aria-label="{{ __('Company') }}">
+                            <option value="">{{ __('Company') }}</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-forms.select>
+                        <x-forms.input wire:model.live="clientName" placeholder="{{ __('Client name') }}" />
+                        <x-forms.input wire:model.live="clientContactName" placeholder="{{ __('Contact name') }}" />
+                        <x-forms.input wire:model.live="clientContactPhone" placeholder="{{ __('Contact phone') }}" />
+                        <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Create Client') }}</x-actions.button>
+                    </form>
                 </x-admin.panel>
+
+                @elseif ($activeTab === 'branches')
+                <x-admin.panel>
+                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Branch') }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Add stores, offices, warehouses, or field locations for scoped operations.') }}</p>
+                    </div>
+                    <form wire:submit.prevent="createBranch" class="space-y-3 p-4">
+                        <x-forms.select id="branch-company" wire:model.live="branchCompanyId" class="w-full" aria-label="{{ __('Company') }}">
+                            <option value="">{{ __('Company') }}</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-forms.select>
+                        <x-forms.input wire:model.live="branchName" placeholder="{{ __('Branch / store / location name') }}" />
+                        <x-forms.input wire:model.live="branchType" placeholder="{{ __('branch, store, site') }}" />
+                        <x-forms.textarea wire:model.live="branchAddress" rows="2" placeholder="{{ __('Address') }}" />
+                        <x-actions.button type="submit" variant="soft-success" class="w-full">{{ __('Create Branch') }}</x-actions.button>
+                    </form>
+                </x-admin.panel>
+                @endif
             @else
                 <x-admin.alert tone="info">
                     {{ __('You can view this workspace, but need manage permission to create or update operational records.') }}
