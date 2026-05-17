@@ -193,7 +193,7 @@
             'type' => 'group',
             'id' => 'system',
             'label' => __('System'),
-            'active' => $isRouteActive(['admin.settings', 'admin.settings.kpi', 'admin.companies', 'admin.system-maintenance', 'admin.operational-health', 'admin.reports.*', 'admin.import-export.*', 'admin.activity-logs', 'admin.roles.permissions']),
+            'active' => $isRouteActive(['admin.settings', 'admin.settings.kpi', 'admin.companies', 'admin.system-maintenance', 'admin.operational-health', 'admin.reports.*', 'admin.import-export.*', 'admin.activity-logs', 'admin.user-sessions', 'admin.roles.permissions']),
             'items' => array_values(array_filter([
                 ['type' => 'link', 'label' => __('App Settings'), 'href' => route('admin.settings'), 'active' => $isRouteActive('admin.settings'), 'visible' => $can('viewAdminSettings')],
                 ['type' => 'link', 'label' => __('Companies'), 'href' => route('admin.companies'), 'active' => $isRouteActive('admin.companies'), 'visible' => $can('manageCompanies')],
@@ -217,6 +217,7 @@
                 ['type' => 'heading', 'label' => __('Data Management')],
                 ['type' => 'link', 'label' => __('Reports'), 'href' => route('admin.reports.index'), 'active' => $isRouteActive('admin.reports.*'), 'visible' => $can('viewOperationalReports')],
                 ['type' => 'link', 'label' => __('Activity Logs'), 'href' => route('admin.activity-logs'), 'active' => $isRouteActive('admin.activity-logs'), 'visible' => $can('viewActivityLogs')],
+                ['type' => 'link', 'label' => __('User Sessions'), 'href' => route('admin.user-sessions'), 'active' => $isRouteActive('admin.user-sessions'), 'visible' => $can('manageUserSessions')],
                 [
                     'type' => 'feature',
                     'label' => __('Import/Export Users'),

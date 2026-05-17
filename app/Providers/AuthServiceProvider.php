@@ -155,6 +155,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('exportAttendances', fn (User $user): bool => ! Editions::reportingLocked() && $adminPermission($user, 'admin.import_export_attendances.export'));
         Gate::define('viewActivityLogs', fn (User $user): bool => ! Editions::auditLocked() && $adminPermission($user, 'admin.activity_logs.view'));
         Gate::define('exportActivityLogs', fn (User $user): bool => ! Editions::auditLocked() && $adminPermission($user, 'admin.activity_logs.export'));
+        Gate::define('manageUserSessions', fn (User $user): bool => $adminPermission($user, 'admin.user_sessions.manage'));
         Gate::define('viewAnalyticsDashboard', fn (User $user): bool => ! Editions::analyticsLocked() && $adminPermission($user, 'admin.analytics.view'));
         Gate::define('exportAdminReports', fn (User $user): bool => ! Editions::reportingLocked() && $adminPermission($user, 'admin.attendances.export'));
         Gate::define('viewOperationalReports', fn (User $user): bool => $adminPermission($user, 'admin.reports.view') || $user->can('exportAttendances') || $user->can('manageLeaveApprovals') || $user->can('manageOvertime') || $user->can('manageSchedules') || $user->can('viewAdminPayroll'));

@@ -150,6 +150,17 @@ php artisan migrate --seed
 php artisan storage:link
 ```
 
+Seeder default mengisi master data aman, termasuk dataset wilayah Indonesia dari `database/data/wilayah.sql.gz`. Jika dataset wilayah perlu di-refresh ulang, set sementara `WILAYAH_SEED_REFRESH=true` lalu jalankan `php artisan db:seed --class=WilayahSeeder`.
+
+Untuk setup yang lebih eksplisit:
+
+```bash
+php artisan paspapan:seed-real
+php artisan paspapan:seed-fake
+```
+
+`paspapan:seed-real` hanya mengisi master data production-safe. `paspapan:seed-fake` mengisi data demo/fake untuk menu HR, attendance, finance, operations, commercial, accounting, dan custom forms; jangan jalankan di production kecuali environment demo/staging terkontrol.
+
 Jalankan aplikasi:
 
 ```bash

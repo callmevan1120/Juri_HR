@@ -1,13 +1,37 @@
 <?php
 
+use App\Models\AccountingAccount;
+use App\Models\Attendance;
 use App\Models\Barcode;
+use App\Models\CashAdvance;
+use App\Models\Client;
 use App\Models\Company;
+use App\Models\CompanyBranch;
+use App\Models\CustomFormSubmission;
+use App\Models\CustomFormTemplate;
 use App\Models\Division;
+use App\Models\Invoice;
 use App\Models\JobTitle;
+use App\Models\JournalEntry;
+use App\Models\LeaveEntitlement;
+use App\Models\Overtime;
+use App\Models\Payroll;
+use App\Models\Product;
+use App\Models\Project;
+use App\Models\ProjectTask;
+use App\Models\Quotation;
+use App\Models\Reimbursement;
+use App\Models\Role;
+use App\Models\SalesOpportunity;
 use App\Models\Shift;
 use App\Models\User;
+use App\Models\Vendor;
+use App\Models\VendorBill;
+use App\Models\Wilayah;
+use App\Support\RbacRegistry;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\FakeDataSeeder;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 test('database seeder is idempotent for real master data', function () {
@@ -25,6 +49,10 @@ test('database seeder is idempotent for real master data', function () {
             'Shift Sore',
             'Shift Malam',
         ])->count())->toBe(3)
+        ->and(Wilayah::query()->count())->toBeGreaterThan(80000)
+        ->and(Wilayah::query()->whereRaw('LENGTH(kode) = 2')->count())->toBeGreaterThan(30)
+        ->and(Wilayah::query()->where('kode', '11')->value('nama'))->toBe('Aceh')
+        ->and(AccountingAccount::query()->where('code', '1100')->exists())->toBeTrue()
         ->and(JobTitle::query()->whereIn('name', ['Head', 'Manager', 'Senior', 'Staff'])->whereNotNull('job_level_id')->count())->toBe(4);
 });
 
@@ -135,4 +163,55 @@ test('fake employee seeder keeps one head and manager per division and fills emp
             $this->assertNotEmpty($employee->manager_id, "Expected {$employee->email} manager_id to be filled.");
         }
     }
+
+    expect(CompanyBranch::query()->where('code', 'JKT-HQ')->exists())->toBeTrue()
+        ->and(Client::query()->where('code', 'CL-ACME')->exists())->toBeTrue()
+        ->and(Project::query()->where('code', 'PRJ-OPS-001')->exists())->toBeTrue()
+        ->and(ProjectTask::query()->where('title', 'Survey lokasi outlet pertama')->exists())->toBeTrue()
+        ->and(Product::query()->where('sku', 'DEVICE-BUNDLE-001')->exists())->toBeTrue()
+        ->and(Vendor::query()->where('name', 'PT Supplier Teknologi Nusantara')->exists())->toBeTrue()
+        ->and(Quotation::query()->where('number', 'QTN-DEMO-001')->exists())->toBeTrue()
+        ->and(Invoice::query()->where('number', 'INV-DEMO-001')->exists())->toBeTrue()
+        ->and(VendorBill::query()->where('number', 'BILL-DEMO-001')->exists())->toBeTrue()
+        ->and(SalesOpportunity::query()->where('title', 'ACME Device Rollout Q2')->exists())->toBeTrue()
+        ->and(JournalEntry::query()->count())->toBeGreaterThan(0)
+        ->and(CustomFormTemplate::query()->where('title', 'Bukti Kunjungan Lokasi')->exists())->toBeTrue()
+        ->and(CustomFormSubmission::query()->exists())->toBeTrue()
+        ->and(Reimbursement::query()->where('description', 'Demo pending taxi reimbursement for client meeting.')->exists())->toBeTrue()
+        ->and(CashAdvance::query()->where('purpose', 'Demo travel advance for client visit.')->exists())->toBeTrue()
+        ->and(Overtime::query()->where('reason', 'Demo urgent client rollout support.')->exists())->toBeTrue()
+        ->and(Payroll::query()->where('period_type', 'monthly')->exists())->toBeTrue()
+        ->and(LeaveEntitlement::query()->exists())->toBeTrue()
+        ->and(Attendance::query()->where('approval_status', Attendance::STATUS_PENDING)->whereNotNull('leave_type_id')->exists())->toBeTrue();
+
+    $demoAdmin = User::query()->where('email', 'admin123@paspapan.com')->firstOrFail();
+    $demoRole = Role::query()->where('slug', 'demo_admin_readonly')->firstOrFail();
+    $demoPermissions = $demoRole->permissions ?? [];
+
+    expect($demoAdmin->roles()->pluck('slug')->all())->toBe(['demo_admin_readonly'])
+        ->and($demoPermissions)->toContain('admin.dashboard.view')
+        ->and($demoPermissions)->toContain('admin.employees.view')
+        ->and($demoPermissions)->toContain('admin.commercial.view')
+        ->and($demoPermissions)->not->toContain('admin.employees.manage')
+        ->and($demoPermissions)->not->toContain('admin.rbac.manage')
+        ->and($demoPermissions)->not->toContain('admin.system_maintenance.manage')
+        ->and($demoPermissions)->not->toContain('admin.user_sessions.manage')
+        ->and($demoPermissions)->toBe(RbacRegistry::readOnlyPermissionKeys())
+        ->and(Gate::forUser($demoAdmin)->allows('viewEmployees'))->toBeTrue()
+        ->and(Gate::forUser($demoAdmin)->allows('manageRbac'))->toBeFalse()
+        ->and(Gate::forUser($demoAdmin)->allows('manageUserRecord', [User::query()->where('group', 'user')->first(), 'user']))->toBeFalse();
+});
+
+test('paspapan seeding commands keep real and fake data separated', function () {
+    $this->artisan('paspapan:seed-real')
+        ->assertSuccessful();
+
+    expect(Company::query()->where('slug', 'paspapan-demo')->exists())->toBeTrue()
+        ->and(Product::query()->where('sku', 'DEVICE-BUNDLE-001')->exists())->toBeFalse();
+
+    $this->artisan('paspapan:seed-fake')
+        ->assertSuccessful();
+
+    expect(Product::query()->where('sku', 'DEVICE-BUNDLE-001')->exists())->toBeTrue()
+        ->and(CustomFormTemplate::query()->where('title', 'Bukti Kunjungan Lokasi')->exists())->toBeTrue();
 });

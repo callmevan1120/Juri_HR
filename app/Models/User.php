@@ -514,6 +514,18 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $permissions = (array) $permissions;
 
+        if ($this->isDemo) {
+            $readOnlyPermissions = RbacRegistry::readOnlyPermissionKeys();
+
+            foreach ($permissions as $permission) {
+                if (in_array($permission, $readOnlyPermissions, true)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         if ($this->hasAssignedRoles()) {
             return $this->hasAnyPermission($permissions);
         }
@@ -626,6 +638,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'admin.import-export.users' => ['viewUserImportExport'],
             'admin.import-export.attendances' => ['viewAttendanceImportExport'],
             'admin.activity-logs' => ['viewActivityLogs'],
+            'admin.user-sessions' => ['manageUserSessions'],
             'admin.system-maintenance' => ['viewAny', SystemBackupRun::class],
             'admin.roles.permissions' => ['manageRbac'],
         ];

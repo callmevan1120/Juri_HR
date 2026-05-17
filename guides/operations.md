@@ -303,6 +303,8 @@ Sebelum go-live:
 - ganti password
 - hapus user demo yang tidak boleh ada di produksi
 - jangan menjalankan seeder sembarang pada database produksi
+- master wilayah Indonesia ikut `DatabaseSeeder`; gunakan `WILAYAH_SEED_REFRESH=true php artisan db:seed --class=WilayahSeeder` hanya saat perlu reload dataset wilayah penuh
+- gunakan `php artisan paspapan:seed-real` untuk master data aman dan `php artisan paspapan:seed-fake` hanya untuk lokal, QA, atau staging demo
 
 ### Storage dan Attachment Privat
 

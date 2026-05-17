@@ -8,6 +8,7 @@ use App\Models\Education;
 use App\Models\JobTitle;
 use App\Models\User;
 use App\Models\Wilayah;
+use Database\Seeders\Concerns\GuardsDemoSeeding;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
 
 class FakeDataSeeder extends Seeder
 {
+    use GuardsDemoSeeding;
+
     private ?array $cachedLocationFields = null;
 
     private ?Company $cachedCompany = null;
@@ -24,9 +27,7 @@ class FakeDataSeeder extends Seeder
      */
     public function run(): void
     {
-        if ($this->runningProduction() && ! $this->demoSeedingEnabled()) {
-            $this->command?->warn('Skipping fake demo employee data in production. Set DEMO_SEEDING_ENABLED=true only for staging/demo.');
-
+        if ($this->shouldSkipDemoSeeding()) {
             return;
         }
 
@@ -120,19 +121,14 @@ class FakeDataSeeder extends Seeder
         );
 
         $this->call([
+            DemoAdminReadonlyRoleSeeder::class,
             AttendanceSeeder::class,
             DemoAssetSeeder::class,
+            DemoOperationsSeeder::class,
+            DemoCommercialSeeder::class,
+            DemoFinanceWorkflowSeeder::class,
+            DemoCustomFormSeeder::class,
         ]);
-    }
-
-    private function demoSeedingEnabled(): bool
-    {
-        return filter_var(config('paspapan.demo_seeding_enabled', false), FILTER_VALIDATE_BOOL);
-    }
-
-    private function runningProduction(): bool
-    {
-        return app()->environment('production') || config('app.env') === 'production';
     }
 
     private function upsertEmployee(

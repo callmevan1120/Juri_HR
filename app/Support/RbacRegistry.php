@@ -55,6 +55,34 @@ class RbacRegistry
         return array_values(array_unique($permissions));
     }
 
+    public static function readOnlyPermissionKeys(): array
+    {
+        $permissions = [];
+        $readOnlyActions = [
+            'view',
+            'report',
+            'export',
+            'export_leave',
+            'export_schedule',
+            'export_overtime',
+            'export_payroll',
+        ];
+
+        foreach (static::modules() as $module) {
+            foreach (($module['actions'] ?? []) as $actionKey => $action) {
+                if (! in_array($actionKey, $readOnlyActions, true)) {
+                    continue;
+                }
+
+                if (isset($action['permission'])) {
+                    $permissions[] = $action['permission'];
+                }
+            }
+        }
+
+        return array_values(array_unique($permissions));
+    }
+
     public static function modulePermissionKeys(string $moduleKey): array
     {
         $module = static::module($moduleKey);

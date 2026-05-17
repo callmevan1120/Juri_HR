@@ -98,17 +98,24 @@ class CommercialDocumentPdfFactory
     private function make(string $type, Quotation|Invoice|VendorBill $record, array $document): mixed
     {
         $companyName = $record->company?->name ?: Setting::getValue('app.company_name', config('app.name'));
-
-        return Pdf::loadView('pdf.commercial-document', [
+        $body = view('pdf.commercial-document', [
             'type' => $type,
             'record' => $record,
             'document' => $document,
+        ])->render();
+
+        return Pdf::loadView('pdf.employee-document-template', [
+            'preview' => false,
             'companyName' => $companyName,
-            'companyAddress' => Setting::getValue('app.company_address', ''),
-            'companyPhone' => Setting::getValue('app.company_phone', ''),
-            'companyWebsite' => Setting::getValue('app.company_website', ''),
-            'supportContact' => Setting::getValue('app.support_contact', config('mail.from.address')),
-            'logoSrc' => MailBranding::logoPdfSource(),
+            'body' => $body,
+            'footer' => null,
+            'documentMeta' => [],
+            'layoutOptions' => [
+                'header_company_name' => $companyName,
+                'header_tagline' => __('Commercial Document'),
+                'show_accents' => true,
+                'show_document_meta' => false,
+            ],
         ])->setPaper('a4');
     }
 }

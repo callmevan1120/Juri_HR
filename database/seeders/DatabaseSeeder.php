@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
             SettingSeeder::class,
+            WilayahSeeder::class,
             HolidaySeeder::class,
             JobLevelSeeder::class,
             PayrollComponentSeeder::class,
@@ -53,6 +54,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->seedDefaultCompany();
+        $this->call(AccountingMasterDataSeeder::class);
         $this->seedDefaultBarcodes();
         $this->seedDefaultShifts();
     }
