@@ -43,8 +43,10 @@
                     <x-actions.button
                         type="button"
                         variant="secondary"
+                        data-sweet-confirm
                         data-confirm-message="{{ __('Regenerate the dynamic secret now? Any currently displayed QR will stop working immediately.') }}"
-                        onclick="if (confirm(this.dataset.confirmMessage)) { document.getElementById('regenerate-secret-form').submit(); }"
+                        data-confirm-form="regenerate-secret-form"
+                        data-confirm-icon="warning"
                     >
                         {{ __('Regenerate Secret') }}
                     </x-actions.button>

@@ -34,6 +34,189 @@ window.Capacitor = window.Capacitor || Capacitor;
 window.CapacitorGeolocation = CapacitorGeolocation;
 window.CapacitorApp = App;
 
+const pasPapanAlertLabels = () => ({
+    confirm: window.PasPapanAlertLabels?.confirm || "Confirm",
+    cancel: window.PasPapanAlertLabels?.cancel || "Cancel",
+    confirmTitle: window.PasPapanAlertLabels?.confirmTitle || "Are you sure?",
+    noticeTitle: window.PasPapanAlertLabels?.noticeTitle || "Notice",
+});
+
+const normalizeSweetAlertIcon = (icon) => {
+    if (["danger", "failed", "failure"].includes(icon)) {
+        return "error";
+    }
+
+    if (["warn"].includes(icon)) {
+        return "warning";
+    }
+
+    return ["success", "error", "warning", "info", "question"].includes(icon)
+        ? icon
+        : "info";
+};
+
+const sweetAlertBaseClasses = {
+    popup: "!rounded-2xl !border !border-slate-200 dark:!border-slate-700 !bg-white dark:!bg-slate-900 !text-slate-950 dark:!text-white !shadow-[0_24px_70px_-34px_rgba(15,23,42,0.55)]",
+    title: "!text-base !font-semibold !tracking-tight",
+    htmlContainer: "!text-sm !leading-6 !text-slate-600 dark:!text-slate-300",
+    confirmButton: "!rounded-xl !bg-primary-700 !px-4 !py-2.5 !text-sm !font-semibold !text-white hover:!bg-primary-800 focus:!shadow-none focus:!ring-2 focus:!ring-primary-500 focus:!ring-offset-2 dark:!bg-primary-400 dark:!text-slate-950 dark:hover:!bg-primary-300",
+    cancelButton: "!rounded-xl !border !border-slate-200 !bg-white !px-4 !py-2.5 !text-sm !font-semibold !text-slate-700 hover:!bg-slate-50 focus:!shadow-none focus:!ring-2 focus:!ring-slate-300 focus:!ring-offset-2 dark:!border-slate-700 dark:!bg-slate-800 dark:!text-slate-100 dark:hover:!bg-slate-700",
+};
+
+const createPasPapanToast = () => Swal.mixin({
+    toast: true,
+    position: "bottom-end",
+    showConfirmButton: false,
+    timer: 3200,
+    timerProgressBar: true,
+    background: "transparent",
+    customClass: {
+        popup: "!bg-white dark:!bg-slate-900 !text-slate-900 dark:!text-white !rounded-2xl !shadow-[0_18px_48px_-28px_rgba(15,23,42,0.65)] !border !border-slate-100 dark:!border-slate-700/70 !px-4 !py-3 !w-auto !max-w-[92vw] !mx-auto !mt-4",
+        title: "!text-sm !font-semibold !leading-5",
+        timerProgressBar: "!bg-primary-500 !h-1",
+    },
+    didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+    },
+});
+
+window.PasPapanAlert = {
+    toast(payload = {}) {
+        const title = payload.title || payload.message || payload.text || "";
+
+        if (!title) {
+            return Promise.resolve();
+        }
+
+        return createPasPapanToast().fire({
+            icon: normalizeSweetAlertIcon(payload.icon || payload.style || "info"),
+            title,
+        });
+    },
+    modal(payload = {}) {
+        const labels = pasPapanAlertLabels();
+
+        return Swal.fire({
+            icon: normalizeSweetAlertIcon(payload.icon || "info"),
+            title: payload.title || labels.noticeTitle,
+            text: payload.text || payload.message || "",
+            confirmButtonText: payload.confirmButtonText || labels.confirm,
+            buttonsStyling: false,
+            customClass: sweetAlertBaseClasses,
+        });
+    },
+    async confirm(message, options = {}) {
+        const labels = pasPapanAlertLabels();
+        const result = await Swal.fire({
+            icon: normalizeSweetAlertIcon(options.icon || "question"),
+            title: options.title || labels.confirmTitle,
+            text: message || options.text || "",
+            showCancelButton: true,
+            confirmButtonText: options.confirmButtonText || labels.confirm,
+            cancelButtonText: options.cancelButtonText || labels.cancel,
+            reverseButtons: true,
+            focusCancel: true,
+            buttonsStyling: false,
+            customClass: sweetAlertBaseClasses,
+        });
+
+        return result.isConfirmed;
+    },
+};
+
+window.Toast = createPasPapanToast();
+
+window.alert = (message) => {
+    window.PasPapanAlert.modal({
+        icon: "info",
+        title: String(message || pasPapanAlertLabels().noticeTitle),
+    });
+};
+
+const installSweetAlertConfirmations = (root = document) => {
+    root.querySelectorAll?.("[wire\\:confirm], [wire\\:confirm\\.prompt]").forEach((element) => {
+        element.__livewire_confirm = (onConfirm, onCancel) => {
+            const message = element.getAttribute("wire:confirm")
+                || element.getAttribute("wire:confirm.prompt")
+                || pasPapanAlertLabels().confirmTitle;
+
+            window.PasPapanAlert.confirm(message).then((confirmed) => {
+                if (confirmed) {
+                    onConfirm();
+                    return;
+                }
+
+                onCancel();
+            });
+        };
+    });
+};
+
+const scheduleSweetAlertConfirmations = (root = document) => {
+    installSweetAlertConfirmations(root);
+    setTimeout(() => installSweetAlertConfirmations(root), 0);
+    setTimeout(() => installSweetAlertConfirmations(root), 80);
+};
+
+const installSweetAlertDelegates = () => {
+    document.addEventListener("click", async (event) => {
+        const trigger = event.target.closest("[data-sweet-confirm]");
+
+        if (!trigger) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const confirmed = await window.PasPapanAlert.confirm(
+            trigger.dataset.confirmMessage,
+            {
+                icon: trigger.dataset.confirmIcon || "warning",
+                title: trigger.dataset.confirmTitle,
+                confirmButtonText: trigger.dataset.confirmButton,
+                cancelButtonText: trigger.dataset.cancelButton,
+            },
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const formId = trigger.dataset.confirmForm;
+        const form = formId ? document.getElementById(formId) : trigger.closest("form");
+
+        if (form) {
+            form.requestSubmit();
+        }
+    });
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    scheduleSweetAlertConfirmations(node);
+                }
+            });
+        });
+    });
+
+    if (document.body) {
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    scheduleSweetAlertConfirmations();
+};
+
+document.addEventListener("DOMContentLoaded", installSweetAlertDelegates);
+document.addEventListener("livewire:init", () => {
+    scheduleSweetAlertConfirmations();
+});
+document.addEventListener("livewire:navigated", () => {
+    scheduleSweetAlertConfirmations();
+});
+
 const resolveSystemBarAppearance = () => {
     const root = document.documentElement;
     const body = document.body;

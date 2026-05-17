@@ -1,8 +1,4 @@
-<div class="scanner-card-surface p-4 relative overflow-visible bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700" id="scanner-card" wire:ignore>
-    
-    {{-- Decorative Background Blob --}}
-    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-primary-50 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-
+<div class="scanner-card-surface p-4 relative overflow-visible" id="scanner-card" wire:ignore>
     <div class="scanner-header relative mb-3 flex flex-col gap-4">
         <div class="flex justify-between items-center">
             <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -11,7 +7,7 @@
                 </div>
                 {{ $title }}
             </h3>
-            <button type="button" id="switch-camera-btn" onclick="window.switchCamera?.()" class="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-1.5">
+            <button type="button" id="switch-camera-btn" onclick="window.switchCamera?.()" aria-label="{{ __('Switch camera') }}" class="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-1.5">
                 <x-heroicon-o-arrow-path class="h-3.5 w-3.5" />
                 <span>{{ __('Switch') }}</span>
             </button>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f5faf4">
+    <meta name="theme-color" content="#f8fafc">
     <title>@yield('title') | {{ config('app.name') }}</title>
 
     <script>
@@ -33,41 +33,39 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-full bg-[radial-gradient(circle_at_top_left,rgba(87,148,74,0.14),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(87,148,74,0.08),transparent_30%),#f5faf4] font-sans antialiased text-gray-950 selection:bg-primary-600 selection:text-white dark:bg-[radial-gradient(circle_at_top_left,rgba(132,193,120,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(132,193,120,0.06),transparent_25%),#07110c] dark:text-gray-100">
+<body class="min-h-full bg-slate-50 font-sans antialiased text-slate-950 selection:bg-primary-600 selection:text-white dark:bg-slate-950 dark:text-slate-100">
     <a href="#error-main" class="skip-link">{{ __('Skip to main content') }}</a>
 
-    <div class="min-h-screen px-4 py-[max(1rem,env(safe-area-inset-top))] sm:px-6">
-        <main id="error-main" tabindex="-1" class="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center py-6">
-            <section aria-labelledby="error-page-title" class="w-full overflow-hidden rounded-[1.75rem] border border-primary-100/80 bg-white/95 shadow-[0_24px_60px_-34px_rgba(34,64,41,0.35)] backdrop-blur dark:border-primary-900/40 dark:bg-gray-900/90 dark:shadow-[0_24px_60px_-38px_rgba(0,0,0,0.8)]">
-                <div class="h-1.5 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700"></div>
-
-                <div class="grid gap-4 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-6 lg:px-6">
-                    <div class="space-y-6 text-left">
-                        <div class="inline-flex items-center gap-3">
-                            <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/30">
-                                <x-branding.application-mark class="h-8 w-8 text-white" />
+    <div class="min-h-screen px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-6 lg:px-8">
+        <main id="error-main" tabindex="-1" class="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-5xl items-center justify-center">
+            <section aria-labelledby="error-page-title" class="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_26px_80px_-48px_rgba(15,23,42,0.55)] dark:border-slate-800 dark:bg-slate-900">
+                <div class="grid min-h-[34rem] lg:grid-cols-[18rem_minmax(0,1fr)]">
+                    <aside class="flex flex-col justify-between gap-8 border-b border-slate-200 bg-slate-100/70 p-5 dark:border-slate-800 dark:bg-slate-950/55 sm:p-6 lg:border-b-0 lg:border-r">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-700 text-white shadow-sm dark:bg-primary-400 dark:text-slate-950">
+                                <x-branding.application-mark class="h-7 w-7 text-current" />
                             </span>
-                            <div>
-                                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700 dark:text-primary-300">
+                            <div class="min-w-0">
+                                <p class="truncate text-sm font-semibold text-slate-950 dark:text-white">
                                     {{ config('app.name') }}
                                 </p>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                    {{ __('Accessible system status page') }}
+                                <p class="mt-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                    {{ __('System status') }}
                                 </p>
                             </div>
                         </div>
 
-                        <div class="rounded-2xl border border-primary-100 bg-primary-50/80 p-5 dark:border-primary-900/40 dark:bg-primary-950/20">
-                            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-primary-800 dark:text-primary-200">
+                        <div class="rounded-2xl border border-white bg-white/70 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary-700 dark:text-primary-300">
                                 {{ __('Need help?') }}
                             </p>
-                            <p class="sr-only">
-                                {{ __('If this issue keeps appearing, document the page you were opening and contact the administrator so it can be checked more quickly.') }}
+                            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                                {{ __('If this keeps happening, note the page and time before contacting your administrator.') }}
                             </p>
                         </div>
-                    </div>
+                    </aside>
 
-                    <div class="min-w-0">
+                    <div class="min-w-0 p-5 sm:p-6 lg:p-8">
                         @yield('content')
                     </div>
                 </div>

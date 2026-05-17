@@ -27,7 +27,11 @@ export async function startNativeBarcodeScanner(onScanSuccess, facingMode = null
         if (perm.denied) {
             console.error("Camera permission denied");
             if (!isSwitching) {
-                alert("Camera permission denied. Please enable in settings.");
+                window.PasPapanAlert?.modal({
+                    icon: "warning",
+                    title: "Camera permission denied",
+                    text: "Please enable camera access in settings.",
+                });
             }
             isScanning = false;
             return;
@@ -36,7 +40,11 @@ export async function startNativeBarcodeScanner(onScanSuccess, facingMode = null
         if (!perm.granted) {
             console.error("Camera permission not granted");
             if (!isSwitching) {
-                alert("Camera permission is required");
+                window.PasPapanAlert?.modal({
+                    icon: "warning",
+                    title: "Camera permission is required",
+                    text: "Please allow camera access to scan attendance QR codes.",
+                });
             }
             isScanning = false;
             return;
@@ -60,14 +68,11 @@ export async function startNativeBarcodeScanner(onScanSuccess, facingMode = null
         if (!isSwitching) {
             console.error("Scanner failed", e);
             // Use non-blocking console error instead of blocking alert
-            if (window.Swal) {
-                window.Swal.fire({
-                    icon: 'error',
-                    title: 'Scanner Error',
-                    text: e.message || String(e),
-                    confirmButtonColor: '#6366f1'
-                });
-            }
+            window.PasPapanAlert?.modal({
+                icon: "error",
+                title: "Scanner Error",
+                text: e.message || String(e),
+            });
         }
     } finally {
         // Only do cleanup if we're NOT in the middle of a switch
@@ -126,13 +131,10 @@ export async function switchNativeCamera(onScanSuccess) {
         console.error('[NATIVE CAM] Switch native camera failed:', e);
         isSwitching = false;
         
-        if (window.Swal) {
-            window.Swal.fire({
-                icon: 'error',
-                title: 'Switch Failed',
-                text: 'Could not switch native camera: ' + (e.message || String(e)),
-                confirmButtonColor: '#6366f1'
-            });
-        }
+        window.PasPapanAlert?.modal({
+            icon: "error",
+            title: "Switch Failed",
+            text: "Could not switch native camera: " + (e.message || String(e)),
+        });
     }
 }

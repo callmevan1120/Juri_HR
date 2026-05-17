@@ -3,27 +3,27 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-        <meta name="theme-color" content="#f5faf4">
+        <meta name="theme-color" content="#f8fafc">
         <title>@yield('title') | {{ config('app.name') }}</title>
         <style>
             :root {
                 color-scheme: light dark;
-                --bg: #f5faf4;
-                --surface: rgba(255, 255, 255, 0.96);
-                --border: rgba(87, 148, 74, 0.18);
-                --text: #163020;
-                --text-muted: #486253;
+                --bg: #f8fafc;
+                --surface: #ffffff;
+                --border: #e2e8f0;
+                --text: #0f172a;
+                --text-muted: #475569;
                 --accent: #57944a;
             }
 
             @media (prefers-color-scheme: dark) {
                 :root {
-                    --bg: #07110c;
-                    --surface: rgba(17, 24, 39, 0.92);
-                    --border: rgba(132, 193, 120, 0.2);
-                    --text: #f3f7f2;
-                    --text-muted: #c6d6c4;
-                    --accent: #84c178;
+                    --bg: #020617;
+                    --surface: #0f172a;
+                    --border: #1e293b;
+                    --text: #f8fafc;
+                    --text-muted: #cbd5e1;
+                    --accent: #9bd28d;
                 }
             }
 
@@ -36,19 +36,19 @@
                 min-height: 100vh;
                 display: grid;
                 place-items: center;
-                padding: 1rem;
+                padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
                 font-family: Figtree, "Segoe UI", Arial, sans-serif;
                 background: var(--bg);
                 color: var(--text);
             }
 
             .card {
-                width: min(100%, 32rem);
+                width: min(100%, 34rem);
                 border: 1px solid var(--border);
                 border-radius: 1.5rem;
                 background: var(--surface);
-                padding: 1.5rem;
-                box-shadow: 0 24px 56px -36px rgba(34, 64, 41, 0.4);
+                padding: 1.25rem;
+                box-shadow: 0 24px 64px -44px rgba(15, 23, 42, 0.65);
             }
 
             .code {
@@ -57,20 +57,21 @@
                 align-items: center;
                 justify-content: center;
                 padding: 0.5rem 0.875rem;
+                border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
                 border-radius: 999px;
-                background: rgba(87, 148, 74, 0.08);
+                background: color-mix(in srgb, var(--accent) 10%, transparent);
                 color: var(--accent);
-                font-size: 0.875rem;
+                font-size: 0.8125rem;
                 font-weight: 800;
-                letter-spacing: 0.18em;
+                letter-spacing: 0.16em;
                 text-transform: uppercase;
             }
 
             h1 {
                 margin: 1rem 0 0;
-                font-size: 1.875rem;
+                font-size: clamp(1.5rem, 7vw, 2rem);
                 line-height: 1.15;
-                letter-spacing: -0.03em;
+                letter-spacing: -0.02em;
             }
 
             p {
@@ -84,7 +85,7 @@
         <main class="card" aria-labelledby="minimal-error-title">
             <div class="code">@yield('code')</div>
             <h1 id="minimal-error-title">@yield('message')</h1>
-            <p>{{ __('The requested page is currently unavailable.') }}</p>
+            <p>{{ __('The requested page is currently unavailable. Please return to the app and try again.') }}</p>
         </main>
     </body>
 </html>

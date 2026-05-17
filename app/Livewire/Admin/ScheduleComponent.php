@@ -120,7 +120,7 @@ class ScheduleComponent extends Component
         }
 
         $this->showModal = false;
-        $this->js("Swal.fire({icon: 'success', title: 'Schedule Updated', timer: 1500, showConfirmButton: false})");
+        $this->dispatch('success', message: __('Schedule Updated'));
     }
 
     public function render()

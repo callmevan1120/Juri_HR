@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 @php
     $isAdminRoute = request()->routeIs('admin.*');
+    $isUserShell = ! $isAdminRoute && auth()->check();
 @endphp
 
 <head>
@@ -97,6 +98,12 @@
 
     <script>
         window.PasPapanBroadcast = {{ Illuminate\Support\Js::from($pasPapanBroadcast) }};
+        window.PasPapanAlertLabels = {{ Illuminate\Support\Js::from([
+            'confirm' => __('Confirm'),
+            'cancel' => __('Cancel'),
+            'confirmTitle' => __('Are you sure?'),
+            'noticeTitle' => __('Notice'),
+        ]) }};
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -115,8 +122,10 @@
         <livewire:shared.high-priority-announcement-modal />
     @endunless
 
-    <div class="app-shell min-h-screen {{ $isAdminRoute ? 'bg-slate-50 pt-[calc(4rem+env(safe-area-inset-top))] dark:bg-slate-950' : 'bg-gray-100 pt-[calc(3.5rem+env(safe-area-inset-top))] dark:bg-gray-900 sm:pt-[calc(4.25rem+env(safe-area-inset-top))]' }} pb-[env(safe-area-inset-bottom)]">
-        <livewire:navigation-menu />
+    <div class="app-shell min-h-screen {{ $isAdminRoute ? 'bg-slate-50 pt-[calc(4rem+env(safe-area-inset-top))] dark:bg-slate-950' : 'bg-transparent' }} {{ $isUserShell ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom))]' : 'pb-[env(safe-area-inset-bottom)]' }}">
+        @if ($isAdminRoute)
+            <livewire:navigation-menu />
+        @endif
 
         <!-- @if (isset($header))
             <header class="bg-white shadow dark:bg-gray-800">
@@ -142,16 +151,22 @@
             </div>
         </div>
 
-        <main id="main-content" tabindex="-1" class="{{ $isAdminRoute ? 'relative isolate' : '' }}">
+        <main id="main-content" tabindex="-1" class="{{ $isAdminRoute || $isUserShell ? 'relative isolate' : '' }}">
             @if ($isAdminRoute)
                 <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[22rem] overflow-hidden">
                     <div class="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-white via-slate-50 to-transparent dark:from-slate-900 dark:via-slate-950 dark:to-transparent"></div>
                     <div class="hidden"></div>
                     <div class="absolute right-0 top-0 h-56 w-56 rounded-full bg-emerald-200/25 blur-3xl dark:bg-emerald-500/10"></div>
                 </div>
+            @elseif ($isUserShell)
+                <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 overflow-hidden bg-[linear-gradient(180deg,rgba(226,240,223,0.42),rgba(248,250,252,0))] dark:bg-[linear-gradient(180deg,rgba(21,35,18,0.32),rgba(2,6,23,0))]"></div>
             @endif
             {{ $slot }}
         </main>
+
+        @if ($isUserShell)
+            <x-user.app-bottom-navigation />
+        @endif
     </div>
 
     @stack('modals')
@@ -430,91 +445,50 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Toast Configuration
-            // Toast Configuration
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'bottom-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                background: 'transparent',
-                customClass: {
-                    popup: '!bg-white dark:!bg-gray-800 !text-gray-900 dark:!text-white !rounded-2xl !shadow-sm !border !border-gray-100 dark:!border-gray-700/50 !px-4 !py-3 !w-auto !max-w-[90vw] !mx-auto !mt-4',
-                    title: '!text-sm !font-bold',
-                    timerProgressBar: '!bg-primary-500 !h-1'
-                },
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-            window.Toast = Toast;
+            const notify = (icon, message) => {
+                window.PasPapanAlert?.toast({
+                    icon,
+                    title: message
+                });
+            };
 
             // Listen for Livewire Events
             if (typeof Livewire !== 'undefined') {
                 Livewire.on('success', (data) => {
-                    Toast.fire({
-                        icon: 'success',
-                        title: data.message || data
-                    });
+                    notify('success', data.message || data);
                 });
 
                 Livewire.on('error', (data) => {
-                    Toast.fire({
-                        icon: 'error',
-                        title: data.message || data
-                    });
+                    notify('error', data.message || data);
                 });
 
                 Livewire.on('warning', (data) => {
-                    Toast.fire({
-                        icon: 'warning',
-                        title: data.message || data
-                    });
+                    notify('warning', data.message || data);
                 });
 
                 Livewire.on('info', (data) => {
-                    Toast.fire({
-                        icon: 'info',
-                        title: data.message || data
-                    });
+                    notify('info', data.message || data);
                 });
             }
 
             @if(session('success'))
-            Toast.fire({
-                icon: 'success',
-                title: "{{ session('success') }}"
-            });
+            notify('success', @js(session('success')));
             @endif
 
             @if(session('error'))
-            Toast.fire({
-                icon: 'error',
-                title: "{{ session('error') }}"
-            });
+            notify('error', @js(session('error')));
             @endif
 
             @if(session('warning'))
-            Toast.fire({
-                icon: 'warning',
-                title: "{{ session('warning') }}"
-            });
+            notify('warning', @js(session('warning')));
             @endif
 
             @if(session('info'))
-            Toast.fire({
-                icon: 'info',
-                title: "{{ session('info') }}"
-            });
+            notify('info', @js(session('info')));
             @endif
 
             @if(session('flash.banner'))
-            Toast.fire({
-                icon: 'success',
-                title: "{{ session('flash.banner') }}"
-            });
+            notify(@js(session('flash.bannerStyle', 'success')), @js(session('flash.banner')));
             @endif
         });
     </script>

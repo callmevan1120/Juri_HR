@@ -80,17 +80,6 @@
     </style>
 
     <div class="min-w-0 space-y-3">
-        @if (session()->has('success'))
-            <div class="rounded-xl border border-green-100 bg-green-50 p-4 text-sm font-medium text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if (session()->has('warning'))
-            <div class="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
-                {{ session('warning') }}
-            </div>
-        @endif
-
         <div class="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_36rem]">
             <section class="min-w-0 space-y-3">
                 <x-admin.panel class="p-4">

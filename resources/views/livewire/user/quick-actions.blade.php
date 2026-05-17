@@ -285,7 +285,7 @@
         aria-labelledby="quick-access-more-title" style="display: none;">
         <div class="quick-wallet-modal__backdrop" x-on:click="showMore = false"></div>
 
-        <div class="relative flex min-h-full items-end justify-center sm:items-center" x-show="showMore"
+        <div class="quick-wallet-modal__frame" x-show="showMore"
             x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">

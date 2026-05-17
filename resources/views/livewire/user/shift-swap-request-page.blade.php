@@ -18,13 +18,6 @@
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-                @if (session()->has('success'))
-                    <div
-                        class="mb-4 rounded-xl border border-green-100 bg-green-50 p-4 text-sm font-medium text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
                 <div
                     class="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
                     <div class="overflow-x-auto">

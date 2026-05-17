@@ -1,23 +1,6 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
         
-        @if (session()->has('error'))
-            <div class="mb-4 rounded-xl border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/30 p-4">
-                <div class="flex">
-                    <x-heroicon-m-x-circle class="h-5 w-5 text-red-500 shrink-0" />
-                    <p class="ml-3 text-sm font-medium text-red-800 dark:text-red-300">{{ session('error') }}</p>
-                </div>
-            </div>
-        @endif
-        @if (session()->has('success'))
-            <div class="mb-4 rounded-xl border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-900/30 p-4">
-                <div class="flex">
-                    <x-heroicon-m-check-circle class="h-5 w-5 text-green-500 shrink-0" />
-                    <p class="ml-3 text-sm font-medium text-green-800 dark:text-green-300">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
         <section aria-labelledby="my-performance-title" class="user-page-surface relative">
             <x-user.page-header
                 :back-href="route('home')"

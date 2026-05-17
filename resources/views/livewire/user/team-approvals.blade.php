@@ -60,22 +60,6 @@
             </nav>
         </div>
 
-        @if (session()->has('success'))
-            <div
-                class="mb-4 rounded-xl bg-green-50 p-4 border border-green-100 dark:bg-green-900/20 dark:border-green-800">
-                <div class="flex">
-                    <div class="shrink-0">
-                        <x-heroicon-s-check-circle class="h-5 w-5 text-green-400" />
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-green-800 dark:text-green-200">
-                            {{ session('success') }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        @endif
-
         <div class="space-y-4">
             @if ($activeTab === 'leaves')
                 <!-- Desktop Table -->

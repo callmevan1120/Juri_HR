@@ -36,17 +36,6 @@
             </div>
         </div>
 
-        @if (session()->has('success'))
-            <div class="rounded-xl border border-green-100 bg-green-50 p-4 text-sm font-medium text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if (session()->has('warning'))
-            <div class="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
-                {{ session('warning') }}
-            </div>
-        @endif
-
         @if (count($selectedRequestIds) > 0)
             <x-admin.alert tone="primary" class="flex items-center gap-3">
                 <span class="text-sm font-medium text-primary-700 dark:text-primary-300">

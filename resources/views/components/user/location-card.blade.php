@@ -1,8 +1,4 @@
 <div {{ $attributes->merge(['class' => 'location-card-surface p-4 relative overflow-visible']) }}>
-    
-    {{-- Decorative Background Blob --}}
-    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-primary-50 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-
     <div class="flex items-center justify-between mb-3 relative z-10">
         <div class="flex items-center gap-3">
             @if (isset($icon))
@@ -15,12 +11,13 @@
 
         <div class="flex items-center gap-2">
             @if ($showRefresh ?? false)
-                <button onclick="refreshLocation()" id="refresh-location-btn" title="{{ __('Refresh Location') }}"
+                <button onclick="refreshLocation()" id="refresh-location-btn" title="{{ __('Refresh Location') }}" aria-label="{{ __('Refresh Location') }}"
                     class="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/50 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-sm">
                     <x-heroicon-o-arrow-path class="h-4 w-4" />
                 </button>
             @endif
             <button onclick="toggleMap('{{ $mapId }}')" id="toggle-{{ $mapId }}-btn"
+                aria-label="{{ __('Toggle map') }}"
                 class="text-xs font-medium px-3 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition flex items-center gap-1.5">
                 <x-heroicon-o-chevron-down class="h-3.5 w-3.5 transition-transform duration-300" />
                 <span>{{ __('Show Map') }}</span>

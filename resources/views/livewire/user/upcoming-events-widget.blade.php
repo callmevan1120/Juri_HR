@@ -1,9 +1,11 @@
-<div class="relative overflow-hidden rounded-2xl border border-primary-100 bg-white transition-all dark:border-gray-700 dark:bg-gray-800">
+<div class="user-content-panel">
 
     {{-- Header --}}
-    <div class="p-4 border-b border-primary-50 dark:border-gray-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
-        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-            <span class="text-lg">📅</span>
+    <div class="user-content-panel__header">
+        <h3 class="user-content-panel__title">
+            <span class="user-content-panel__mark">
+                <x-heroicon-o-calendar-days class="h-4 w-4" />
+            </span>
             {{ __('Upcoming Events') }}
         </h3>
     </div>

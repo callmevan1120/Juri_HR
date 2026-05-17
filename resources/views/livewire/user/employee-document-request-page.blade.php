@@ -20,12 +20,6 @@
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-                @if (session()->has('success'))
-                    <div class="mb-4 rounded-xl border border-green-100 bg-green-50 p-4 text-sm font-medium text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
                 <div class="mb-3 rounded-2xl border border-gray-100 bg-gray-50/70 p-1 shadow-sm backdrop-blur dark:border-gray-700/70 dark:bg-gray-900/25">
                     <div class="grid grid-cols-2 gap-1 min-[420px]:grid-cols-4">
                         <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">

@@ -17,40 +17,34 @@
                     @include('components.feedback.alert-messages')
                 </div>
 
-                <div class="mb-6 flex justify-center">
-                    <div class="inline-flex rounded-2xl border border-gray-200 bg-white p-1 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <div class="mb-6">
+                    <nav class="user-segmented-tabs" aria-label="{{ __('Tabs') }}">
                         <button
                             type="button"
                             wire:click="setAssetFilter('active')"
-                            @class([
-                                'wcag-touch-target inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition',
-                                'bg-primary-600 text-white shadow-sm' => $assetFilter === 'active',
-                                'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' => $assetFilter !== 'active',
-                            ])>
+                            aria-selected="{{ $assetFilter === 'active' ? 'true' : 'false' }}"
+                            class="user-segmented-tab">
                             <span>{{ __('Active') }}</span>
                             <span @class([
-                                'rounded-full px-2 py-0.5 text-xs font-bold',
-                                'bg-white/20 text-white' => $assetFilter === 'active',
-                                'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200' => $assetFilter !== 'active',
+                                'ms-2 rounded-full px-2 py-0.5 text-xs font-bold',
+                                'bg-primary-50 text-primary-800 dark:bg-primary-950/50 dark:text-primary-100' => $assetFilter === 'active',
+                                'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' => $assetFilter !== 'active',
                             ])>{{ $assets->count() }}</span>
                         </button>
 
                         <button
                             type="button"
                             wire:click="setAssetFilter('returned')"
-                            @class([
-                                'wcag-touch-target inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition',
-                                'bg-primary-600 text-white shadow-sm' => $assetFilter === 'returned',
-                                'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' => $assetFilter !== 'returned',
-                            ])>
+                            aria-selected="{{ $assetFilter === 'returned' ? 'true' : 'false' }}"
+                            class="user-segmented-tab">
                             <span>{{ __('Returned') }}</span>
                             <span @class([
-                                'rounded-full px-2 py-0.5 text-xs font-bold',
-                                'bg-white/20 text-white' => $assetFilter === 'returned',
-                                'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200' => $assetFilter !== 'returned',
+                                'ms-2 rounded-full px-2 py-0.5 text-xs font-bold',
+                                'bg-primary-50 text-primary-800 dark:bg-primary-950/50 dark:text-primary-100' => $assetFilter === 'returned',
+                                'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' => $assetFilter !== 'returned',
                             ])>{{ $returnedHistories->count() }}</span>
                         </button>
-                    </div>
+                    </nav>
                 </div>
 
                 @if($assetFilter === 'active' && $assets->isEmpty())
@@ -95,105 +89,88 @@
                                 };
                             @endphp
 
-                            <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/95">
-                                <div class="border-b border-gray-100 px-5 py-5 dark:border-gray-700 sm:px-6">
-                                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                                        <div class="flex items-start gap-4">
-                                            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl {{ $assetTypeMeta['classes'] }}">
-                                                <x-dynamic-component :component="$assetTypeMeta['icon']" class="h-7 w-7" />
-                                            </div>
+                            @php
+                                $expiryTone = $asset->expiration_date
+                                    ? ($asset->isExpired()
+                                        ? 'text-red-700 dark:text-red-300'
+                                        : ($asset->isExpiringSoon()
+                                            ? 'text-amber-700 dark:text-amber-300'
+                                            : 'text-emerald-700 dark:text-emerald-300'))
+                                    : 'text-gray-500 dark:text-gray-400';
+                                $expiryLabel = $asset->expiration_date
+                                    ? ($asset->isExpired()
+                                        ? __('Expired')
+                                        : ($asset->isExpiringSoon() ? __('Expiring') : __('Valid till')))
+                                    : null;
+                            @endphp
 
+                            <article class="asset-mobile-card">
+                                <div class="asset-mobile-card__top">
+                                    <div class="asset-mobile-card__icon {{ $assetTypeMeta['classes'] }}">
+                                        <x-dynamic-component :component="$assetTypeMeta['icon']" class="h-6 w-6" />
+                                    </div>
+
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-start justify-between gap-3">
                                             <div class="min-w-0">
-                                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{{ __('Assigned asset overview') }}</p>
-                                                <h3 class="mt-1 text-lg font-bold leading-tight text-gray-950 dark:text-white">{{ $asset->name }}</h3>
-                                                <p class="mt-1 break-all font-mono text-xs text-gray-600 dark:text-gray-300">
+                                                <h3 class="asset-mobile-card__title">{{ $asset->name }}</h3>
+                                                <p class="asset-mobile-card__serial">
                                                     {{ $asset->serial_number ?: __('No serial number') }}
                                                 </p>
                                             </div>
-                                        </div>
 
-                                        <span class="inline-flex max-w-fit items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] ring-1 ring-inset {{ $statusClasses }}">
-                                            {{ $asset->displayStatus() }}
-                                        </span>
+                                            <span class="asset-mobile-card__status {{ $statusClasses }}">
+                                                {{ $asset->displayStatus() }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="space-y-4 px-5 py-5 sm:px-6">
-                                    @if($asset->return_date)
-                                        <div class="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 dark:border-sky-900/50 dark:bg-sky-950/30">
-                                            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                                                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">{{ __('Return Scheduled') }}</p>
-                                                <p class="text-sm font-semibold text-sky-900 dark:text-sky-100">{{ $asset->return_date->format('d M Y') }}</p>
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    @php
-                                        $expiryTone = $asset->expiration_date
-                                            ? ($asset->isExpired()
-                                                ? 'text-red-700 dark:text-red-300'
-                                                : ($asset->isExpiringSoon()
-                                                    ? 'text-amber-700 dark:text-amber-300'
-                                                    : 'text-emerald-700 dark:text-emerald-300'))
-                                            : 'text-gray-500 dark:text-gray-400';
-                                        $expiryLabel = $asset->expiration_date
-                                            ? ($asset->isExpired()
-                                                ? __('Expired')
-                                                : ($asset->isExpiringSoon() ? __('Expiring') : __('Valid till')))
-                                            : null;
-                                    @endphp
-
-                                    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/80 dark:border-gray-700 dark:bg-gray-900/30">
-                                        <dl class="divide-y divide-gray-200 dark:divide-gray-700">
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Asset Type') }}</dt>
-                                                <dd class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                    {{ filled($asset->type) ? __(ucfirst($asset->type)) : '—' }}
-                                                </dd>
-                                            </div>
-
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Date Assigned') }}</dt>
-                                                <dd class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                    {{ $asset->date_assigned?->format('d M Y') ?? '—' }}
-                                                </dd>
-                                            </div>
-
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Purchase Date') }}</dt>
-                                                <dd class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                    {{ $asset->purchase_date?->format('d M Y') ?? '—' }}
-                                                </dd>
-                                            </div>
-
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Planned Return') }}</dt>
-                                                <dd class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                    {{ $asset->return_date?->format('d M Y') ?? '—' }}
-                                                </dd>
-                                            </div>
-
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Expiration Date') }}</dt>
-                                                <dd class="flex flex-col gap-1 text-sm font-semibold text-gray-900 dark:text-white sm:flex-row sm:items-center sm:gap-3">
-                                                    <span>{{ $asset->expiration_date?->format('d M Y') ?? '—' }}</span>
-                                                    @if($expiryLabel)
-                                                        <span class="text-xs font-bold uppercase tracking-[0.16em] {{ $expiryTone }}">{{ $expiryLabel }}</span>
-                                                    @endif
-                                                </dd>
-                                            </div>
-
-                                            @if($asset->notes)
-                                                <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                    <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Asset Notes') }}</dt>
-                                                    <dd class="sr-only">{{ $asset->notes }}</dd>
-                                                </div>
-                                            @endif
-                                        </dl>
+                                <dl class="asset-mobile-card__facts">
+                                    <div class="asset-mobile-card__fact">
+                                        <dt>{{ __('Asset Type') }}</dt>
+                                        <dd>{{ filled($asset->type) ? __(ucfirst($asset->type)) : '—' }}</dd>
                                     </div>
-                                </div>
+                                    <div class="asset-mobile-card__fact">
+                                        <dt>{{ __('Date Assigned') }}</dt>
+                                        <dd>{{ $asset->date_assigned?->format('d M Y') ?? '—' }}</dd>
+                                    </div>
+                                    <div class="asset-mobile-card__fact">
+                                        <dt>{{ __('Planned Return') }}</dt>
+                                        <dd>{{ $asset->return_date?->format('d M Y') ?? '—' }}</dd>
+                                    </div>
+                                </dl>
 
-                                <div class="flex flex-col gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/30 lg:flex-row lg:items-center lg:justify-between">
+                                <details class="asset-mobile-card__details">
+                                    <summary>
+                                        <span>{{ __('Details') }}</span>
+                                        <x-heroicon-o-chevron-down class="h-4 w-4" />
+                                    </summary>
+
+                                    <dl class="asset-mobile-card__detail-list">
+                                        <div>
+                                            <dt>{{ __('Purchase Date') }}</dt>
+                                            <dd>{{ $asset->purchase_date?->format('d M Y') ?? '—' }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt>{{ __('Expiration Date') }}</dt>
+                                            <dd>
+                                                <span>{{ $asset->expiration_date?->format('d M Y') ?? '—' }}</span>
+                                                @if($expiryLabel)
+                                                    <span class="ms-2 text-xs font-bold uppercase tracking-[0.14em] {{ $expiryTone }}">{{ $expiryLabel }}</span>
+                                                @endif
+                                            </dd>
+                                        </div>
+                                        @if($asset->notes)
+                                            <div>
+                                                <dt>{{ __('Asset Notes') }}</dt>
+                                                <dd>{{ $asset->notes }}</dd>
+                                            </div>
+                                        @endif
+                                    </dl>
+                                </details>
+
+                                <div class="asset-mobile-card__actions">
                                     <p class="sr-only">{{ __('Return request uses OTP verification and is available only for assigned assets.') }}</p>
 
                                     @if($isReturnable)
@@ -208,6 +185,7 @@
                                         <button
                                             type="button"
                                             disabled
+                                            aria-label="{{ __('Request Return') }}"
                                             class="wcag-touch-target inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-400 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500">
                                             <x-heroicon-m-arrow-path class="h-4 w-4" />
                                             {{ __('Request Return') }}
@@ -251,55 +229,55 @@
                                     ],
                                 };
                             @endphp
-                            <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/95">
-                                <div class="flex flex-col gap-4 border-b border-gray-100 px-5 py-5 dark:border-gray-700 sm:flex-row sm:items-start sm:justify-between sm:px-6">
-                                    <div class="flex items-start gap-4">
-                                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl {{ $historyTypeMeta['classes'] }}">
-                                            <x-dynamic-component :component="$historyTypeMeta['icon']" class="h-7 w-7" />
-                                        </div>
-
-                                        <div class="min-w-0">
-                                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{{ __('History') }}</p>
-                                            <h3 class="mt-1 text-lg font-bold leading-tight text-gray-950 dark:text-white">
-                                                {{ $history->asset?->name ?? __('Deleted asset record') }}
-                                            </h3>
-                                            <p class="mt-1 break-all font-mono text-xs text-gray-600 dark:text-gray-300">
-                                                {{ $history->asset?->serial_number ?: __('No serial number') }}
-                                            </p>
-                                        </div>
+                            <article class="asset-mobile-card">
+                                <div class="asset-mobile-card__top">
+                                    <div class="asset-mobile-card__icon {{ $historyTypeMeta['classes'] }}">
+                                        <x-dynamic-component :component="$historyTypeMeta['icon']" class="h-6 w-6" />
                                     </div>
 
-                                    <span class="inline-flex max-w-fit items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-sky-900 ring-1 ring-inset ring-sky-700/20 dark:bg-sky-900/30 dark:text-sky-300">
-                                        {{ __('Returned') }}
-                                    </span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <h3 class="asset-mobile-card__title">
+                                                    {{ $history->asset?->name ?? __('Deleted asset record') }}
+                                                </h3>
+                                                <p class="asset-mobile-card__serial">
+                                                    {{ $history->asset?->serial_number ?: __('No serial number') }}
+                                                </p>
+                                            </div>
+
+                                            <span class="asset-mobile-card__status bg-sky-100 text-sky-900 ring-sky-700/20 dark:bg-sky-900/30 dark:text-sky-300">
+                                                {{ __('Returned') }}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="px-5 py-5 sm:px-6">
-                                    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/80 dark:border-gray-700 dark:bg-gray-900/30">
-                                        <dl class="divide-y divide-gray-200 dark:divide-gray-700">
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Asset Type') }}</dt>
-                                                <dd class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                    {{ filled($history->asset?->type) ? __(ucfirst($history->asset->type)) : '—' }}
-                                                </dd>
-                                            </div>
+                                <dl class="asset-mobile-card__facts">
+                                    <div class="asset-mobile-card__fact">
+                                        <dt>{{ __('Asset Type') }}</dt>
+                                        <dd>{{ filled($history->asset?->type) ? __(ucfirst($history->asset->type)) : '—' }}</dd>
+                                    </div>
+                                    <div class="asset-mobile-card__fact sm:col-span-2">
+                                        <dt>{{ __('Returned On') }}</dt>
+                                        <dd>{{ $history->date?->format('d M Y H:i') ?? $history->created_at?->format('d M Y H:i') ?? '—' }}</dd>
+                                    </div>
+                                </dl>
 
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Returned On') }}</dt>
-                                                <dd class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                    {{ $history->date?->format('d M Y H:i') ?? $history->created_at?->format('d M Y H:i') ?? '—' }}
-                                                </dd>
-                                            </div>
-
-                                            <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,180px)_1fr] sm:items-start sm:gap-4">
-                                                <dt class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{{ __('Note') }}</dt>
-                                                <dd class="sr-only">
-                                                    {{ $history->notes ?: '—' }}
-                                                </dd>
+                                @if($history->notes)
+                                    <details class="asset-mobile-card__details">
+                                        <summary>
+                                            <span>{{ __('Details') }}</span>
+                                            <x-heroicon-o-chevron-down class="h-4 w-4" />
+                                        </summary>
+                                        <dl class="asset-mobile-card__detail-list">
+                                            <div>
+                                                <dt>{{ __('Note') }}</dt>
+                                                <dd>{{ $history->notes }}</dd>
                                             </div>
                                         </dl>
-                                    </div>
-                                </div>
+                                    </details>
+                                @endif
                             </article>
                         @endforeach
                     </div>
