@@ -4,7 +4,7 @@
 
 # PasPapan
 
-Platform manajemen tenaga kerja berbasis Laravel untuk absensi aman, approval, onboarding/offboarding, payroll preparation, reporting, aset, dan operasi HR.
+Platform kerja terpadu berbasis Laravel untuk HR, absensi aman, approval, payroll preparation, accounting foundation, CRM/operasional, reporting, aset, dan mobile workforce.
 
 [![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
 [![Livewire 4](https://img.shields.io/badge/Livewire-4-4E56A6?style=flat-square&logo=livewire&logoColor=white)](https://livewire.laravel.com)
@@ -17,7 +17,7 @@ Platform manajemen tenaga kerja berbasis Laravel untuk absensi aman, approval, o
 
 ## Ringkasan
 
-PasPapan adalah aplikasi workforce untuk organisasi yang membutuhkan absensi mobile, HR checklist onboarding/offboarding, workflow approval, persiapan payroll, import/export, reporting, dan maintenance system dalam satu aplikasi Laravel deployable.
+PasPapan adalah aplikasi workforce untuk organisasi yang membutuhkan absensi mobile, HR checklist onboarding/offboarding, workflow approval, persiapan payroll, import/export, reporting, accounting foundation, CRM/operasional, dan maintenance system dalam satu aplikasi Laravel deployable.
 
 Fokus utama aplikasi:
 
@@ -27,6 +27,14 @@ Fokus utama aplikasi:
 - panel admin untuk karyawan, absensi, cuti, lembur, reimbursement, kasbon, aset, payroll, reports, settings, dan maintenance
 - self-service karyawan untuk check-in/out, koreksi absensi, cuti, lembur, reimbursement, slip gaji, dokumen, jadwal, HR tasks, dan approval tim
 - approval matrix reusable untuk reimbursement, kasbon, koreksi absensi, cuti, lembur, asset/document/payroll-sensitive workflow foundation
+- multi-company dan company branch foundation untuk isolasi data perusahaan/cabang
+- operations workspace untuk client, project, task, checklist, bukti kunjungan, dan bukti foto
+- commercial workspace untuk client, product, stock movement, quotation, invoice, sales opportunity, follow-up, dan vendor bill foundation
+- accounting workspace untuk chart of accounts, journal, AR/AP aging, cashflow, ledger detail, export Excel, dan closing period
+- command center untuk pending approval, overdue HR task, attendance risk, payroll readiness, profile completeness, dan contract expiry
+- custom form builder untuk request/form operasional yang bisa berubah tanpa migration baru
+- WFH request dan leave entitlement untuk alokasi/expiry cuti
+- payroll Indonesia foundation untuk period bulanan/mingguan/harian, BPJS, PPh21 TER/Coretax metadata, payment instruction, dan workbook export
 - generic attendance integration API untuk mesin absensi/gateway seperti Solution atau SBG
 - import/export background dengan progress run, ringkasan sukses/error, download hasil, dan cleanup otomatis
 - operational health dashboard untuk queue, scheduler, backup, disk, database, cache/session/queue driver, app version, Reverb/polling, dan license status
@@ -90,9 +98,16 @@ Rilis terbaru: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.
 Sorotan `v4.3.0`:
 
 - security matrix, multi-company isolation guard, private attachment policy, dan CI security scanning diperluas
-- Playwright smoke workflow dan Android attendance smoke tersedia untuk regresi utama
+- Playwright smoke workflow dan Android smoke/E2E tersedia untuk regresi utama
 - screenshot katalog menu diperbarui menjadi 62 halaman untuk desktop dan APK
 - source review enterprise dipisahkan dari artifact runtime obfuscated melalui `.gitattributes` dan panduan packaging
+
+Sorotan branch `chore/major-upgrade-audit`:
+
+- Laravel 13, Livewire 4, Tailwind CSS 4, Vite 7, PHP 8.3+, Node 20+, Bun 1.3.6+, dan Capacitor 8 sudah menjadi baseline modern stack.
+- Foundation produk diperluas ke multi-company/branch, operations workspace, commercial/CRM workspace, accounting workspace, custom form builder, leave entitlement, WFH request, command center, dan payroll period/Coretax export.
+- Evidence terakhir: `php artisan test` pass `505` tests / `9684` assertions, `composer phpstan`, Pint, composer/bun audit, `bun run build`, `php artisan rbac:audit`, browser smoke, APK smoke, APK attendance E2E, dan APK document upload E2E pass.
+- Commit evidence terakhir: `99cde52` untuk screenshot APK smoke, lalu `0ed8b9f` untuk refresh dokumen release evidence.
 
 ## Enterprise Offline
 
@@ -255,10 +270,13 @@ php artisan queue:restart
 ```bash
 php artisan test --without-tty
 composer check:ui
+composer check:modern-stack
 ./vendor/bin/pint --test
 composer phpstan
 composer audit
+bun audit
 bun run build
+php artisan rbac:audit
 ```
 
 Smoke dan screenshot tambahan:
@@ -267,13 +285,21 @@ Smoke dan screenshot tambahan:
 bun run e2e:smoke
 bun run screenshots:desktop
 bun run screenshots:apk
+bun run apk:smoke
 bun run apk:e2e:attendance
+bun run apk:e2e:document-upload
 ```
 
 Screenshot katalog saat ini berisi 62 halaman menu/page untuk desktop dan APK. Manifest berada di:
 
 - [`screenshots/desktop-pages/manifest.json`](./screenshots/desktop-pages/manifest.json)
 - [`screenshots/apk-pages/manifest.json`](./screenshots/apk-pages/manifest.json)
+
+Evidence APK terakhir:
+
+- `screenshots/apk-device-smoke.png`
+- `screenshots/apk-attendance-e2e.png`
+- `screenshots/apk-document-upload-e2e.png`
 
 ## Demo
 
