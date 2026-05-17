@@ -84,6 +84,7 @@ The final pass covered:
 - `php artisan optimize:clear`: passed before test runs to avoid stale cached bootstrap state.
 - `php artisan test`: passed, `505` tests and `10246` assertions after the salted enterprise obfuscator rerun.
 - `php secure_tools/build_enterprise.php`: passed in salted key mode with `ENTERPRISE_OBFUSCATOR_KEY` active; 39 enterprise artifacts were secured.
+- `composer check:enterprise-boundary`: passed; private `secure_tools/`, source mirrors, and generated enterprise build output remain outside the OSS review boundary.
 - `./vendor/bin/pint --test`: passed.
 - `composer phpstan`: passed, no errors.
 - `composer audit`: passed, no advisories.

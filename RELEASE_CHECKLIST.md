@@ -52,6 +52,7 @@ Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
 - [x] `bun run build`
 - [x] `php artisan rbac:audit`
 - [x] `composer check:modern-stack`
+- [x] `composer check:enterprise-boundary`
 - [x] Review evidence bundle tersedia di CI.
   Evidence: `.github/workflows/laravel.yml` upload `review-evidence-ci`; `.github/workflows/e2e.yml` upload `review-evidence-playwright`; `.github/workflows/apk-smoke.yml` upload `review-evidence-apk-smoke` dari self-hosted Android/ADB runner.
 - [x] Coverage baseline workflow reviewed.
@@ -102,7 +103,7 @@ Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
 ## Release
 
 - [x] Untuk rilis enterprise internal saja: jalankan enterprise obfuscator salted sesuai SOP private sebelum commit artifact enterprise.
-  Evidence: rilis OSS tidak boleh membutuhkan obfuscator/key saat `composer install`; artifact enterprise customer wajib dibuild salted dengan `ENTERPRISE_OBFUSCATOR_KEY`, dan runtime harus memiliki key yang sama. Obfuscator internal `php secure_tools/build_enterprise.php` sudah dijalankan ulang dalam mode salted key dan full `php artisan test` pass setelahnya.
+  Evidence: rilis OSS tidak boleh membutuhkan obfuscator/key saat `composer install`; artifact enterprise customer wajib dibuild salted dengan `ENTERPRISE_OBFUSCATOR_KEY`, dan runtime harus memiliki key yang sama. Obfuscator internal `php secure_tools/build_enterprise.php` sudah dijalankan ulang dalam mode salted key, `composer check:enterprise-boundary` pass, dan full `php artisan test` pass setelahnya.
 - [x] Buat tag dan GitHub Release.
   Evidence: Git tag/release `v4.3.0` exists and is published.
 - [x] Attach APK dan checksum.

@@ -110,6 +110,7 @@ bun audit
 bun run build
 php artisan rbac:audit
 composer check:modern-stack
+composer check:enterprise-boundary
 php scripts/prepare-apk-screenshots-demo.php
 bun run e2e:smoke
 ```
