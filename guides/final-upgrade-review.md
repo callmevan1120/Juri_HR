@@ -1,6 +1,8 @@
 # Final Upgrade Review
 
-Reviewed commit: `c4d69fe`
+Reviewed branch: `chore/major-upgrade-audit`
+
+Latest evidence baseline: README/docs sync at `c4d69fe`, followed by a salted enterprise obfuscator rerun and validation in the final release pass.
 
 Branch: `chore/major-upgrade-audit`
 
@@ -8,11 +10,11 @@ Suggested final PR/merge title: `chore(app): upgrade Laravel 13 and Livewire 4`
 
 ## Files Changed In Final Pass
 
-The final reviewed branch head is `c4d69fe`.
+The final reviewed code baseline includes the product/platform expansion, APK evidence commits, README/docs sync, and the final salted enterprise obfuscator rerun.
 
 The major stabilization commit is `9ab163e` (`129 files changed, 12889 insertions(+), 61 deletions(-)`). It expanded PasPapan into broader HR, operations, commercial, accounting, payroll, leave entitlement, WFH, custom form, command center, and multi-company foundations while keeping the Laravel 13, Livewire 4, Tailwind 4 upgrade gates green.
 
-The follow-up evidence commits are `99cde52`, which updated APK smoke screenshots after running the physical device smoke suite, `0ed8b9f`, which refreshed release evidence docs, and `c4d69fe`, which synced the README summary.
+The follow-up evidence commits are `99cde52`, which updated APK smoke screenshots after running the physical device smoke suite, `0ed8b9f`, which refreshed release evidence docs, and `c4d69fe`, which synced the README summary. The final release pass reran `php secure_tools/build_enterprise.php` in salted mode before committing enterprise artifacts.
 
 The final pass covered:
 
@@ -23,6 +25,7 @@ The final pass covered:
 - admin/user Livewire pages for company, operations, commercial, accounting, command center, leave entitlement, custom forms, WFH, and operational tasks
 - route/RBAC registration, policies, and direct policy coverage
 - APK smoke screenshots in `screenshots/apk-device-smoke.png`, `screenshots/apk-attendance-e2e.png`, and `screenshots/apk-document-upload-e2e.png`
+- salted enterprise obfuscated PHP artifacts generated from private `*.Source.php` mirrors
 - `guides/final-upgrade-review.md`, `guides/reviewer-evidence.md`, `guides/operations.md`, and `RELEASE_CHECKLIST.md`
 
 ## Typo Audit
@@ -79,7 +82,8 @@ The final pass covered:
 - `php artisan route:cache`: passed.
 - `php artisan view:cache`: passed.
 - `php artisan optimize:clear`: passed before test runs to avoid stale cached bootstrap state.
-- `php artisan test`: passed, `505` tests and `9684` assertions.
+- `php artisan test`: passed, `505` tests and `10246` assertions after the salted enterprise obfuscator rerun.
+- `php secure_tools/build_enterprise.php`: passed in salted key mode with `ENTERPRISE_OBFUSCATOR_KEY` active; 39 enterprise artifacts were secured.
 - `./vendor/bin/pint --test`: passed.
 - `composer phpstan`: passed, no errors.
 - `composer audit`: passed, no advisories.
@@ -112,4 +116,4 @@ Still physical-device or staging only:
 
 ## Merge Recommendation
 
-Code review ready. Backend, frontend, browser smoke, RBAC audit, queue smoke, dependency audits, and physical APK smoke all passed before the docs-only README sync at branch head `c4d69fe`.
+Code review ready. Backend, frontend, browser smoke, RBAC audit, queue smoke, dependency audits, physical APK smoke, and salted enterprise obfuscator validation all passed in the final release-review sequence.
