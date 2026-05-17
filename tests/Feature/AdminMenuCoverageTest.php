@@ -15,6 +15,26 @@ function adminMenuRouteNamesFromNavigation(): array
     return $routeNames;
 }
 
+function adminMenuGroupIdsFromNavigation(): array
+{
+    $navigation = file_get_contents(resource_path('views/navigation-menu.blade.php'));
+
+    preg_match_all("/'id'\\s*=>\\s*'(?<id>[a-z-]+)'/", $navigation ?: '', $matches);
+
+    return array_values($matches['id'] ?? []);
+}
+
+test('admin navigation keeps six top level groups', function () {
+    expect(adminMenuGroupIdsFromNavigation())->toBe([
+        'overview',
+        'attendance',
+        'finance',
+        'people',
+        'operations',
+        'system',
+    ]);
+});
+
 test('admin navigation menu keeps every linked route registered', function () {
     $routeNames = adminMenuRouteNamesFromNavigation();
 

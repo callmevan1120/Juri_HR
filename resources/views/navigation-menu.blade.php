@@ -23,27 +23,24 @@
 
     $adminMenu = [
         [
-            'type' => 'link',
-            'label' => __('Dashboard'),
-            'href' => route('admin.dashboard'),
-            'active' => $isRouteActive('admin.dashboard'),
-            'visible' => $can('viewAdminDashboard'),
-        ],
-        [
-            'type' => 'link',
-            'label' => __('Command Center'),
-            'href' => route('admin.command-center'),
-            'active' => $isRouteActive('admin.command-center'),
-            'visible' => $can('viewCommandCenter'),
-        ],
-        [
-            'type' => 'link',
-            'label' => __('Manager Inbox'),
-            'href' => route('admin.inbox'),
-            'active' => $isRouteActive('admin.inbox'),
-            'visible' => $managerInboxVisible,
-            'badge' => fn () => $managerInboxCount > 0 ? (string) $managerInboxCount : null,
-            'badgeTone' => 'danger',
+            'type' => 'group',
+            'id' => 'overview',
+            'label' => __('Overview'),
+            'active' => $isRouteActive(['admin.dashboard', 'admin.command-center', 'admin.inbox']),
+            'items' => [
+                ['type' => 'heading', 'label' => __('Daily Command')],
+                ['type' => 'link', 'label' => __('Dashboard'), 'href' => route('admin.dashboard'), 'active' => $isRouteActive('admin.dashboard'), 'visible' => $can('viewAdminDashboard')],
+                ['type' => 'link', 'label' => __('Command Center'), 'href' => route('admin.command-center'), 'active' => $isRouteActive('admin.command-center'), 'visible' => $can('viewCommandCenter')],
+                [
+                    'type' => 'link',
+                    'label' => __('Manager Inbox'),
+                    'href' => route('admin.inbox'),
+                    'active' => $isRouteActive('admin.inbox'),
+                    'visible' => $managerInboxVisible,
+                    'badge' => fn () => $managerInboxCount > 0 ? (string) $managerInboxCount : null,
+                    'badgeTone' => 'danger',
+                ],
+            ],
         ],
         [
             'type' => 'group',
@@ -117,8 +114,8 @@
         ],
         [
             'type' => 'group',
-            'id' => 'master-data',
-            'label' => __('Master Data'),
+            'id' => 'people',
+            'label' => __('People'),
             'active' => $isRouteActive(['admin.masters.*', 'admin.employees', 'admin.hr-checklists', 'admin.document-requests', 'admin.document-templates', 'admin.document-templates.*', 'admin.barcodes', 'admin.barcodes.*', 'admin.appraisals', 'admin.assets']),
             'items' => [
                 ['type' => 'heading', 'label' => __('Organization')],
@@ -342,8 +339,14 @@
                                                     <x-heroicon-o-lock-closed class="ms-1 inline h-4 w-4" />
                                                 </button>
                                             @else
+                                                @php($badge = isset($navItem['badge']) ? value($navItem['badge']) : null)
                                                 <x-navigation.dropdown-link href="{{ $navItem['href'] }}" :active="$navItem['active']" wire:navigate>
-                                                    {{ $navItem['label'] }}
+                                                    <span class="flex items-center justify-between gap-3">
+                                                        <span>{{ $navItem['label'] }}</span>
+                                                        @if ($badge)
+                                                            <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $badge }}</span>
+                                                        @endif
+                                                    </span>
                                                 </x-navigation.dropdown-link>
                                             @endif
                                         @endforeach
@@ -503,8 +506,14 @@
                                             <x-heroicon-o-lock-closed class="ms-1 inline h-4 w-4" />
                                         </button>
                                     @else
+                                        @php($badge = isset($navItem['badge']) ? value($navItem['badge']) : null)
                                         <x-navigation.responsive-nav-link href="{{ $navItem['href'] }}" :active="$navItem['active']" wire:navigate>
-                                            {{ $navItem['label'] }}
+                                            <span class="flex items-center justify-between gap-3">
+                                                <span>{{ $navItem['label'] }}</span>
+                                                @if ($badge)
+                                                    <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $badge }}</span>
+                                                @endif
+                                            </span>
                                         </x-navigation.responsive-nav-link>
                                     @endif
                                 @endforeach
