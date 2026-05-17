@@ -37,6 +37,11 @@ Isi `review-evidence-apk-smoke`:
 - `apk-device-smoke.png`
 - `apk-smoke-summary.md`
 
+Local physical-device evidence can also include:
+
+- `screenshots/apk-attendance-e2e.png`
+- `screenshots/apk-document-upload-e2e.png`
+
 ## Critical Regression Scope
 
 Feature/unit tests tetap menjadi bukti utama untuk domain kritikal:
@@ -51,7 +56,7 @@ Feature/unit tests tetap menjadi bukti utama untuk domain kritikal:
 - backup/restore drill dan checksum
 - multi-company isolation
 
-Playwright smoke menambahkan bukti browser untuk halaman utama admin/user. APK smoke menambahkan bukti device untuk launch, permission kamera/GPS, barcode/photo readiness, screenshot, dan crash log.
+Playwright smoke menambahkan bukti browser untuk halaman utama admin/user. APK smoke menambahkan bukti device untuk launch, permission kamera/GPS, barcode/photo readiness, screenshot, dan crash log. APK E2E tambahan menutup flow attendance check-in/photo/check-out dan document upload dari WebView.
 Authenticated Playwright smoke memakai akun demo `apk.demo.superadmin@paspapan.test` dan `apk.demo.user@paspapan.test` secara default. Jalankan `php scripts/prepare-apk-screenshots-demo.php` sebelum smoke lokal, atau override dengan `E2E_ADMIN_EMAIL`, `E2E_ADMIN_PASSWORD`, `E2E_USER_EMAIL`, dan `E2E_USER_PASSWORD`.
 
 ## Package Smoke Scope
@@ -116,6 +121,14 @@ bun run apk:smoke
 bun run apk:e2e:attendance
 bun run apk:e2e:document-upload
 ```
+
+Local evidence terakhir:
+
+- Device: `DQEQLFCEDEKFKFZ5`
+- `bun run apk:smoke`: pass
+- `bun run apk:e2e:attendance`: pass
+- `bun run apk:e2e:document-upload`: pass
+- Screenshots: `screenshots/apk-device-smoke.png`, `screenshots/apk-attendance-e2e.png`, `screenshots/apk-document-upload-e2e.png`
 
 ## Runtime Baseline
 

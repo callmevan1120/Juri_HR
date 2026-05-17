@@ -216,8 +216,11 @@ Smoke APK/device:
 ```bash
 bun run apk:smoke
 bun run apk:e2e:attendance
+bun run apk:e2e:document-upload
 bun run screenshots:apk
 ```
+
+`bun run apk:smoke` mengecek launch, permission kamera/GPS, barcode/photo readiness, screenshot, dan crash log. `bun run apk:e2e:attendance` mengecek build debug APK, check-in, upload foto, dan check-out. `bun run apk:e2e:document-upload` mengecek build debug APK, file push ke device, upload dokumen, dan status processed/uploaded.
 
 `bun run screenshots:apk` memakai device ADB debug, WebView DevTools/CDP, dan katalog halaman yang sama dengan desktop. Output berada di `screenshots/apk-pages/` dan saat ini berisi 62 screenshot. Untuk state khusus Face ID, script menghapus descriptor demo sebelum screenshot `user-home-before-face-id` agar card `Daftar Face ID Sekarang` benar-benar terekam, lalu halaman berikutnya masuk ke setup Face ID.
 

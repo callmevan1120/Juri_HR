@@ -1,6 +1,6 @@
 # Final Upgrade Review
 
-Reviewed commit: `3f688db`
+Reviewed commit: `99cde52`
 
 Branch: `chore/major-upgrade-audit`
 
@@ -8,24 +8,27 @@ Suggested final PR/merge title: `chore(app): upgrade Laravel 13 and Livewire 4`
 
 ## Files Changed In Final Pass
 
-The reviewed refactor commit is `3f688db` (`89 files changed, 407 insertions(+), 163 deletions(-)`). It covered the final Laravel 13, Livewire 4, Tailwind 4, request-context, and view consistency pass across:
+The final reviewed branch head is `99cde52`.
+
+The major stabilization commit is `9ab163e` (`129 files changed, 12889 insertions(+), 61 deletions(-)`). It expanded PasPapan into broader HR, operations, commercial, accounting, payroll, leave entitlement, WFH, custom form, command center, and multi-company foundations while keeping the Laravel 13, Livewire 4, Tailwind 4 upgrade gates green.
+
+The follow-up evidence commit is `99cde52`, which updated APK smoke screenshots after running the physical device smoke suite.
+
+The final pass covered:
 
 - `app/Actions`, `app/Http/Controllers`, `app/Http/Middleware`, `app/Http/Requests`, `app/Livewire`, `app/Policies`, `app/Providers`, `app/Services`, and `app/Support`
 - `resources/views` Blade files for modern Livewire/Tailwind usage
-- `tests/Feature/ModernStackGuardTest.php`
-- `guides/final-upgrade-review.md` and `guides/reviewer-evidence.md`
-
-This follow-up consistency pass changed:
-
-- `app/Http/Controllers/System/LanguageController.php`
-- `app/Http/Controllers/User/AttendanceController.php`
-- `tests/e2e/main-smoke.spec.ts`
-- `guides/final-upgrade-review.md`
+- platform workspace migrations and models for company branches, operations, commercial, accounting, sales pipeline, custom forms, leave entitlement, vendor bills, payroll period/tax metadata, and accounting period closing
+- report exports for accounting statements and payroll workbook/Coretax sheets
+- admin/user Livewire pages for company, operations, commercial, accounting, command center, leave entitlement, custom forms, WFH, and operational tasks
+- route/RBAC registration, policies, and direct policy coverage
+- APK smoke screenshots in `screenshots/apk-device-smoke.png`, `screenshots/apk-attendance-e2e.png`, and `screenshots/apk-document-upload-e2e.png`
+- `guides/final-upgrade-review.md`, `guides/reviewer-evidence.md`, `guides/operations.md`, and `RELEASE_CHECKLIST.md`
 
 ## Typo Audit
 
 - The misspelled Livewire variant from the commit subject was not found in tracked source, docs, or release-note files after this pass.
-- The historical commit subject for `3f688db` still contains that typo in Git metadata; keep the PR/merge title as `chore(app): upgrade Laravel 13 and Livewire 4` unless the commit is intentionally amended before merge.
+- No tracked docs or release-note files contain the typo after the final evidence update.
 
 ## Tailwind 4 Verification
 
@@ -64,6 +67,8 @@ This follow-up consistency pass changed:
 - Modern stack guard coverage is present in `tests/Feature/ModernStackGuardTest.php`.
 - Playwright authenticated admin/user smoke defaults to the local E2E login token outside CI for deterministic menu/page coverage, while CI can still use explicit credentials or `E2E_LOGIN_TOKEN`.
 - Backup restore drill remains covered by `tests/Feature/BackupSecurityHardeningTest.php`.
+- New or expanded platform coverage includes `AccountingWorkspaceTest`, `AdminCompanyManagerTest`, `CommandCenterTest`, `CommercialWorkspaceTest`, `CustomFormBuilderTest`, `LeaveEntitlementManagerTest`, `MyOperationalTasksTest`, `OperationalWorkspaceTest`, and `WorkFromHomeRequestFlowTest`.
+- APK device evidence now covers launch/permission readiness, attendance check-in/photo/check-out, and document upload.
 
 ## Command Results
 
@@ -74,32 +79,37 @@ This follow-up consistency pass changed:
 - `php artisan route:cache`: passed.
 - `php artisan view:cache`: passed.
 - `php artisan optimize:clear`: passed before test runs to avoid stale cached bootstrap state.
-- `php artisan test`: passed, `446` tests and `9233` assertions.
-- `vendor/bin/pest`: passed, `446` tests and `9233` assertions.
-- `./vendor/bin/pint --test app/Http/Controllers/System/LanguageController.php app/Http/Controllers/User/AttendanceController.php`: passed.
+- `php artisan test`: passed, `505` tests and `9684` assertions.
+- `./vendor/bin/pint --test`: passed.
 - `composer phpstan`: passed, no errors.
 - `composer audit`: passed, no advisories.
 - `bun install`: passed with Bun `1.3.12`; no dependency changes.
 - `bun run build`: passed; Vite `7.3.2`, `359` modules transformed, no Tailwind/PostCSS warnings.
-- `bunx playwright test tests/e2e/main-smoke.spec.ts`: passed after starting `php artisan serve --host=127.0.0.1 --port=8000`; public, admin, and user smoke all passed (`3` tests). Earlier false starts were caused by no local server and macOS sandbox browser launch permissions, not app assertions.
+- `bun run e2e:smoke`: passed after starting `php artisan serve --host=127.0.0.1 --port=8000`; public, admin, and user smoke all passed (`3` tests). The first sandboxed browser launch failed on macOS `MachPortRendezvousServer` permissions, then passed when rerun outside the sandbox.
+- `bun run apk:smoke`: passed on physical device `DQEQLFCEDEKFKFZ5`; launch, camera permission, GPS permission, barcode/photo readiness, and crash log were checked.
+- `bun run apk:e2e:attendance`: passed on physical device; debug APK build, check-in, photo upload, and check-out succeeded.
+- `bun run apk:e2e:document-upload`: passed on physical device; debug APK build, PDF push, document upload, and processed/uploaded status succeeded.
+- `bun audit`: passed, no vulnerabilities.
 - `php artisan rbac:audit`: passed; routes, menus, permissions, roles, and direct policy coverage all `OK`.
+- `php artisan queue:work database --once`: passed.
 - `git diff --check`: passed.
 
 ## Commands Not Run
 
 - `composer install` was not rerun in this follow-up because this pass did not change dependencies and the requested command list did not include it.
-- Physical APK smoke was not run in this pass.
+- `vendor/bin/pest` was not rerun separately after `9ab163e`; `php artisan test` ran the full Pest suite successfully.
 
 ## Manual Smoke Status
 
-Covered by automated tests or Playwright in this pass:
+Covered by automated tests, Playwright, or physical APK smoke in this pass:
 
 - Login page, admin smoke, user smoke, RBAC audit, route cache, config cache, view cache, backup drill, private attachment access, payslip privacy, attendance API/photo validation, Dynamic QR/risk scoring, payroll/privacy, import/export jobs, and operational health.
+- APK launch, camera/GPS permission readiness, barcode/photo readiness, attendance check-in/photo/check-out, document upload, and crash log.
 
 Still physical-device or staging only:
 
-- APK camera permission prompt, GPS prompt, real barcode scan camera surface, Android file picker upload, WebView lifecycle under install/update, and full staging backup/restore drill.
+- Full staging backup/restore drill, production queue/scheduler heartbeat, production attachment storage fallback monitoring, and release-candidate install/update lifecycle across multiple Android versions.
 
 ## Merge Recommendation
 
-Code review ready after the Android device smoke is either attached from a local authorized device or accepted as a release-gate artifact from the self-hosted APK CI runner.
+Code review ready. Backend, frontend, browser smoke, RBAC audit, queue smoke, dependency audits, and physical APK smoke all passed at branch head `99cde52`.

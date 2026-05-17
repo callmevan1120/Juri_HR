@@ -2,7 +2,7 @@
 
 Checklist publik ini dipakai sebelum membuat tag atau GitHub Release. Jangan menaruh secret, credential demo, atau detail private enterprise build di dokumen ini.
 
-Status terakhir diverifikasi lokal pada 2026-05-13 Asia/Jakarta.
+Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
 
 - `[x]` berarti sudah terbukti lewat local/dev gate, device smoke, release asset check, atau server probe.
 
@@ -38,7 +38,7 @@ Status terakhir diverifikasi lokal pada 2026-05-13 Asia/Jakarta.
 - [x] Dynamic QR butuh permission admin dan response `no-store`.
   Evidence: full feature test pass.
 - [x] Jalankan `php artisan rbac:audit`.
-  Evidence: command pass. Catatan: report masih menampilkan daftar policy yang belum punya direct policy test.
+  Evidence: command pass; routes, menus, permissions, roles, and direct policy coverage all `OK`.
 - [x] Pastikan `FILESYSTEM_ATTACHMENT_DISKS=local` untuk production baru.
   Evidence: `.env.example` sudah merekomendasikan `FILESYSTEM_ATTACHMENT_DISKS=local`; nilai production tetap harus dicek di server.
 
@@ -64,7 +64,7 @@ Status terakhir diverifikasi lokal pada 2026-05-13 Asia/Jakarta.
 - [x] Login user/admin.
   Evidence: APK page smoke captured authenticated user and admin pages.
 - [x] Check-in dan check-out.
-  Evidence: `FORCE_REBUILD=0 bun run apk:e2e:attendance` pass with check-in, photo upload, and check-out.
+  Evidence: `bun run apk:e2e:attendance` pass on device `DQEQLFCEDEKFKFZ5` with debug APK build, check-in, photo upload, and check-out; screenshot: `screenshots/apk-attendance-e2e.png`.
 - [x] Face enrollment.
   Evidence: APK page smoke captured `screenshots/apk-pages/20-user-face-enrollment.png`.
 - [x] Upload reimbursement.
@@ -72,7 +72,7 @@ Status terakhir diverifikasi lokal pada 2026-05-13 Asia/Jakarta.
 - [x] Upload leave attachment.
   Evidence: leave page captured in APK smoke and native file input/webview upload behavior covered by `UploadInputMarkupTest`.
 - [x] Download attachment.
-  Evidence: attachment authorization/download covered by feature tests; APK document upload E2E pass.
+  Evidence: attachment authorization/download covered by feature tests; `bun run apk:e2e:document-upload` pass with PDF push, document upload, and processed/uploaded status; screenshot: `screenshots/apk-document-upload-e2e.png`.
 - [x] Approval manager.
   Evidence: APK page smoke captured `screenshots/apk-pages/13-user-approvals.png` and `screenshots/apk-pages/25-admin-inbox.png`.
 - [x] Back button.
