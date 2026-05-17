@@ -47,6 +47,11 @@
                     class="user-segmented-tab">
                     {{ __('Overtime Requests') }}
                 </button>
+                <button wire:click="switchTab('wfh')"
+                    aria-selected="{{ $activeTab === 'wfh' ? 'true' : 'false' }}"
+                    class="user-segmented-tab">
+                    {{ __('WFH') }}
+                </button>
                 <button wire:click="switchTab('kasbons')"
                     aria-selected="{{ $activeTab === 'kasbons' ? 'true' : 'false' }}"
                     class="user-segmented-tab">
@@ -679,6 +684,60 @@
                 </div>
                 <div class="px-2 py-3 sm:px-4">
                     {{ $overtimes->links() }}
+                </div>
+            @elseif ($activeTab === 'wfh')
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    @forelse ($wfhRequests as $request)
+                        <article class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            <div class="flex items-start gap-3">
+                                <img class="h-10 w-10 rounded-full object-cover" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                        <div>
+                                            <h3 class="truncate text-sm font-semibold text-gray-900 dark:text-white">{{ $request->user->name }}</h3>
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $request->user->jobTitle->name ?? __('N/A') }}</p>
+                                        </div>
+                                        <span class="inline-flex w-fit rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+                                            {{ __('Pending') }}
+                                        </span>
+                                    </div>
+                                    <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                                        <div>
+                                            <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date') }}</dt>
+                                            <dd class="font-medium text-gray-900 dark:text-white">{{ $request->date?->translatedFormat('d M Y') }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('Time') }}</dt>
+                                            <dd class="font-medium text-gray-900 dark:text-white">{{ $request->start_time ?: '--:--' }} - {{ $request->end_time ?: '--:--' }}</dd>
+                                        </div>
+                                    </dl>
+                                    @if ($request->location_address)
+                                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">{{ $request->location_address }}</p>
+                                    @endif
+                                    <p class="mt-3 rounded-xl bg-gray-50 p-3 text-sm italic text-gray-600 dark:bg-gray-700/50 dark:text-gray-300">"{{ $request->reason }}"</p>
+                                    <div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
+                                        <button wire:click="rejectWfh('{{ $request->id }}')"
+                                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30">
+                                            <x-heroicon-o-x-mark class="h-4 w-4" />
+                                            {{ __('Reject') }}
+                                        </button>
+                                        <button wire:click="approveWfh('{{ $request->id }}')"
+                                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-sm font-medium text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30">
+                                            <x-heroicon-o-check class="h-4 w-4" />
+                                            {{ __('Approve') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="rounded-xl border border-gray-100 bg-white p-4 text-center text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 lg:col-span-2">
+                            {{ __('No WFH requests found') }}
+                        </div>
+                    @endforelse
+                </div>
+                <div class="px-2 py-3 sm:px-4">
+                    {{ $wfhRequests->links() }}
                 </div>
             @else
                 <!-- Kasbons Table -->

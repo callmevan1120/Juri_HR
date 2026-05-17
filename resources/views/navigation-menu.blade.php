@@ -31,6 +31,13 @@
         ],
         [
             'type' => 'link',
+            'label' => __('Command Center'),
+            'href' => route('admin.command-center'),
+            'active' => $isRouteActive('admin.command-center'),
+            'visible' => $can('viewCommandCenter'),
+        ],
+        [
+            'type' => 'link',
             'label' => __('Manager Inbox'),
             'href' => route('admin.inbox'),
             'active' => $isRouteActive('admin.inbox'),
@@ -168,16 +175,31 @@
                 ['type' => 'link', 'label' => __('Education Levels'), 'href' => route('admin.masters.education'), 'active' => $isRouteActive('admin.masters.education'), 'visible' => $can('manageEducations')],
                 ['type' => 'link', 'label' => __('Shifts'), 'href' => route('admin.masters.shift'), 'active' => $isRouteActive('admin.masters.shift'), 'visible' => $can('manageShifts')],
                 ['type' => 'link', 'label' => __('Leave Types'), 'href' => route('admin.masters.leave-types'), 'active' => $isRouteActive('admin.masters.leave-types'), 'visible' => $can('manageLeaveTypes')],
+                ['type' => 'link', 'label' => __('Leave Entitlements'), 'href' => route('admin.masters.leave-entitlements'), 'active' => $isRouteActive('admin.masters.leave-entitlements'), 'visible' => $can('manageLeaveEntitlements')],
                 ['type' => 'link', 'label' => __('Administrators'), 'href' => route('admin.masters.admin'), 'active' => $isRouteActive('admin.masters.admin'), 'visible' => $can('viewAdminAccounts')],
+            ],
+        ],
+        [
+            'type' => 'group',
+            'id' => 'operations',
+            'label' => __('Operations'),
+            'active' => $isRouteActive(['admin.operations', 'admin.commercial', 'admin.accounting', 'admin.custom-forms']),
+            'items' => [
+                ['type' => 'heading', 'label' => __('CRM & Field Work')],
+                ['type' => 'link', 'label' => __('Workspace'), 'href' => route('admin.operations'), 'active' => $isRouteActive('admin.operations'), 'visible' => $can('viewOperationsWorkspace')],
+                ['type' => 'link', 'label' => __('Commercial'), 'href' => route('admin.commercial'), 'active' => $isRouteActive('admin.commercial'), 'visible' => $can('viewCommercialWorkspace')],
+                ['type' => 'link', 'label' => __('Accounting'), 'href' => route('admin.accounting'), 'active' => $isRouteActive('admin.accounting'), 'visible' => $can('viewAccountingWorkspace')],
+                ['type' => 'link', 'label' => __('Forms'), 'href' => route('admin.custom-forms'), 'active' => $isRouteActive('admin.custom-forms'), 'visible' => $can('viewCustomForms')],
             ],
         ],
         [
             'type' => 'group',
             'id' => 'system',
             'label' => __('System'),
-            'active' => $isRouteActive(['admin.settings', 'admin.settings.kpi', 'admin.system-maintenance', 'admin.operational-health', 'admin.reports.*', 'admin.import-export.*', 'admin.activity-logs', 'admin.roles.permissions']),
+            'active' => $isRouteActive(['admin.settings', 'admin.settings.kpi', 'admin.companies', 'admin.system-maintenance', 'admin.operational-health', 'admin.reports.*', 'admin.import-export.*', 'admin.activity-logs', 'admin.roles.permissions']),
             'items' => array_values(array_filter([
                 ['type' => 'link', 'label' => __('App Settings'), 'href' => route('admin.settings'), 'active' => $isRouteActive('admin.settings'), 'visible' => $can('viewAdminSettings')],
+                ['type' => 'link', 'label' => __('Companies'), 'href' => route('admin.companies'), 'active' => $isRouteActive('admin.companies'), 'visible' => $can('manageCompanies')],
                 [
                     'type' => 'feature',
                     'label' => __('KPI Settings'),

@@ -9,6 +9,7 @@ use App\Models\Overtime;
 use App\Models\Reimbursement;
 use App\Models\ShiftSwapRequest;
 use App\Models\User;
+use App\Models\WorkFromHomeRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -51,6 +52,14 @@ class TeamApprovalQueryService
                 ->where('status', 'pending')
                 ->when($search !== '', fn (Builder $query) => $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('name', 'like', '%'.$search.'%')))
                 ->orderBy('created_at', 'desc')
+                ->paginate(10),
+            'wfh' => WorkFromHomeRequest::query()
+                ->with('user')
+                ->whereIn('user_id', $subordinateIds)
+                ->where('status', WorkFromHomeRequest::STATUS_PENDING)
+                ->when($search !== '', fn (Builder $query) => $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('name', 'like', '%'.$search.'%')))
+                ->latest('date')
+                ->latest()
                 ->paginate(10),
             'kasbons' => CashAdvance::query()
                 ->with('user')
@@ -109,6 +118,13 @@ class TeamApprovalQueryService
                 ->whereIn('status', ['approved', 'rejected'])
                 ->when($search !== '', fn (Builder $query) => $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('name', 'like', '%'.$search.'%')))
                 ->orderBy('updated_at', 'desc')
+                ->paginate(10),
+            'wfh' => WorkFromHomeRequest::query()
+                ->with(['user', 'reviewer'])
+                ->whereIn('user_id', $subordinateIds)
+                ->whereIn('status', [WorkFromHomeRequest::STATUS_APPROVED, WorkFromHomeRequest::STATUS_REJECTED])
+                ->when($search !== '', fn (Builder $query) => $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('name', 'like', '%'.$search.'%')))
+                ->latest('updated_at')
                 ->paginate(10),
             'kasbons' => CashAdvance::query()
                 ->with('user')

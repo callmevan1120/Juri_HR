@@ -14,6 +14,7 @@ use App\Models\HrChecklistTask;
 use App\Models\Overtime;
 use App\Models\Reimbursement;
 use App\Models\ShiftSwapRequest;
+use App\Models\WorkFromHomeRequest;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
@@ -45,6 +46,9 @@ Route::middleware([
         Route::livewire('/shift-swap-requests', 'user.shift-swap-request-page')
             ->name('shift-swap-requests')
             ->can('viewAny', ShiftSwapRequest::class);
+        Route::livewire('/wfh-requests', 'user.work-from-home-request-page')
+            ->name('wfh-requests')
+            ->can('viewAny', WorkFromHomeRequest::class);
         enterprise_livewire_route('/document-requests', 'user.employee-document-request-page')
             ->name('document-requests')
             ->can('viewAny', EmployeeDocumentRequest::class);
@@ -57,6 +61,8 @@ Route::middleware([
         Route::livewire('/hr-tasks', 'user.hr-tasks-page')
             ->name('hr-tasks')
             ->can('viewAny', HrChecklistTask::class);
+        Route::livewire('/my-tasks', 'user.my-operational-tasks')->name('my-tasks');
+        Route::livewire('/forms', 'user.my-custom-forms')->name('my-forms');
         Route::livewire('/approvals', 'user.team-approvals')
             ->name('approvals')
             ->can('reviewSubordinateRequests');

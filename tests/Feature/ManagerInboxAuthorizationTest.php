@@ -3,13 +3,17 @@
 use App\Livewire\Admin\ManagerInbox;
 use App\Models\Attendance;
 use App\Models\CashAdvance;
+use App\Models\CustomFormSubmission;
+use App\Models\CustomFormTemplate;
 use App\Models\HrChecklistCase;
 use App\Models\HrChecklistTask;
 use App\Models\HrChecklistTemplate;
 use App\Models\LeaveType;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\WorkFromHomeRequest;
 use App\Support\ManagerInboxService;
+use App\Support\MultiCompanyService;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -189,4 +193,98 @@ test('manager inbox includes hr checklist blockers and quick actions', function 
         ->call('approve', $task->id);
 
     expect($task->fresh()->status)->toBe(HrChecklistTask::STATUS_DONE);
+});
+
+test('manager inbox can approve work from home requests', function () {
+    $admin = User::factory()->admin()->create();
+    $employee = User::factory()->create();
+    $role = Role::create([
+        'name' => 'WFH Inbox Reviewer',
+        'slug' => 'wfh_inbox_reviewer',
+        'description' => 'Can review WFH requests from the manager inbox.',
+        'permissions' => [
+            'admin.dashboard.view',
+            'admin.wfh_requests.manage',
+        ],
+    ]);
+
+    $admin->roles()->sync([$role->id]);
+
+    $request = WorkFromHomeRequest::create([
+        'user_id' => $employee->id,
+        'company_id' => $employee->company_id,
+        'date' => now()->addDay()->toDateString(),
+        'reason' => 'Remote client support',
+        'status' => WorkFromHomeRequest::STATUS_PENDING,
+    ]);
+
+    Livewire::actingAs($admin->fresh())
+        ->test(ManagerInbox::class)
+        ->assertSee(__('WFH'))
+        ->call('switchTab', 'wfh_requests')
+        ->assertSee('Remote client support')
+        ->call('approve', $request->id);
+
+    expect($request->fresh()->status)->toBe(WorkFromHomeRequest::STATUS_APPROVED);
+});
+
+test('manager inbox can mark custom form submissions reviewed within company scope', function () {
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Inbox Forms A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Inbox Forms B');
+    $admin = User::factory()->admin()->create(['company_id' => $companyA->id]);
+    $employeeA = User::factory()->create(['company_id' => $companyA->id]);
+    $employeeB = User::factory()->create(['company_id' => $companyB->id]);
+    $role = Role::create([
+        'name' => 'Forms Inbox Reviewer',
+        'slug' => 'forms_inbox_reviewer',
+        'description' => 'Can review custom form submissions from the manager inbox.',
+        'permissions' => [
+            'admin.dashboard.view',
+            'admin.custom_forms.view',
+        ],
+    ]);
+
+    $admin->roles()->sync([$role->id]);
+
+    $templateA = CustomFormTemplate::create([
+        'company_id' => $companyA->id,
+        'title' => 'Visit Report A',
+        'category' => 'operations',
+        'fields' => [['key' => 'site', 'label' => 'Site', 'type' => 'text', 'required' => true, 'options' => []]],
+        'is_active' => true,
+    ]);
+    $templateB = CustomFormTemplate::create([
+        'company_id' => $companyB->id,
+        'title' => 'Visit Report B',
+        'category' => 'operations',
+        'fields' => [['key' => 'site', 'label' => 'Site', 'type' => 'text', 'required' => true, 'options' => []]],
+        'is_active' => true,
+    ]);
+
+    $submissionA = CustomFormSubmission::create([
+        'custom_form_template_id' => $templateA->id,
+        'company_id' => $companyA->id,
+        'submitted_by' => $employeeA->id,
+        'status' => CustomFormSubmission::STATUS_SUBMITTED,
+        'payload' => ['site' => 'Bandung'],
+    ]);
+    $submissionB = CustomFormSubmission::create([
+        'custom_form_template_id' => $templateB->id,
+        'company_id' => $companyB->id,
+        'submitted_by' => $employeeB->id,
+        'status' => CustomFormSubmission::STATUS_SUBMITTED,
+        'payload' => ['site' => 'Jakarta'],
+    ]);
+
+    Livewire::actingAs($admin->fresh())
+        ->test(ManagerInbox::class)
+        ->assertSee(__('Forms'))
+        ->call('switchTab', 'custom_forms')
+        ->assertSee('Visit Report A')
+        ->assertDontSee('Visit Report B')
+        ->call('approve', $submissionA->id);
+
+    expect($submissionA->fresh()->status)->toBe(CustomFormSubmission::STATUS_REVIEWED)
+        ->and($submissionA->fresh()->metadata['reviewed_by'])->toBe($admin->id)
+        ->and($submissionB->fresh()->status)->toBe(CustomFormSubmission::STATUS_SUBMITTED);
 });

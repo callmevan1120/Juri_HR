@@ -5,20 +5,24 @@ namespace App\Livewire\Admin;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\CustomFormSubmission;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\HrChecklistTask;
 use App\Models\Overtime;
 use App\Models\Reimbursement;
 use App\Models\ShiftSwapRequest;
 use App\Models\User;
+use App\Models\WorkFromHomeRequest;
 use App\Support\AttendanceCorrectionService;
 use App\Support\CashAdvanceApprovalService;
+use App\Support\CustomFormBuilderService;
 use App\Support\HrChecklistService;
 use App\Support\LeaveApprovalService;
 use App\Support\ManagerInboxService;
 use App\Support\OvertimeApprovalService;
 use App\Support\ReimbursementApprovalService;
 use App\Support\ShiftSwapRequestService;
+use App\Support\WorkFromHomeRequestService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -61,6 +65,10 @@ class ManagerInbox extends Component
 
     protected HrChecklistService $hrChecklistService;
 
+    protected WorkFromHomeRequestService $wfhService;
+
+    protected CustomFormBuilderService $customFormService;
+
     public function boot(
         ManagerInboxService $inboxService,
         LeaveApprovalService $leaveService,
@@ -70,6 +78,8 @@ class ManagerInbox extends Component
         CashAdvanceApprovalService $cashAdvanceService,
         ShiftSwapRequestService $shiftSwapService,
         HrChecklistService $hrChecklistService,
+        WorkFromHomeRequestService $wfhService,
+        CustomFormBuilderService $customFormService,
     ): void {
         $this->inboxService = $inboxService;
         $this->leaveService = $leaveService;
@@ -79,6 +89,8 @@ class ManagerInbox extends Component
         $this->cashAdvanceService = $cashAdvanceService;
         $this->shiftSwapService = $shiftSwapService;
         $this->hrChecklistService = $hrChecklistService;
+        $this->wfhService = $wfhService;
+        $this->customFormService = $customFormService;
     }
 
     public function mount(): void
@@ -204,16 +216,24 @@ class ManagerInbox extends Component
                 $message = $this->shiftSwapService->approve($item, $user);
                 $this->dispatch('toast', type: 'success', message: $message);
                 break;
+            case 'wfh_requests':
+                $message = $this->wfhService->approve($item, $user);
+                $this->dispatch('toast', type: 'success', message: $message);
+                break;
             case 'hr_tasks':
                 $this->hrChecklistService->updateTaskStatus($item, $user, HrChecklistTask::STATUS_DONE, $this->taskCompletionNote($item));
                 $this->dispatch('toast', type: 'success', message: __('HR task marked as done.'));
+                break;
+            case 'custom_forms':
+                $message = $this->customFormService->markReviewed($user, $item);
+                $this->dispatch('toast', type: 'success', message: $message);
                 break;
         }
     }
 
     public function confirmReject($id): void
     {
-        if ($this->activeTab === 'document_requests') {
+        if (in_array($this->activeTab, ['document_requests', 'custom_forms'], true)) {
             return;
         }
 
@@ -261,6 +281,10 @@ class ManagerInbox extends Component
                 break;
             case 'shift_swaps':
                 $message = $this->shiftSwapService->reject($item, $user, $this->rejectionReason);
+                $this->dispatch('toast', type: 'success', message: $message);
+                break;
+            case 'wfh_requests':
+                $message = $this->wfhService->reject($item, $user, $this->rejectionReason);
                 $this->dispatch('toast', type: 'success', message: $message);
                 break;
             case 'hr_tasks':
@@ -338,6 +362,12 @@ class ManagerInbox extends Component
                 ->where('status', ShiftSwapRequest::STATUS_PENDING)
                 ->tap($applyInboxFilters)
                 ->latest(),
+            'wfh_requests' => WorkFromHomeRequest::query()
+                ->with('user')
+                ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
+                ->where('status', WorkFromHomeRequest::STATUS_PENDING)
+                ->tap($applyInboxFilters)
+                ->latest(),
             'document_requests' => EmployeeDocumentRequest::query()
                 ->with('user')
                 ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
@@ -368,6 +398,17 @@ class ManagerInbox extends Component
                 ->where('approval_status', 'pending')
                 ->whereNotNull('leave_type_id')
                 ->tap($applyInboxFilters)
+                ->latest(),
+            'custom_forms' => CustomFormSubmission::query()
+                ->with(['template:id,title,category', 'submitter:id,name,email,profile_photo_path,job_title_id,company_id'])
+                ->whereHas('submitter', fn (Builder $query) => $query->managedBy($admin))
+                ->where('status', CustomFormSubmission::STATUS_SUBMITTED)
+                ->when($search !== '', fn (Builder $query) => $query->where(function (Builder $nested) use ($search): void {
+                    $nested
+                        ->whereHas('submitter', fn (Builder $userQuery) => $userQuery->where('name', 'like', '%'.$search.'%'))
+                        ->orWhereHas('template', fn (Builder $templateQuery) => $templateQuery->where('title', 'like', '%'.$search.'%'));
+                }))
+                ->when($this->statusFilter === 'overdue', $overdueClosure)
                 ->latest(),
             default => abort(403, 'Unauthorized action.'),
         };

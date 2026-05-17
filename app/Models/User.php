@@ -363,6 +363,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Company::class);
     }
 
+    public function leaveEntitlements()
+    {
+        return $this->hasMany(LeaveEntitlement::class);
+    }
+
     public function division()
     {
         return $this->belongsTo(Division::class);
@@ -401,6 +406,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function shiftSwapRequests()
     {
         return $this->hasMany(ShiftSwapRequest::class);
+    }
+
+    public function workFromHomeRequests()
+    {
+        return $this->hasMany(WorkFromHomeRequest::class);
     }
 
     public function employeeDocumentRequests()
@@ -597,6 +607,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'admin.payroll.settings' => ['managePayrollSettings'],
             'admin.employees' => ['viewEmployees'],
             'admin.hr-checklists' => ['viewAny', HrChecklistCase::class],
+            'admin.operations' => ['viewOperationsWorkspace'],
+            'admin.commercial' => ['viewCommercialWorkspace'],
+            'admin.accounting' => ['viewAccountingWorkspace'],
+            'admin.custom-forms' => ['viewCustomForms'],
             'admin.appraisals' => ['viewAdminAny', Appraisal::class],
             'admin.assets' => ['viewAdminAny', CompanyAsset::class],
             'admin.barcodes' => ['manageBarcodes'],
@@ -608,6 +622,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'admin.masters.admin' => ['viewAdminAccounts'],
             'admin.settings' => ['viewAdminSettings'],
             'admin.settings.kpi' => ['manageKpiSettings'],
+            'admin.companies' => ['manageCompanies'],
             'admin.import-export.users' => ['viewUserImportExport'],
             'admin.import-export.attendances' => ['viewAttendanceImportExport'],
             'admin.activity-logs' => ['viewActivityLogs'],

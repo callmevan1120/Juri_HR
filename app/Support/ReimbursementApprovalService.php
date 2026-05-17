@@ -14,6 +14,7 @@ class ReimbursementApprovalService
     public function __construct(
         protected ApprovalActorService $approvalActors,
         protected ApprovalMatrixService $approvalMatrix,
+        protected AccountingWorkspaceService $accounting,
     ) {}
 
     public function approve(Reimbursement $reimbursement, User $actor): string
@@ -33,6 +34,7 @@ class ReimbursementApprovalService
             ]);
 
             $this->notifyStatusUpdated($reimbursement);
+            $this->accounting->postReimbursement($actor, $reimbursement->fresh(['user']));
 
             return __('Reimbursement approved.');
         }
@@ -162,6 +164,10 @@ class ReimbursementApprovalService
 
         $reimbursement->update($payload);
         $this->notifyStatusUpdated($reimbursement);
+
+        if ($nextStep === null) {
+            $this->accounting->postReimbursement($actor, $reimbursement->fresh(['user']));
+        }
 
         return $nextStep === null
             ? __('Reimbursement approved.')

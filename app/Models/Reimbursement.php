@@ -19,6 +19,8 @@ class Reimbursement extends Model
         'approval_current_step',
         'approval_completed_steps',
         'admin_note',
+        'accounting_journal_entry_id',
+        'accounting_posted_at',
         'approved_by',
         'head_approved_by',
         'head_approved_at',
@@ -31,6 +33,7 @@ class Reimbursement extends Model
         'amount' => 'decimal:2',
         'approval_steps' => 'array',
         'approval_completed_steps' => 'array',
+        'accounting_posted_at' => 'datetime',
         'head_approved_at' => 'datetime',
         'finance_approved_at' => 'datetime',
     ];
@@ -53,5 +56,10 @@ class Reimbursement extends Model
     public function financeApprover()
     {
         return $this->belongsTo(User::class, 'finance_approved_by');
+    }
+
+    public function accountingJournalEntry()
+    {
+        return $this->belongsTo(JournalEntry::class, 'accounting_journal_entry_id');
     }
 }

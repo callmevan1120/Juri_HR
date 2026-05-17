@@ -3,6 +3,7 @@
 use App\Http\Controllers\User\AttendanceController;
 use App\Http\Controllers\User\AttendancePhotoController;
 use App\Http\Controllers\User\HrChecklistTaskAttachmentController;
+use App\Http\Controllers\User\ProjectVisitEvidenceAttachmentController;
 use App\Http\Controllers\User\ReimbursementAttachmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,8 @@ Route::middleware([
     Route::get('/hr-checklist/task-attachment/{task}', [HrChecklistTaskAttachmentController::class, 'show'])
         ->name('hr-checklist.task-attachment.download')
         ->can('downloadAttachment', 'task');
+
+    Route::get('/operations/visit-evidence/{evidence}/photo', [ProjectVisitEvidenceAttachmentController::class, 'show'])
+        ->name('operations.visit-evidence.photo')
+        ->can('downloadPhoto', 'evidence');
 });

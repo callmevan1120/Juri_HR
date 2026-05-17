@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Reports;
 
-use App\Exports\PayrollSummaryExport;
+use App\Exports\PayrollWorkbookExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,6 +24,6 @@ class ExportPayrollReportController extends Controller
 
         $filename = 'payroll-summary-report-'.now()->format('Ymd-His').'.xlsx';
 
-        return Excel::download(new PayrollSummaryExport($request->user(), $validated), $filename);
+        return Excel::download(new PayrollWorkbookExport($request->user(), $validated), $filename);
     }
 }

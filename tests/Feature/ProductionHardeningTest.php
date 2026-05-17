@@ -108,7 +108,7 @@ test('wilayah routes use dedicated throttle middleware', function () {
 
 test('missing enterprise obfuscator key fails closed instead of rendering a raw runtime exception', function () {
     Route::middleware('web')->get('/__test/enterprise-runtime-missing', function () {
-        throw new \RuntimeException('Enterprise obfuscator key is missing.');
+        throw new RuntimeException('Enterprise obfuscator key is missing.');
     })->name('test.enterprise-runtime-missing');
 
     $superadmin = User::factory()->admin(true)->create();
@@ -121,7 +121,7 @@ test('missing enterprise obfuscator key fails closed instead of rendering a raw 
 
 test('missing enterprise obfuscator key returns a locked json response', function () {
     Route::middleware('web')->get('/__test/enterprise-runtime-missing-json', function () {
-        throw new \RuntimeException('Enterprise obfuscator key is missing.');
+        throw new RuntimeException('Enterprise obfuscator key is missing.');
     })->name('test.enterprise-runtime-missing-json');
 
     $superadmin = User::factory()->admin(true)->create();

@@ -12,5 +12,6 @@ Route::get('/masterdata/job-title', JobTitleController::class)->name('admin.mast
 Route::get('/masterdata/education', EducationController::class)->name('admin.masters.education')->can('manageEducations');
 Route::get('/masterdata/shift', ShiftController::class)->name('admin.masters.shift')->can('manageShifts');
 Route::livewire('/masterdata/leave-types', 'admin.master-data.leave-type-manager')->name('admin.masters.leave-types')->can('manageLeaveTypes');
+Route::livewire('/masterdata/leave-entitlements', 'admin.leave-entitlement-manager')->name('admin.masters.leave-entitlements')->can('manageLeaveEntitlements');
 Route::get('/masterdata/admin', MasterAdminController::class)->name('admin.masters.admin')->can('viewAdminAccounts');
 Route::livewire('/holidays', 'admin.holiday-manager')->name('admin.holidays')->can('manageHolidays');

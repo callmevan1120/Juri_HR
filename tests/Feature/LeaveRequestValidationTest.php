@@ -4,6 +4,7 @@ use App\Models\Attendance;
 use App\Models\LeaveType;
 use App\Models\Setting;
 use App\Models\User;
+use App\Support\LeaveEntitlementService;
 use Illuminate\Http\UploadedFile;
 
 test('leave request is blocked when annual leave quota is exhausted', function () {
@@ -118,6 +119,83 @@ test('custom leave type can be requested without annual quota usage', function (
         'leave_type_id' => $customLeave->id,
         'approval_status' => Attendance::STATUS_PENDING,
     ]);
+});
+
+test('annual leave entitlement allocation and expiry are enforced', function () {
+    $user = User::factory()->create();
+    $annualLeave = LeaveType::query()->where('code', 'annual_leave')->firstOrFail();
+
+    Setting::updateOrCreate(
+        ['key' => 'leave.annual_quota'],
+        ['value' => '0', 'group' => 'leave', 'type' => 'number']
+    );
+    Setting::updateOrCreate(
+        ['key' => 'leave.require_attachment'],
+        ['value' => '0', 'group' => 'leave', 'type' => 'boolean']
+    );
+    Setting::flushCache('leave.annual_quota');
+    Setting::flushCache('leave.require_attachment');
+
+    app(LeaveEntitlementService::class)->createOrUpdateAnnualEntitlement(
+        user: $user,
+        year: now()->year,
+        allocatedDays: 2,
+        expiresAt: now()->addDays(10),
+    );
+
+    $response = $this->actingAs($user)->post(route('store-leave-request'), [
+        'leave_type_id' => $annualLeave->id,
+        'note' => 'Planned annual leave',
+        'from' => now()->addDays(2)->toDateString(),
+        'to' => now()->addDays(3)->toDateString(),
+    ]);
+
+    $response->assertRedirect(route('home'));
+
+    expect(app(LeaveEntitlementService::class)->summaryFor($user, $annualLeave)['remaining_days'])->toBe(0.0);
+
+    app(LeaveEntitlementService::class)->createOrUpdateAnnualEntitlement(
+        user: $user,
+        year: now()->year,
+        allocatedDays: 4,
+        expiresAt: now()->addDay(),
+    );
+
+    $expiredRangeResponse = $this->actingAs($user)->post(route('store-leave-request'), [
+        'leave_type_id' => $annualLeave->id,
+        'note' => 'After entitlement expiry',
+        'from' => now()->addDays(3)->toDateString(),
+        'to' => now()->addDays(3)->toDateString(),
+    ]);
+
+    $expiredRangeResponse
+        ->assertSessionHasNoErrors()
+        ->assertSessionHas('error', __('Leave entitlement expired on :date.', [
+            'date' => now()->addDay()->translatedFormat('d M Y'),
+        ]));
+});
+
+test('leave apply page shows entitlement expiry information', function () {
+    $user = User::factory()->create();
+
+    Setting::updateOrCreate(
+        ['key' => 'leave.require_attachment'],
+        ['value' => '0', 'group' => 'leave', 'type' => 'boolean']
+    );
+    Setting::flushCache('leave.require_attachment');
+
+    app(LeaveEntitlementService::class)->createOrUpdateAnnualEntitlement(
+        user: $user,
+        year: now()->year,
+        allocatedDays: 12,
+        expiresAt: now()->endOfYear(),
+    );
+
+    $this->actingAs($user)
+        ->get(route('apply-leave'))
+        ->assertOk()
+        ->assertSee(__('Valid until'))
+        ->assertSee(now()->endOfYear()->translatedFormat('d M Y'));
 });
 
 test('leave request rejects unsafe attachment types and invalid coordinates', function () {

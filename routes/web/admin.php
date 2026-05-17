@@ -12,6 +12,7 @@ Route::middleware([
         require __DIR__.'/admin/attendance.php';
         require __DIR__.'/admin/hr-checklists.php';
         require __DIR__.'/admin/master-data.php';
+        require __DIR__.'/admin/operations.php';
         require __DIR__.'/admin/import-export.php';
         require __DIR__.'/admin/reports.php';
         require __DIR__.'/admin/payroll.php';

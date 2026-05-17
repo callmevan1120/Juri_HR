@@ -8,6 +8,7 @@ use App\Models\CashAdvance;
 use App\Models\Overtime;
 use App\Models\Reimbursement;
 use App\Models\ShiftSwapRequest;
+use App\Models\WorkFromHomeRequest;
 use App\Support\ApprovalActorService;
 use App\Support\AttendanceCorrectionService;
 use App\Support\CashAdvanceApprovalService;
@@ -15,6 +16,7 @@ use App\Support\OvertimeApprovalService;
 use App\Support\ReimbursementApprovalService;
 use App\Support\ShiftSwapRequestService;
 use App\Support\TeamApprovalQueryService;
+use App\Support\WorkFromHomeRequestService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Url;
@@ -39,8 +41,10 @@ class TeamApprovals extends Component
 
     protected ShiftSwapRequestService $shiftSwapApprovals;
 
+    protected WorkFromHomeRequestService $wfhApprovals;
+
     #[Url(history: true)]
-    public $activeTab = 'leaves'; // leaves, attendance-corrections, shift-swaps, reimbursements, overtimes, kasbons
+    public $activeTab = 'leaves'; // leaves, attendance-corrections, shift-swaps, reimbursements, overtimes, wfh, kasbons
 
     public $search = '';
 
@@ -52,6 +56,7 @@ class TeamApprovals extends Component
         OvertimeApprovalService $overtimeApprovals,
         CashAdvanceApprovalService $cashAdvanceApprovals,
         ShiftSwapRequestService $shiftSwapApprovals,
+        WorkFromHomeRequestService $wfhApprovals,
     ): void {
         $this->teamApprovalQueries = $teamApprovalQueries;
         $this->approvalActors = $approvalActors;
@@ -60,6 +65,7 @@ class TeamApprovals extends Component
         $this->overtimeApprovals = $overtimeApprovals;
         $this->cashAdvanceApprovals = $cashAdvanceApprovals;
         $this->shiftSwapApprovals = $shiftSwapApprovals;
+        $this->wfhApprovals = $wfhApprovals;
     }
 
     public function mount()
@@ -210,6 +216,30 @@ class TeamApprovals extends Component
         session()->flash('success', __('Overtime request rejected.'));
     }
 
+    public function approveWfh($id)
+    {
+        $request = WorkFromHomeRequest::find($id);
+
+        if (! $request || ! $this->isSubordinate($request->user_id)) {
+            return;
+        }
+
+        session()->flash('success', $this->wfhApprovals->approve($request, Auth::user()));
+        $this->dispatch('refresh');
+    }
+
+    public function rejectWfh($id)
+    {
+        $request = WorkFromHomeRequest::find($id);
+
+        if (! $request || ! $this->isSubordinate($request->user_id)) {
+            return;
+        }
+
+        session()->flash('success', $this->wfhApprovals->reject($request, Auth::user()));
+        $this->dispatch('refresh');
+    }
+
     public function approveKasbon($id)
     {
         $advance = CashAdvance::find($id);
@@ -246,6 +276,7 @@ class TeamApprovals extends Component
         $shiftSwapRequests = collect();
         $reimbursements = collect();
         $overtimes = collect();
+        $wfhRequests = collect();
         $kasbons = collect();
         $result = $this->teamApprovalQueries->pending(Auth::user(), (string) $this->activeTab, (string) $this->search);
 
@@ -254,6 +285,7 @@ class TeamApprovals extends Component
             'shift-swaps' => $shiftSwapRequests = $result,
             'reimbursements' => $reimbursements = $result,
             'overtimes' => $overtimes = $result,
+            'wfh' => $wfhRequests = $result,
             'kasbons' => $kasbons = $result,
             default => $leaves = $result,
         };
@@ -264,6 +296,7 @@ class TeamApprovals extends Component
             'shiftSwapRequests' => $shiftSwapRequests,
             'reimbursements' => $reimbursements,
             'overtimes' => $overtimes,
+            'wfhRequests' => $wfhRequests,
             'kasbons' => $kasbons,
         ])->layout('layouts.app');
     }

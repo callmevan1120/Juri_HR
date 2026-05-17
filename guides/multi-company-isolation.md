@@ -1,6 +1,13 @@
 # Multi-Company Isolation
 
-Multi-company is currently guarded as a backend safety layer and must not be broadly exposed in UI until isolation tests cover every sensitive module.
+Multi-company is currently guarded as a backend safety layer with a narrow admin UI for creating company, branch, store, or partner scopes. Broader tenant-specific settings should stay behind isolation tests for every sensitive module.
+
+## Admin Entry Point
+
+- Route: `admin.companies`
+- Menu: Admin navigation > System > Companies
+- Permission: `admin.companies.manage`
+- Scope behavior: assign admins or employees to `users.company_id`; superadmins remain global.
 
 ## Enforced Scope
 
@@ -21,8 +28,9 @@ Legacy rows with `company_id = null` remain accessible to avoid breaking single-
 
 - `tests/Feature/SecurityIsolationMatrixTest.php`
 - `tests/Feature/ProductFoundationServiceTest.php`
+- `tests/Feature/AdminCompanyManagerTest.php`
 
-## Backlog Before UI Exposure
+## Backlog Before Broader UI Exposure
 
 - Scope settings per company for tenant-specific branding/policies.
 - Scope activity logs and audit exports.

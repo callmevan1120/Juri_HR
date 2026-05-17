@@ -22,5 +22,6 @@ parameters:
   scanFiles:
     - stubs/Editions.stub
     - stubs/EmployeeDocumentRequestService.stub
+    - stubs/RunSystemBackup.stub
   parallel:
     maximumNumberOfProcesses: 1

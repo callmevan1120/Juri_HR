@@ -9,8 +9,10 @@
                     'reimbursements' => ['label' => __('Reimbursements'), 'icon' => 'heroicon-o-banknotes', 'color' => 'green'],
                     'cash_advances' => ['label' => __('Cash Advances'), 'icon' => 'heroicon-o-currency-dollar', 'color' => 'emerald'],
                     'shift_swaps' => ['label' => __('Shift Swaps'), 'icon' => 'heroicon-o-arrows-right-left', 'color' => 'purple'],
+                    'wfh_requests' => ['label' => __('WFH'), 'icon' => 'heroicon-o-home-modern', 'color' => 'cyan'],
                     'document_requests' => ['label' => __('Documents'), 'icon' => 'heroicon-o-document-text', 'color' => 'gray'],
                     'hr_tasks' => ['label' => __('HR Tasks'), 'icon' => 'heroicon-o-clipboard-document-check', 'color' => 'rose'],
+                    'custom_forms' => ['label' => __('Forms'), 'icon' => 'heroicon-o-clipboard-document-list', 'color' => 'teal'],
                 ];
 
                 $tabs = array_intersect_key($tabConfigs, array_flip($availableTabs ?? []));
@@ -53,7 +55,9 @@
                             'green' => 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30',
                             'emerald' => 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/30',
                             'purple' => 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30',
+                            'cyan' => 'text-cyan-600 bg-cyan-100 dark:text-cyan-400 dark:bg-cyan-900/30',
                             'rose' => 'text-rose-600 bg-rose-100 dark:text-rose-400 dark:bg-rose-900/30',
+                            'teal' => 'text-teal-600 bg-teal-100 dark:text-teal-400 dark:bg-teal-900/30',
                             'gray' => 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700',
                             default => 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/30'
                         };
@@ -151,12 +155,18 @@
                                     'reimbursements' => route('admin.reimbursements'),
                                     'cash_advances' => route('admin.manage-kasbon'),
                                     'shift_swaps' => route('admin.shift-swaps'),
+                                    'wfh_requests' => route('admin.inbox', ['activeTab' => 'wfh_requests']),
                                     'document_requests' => route('admin.document-requests'),
                                     'hr_tasks' => route('admin.hr-checklists'),
+                                    'custom_forms' => route('admin.custom-forms'),
                                     default => '#'
                                 };
 
-                                $employee = $activeTab === 'hr_tasks' ? $item->case?->user : $item->user;
+                                $employee = match($activeTab) {
+                                    'hr_tasks' => $item->case?->user,
+                                    'custom_forms' => $item->submitter,
+                                    default => $item->user,
+                                };
 
                                 $accentColor = match($tabs[$activeTab]['color']) {
                                     'blue' => 'bg-blue-500',
@@ -165,7 +175,9 @@
                                     'green' => 'bg-green-500',
                                     'emerald' => 'bg-emerald-500',
                                     'purple' => 'bg-purple-500',
+                                    'cyan' => 'bg-cyan-500',
                                     'rose' => 'bg-rose-500',
+                                    'teal' => 'bg-teal-500',
                                     'gray' => 'bg-gray-500',
                                     default => 'bg-primary-500'
                                 };
@@ -176,10 +188,10 @@
                             
                             <div class="flex flex-1 flex-col p-4">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $employee->profile_photo_url }}" alt="{{ $employee->name }}" class="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800">
+                                    <img src="{{ $employee?->profile_photo_url }}" alt="{{ $employee?->name ?? __('Unknown user') }}" class="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800">
                                     <div class="flex-1 min-w-0">
-                                        <h3 class="truncate text-base font-bold text-gray-900 dark:text-white">{{ $employee->name }}</h3>
-                                        <p class="truncate text-xs font-medium text-gray-500">{{ $employee->jobTitle?->name ?? 'Employee' }}</p>
+                                        <h3 class="truncate text-base font-bold text-gray-900 dark:text-white">{{ $employee?->name ?? __('Unknown user') }}</h3>
+                                        <p class="truncate text-xs font-medium text-gray-500">{{ $employee?->jobTitle?->name ?? __('Employee') }}</p>
                                     </div>
                                     
                                     <a href="{{ $detailRoute }}" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors dark:bg-gray-800 dark:hover:bg-gray-700" title="{{ __('View Module') }}">
@@ -218,6 +230,11 @@
                                                 <x-heroicon-o-arrow-right class="h-3 w-3 text-gray-400 mx-2" />
                                                 <span class="text-xs font-bold text-purple-600 dark:text-purple-400">{{ $item->requestedShift->name }}</span>
                                             </div>
+                                        @elseif($activeTab === 'wfh_requests')
+                                            <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Date') }}</span> <span>{{ $item->date?->translatedFormat('d M Y') }}</span></div>
+                                            <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Time') }}</span> <span>{{ $item->start_time ?: '--:--' }} - {{ $item->end_time ?: '--:--' }}</span></div>
+                                            <div class="mt-2 text-xs text-gray-500 italic border-t border-gray-100 dark:border-gray-700 pt-2">{{ $item->reason }}</div>
+                                            @if($item->location_address)<div class="mt-2 text-xs text-gray-500 italic border-t border-gray-100 dark:border-gray-700 pt-2">{{ $item->location_address }}</div>@endif
                                         
                                         @elseif($activeTab === 'document_requests')
                                             <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Document') }}</span> <span class="font-bold text-gray-900 dark:text-white">{{ $item->documentTypeLabel() }}</span></div>
@@ -229,18 +246,36 @@
                                             @if($item->dependency)
                                                 <div class="mt-2 text-xs text-gray-500 italic border-t border-gray-100 dark:border-gray-700 pt-2">{{ __('Depends on: :task', ['task' => $item->dependency->title]) }}</div>
                                             @endif
+                                        @elseif($activeTab === 'custom_forms')
+                                            <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Form') }}</span> <span class="font-bold text-gray-900 dark:text-white">{{ $item->template?->title }}</span></div>
+                                            <div class="flex justify-between items-center"><span class="text-xs text-gray-400">{{ __('Category') }}</span> <span class="font-bold text-teal-600 dark:text-teal-400">{{ __(str($item->template?->category ?? 'general')->headline()->toString()) }}</span></div>
+                                            <div class="mt-2 grid grid-cols-1 gap-1 border-t border-gray-100 pt-2 text-xs dark:border-gray-700">
+                                                @foreach(collect($item->payload ?? [])->take(2) as $key => $value)
+                                                    <div class="flex justify-between gap-3">
+                                                        <span class="truncate text-gray-400">{{ __(str($key)->replace('_', ' ')->headline()->toString()) }}</span>
+                                                        <span class="max-w-[9rem] truncate text-gray-600 dark:text-gray-300">{{ is_array($value) ? json_encode($value) : ($value ?: '-') }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700">
-                                @if($activeTab !== 'document_requests')
+                                @if(! in_array($activeTab, ['document_requests', 'custom_forms'], true))
                                     <button wire:click="confirmReject({{ $item->id }})" class="flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-danger-600 transition-colors hover:bg-danger-50 hover:text-danger-700 focus:outline-none dark:bg-gray-800 dark:text-danger-400 dark:hover:bg-danger-900/20">
                                         <x-heroicon-m-x-mark class="h-5 w-5" /> {{ $activeTab === 'hr_tasks' ? __('Block') : __('Reject') }}
                                     </button>
                                     <button wire:click="approve({{ $item->id }})" class="flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-success-600 transition-colors hover:bg-success-50 hover:text-success-700 focus:outline-none dark:bg-gray-800 dark:text-success-400 dark:hover:bg-success-900/20">
                                         <x-heroicon-m-check class="h-5 w-5" /> {{ $activeTab === 'hr_tasks' ? __('Mark Done') : __('Approve') }}
+                                    </button>
+                                @elseif($activeTab === 'custom_forms')
+                                    <a href="{{ $detailRoute }}" class="flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 focus:outline-none dark:bg-gray-800 dark:text-primary-400 dark:hover:bg-primary-900/20">
+                                        <x-heroicon-o-arrow-top-right-on-square class="h-5 w-5" /> {{ __('Open') }}
+                                    </a>
+                                    <button wire:click="approve({{ $item->id }})" class="flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-success-600 transition-colors hover:bg-success-50 hover:text-success-700 focus:outline-none dark:bg-gray-800 dark:text-success-400 dark:hover:bg-success-900/20">
+                                        <x-heroicon-m-check class="h-5 w-5" /> {{ __('Mark Reviewed') }}
                                     </button>
                                 @else
                                     <a href="{{ $detailRoute }}" class="col-span-2 flex items-center justify-center gap-2 bg-white px-3 py-2.5 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 focus:outline-none dark:bg-gray-800 dark:text-primary-400 dark:hover:bg-primary-900/20">

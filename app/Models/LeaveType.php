@@ -45,6 +45,11 @@ class LeaveType extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function entitlements(): HasMany
+    {
+        return $this->hasMany(LeaveEntitlement::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);

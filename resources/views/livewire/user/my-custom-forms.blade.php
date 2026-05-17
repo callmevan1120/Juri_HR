@@ -1,0 +1,93 @@
+<div class="mx-auto max-w-5xl space-y-4 px-4 py-4 sm:px-6 lg:px-8">
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-lg font-bold text-slate-950 dark:text-white">{{ __('Forms') }}</h1>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Submit company forms for HR, operations, visits, and internal requests.') }}</p>
+            </div>
+            <span class="rounded-full bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
+                {{ __('Available: :count', ['count' => $templates->count()]) }}
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div class="space-y-3">
+            @forelse ($templates as $template)
+                <button
+                    type="button"
+                    wire:click="selectTemplate({{ $template->id }})"
+                    class="w-full rounded-xl border p-4 text-left shadow-sm transition {{ (int) $selectedTemplateId === $template->id ? 'border-primary-300 bg-primary-50 dark:border-primary-700 dark:bg-primary-950/30' : 'border-slate-200 bg-white hover:border-primary-200 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-primary-800' }}"
+                >
+                    <p class="font-semibold text-slate-950 dark:text-white">{{ $template->title }}</p>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __(str($template->category)->headline()->toString()) }} · {{ $template->company?->name }}</p>
+                    @if ($template->description)
+                        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">{{ $template->description }}</p>
+                    @endif
+                </button>
+            @empty
+                <div class="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+                    {{ __('No forms are available for your company yet.') }}
+                </div>
+            @endforelse
+        </div>
+
+        <div class="space-y-4">
+            @if ($selectedTemplate)
+                <form wire:submit.prevent="submit" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <div class="border-b border-slate-200 pb-4 dark:border-slate-800">
+                        <h2 class="text-base font-bold text-slate-950 dark:text-white">{{ $selectedTemplate->title }}</h2>
+                        @if ($selectedTemplate->description)
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $selectedTemplate->description }}</p>
+                        @endif
+                    </div>
+
+                    <div class="mt-4 space-y-4">
+                        @foreach (($selectedTemplate->fields ?? []) as $field)
+                            <div>
+                                <x-forms.label :for="'custom-form-'.$field['key']" :value="$field['label'].(($field['required'] ?? false) ? ' *' : '')" class="mb-1.5 block" />
+                                @if ($field['type'] === \App\Models\CustomFormTemplate::TYPE_TEXTAREA)
+                                    <x-forms.textarea :id="'custom-form-'.$field['key']" wire:model.live="responseValues.{{ $field['key'] }}" rows="3" />
+                                @elseif ($field['type'] === \App\Models\CustomFormTemplate::TYPE_SELECT)
+                                    <select id="custom-form-{{ $field['key'] }}" wire:model.live="responseValues.{{ $field['key'] }}" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                        <option value="">{{ __('Select') }}</option>
+                                        @foreach (($field['options'] ?? []) as $option)
+                                            <option value="{{ $option }}">{{ $option }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <x-forms.input :id="'custom-form-'.$field['key']" :type="$field['type']" wire:model.live="responseValues.{{ $field['key'] }}" />
+                                @endif
+                                <x-forms.input-error :for="$field['key']" />
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <x-actions.button type="submit" class="mt-5 w-full justify-center">
+                        {{ __('Submit Form') }}
+                    </x-actions.button>
+                </form>
+            @else
+                <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center dark:border-slate-700 dark:bg-slate-900">
+                    <x-heroicon-o-clipboard-document-list class="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
+                    <h2 class="mt-3 font-semibold text-slate-950 dark:text-white">{{ __('Choose a form') }}</h2>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Pick a form from the list to start filling it out.') }}</p>
+                </div>
+            @endif
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Recent Submissions') }}</h2>
+                <div class="mt-3 space-y-2">
+                    @forelse ($submissions as $submission)
+                        <div class="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-950/50">
+                            <p class="font-semibold text-slate-900 dark:text-white">{{ $submission->template?->title }}</p>
+                            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $submission->created_at?->format('d M Y H:i') }}</p>
+                        </div>
+                    @empty
+                        <p class="text-sm text-slate-500 dark:text-slate-400">{{ __('No submissions yet.') }}</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

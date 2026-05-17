@@ -28,6 +28,12 @@
                                 <span class="text-sm font-semibold text-primary-700/80 dark:text-primary-300/80">/ {{ $annualQuota ?? 12 }}</span>
                             </div>
                             <p class="mt-2 text-sm text-primary-800/80 dark:text-primary-200/80">{{ __('Used') }}: {{ $usedExcused ?? 0 }}</p>
+                            @if ($annualLeaveExpiresAt ?? null)
+                                <p class="mt-1 text-xs font-semibold {{ ($annualLeaveExpired ?? false) ? 'text-rose-700 dark:text-rose-300' : 'text-primary-700/80 dark:text-primary-300/80' }}">
+                                    {{ ($annualLeaveExpired ?? false) ? __('Expired') : __('Valid until') }}:
+                                    {{ \Illuminate\Support\Carbon::parse($annualLeaveExpiresAt)->translatedFormat('d M Y') }}
+                                </p>
+                            @endif
                         </div>
                     </div>
 

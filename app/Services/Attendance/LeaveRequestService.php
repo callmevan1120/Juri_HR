@@ -10,7 +10,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\LeaveRequested;
 use App\Notifications\LeaveRequestedEmail;
-use App\Support\LeaveCalculator;
+use App\Support\LeaveEntitlementService;
 use App\Support\UserNotificationRecipientService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
@@ -22,7 +22,7 @@ class LeaveRequestService
 {
     public function __construct(
         protected AttendanceServiceInterface $attendanceService,
-        protected LeaveCalculator $leaveCalculator,
+        protected LeaveEntitlementService $leaveEntitlements,
         protected UserNotificationRecipientService $notificationRecipients,
     ) {}
 
@@ -33,19 +33,21 @@ class LeaveRequestService
             ->whereDate('date', now()->toDateString())
             ->first();
 
-        $annualQuota = (int) Setting::getValue('leave.annual_quota', 12);
         $requireAttachment = Setting::getValue('leave.require_attachment', '1') === '1';
-        $usedExcused = $this->countAnnualLeaveDays($user, now()->year);
         $leaveTypes = LeaveType::query()
             ->active()
             ->ordered()
             ->get();
+        $annualSummary = $this->leaveEntitlements->summaryFor($user, $leaveTypes->firstWhere('counts_against_quota', true));
 
         return [
             'attendance' => $attendance,
-            'annualQuota' => $annualQuota,
-            'usedExcused' => $usedExcused,
-            'remainingExcused' => $this->leaveCalculator->remainingAnnualQuota($annualQuota, $usedExcused),
+            'annualQuota' => (int) floor($annualSummary['total_allocated']),
+            'usedExcused' => $annualSummary['used_days'],
+            'remainingExcused' => (int) floor($annualSummary['remaining_days']),
+            'annualLeaveExpiresAt' => $annualSummary['expires_at'],
+            'annualLeaveExpired' => $annualSummary['is_expired'],
+            'leaveEntitlements' => $this->leaveEntitlements->quotaSummariesFor($user),
             'requireAttachment' => $requireAttachment,
             'leaveTypes' => $leaveTypes,
         ];
@@ -67,12 +69,10 @@ class LeaveRequestService
         }
 
         $requestedDays = $fromDate->diffInDays($toDate) + 1;
-        $annualQuota = (int) Setting::getValue('leave.annual_quota', 12);
-        $usedExcused = $this->countAnnualLeaveDays($user, $fromDate->year);
-        $countsAgainstQuota = $leaveType?->counts_against_quota;
+        $quotaError = $this->leaveEntitlements->quotaErrorForRequest($user, $status, $leaveType, $fromDate, $toDate, $requestedDays);
 
-        if ($this->leaveCalculator->wouldExceedAnnualQuota($status, $annualQuota, $usedExcused, $requestedDays, $countsAgainstQuota)) {
-            return LeaveRequestResult::error(__('Not enough remaining annual leave quota for this request.'));
+        if ($quotaError !== null) {
+            return LeaveRequestResult::error($quotaError);
         }
 
         $existingClockRecords = $this->existingClockRecords($user, $fromDate, $toDate);
@@ -143,22 +143,6 @@ class LeaveRequestService
         }
 
         return LeaveRequestResult::success();
-    }
-
-    protected function countAnnualLeaveDays(User $user, int $year): int
-    {
-        return Attendance::query()
-            ->where('user_id', $user->id)
-            ->whereYear('date', $year)
-            ->whereIn('approval_status', [Attendance::STATUS_PENDING, Attendance::STATUS_APPROVED])
-            ->where(function ($query) {
-                $query->whereHas('leaveType', fn ($leaveTypeQuery) => $leaveTypeQuery->where('counts_against_quota', true))
-                    ->orWhere(function ($legacyQuery) {
-                        $legacyQuery->whereNull('leave_type_id')
-                            ->where('status', 'excused');
-                    });
-            })
-            ->count();
     }
 
     protected function existingClockRecords(User $user, Carbon $fromDate, Carbon $toDate): Collection

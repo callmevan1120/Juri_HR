@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\EnterpriseObfuscatorKeyMissingException;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\EnsureActiveAccount;
@@ -10,7 +11,6 @@ use App\Http\Middleware\SetUserLocale;
 use App\Http\Middleware\ThrottleRequestsByIP;
 use App\Http\Middleware\UserMiddleware;
 use App\Http\Middleware\VerifyAttendanceIntegrationSignature;
-use App\Exceptions\EnterpriseObfuscatorKeyMissingException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -103,7 +103,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             return $renderEnterpriseRuntimeLock($request);
         });
 
-        $exceptions->render(function (\RuntimeException $e, Request $request) use ($renderEnterpriseRuntimeLock) {
+        $exceptions->render(function (RuntimeException $e, Request $request) use ($renderEnterpriseRuntimeLock) {
             if ($e->getMessage() !== 'Enterprise obfuscator key is missing.') {
                 return null;
             }

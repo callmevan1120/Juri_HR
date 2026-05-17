@@ -38,6 +38,27 @@ class MultiCompanyService
         return $user->fresh();
     }
 
+    /**
+     * @param  array<string, mixed>  $metadata
+     */
+    public function updateCompany(Company $company, string $name, string $status, array $metadata = []): Company
+    {
+        $company->forceFill([
+            'name' => $name,
+            'status' => $status,
+            'metadata' => $metadata,
+        ])->save();
+
+        return $company->fresh();
+    }
+
+    public function unassignUser(User $user): User
+    {
+        $user->forceFill(['company_id' => null])->save();
+
+        return $user->fresh();
+    }
+
     public function guardUserQuery(Builder $query, User $actor): Builder
     {
         if ($actor->isSuperadmin || $actor->company_id === null) {

@@ -5,12 +5,14 @@ namespace App\Support;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\CustomFormSubmission;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\HrChecklistTask;
 use App\Models\Overtime;
 use App\Models\Reimbursement;
 use App\Models\ShiftSwapRequest;
 use App\Models\User;
+use App\Models\WorkFromHomeRequest;
 use Illuminate\Database\Eloquent\Builder;
 
 class ManagerInboxService
@@ -48,12 +50,20 @@ class ManagerInboxService
             $tabs[] = 'shift_swaps';
         }
 
+        if ($admin->can('manageWfhRequests')) {
+            $tabs[] = 'wfh_requests';
+        }
+
         if ($admin->can('viewAdminAny', EmployeeDocumentRequest::class)) {
             $tabs[] = 'document_requests';
         }
 
         if ($admin->can('viewHrChecklists')) {
             $tabs[] = 'hr_tasks';
+        }
+
+        if ($admin->can('viewCustomForms')) {
+            $tabs[] = 'custom_forms';
         }
 
         return $tabs;
@@ -137,6 +147,12 @@ class ManagerInboxService
                 ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
 
+            'wfh_requests' => WorkFromHomeRequest::query()
+                ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
+                ->where('status', WorkFromHomeRequest::STATUS_PENDING)
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
+                ->count(),
+
             'document_requests' => EmployeeDocumentRequest::query()
                 ->whereHas('user', fn (Builder $q) => $q->managedBy($admin))
                 ->whereIn('status', [EmployeeDocumentRequest::STATUS_PENDING, EmployeeDocumentRequest::STATUS_REQUESTED])
@@ -150,6 +166,12 @@ class ManagerInboxService
                     $overdueQuery->where('status', HrChecklistTask::STATUS_BLOCKED)
                         ->orWhere(fn (Builder $pendingQuery) => $pendingQuery->reminderReady());
                 }))
+                ->count(),
+
+            'custom_forms' => CustomFormSubmission::query()
+                ->whereHas('submitter', fn (Builder $q) => $q->managedBy($admin))
+                ->where('status', CustomFormSubmission::STATUS_SUBMITTED)
+                ->when($overdueOnly, fn (Builder $query) => $query->where('created_at', '<=', $overdueAt))
                 ->count(),
         ];
 

@@ -113,6 +113,11 @@
                     @if ($claim->description)
                         <p class="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-900/40 dark:text-gray-300">{{ $claim->description }}</p>
                     @endif
+                    @if ($claim->accounting_journal_entry_id)
+                        <p class="mt-3 text-xs font-semibold text-emerald-600 dark:text-emerald-300">
+                            {{ __('Posted to journal #:id', ['id' => $claim->accounting_journal_entry_id]) }}
+                        </p>
+                    @endif
 
                     <div class="mt-4 flex justify-end gap-2">
                         @if ($canApprove)
@@ -206,6 +211,11 @@
                                 <x-admin.status-badge :tone="$claim->status === 'approved' ? 'success' : ($claim->status === 'rejected' ? 'danger' : ($claim->status === 'pending_finance' ? 'accent' : 'warning'))">
                                     {{ __($claim->status === 'pending_finance' ? 'Menunggu Finance' : ucfirst($claim->status)) }}
                                 </x-admin.status-badge>
+                                @if ($claim->accounting_journal_entry_id)
+                                    <div class="mt-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-300">
+                                        {{ __('Journal #:id', ['id' => $claim->accounting_journal_entry_id]) }}
+                                    </div>
+                                @endif
                                 @if ($claim->status !== 'pending')
                                     <div class="mt-1 flex flex-col gap-0.5 w-[140px]">
                                         @if ($claim->head_approved_by)
