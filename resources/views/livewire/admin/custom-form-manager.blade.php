@@ -124,20 +124,49 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Template') }}</h2>
                         <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Build reusable forms with fields, automation, and company scope from one focused panel.') }}</p>
                     </div>
-                    <form wire:submit.prevent="createTemplate" class="space-y-3 p-4">
-                        <x-forms.select id="template-company" wire:model.live="templateCompanyId" class="w-full" aria-label="{{ __('Company') }}">
-                            <option value="">{{ __('Company') }}</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="templateCompanyId" />
-                        <x-forms.input wire:model.live="templateTitle" placeholder="{{ __('Form title') }}" />
-                        <x-forms.input-error for="templateTitle" />
-                        <x-forms.input wire:model.live="templateCategory" placeholder="{{ __('Category') }}" />
-                        <x-forms.textarea wire:model.live="templateDescription" rows="2" placeholder="{{ __('Description optional') }}" />
-                        <x-forms.textarea wire:model.live="fieldLines" rows="7" placeholder="{{ __('Label|type|required|options') }}" />
-                        <x-forms.input-error for="fieldLines" />
+                    <form wire:submit.prevent="createTemplate" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="template-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="template-company" wire:model.live="templateCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="templateCompanyId" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="template-title" value="{{ __('Form title') }}" />
+                            <x-forms.input id="template-title" wire:model.live="templateTitle" placeholder="{{ __('e.g. Visit Report') }}" />
+                            <x-forms.input-error for="templateTitle" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="template-category" value="{{ __('Category') }}" />
+                            <x-forms.select id="template-category" wire:model.live="templateCategory" class="w-full" placeholder="{{ __('Choose category') }}">
+                                <option value="general">{{ __('General') }}</option>
+                                <option value="operations">{{ __('Operations') }}</option>
+                                <option value="hr">{{ __('HR') }}</option>
+                                <option value="visit">{{ __('Visit') }}</option>
+                                <option value="survey">{{ __('Survey') }}</option>
+                                <option value="finance">{{ __('Finance') }}</option>
+                            </x-forms.select>
+                            <x-forms.input-error for="templateCategory" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="template-description" value="{{ __('Description') }}" />
+                            <x-forms.textarea id="template-description" wire:model.live="templateDescription" rows="3" placeholder="{{ __('Who should use this form and when?') }}" />
+                            <x-forms.input-error for="templateDescription" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="field-lines" value="{{ __('Fields') }}" />
+                            <x-forms.textarea id="field-lines" wire:model.live="fieldLines" rows="7" placeholder="{{ __('Label|type|required|options') }}" />
+                            <x-forms.input-error for="fieldLines" />
+                        </div>
+
                         <div class="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 dark:bg-slate-950/50 dark:text-slate-300">
                             {{ __('Format: Label|type|required|options. Types: :types', ['types' => implode(', ', $fieldTypes)]) }}
                         </div>
@@ -152,19 +181,30 @@
 
                             @if ($automationEnabled)
                                 <div class="mt-3 space-y-3">
-                                    <x-forms.select id="automation-project" wire:model.live="automationProjectId" class="w-full" aria-label="{{ __('Project') }}">
-                                        <option value="">{{ __('Project') }}</option>
-                                        @foreach ($projects as $project)
-                                            <option value="{{ $project->id }}">{{ $project->name }}</option>
-                                        @endforeach
-                                    </x-forms.select>
+                                    <div class="space-y-1.5">
+                                        <x-forms.label for="automation-project" value="{{ __('Project') }}" />
+                                        <x-forms.select id="automation-project" wire:model.live="automationProjectId" class="w-full" placeholder="{{ __('Choose project') }}">
+                                            <option value="">{{ __('Choose project') }}</option>
+                                            @foreach ($automationProjectOptions as $project)
+                                                <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                            @endforeach
+                                        </x-forms.select>
+                                    </div>
                                     <x-forms.input-error for="automationProjectId" />
-                                    <x-forms.input wire:model.live="automationTaskTitle" placeholder="{{ __('Task title optional') }}" />
-                                    <x-forms.select id="automation-task-priority" wire:model.live="automationTaskPriority" class="w-full" aria-label="{{ __('Priority') }}">
-                                        <option value="{{ \App\Models\ProjectTask::PRIORITY_LOW }}">{{ __('Low') }}</option>
-                                        <option value="{{ \App\Models\ProjectTask::PRIORITY_NORMAL }}">{{ __('Normal') }}</option>
-                                        <option value="{{ \App\Models\ProjectTask::PRIORITY_HIGH }}">{{ __('High') }}</option>
-                                    </x-forms.select>
+                                    <div class="space-y-1.5">
+                                        <x-forms.label for="automation-task-title" value="{{ __('Task title') }}" />
+                                        <x-forms.input id="automation-task-title" wire:model.live="automationTaskTitle" placeholder="{{ __('Optional') }}" />
+                                        <x-forms.input-error for="automationTaskTitle" />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <x-forms.label for="automation-task-priority" value="{{ __('Priority') }}" />
+                                        <x-forms.select id="automation-task-priority" wire:model.live="automationTaskPriority" class="w-full" placeholder="{{ __('Priority') }}">
+                                            <option value="{{ \App\Models\ProjectTask::PRIORITY_LOW }}">{{ __('Low') }}</option>
+                                            <option value="{{ \App\Models\ProjectTask::PRIORITY_NORMAL }}">{{ __('Normal') }}</option>
+                                            <option value="{{ \App\Models\ProjectTask::PRIORITY_HIGH }}">{{ __('High') }}</option>
+                                        </x-forms.select>
+                                        <x-forms.input-error for="automationTaskPriority" />
+                                    </div>
                                 </div>
                             @endif
                         </div>

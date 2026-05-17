@@ -492,9 +492,185 @@ test('tenant scoped commercial admin cannot create opportunity for another compa
         ->set('opportunityTitle', 'Cross tenant opportunity')
         ->set('opportunityExpectedValue', '1000000')
         ->call('createOpportunity')
-        ->assertHasErrors('selected_record');
+        ->assertHasErrors('opportunityProjectId');
 
     expect(SalesOpportunity::query()->where('client_id', $clientB->id)->exists())->toBeFalse();
+});
+
+test('commercial forms scope selectable clients projects and products to selected company context', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Commercial Scope A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Commercial Scope B');
+    $clientA = Client::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Buyer Scope A',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $clientB = Client::query()->create([
+        'company_id' => $companyB->id,
+        'name' => 'Buyer Scope B',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $projectA = Project::query()->create([
+        'company_id' => $companyA->id,
+        'client_id' => $clientA->id,
+        'name' => 'Commercial Project A',
+        'status' => Project::STATUS_ACTIVE,
+    ]);
+    $projectB = Project::query()->create([
+        'company_id' => $companyB->id,
+        'client_id' => $clientB->id,
+        'name' => 'Commercial Project B',
+        'status' => Project::STATUS_ACTIVE,
+    ]);
+    $productA = Product::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Scoped Product A',
+        'unit' => 'pcs',
+        'selling_price' => 100000,
+        'cost_price' => 50000,
+    ]);
+    $productB = Product::query()->create([
+        'company_id' => $companyB->id,
+        'name' => 'Scoped Product B',
+        'unit' => 'pcs',
+        'selling_price' => 100000,
+        'cost_price' => 50000,
+    ]);
+    $vendorA = Vendor::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Vendor Scope A',
+        'status' => Vendor::STATUS_ACTIVE,
+    ]);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(CommercialWorkspace::class)
+        ->set('activeTab', 'pipeline')
+        ->set('opportunityCompanyId', (string) $companyA->id)
+        ->assertSee('Buyer Scope A')
+        ->assertSee('Commercial Project A')
+        ->assertDontSee('Buyer Scope B')
+        ->assertDontSee('Commercial Project B')
+        ->set('activeTab', 'quotations')
+        ->set('documentCompanyId', (string) $companyA->id)
+        ->assertSee('Buyer Scope A')
+        ->assertSee('Commercial Project A')
+        ->assertSee('Scoped Product A')
+        ->assertDontSee('Buyer Scope B')
+        ->assertDontSee('Commercial Project B')
+        ->assertDontSee('Scoped Product B')
+        ->set('activeTab', 'purchases')
+        ->set('billVendorId', (string) $vendorA->id)
+        ->assertSee('Scoped Product A')
+        ->assertDontSee('Scoped Product B');
+
+    expect($projectB->exists)->toBeTrue()
+        ->and($productA->exists)->toBeTrue()
+        ->and($productB->exists)->toBeTrue();
+});
+
+test('commercial workspace keeps selected tab from query string on reload', function () {
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin);
+
+    Livewire::withQueryParams(['activeTab' => 'purchases'])
+        ->test(CommercialWorkspace::class)
+        ->assertSet('activeTab', 'purchases');
+
+    Livewire::withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(CommercialWorkspace::class)
+        ->assertSet('activeTab', 'products');
+});
+
+test('commercial documents can be downloaded as scoped pdf files', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Commercial PDF A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Commercial PDF B');
+    $client = Client::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'PDF Buyer',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $vendor = Vendor::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'PDF Vendor',
+        'status' => Vendor::STATUS_ACTIVE,
+    ]);
+    $product = Product::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'PDF Product',
+        'unit' => 'pcs',
+        'selling_price' => 250000,
+        'cost_price' => 150000,
+    ]);
+
+    $quotation = app(CommercialWorkspaceService::class)->createQuotation($superadmin, [
+        'company_id' => $companyA->id,
+        'client_id' => $client->id,
+        'issued_at' => now()->toDateString(),
+        'valid_until' => now()->addDays(7)->toDateString(),
+        'notes' => 'Quotation PDF note',
+    ], [[
+        'product_id' => $product->id,
+        'description' => 'PDF quotation line',
+        'quantity' => 2,
+        'unit_price' => 250000,
+        'tax_rate' => 11,
+    ]]);
+
+    $invoice = app(CommercialWorkspaceService::class)->createInvoice($superadmin, [
+        'company_id' => $companyA->id,
+        'client_id' => $client->id,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->addDays(14)->toDateString(),
+        'notes' => 'Invoice PDF note',
+    ], [[
+        'product_id' => $product->id,
+        'description' => 'PDF invoice line',
+        'quantity' => 1,
+        'unit_price' => 250000,
+        'tax_rate' => 11,
+    ]]);
+
+    $bill = app(CommercialWorkspaceService::class)->createVendorBill($superadmin, [
+        'company_id' => $companyA->id,
+        'vendor_id' => $vendor->id,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->addDays(14)->toDateString(),
+        'notes' => 'Vendor bill PDF note',
+    ], [[
+        'product_id' => $product->id,
+        'description' => 'PDF vendor bill line',
+        'quantity' => 3,
+        'unit_cost' => 150000,
+        'tax_rate' => 11,
+    ]]);
+
+    foreach ([
+        route('admin.commercial.quotations.pdf', $quotation),
+        route('admin.commercial.invoices.pdf', $invoice),
+        route('admin.commercial.vendor-bills.pdf', $bill),
+    ] as $url) {
+        $response = $this->actingAs($superadmin)->get($url);
+
+        $response->assertOk();
+        expect($response->headers->get('content-type'))->toContain('application/pdf')
+            ->and($response->getContent())->toStartWith('%PDF');
+    }
+
+    $tenantAdmin = User::factory()->admin()->create(['company_id' => $companyB->id]);
+    $role = Role::query()->create([
+        'name' => 'Commercial PDF Viewer',
+        'slug' => 'commercial_pdf_viewer',
+        'permissions' => ['admin.commercial.view'],
+    ]);
+    $tenantAdmin->roles()->sync([$role->id]);
+
+    $this->actingAs($tenantAdmin)
+        ->get(route('admin.commercial.quotations.pdf', $quotation))
+        ->assertForbidden();
 });
 
 test('commercial route requires explicit permission', function () {

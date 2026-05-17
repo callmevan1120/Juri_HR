@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Finance;
 
+use App\Helpers\Editions;
 use App\Livewire\Finance\Concerns\ManagesCashAdvances;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Url;
@@ -12,6 +13,8 @@ class CashAdvanceManager extends Component
 {
     use ManagesCashAdvances;
     use WithPagination;
+
+    private const TABS = ['requests', 'users'];
 
     #[Url(history: true)]
     public $activeTab = 'requests';
@@ -25,6 +28,36 @@ class CashAdvanceManager extends Component
         Gate::authorize('manageCashAdvances');
     }
 
+    public function mount()
+    {
+        if (Editions::payrollLocked()) {
+            session()->flash('show-feature-lock', [
+                'title' => 'Kasbon Locked',
+                'message' => 'Manage Kasbon is an Enterprise Feature. Please Upgrade.',
+            ]);
+
+            return redirect()->route($this->lockedRedirectRoute());
+        }
+
+        $this->normalizeActiveTab();
+    }
+
+    public function switchTab($tab)
+    {
+        if (! in_array($tab, self::TABS, true)) {
+            return;
+        }
+
+        $this->activeTab = $tab;
+        $this->resetPage();
+    }
+
+    public function updatedActiveTab(): void
+    {
+        $this->normalizeActiveTab();
+        $this->resetPage();
+    }
+
     protected function lockedRedirectRoute(): string
     {
         return 'admin.dashboard';
@@ -34,5 +67,12 @@ class CashAdvanceManager extends Component
     {
         return view('livewire.admin.finance.cash-advance-manager', $this->cashAdvanceViewData())
             ->layout('layouts.app');
+    }
+
+    private function normalizeActiveTab(): void
+    {
+        if (! in_array($this->activeTab, self::TABS, true)) {
+            $this->activeTab = 'requests';
+        }
     }
 }

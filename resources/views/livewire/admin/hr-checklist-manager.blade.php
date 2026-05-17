@@ -1,4 +1,26 @@
-<x-admin.page-shell :title="__('HR Checklists')" :description="__('Run and track onboarding and offboarding checklists seamlessly.')">
+<x-admin.page-shell
+    :title="__('HR Checklists')"
+    :description="__('Run and track onboarding and offboarding checklists seamlessly.')"
+    x-data="{
+        tabs: ['cases', 'templates'],
+        init() {
+            const requested = new URLSearchParams(window.location.search).get('activeTab');
+
+            if (this.tabs.includes(requested)) {
+                this.$wire.switchTab(requested);
+            }
+        },
+        setTab(tab) {
+            if (! this.tabs.includes(tab)) {
+                return;
+            }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('activeTab', tab);
+            window.history.replaceState({}, '', url);
+        },
+    }"
+>
     <x-slot name="actions">
         @can('manageHrChecklists')
             <x-actions.button wire:click="createCase" size="icon" label="{{ __('Start checklist case') }}">
@@ -12,12 +34,12 @@
             <div class="md:col-span-2 xl:col-span-3">
                 <x-forms.label for="hr-checklist-tab" value="{{ __('View') }}" class="mb-1.5 block" />
                 <div id="hr-checklist-tab" class="inline-flex w-full rounded-xl border border-gray-200 bg-white p-1 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <button type="button" wire:click="switchTab('cases')" @class([
+                    <button type="button" wire:click="switchTab('cases')" x-on:click="setTab('cases')" @class([
                         'wcag-touch-target flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition',
                         'bg-primary-700 text-white' => $activeTab === 'cases',
                         'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' => $activeTab !== 'cases',
                     ])>{{ __('Cases') }}</button>
-                    <button type="button" wire:click="switchTab('templates')" @class([
+                    <button type="button" wire:click="switchTab('templates')" x-on:click="setTab('templates')" @class([
                         'wcag-touch-target flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition',
                         'bg-primary-700 text-white' => $activeTab === 'templates',
                         'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700' => $activeTab !== 'templates',

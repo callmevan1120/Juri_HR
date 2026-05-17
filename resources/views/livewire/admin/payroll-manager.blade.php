@@ -358,10 +358,11 @@
         <template x-if="showDetail && detailPayroll">
             <div class="fixed inset-0 z-[90] overflow-y-auto" x-transition>
                 <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] text-center sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
-                    <div class="fixed inset-0 bg-gray-500/75 transition-opacity dark:bg-gray-900/80"
+                    <div class="fixed inset-0 z-0 bg-gray-500/75 transition-opacity dark:bg-gray-900/80"
                         @click="showDetail = false"></div>
-                    <div class="relative w-full overflow-hidden rounded-xl bg-white text-left shadow-md transition-all dark:bg-gray-800 sm:my-8 sm:max-w-lg"
+                    <div class="relative z-10 w-full overflow-hidden rounded-xl bg-white text-left shadow-md transition-all dark:bg-gray-800 sm:my-8 sm:max-w-lg"
                         style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));"
+                        @click.stop
                         role="dialog" aria-modal="true" aria-labelledby="payroll-detail-title">
                         <div
                             class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">

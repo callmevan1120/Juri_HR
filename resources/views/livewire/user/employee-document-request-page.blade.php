@@ -234,8 +234,9 @@
     @if ($showModal)
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-request-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
-                <div class="fixed inset-0 bg-gray-900/60" wire:click="close"></div>
-                <div class="relative w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
+                <div class="fixed inset-0 z-0 bg-gray-900/60" wire:click="close"></div>
+                <div class="relative z-10 w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
+                    wire:click.stop
                     style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
                     <h2 id="document-request-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('New Document Request') }}</h2>
 
@@ -281,8 +282,9 @@
     @if ($uploadingRequestId)
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-upload-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
-                <div class="fixed inset-0 bg-gray-900/60" wire:click="cancelUpload"></div>
-                <div class="relative w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
+                <div class="fixed inset-0 z-0 bg-gray-900/60" wire:click="cancelUpload"></div>
+                <div class="relative z-10 w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
+                    wire:click.stop
                     style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
                     <h2 id="document-upload-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Upload Document') }}</h2>
 

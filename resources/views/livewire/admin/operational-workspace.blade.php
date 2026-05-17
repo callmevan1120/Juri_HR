@@ -271,40 +271,64 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Project') }}</h2>
                         <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Start from company, client, location, and manager so tasks have clear ownership.') }}</p>
                     </div>
-                    <form wire:submit.prevent="createProject" class="space-y-3 p-4">
-                        <x-forms.select id="project-company" wire:model.live="projectCompanyId" class="w-full" aria-label="{{ __('Company') }}">
-                            <option value="">{{ __('Company') }}</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="projectCompanyId" />
+                    <form wire:submit.prevent="createProject" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="project-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="project-company" wire:model.live="projectCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="projectCompanyId" />
+                        </div>
 
-                        <x-forms.input wire:model.live="projectName" placeholder="{{ __('Project name') }}" />
-                        <x-forms.input-error for="projectName" />
+                        <div class="space-y-1.5">
+                            <x-forms.label for="project-name" value="{{ __('Project name') }}" />
+                            <x-forms.input id="project-name" wire:model.live="projectName" placeholder="{{ __('e.g. Store rollout Q2') }}" />
+                            <x-forms.input-error for="projectName" />
+                        </div>
 
-                        <x-forms.select id="project-client" wire:model.live="projectClientId" class="w-full" aria-label="{{ __('Client optional') }}">
-                            <option value="">{{ __('Client optional') }}</option>
-                            @foreach ($clients as $client)
-                                <option value="{{ $client->id }}">{{ $client->name }}</option>
-                            @endforeach
-                        </x-forms.select>
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <x-forms.label for="project-client" value="{{ __('Client') }}" />
+                                <x-forms.select id="project-client" wire:model.live="projectClientId" class="w-full" placeholder="{{ __('No client') }}">
+                                    <option value="">{{ __('No client') }}</option>
+                                    @foreach ($projectClientOptions as $client)
+                                        <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                    @endforeach
+                                </x-forms.select>
+                                <x-forms.input-error for="projectClientId" />
+                            </div>
 
-                        <x-forms.select id="project-branch" wire:model.live="projectBranchId" class="w-full" aria-label="{{ __('Branch/location optional') }}">
-                            <option value="">{{ __('Branch/location optional') }}</option>
-                            @foreach ($branches as $branch)
-                                <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                            @endforeach
-                        </x-forms.select>
+                            <div class="space-y-1.5">
+                                <x-forms.label for="project-branch" value="{{ __('Branch / location') }}" />
+                                <x-forms.select id="project-branch" wire:model.live="projectBranchId" class="w-full" placeholder="{{ __('No branch') }}">
+                                    <option value="">{{ __('No branch') }}</option>
+                                    @foreach ($projectBranchOptions as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </x-forms.select>
+                                <x-forms.input-error for="projectBranchId" />
+                            </div>
+                        </div>
 
-                        <x-forms.select id="project-manager" wire:model.live="projectManagerId" class="w-full" aria-label="{{ __('Manager optional') }}">
-                            <option value="">{{ __('Manager optional') }}</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </x-forms.select>
+                        <div class="space-y-1.5">
+                            <x-forms.label for="project-manager" value="{{ __('Project manager') }}" />
+                            <x-forms.select id="project-manager" wire:model.live="projectManagerId" class="w-full" placeholder="{{ __('No manager') }}">
+                                <option value="">{{ __('No manager') }}</option>
+                                @foreach ($projectManagerOptions as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} · {{ $user->email }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="projectManagerId" />
+                        </div>
 
-                        <x-forms.textarea wire:model.live="projectDescription" rows="2" placeholder="{{ __('Short project description') }}" />
+                        <div class="space-y-1.5">
+                            <x-forms.label for="project-description" value="{{ __('Description') }}" />
+                            <x-forms.textarea id="project-description" wire:model.live="projectDescription" rows="3" placeholder="{{ __('Scope, location notes, or handover context.') }}" />
+                            <x-forms.input-error for="projectDescription" />
+                        </div>
 
                         <x-actions.button type="submit" class="w-full">
                             <x-heroicon-m-plus class="h-5 w-5" />
@@ -319,35 +343,58 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Task') }}</h2>
                         <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Assign work, priority, due date, and checklist items without leaving the task tab.') }}</p>
                     </div>
-                    <form wire:submit.prevent="createTask" class="space-y-3 p-4">
-                        <x-forms.select id="task-project" wire:model.live="taskProjectId" class="w-full" aria-label="{{ __('Project') }}">
-                            <option value="">{{ __('Project') }}</option>
-                            @foreach ($projects as $project)
-                                <option value="{{ $project->id }}">{{ $project->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="taskProjectId" />
-
-                        <x-forms.input wire:model.live="taskTitle" placeholder="{{ __('Task title') }}" />
-                        <x-forms.input-error for="taskTitle" />
-
-                        <x-forms.select id="task-assignee" wire:model.live="taskAssignedTo" class="w-full" aria-label="{{ __('Assignee optional') }}">
-                            <option value="">{{ __('Assignee optional') }}</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-
-                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                            <x-forms.select id="task-priority" wire:model.live="taskPriority" class="w-full" aria-label="{{ __('Priority') }}">
-                                <option value="{{ \App\Models\ProjectTask::PRIORITY_LOW }}">{{ __('Low') }}</option>
-                                <option value="{{ \App\Models\ProjectTask::PRIORITY_NORMAL }}">{{ __('Normal') }}</option>
-                                <option value="{{ \App\Models\ProjectTask::PRIORITY_HIGH }}">{{ __('High') }}</option>
+                    <form wire:submit.prevent="createTask" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="task-project" value="{{ __('Project') }}" />
+                            <x-forms.select id="task-project" wire:model.live="taskProjectId" class="w-full" placeholder="{{ __('Choose project') }}">
+                                <option value="">{{ __('Choose project') }}</option>
+                                @foreach ($projects as $project)
+                                    <option value="{{ $project->id }}">{{ $project->name }} · {{ $project->company?->name }}</option>
+                                @endforeach
                             </x-forms.select>
-                            <x-forms.input type="date" wire:model.live="taskDueDate" />
+                            <x-forms.input-error for="taskProjectId" />
                         </div>
 
-                        <x-forms.textarea wire:model.live="taskChecklist" rows="3" placeholder="{{ __('Checklist items, one per line') }}" />
+                        <div class="space-y-1.5">
+                            <x-forms.label for="task-title" value="{{ __('Task title') }}" />
+                            <x-forms.input id="task-title" wire:model.live="taskTitle" placeholder="{{ __('e.g. Visit client location') }}" />
+                            <x-forms.input-error for="taskTitle" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="task-assignee" value="{{ __('Assignee') }}" />
+                            <x-forms.select id="task-assignee" wire:model.live="taskAssignedTo" class="w-full" placeholder="{{ __('Unassigned') }}">
+                                <option value="">{{ __('Unassigned') }}</option>
+                                @foreach ($taskAssigneeOptions as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} · {{ $user->email }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="taskAssignedTo" />
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <x-forms.label for="task-priority" value="{{ __('Priority') }}" />
+                                <x-forms.select id="task-priority" wire:model.live="taskPriority" class="w-full" placeholder="{{ __('Priority') }}">
+                                    <option value="{{ \App\Models\ProjectTask::PRIORITY_LOW }}">{{ __('Low') }}</option>
+                                    <option value="{{ \App\Models\ProjectTask::PRIORITY_NORMAL }}">{{ __('Normal') }}</option>
+                                    <option value="{{ \App\Models\ProjectTask::PRIORITY_HIGH }}">{{ __('High') }}</option>
+                                </x-forms.select>
+                                <x-forms.input-error for="taskPriority" />
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <x-forms.label for="task-due-date" value="{{ __('Due date') }}" />
+                                <x-forms.input id="task-due-date" type="date" wire:model.live="taskDueDate" placeholder="{{ __('Optional') }}" />
+                                <x-forms.input-error for="taskDueDate" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="task-checklist" value="{{ __('Checklist') }}" />
+                            <x-forms.textarea id="task-checklist" wire:model.live="taskChecklist" rows="4" placeholder="{{ __('One checklist item per line, e.g. Take location photo') }}" />
+                            <x-forms.input-error for="taskChecklist" />
+                        </div>
 
                         <x-actions.button type="submit" class="w-full">
                             <x-heroicon-m-check class="h-5 w-5" />
@@ -362,16 +409,37 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Client') }}</h2>
                         <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Save client contacts once so projects, quotations, and invoices can reuse them.') }}</p>
                     </div>
-                    <form wire:submit.prevent="createClient" class="space-y-3 p-4">
-                        <x-forms.select id="client-company" wire:model.live="clientCompanyId" class="w-full" aria-label="{{ __('Company') }}">
-                            <option value="">{{ __('Company') }}</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input wire:model.live="clientName" placeholder="{{ __('Client name') }}" />
-                        <x-forms.input wire:model.live="clientContactName" placeholder="{{ __('Contact name') }}" />
-                        <x-forms.input wire:model.live="clientContactPhone" placeholder="{{ __('Contact phone') }}" />
+                    <form wire:submit.prevent="createClient" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="client-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="client-company" wire:model.live="clientCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="clientCompanyId" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="client-name" value="{{ __('Client name') }}" />
+                            <x-forms.input id="client-name" wire:model.live="clientName" placeholder="{{ __('e.g. PT Client Utama') }}" />
+                            <x-forms.input-error for="clientName" />
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <x-forms.label for="client-contact-name" value="{{ __('Contact name') }}" />
+                                <x-forms.input id="client-contact-name" wire:model.live="clientContactName" placeholder="{{ __('Optional') }}" />
+                                <x-forms.input-error for="clientContactName" />
+                            </div>
+                            <div class="space-y-1.5">
+                                <x-forms.label for="client-contact-phone" value="{{ __('Contact phone') }}" />
+                                <x-forms.input id="client-contact-phone" wire:model.live="clientContactPhone" placeholder="{{ __('08xxxxxxxxxx') }}" inputmode="tel" />
+                                <x-forms.input-error for="clientContactPhone" />
+                            </div>
+                        </div>
+
                         <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Create Client') }}</x-actions.button>
                     </form>
                 </x-admin.panel>
@@ -382,16 +450,40 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Branch') }}</h2>
                         <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Add stores, offices, warehouses, or field locations for scoped operations.') }}</p>
                     </div>
-                    <form wire:submit.prevent="createBranch" class="space-y-3 p-4">
-                        <x-forms.select id="branch-company" wire:model.live="branchCompanyId" class="w-full" aria-label="{{ __('Company') }}">
-                            <option value="">{{ __('Company') }}</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input wire:model.live="branchName" placeholder="{{ __('Branch / store / location name') }}" />
-                        <x-forms.input wire:model.live="branchType" placeholder="{{ __('branch, store, site') }}" />
-                        <x-forms.textarea wire:model.live="branchAddress" rows="2" placeholder="{{ __('Address') }}" />
+                    <form wire:submit.prevent="createBranch" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="branch-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="branch-company" wire:model.live="branchCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="branchCompanyId" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="branch-name" value="{{ __('Location name') }}" />
+                            <x-forms.input id="branch-name" wire:model.live="branchName" placeholder="{{ __('e.g. Bandung Store') }}" />
+                            <x-forms.input-error for="branchName" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="branch-type" value="{{ __('Location type') }}" />
+                            <x-forms.select id="branch-type" wire:model.live="branchType" class="w-full" placeholder="{{ __('Choose type') }}">
+                                @foreach ($branchTypes as $type)
+                                    <option value="{{ $type }}">{{ __(str($type)->headline()->toString()) }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="branchType" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="branch-address" value="{{ __('Address') }}" />
+                            <x-forms.textarea id="branch-address" wire:model.live="branchAddress" rows="3" placeholder="{{ __('Street, city, or field location notes.') }}" />
+                            <x-forms.input-error for="branchAddress" />
+                        </div>
+
                         <x-actions.button type="submit" variant="soft-success" class="w-full">{{ __('Create Branch') }}</x-actions.button>
                     </form>
                 </x-admin.panel>

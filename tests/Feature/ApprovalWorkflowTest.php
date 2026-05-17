@@ -1,8 +1,10 @@
 <?php
 
+use App\Livewire\Admin\Finance\CashAdvanceManager as AdminCashAdvanceManager;
 use App\Livewire\Admin\ReimbursementManager;
 use App\Livewire\User\Finance\TeamCashAdvanceManager;
 use App\Livewire\User\TeamApprovals;
+use App\Livewire\User\TeamApprovalsHistory;
 use App\Models\AccountingAccount;
 use App\Models\ApprovalMatrixRule;
 use App\Models\CashAdvance;
@@ -136,6 +138,57 @@ test('team approval history keeps finance-forwarded requests visible to supervis
 
     expect($reimbursementHistory->pluck('id'))->toContain($reimbursement->id)
         ->and($cashAdvanceHistory->pluck('id'))->toContain($advance->id);
+});
+
+test('team approval tabs keep selected query tab on reload', function () {
+    [$manager] = createApprovalHierarchy();
+
+    Livewire::actingAs($manager)
+        ->withQueryParams(['activeTab' => 'reimbursements'])
+        ->test(TeamApprovals::class)
+        ->assertSet('activeTab', 'reimbursements');
+
+    Livewire::actingAs($manager)
+        ->withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(TeamApprovals::class)
+        ->assertSet('activeTab', 'leaves');
+
+    Livewire::actingAs($manager)
+        ->withQueryParams(['activeTab' => 'kasbons'])
+        ->test(TeamApprovalsHistory::class)
+        ->assertSet('activeTab', 'kasbons');
+
+    Livewire::actingAs($manager)
+        ->withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(TeamApprovalsHistory::class)
+        ->assertSet('activeTab', 'leaves');
+});
+
+test('cash advance manager tabs keep selected query tab on reload', function () {
+    enableEnterpriseAttendanceForTests();
+
+    [$manager] = createApprovalHierarchy();
+    $superadmin = User::factory()->admin(true)->create();
+
+    Livewire::actingAs($manager)
+        ->withQueryParams(['activeTab' => 'users'])
+        ->test(TeamCashAdvanceManager::class)
+        ->assertSet('activeTab', 'users');
+
+    Livewire::actingAs($manager)
+        ->withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(TeamCashAdvanceManager::class)
+        ->assertSet('activeTab', 'requests');
+
+    Livewire::actingAs($superadmin)
+        ->withQueryParams(['activeTab' => 'users'])
+        ->test(AdminCashAdvanceManager::class)
+        ->assertSet('activeTab', 'users');
+
+    Livewire::actingAs($superadmin)
+        ->withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(AdminCashAdvanceManager::class)
+        ->assertSet('activeTab', 'requests');
 });
 
 test('supervisor approval forwards cash advance to finance', function () {

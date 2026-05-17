@@ -407,6 +407,53 @@ test('accounting workspace can close and reopen periods from UI state', function
         ->assertViewHas('periodClosings', fn ($closings): bool => $closings->contains('status', AccountingPeriodClosing::STATUS_REOPENED));
 });
 
+test('accounting journal form scopes accounts to selected company', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Account Scope A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Account Scope B');
+    $cashA = AccountingAccount::query()->create([
+        'company_id' => $companyA->id,
+        'code' => '1110',
+        'name' => 'Scoped Cash A',
+        'type' => AccountingAccount::TYPE_ASSET,
+        'normal_balance' => AccountingAccount::BALANCE_DEBIT,
+        'is_active' => true,
+    ]);
+    $cashB = AccountingAccount::query()->create([
+        'company_id' => $companyB->id,
+        'code' => '2220',
+        'name' => 'Scoped Cash B',
+        'type' => AccountingAccount::TYPE_ASSET,
+        'normal_balance' => AccountingAccount::BALANCE_DEBIT,
+        'is_active' => true,
+    ]);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(AccountingWorkspace::class)
+        ->set('activeTab', 'journals')
+        ->set('journalCompanyId', (string) $companyA->id)
+        ->assertSee('Scoped Cash A')
+        ->assertDontSee('Scoped Cash B');
+
+    expect($cashA->exists)->toBeTrue()
+        ->and($cashB->exists)->toBeTrue();
+});
+
+test('accounting workspace keeps selected tab from query string on reload', function () {
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin);
+
+    Livewire::withQueryParams(['activeTab' => 'accounts'])
+        ->test(AccountingWorkspace::class)
+        ->assertSet('activeTab', 'accounts');
+
+    Livewire::withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(AccountingWorkspace::class)
+        ->assertSet('activeTab', 'journals');
+});
+
 test('accounting route requires explicit permission', function () {
     $admin = User::factory()->admin()->create();
     $admin->roles()->detach();

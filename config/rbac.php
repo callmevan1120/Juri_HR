@@ -479,7 +479,12 @@ return [
             'section' => 'operations',
             'label' => 'Commercial Workspace',
             'description' => 'Manage products, stock movements, quotations, and invoices.',
-            'route_names' => ['admin.commercial'],
+            'route_names' => [
+                'admin.commercial',
+                'admin.commercial.quotations.pdf',
+                'admin.commercial.invoices.pdf',
+                'admin.commercial.vendor-bills.pdf',
+            ],
             'existing_authorization' => 'Gate:viewCommercialWorkspace/manageCommercialWorkspace + CommercialWorkspaceService',
             'menu_location' => 'Admin navigation > Operations > Commercial',
             'surface' => 'admin',

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
@@ -20,8 +21,11 @@ class CustomFormManager extends Component
 {
     use InteractsWithBanner;
 
+    private const TABS = ['templates', 'submissions'];
+
     protected CustomFormBuilderService $forms;
 
+    #[Url(history: true)]
     public string $activeTab = 'templates';
 
     public string $search = '';
@@ -51,6 +55,27 @@ class CustomFormManager extends Component
         $this->forms = $forms;
     }
 
+    public function mount(): void
+    {
+        $this->normalizeActiveTab();
+
+        $companyId = $this->defaultCompanyId();
+
+        if ($companyId !== null) {
+            $this->templateCompanyId = $companyId;
+        }
+    }
+
+    public function updatedTemplateCompanyId(): void
+    {
+        $this->reset('automationProjectId');
+    }
+
+    public function updatedActiveTab(): void
+    {
+        $this->normalizeActiveTab();
+    }
+
     public function createTemplate(): void
     {
         Gate::authorize('manageCustomForms');
@@ -62,7 +87,11 @@ class CustomFormManager extends Component
             'templateDescription' => ['nullable', 'string', 'max:1000'],
             'fieldLines' => ['required', 'string', 'max:4000'],
             'automationEnabled' => ['boolean'],
-            'automationProjectId' => ['nullable', 'integer', Rule::exists('projects', 'id')],
+            'automationProjectId' => [
+                'nullable',
+                'integer',
+                Rule::exists('projects', 'id')->where('company_id', (int) $this->templateCompanyId),
+            ],
             'automationTaskTitle' => ['nullable', 'string', 'max:180'],
             'automationTaskPriority' => ['required', Rule::in([ProjectTask::PRIORITY_LOW, ProjectTask::PRIORITY_NORMAL, ProjectTask::PRIORITY_HIGH])],
         ]);
@@ -124,6 +153,7 @@ class CustomFormManager extends Component
             ->whereIn('company_id', $companyIds)
             ->orderBy('name')
             ->get(['id', 'company_id', 'name']);
+        $selectedTemplateCompanyId = $this->scopedCompanyId($companyIds, $this->templateCompanyId);
 
         $submissions = CustomFormSubmission::query()
             ->with(['template:id,title,category', 'submitter:id,name,email'])
@@ -135,9 +165,49 @@ class CustomFormManager extends Component
             'companies' => $companies,
             'templates' => $templates,
             'projects' => $projects,
+            'automationProjectOptions' => $selectedTemplateCompanyId === null
+                ? $projects
+                : $projects->where('company_id', $selectedTemplateCompanyId)->values(),
             'submissions' => $submissions,
             'fieldTypes' => $this->forms->fieldTypes(),
             'canManage' => $user->can('manageCustomForms'),
         ]);
+    }
+
+    private function defaultCompanyId(): ?string
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $companyId = $this->forms
+            ->scopeCompanies(Company::query(), $user)
+            ->orderBy('name')
+            ->value('id');
+
+        return $companyId === null ? null : (string) $companyId;
+    }
+
+    /**
+     * @param  list<int|string>  $companyIds
+     */
+    private function scopedCompanyId(array $companyIds, string $companyId): ?int
+    {
+        if ($companyId === '') {
+            return null;
+        }
+
+        $companyId = (int) $companyId;
+
+        return in_array($companyId, array_map('intval', $companyIds), true) ? $companyId : null;
+    }
+
+    private function normalizeActiveTab(): void
+    {
+        if (! in_array($this->activeTab, self::TABS, true)) {
+            $this->activeTab = 'templates';
+        }
     }
 }

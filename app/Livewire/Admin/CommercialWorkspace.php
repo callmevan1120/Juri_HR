@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
@@ -26,8 +27,11 @@ class CommercialWorkspace extends Component
 {
     use InteractsWithBanner;
 
+    private const TABS = ['pipeline', 'products', 'stock', 'purchases', 'quotations', 'invoices'];
+
     protected CommercialWorkspaceService $commerce;
 
+    #[Url(history: true)]
     public string $activeTab = 'products';
 
     public string $search = '';
@@ -127,6 +131,42 @@ class CommercialWorkspace extends Component
         $this->commerce = $commerce;
     }
 
+    public function mount(): void
+    {
+        $this->normalizeActiveTab();
+
+        $companyId = $this->defaultCompanyId();
+
+        if ($companyId === null) {
+            return;
+        }
+
+        $this->productCompanyId = $companyId;
+        $this->vendorCompanyId = $companyId;
+        $this->documentCompanyId = $companyId;
+        $this->opportunityCompanyId = $companyId;
+    }
+
+    public function updatedDocumentCompanyId(): void
+    {
+        $this->reset(['documentClientId', 'documentProjectId', 'documentProductId']);
+    }
+
+    public function updatedOpportunityCompanyId(): void
+    {
+        $this->reset(['opportunityClientId', 'opportunityProjectId']);
+    }
+
+    public function updatedBillVendorId(): void
+    {
+        $this->reset('billProductId');
+    }
+
+    public function updatedActiveTab(): void
+    {
+        $this->normalizeActiveTab();
+    }
+
     public function createProduct(): void
     {
         Gate::authorize('manageCommercialWorkspace');
@@ -216,7 +256,11 @@ class CommercialWorkspace extends Component
 
         $validated = $this->validate([
             'billVendorId' => ['required', 'integer', Rule::exists('vendors', 'id')],
-            'billProductId' => ['nullable', 'integer', Rule::exists('products', 'id')],
+            'billProductId' => [
+                'nullable',
+                'integer',
+                Rule::exists('products', 'id')->where('company_id', $this->selectedVendorCompanyId()),
+            ],
             'billDescription' => ['required', 'string', 'max:180'],
             'billQuantity' => ['required', 'numeric', 'min:0.001', 'max:999999999'],
             'billUnitCost' => ['required', 'numeric', 'min:0', 'max:999999999999'],
@@ -318,8 +362,16 @@ class CommercialWorkspace extends Component
 
         $validated = $this->validate([
             'opportunityCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
-            'opportunityClientId' => ['nullable', 'integer', Rule::exists('clients', 'id')],
-            'opportunityProjectId' => ['nullable', 'integer', Rule::exists('projects', 'id')],
+            'opportunityClientId' => [
+                'nullable',
+                'integer',
+                Rule::exists('clients', 'id')->where('company_id', (int) $this->opportunityCompanyId),
+            ],
+            'opportunityProjectId' => [
+                'nullable',
+                'integer',
+                Rule::exists('projects', 'id')->where('company_id', (int) $this->opportunityCompanyId),
+            ],
             'opportunityTitle' => ['required', 'string', 'max:180'],
             'opportunityStage' => ['required', Rule::in($this->commerce->opportunityStages())],
             'opportunityExpectedValue' => ['required', 'numeric', 'min:0', 'max:999999999999'],
@@ -456,11 +508,21 @@ class CommercialWorkspace extends Component
             ->latest()
             ->get();
 
+        $documentCompanyId = $this->scopedCompanyId($companyIds, $this->documentCompanyId);
+        $opportunityCompanyId = $this->scopedCompanyId($companyIds, $this->opportunityCompanyId);
+        $billVendorCompanyId = $this->selectedVendorCompanyId();
+
         return view('livewire.admin.commercial-workspace', [
             'companies' => $companies,
             'products' => $products,
             'clients' => $clients,
             'projects' => $projects,
+            'documentClientOptions' => $documentCompanyId === null ? $clients : $clients->where('company_id', $documentCompanyId)->values(),
+            'documentProjectOptions' => $documentCompanyId === null ? $projects : $projects->where('company_id', $documentCompanyId)->values(),
+            'documentProductOptions' => $documentCompanyId === null ? $products : $products->where('company_id', $documentCompanyId)->values(),
+            'opportunityClientOptions' => $opportunityCompanyId === null ? $clients : $clients->where('company_id', $opportunityCompanyId)->values(),
+            'opportunityProjectOptions' => $opportunityCompanyId === null ? $projects : $projects->where('company_id', $opportunityCompanyId)->values(),
+            'billProductOptions' => $billVendorCompanyId === null ? $products : $products->where('company_id', $billVendorCompanyId)->values(),
             'quotations' => $quotations,
             'invoices' => $invoices,
             'vendors' => $vendors,
@@ -479,9 +541,21 @@ class CommercialWorkspace extends Component
     {
         return $this->validate([
             'documentCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
-            'documentClientId' => ['nullable', 'integer', Rule::exists('clients', 'id')],
-            'documentProjectId' => ['nullable', 'integer', Rule::exists('projects', 'id')],
-            'documentProductId' => ['nullable', 'integer', Rule::exists('products', 'id')],
+            'documentClientId' => [
+                'nullable',
+                'integer',
+                Rule::exists('clients', 'id')->where('company_id', (int) $this->documentCompanyId),
+            ],
+            'documentProjectId' => [
+                'nullable',
+                'integer',
+                Rule::exists('projects', 'id')->where('company_id', (int) $this->documentCompanyId),
+            ],
+            'documentProductId' => [
+                'nullable',
+                'integer',
+                Rule::exists('products', 'id')->where('company_id', (int) $this->documentCompanyId),
+            ],
             'documentDescription' => ['required', 'string', 'max:180'],
             'documentQuantity' => ['required', 'numeric', 'min:0.001', 'max:999999999'],
             'documentUnitPrice' => ['required', 'numeric', 'min:0', 'max:999999999999'],
@@ -535,5 +609,51 @@ class CommercialWorkspace extends Component
         ]);
         $this->opportunityStage = SalesOpportunity::STAGE_LEAD;
         $this->opportunityExpectedValue = '0';
+    }
+
+    private function defaultCompanyId(): ?string
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $companyId = $this->commerce
+            ->scopeCompanies(Company::query(), $user)
+            ->orderBy('name')
+            ->value('id');
+
+        return $companyId === null ? null : (string) $companyId;
+    }
+
+    /**
+     * @param  list<int|string>  $companyIds
+     */
+    private function scopedCompanyId(array $companyIds, string $companyId): ?int
+    {
+        if ($companyId === '') {
+            return null;
+        }
+
+        $companyId = (int) $companyId;
+
+        return in_array($companyId, array_map('intval', $companyIds), true) ? $companyId : null;
+    }
+
+    private function selectedVendorCompanyId(): ?int
+    {
+        if ($this->billVendorId === '') {
+            return null;
+        }
+
+        return Vendor::query()->whereKey($this->billVendorId)->value('company_id');
+    }
+
+    private function normalizeActiveTab(): void
+    {
+        if (! in_array($this->activeTab, self::TABS, true)) {
+            $this->activeTab = 'products';
+        }
     }
 }

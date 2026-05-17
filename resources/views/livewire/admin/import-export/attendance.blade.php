@@ -1,7 +1,14 @@
 @php
     $canExportAttendances = auth()->user()->can('exportAttendances');
     $canImportAttendances = auth()->user()->can('importAttendances');
-    $defaultTab = $canExportAttendances ? 'export' : 'import';
+    $availableTabs = collect([
+        $canExportAttendances ? 'export' : null,
+        $canImportAttendances ? 'import' : null,
+    ])->filter()->values();
+    $requestedTab = request()->query('activeTab');
+    $defaultTab = $availableTabs->contains($requestedTab)
+        ? $requestedTab
+        : ($canExportAttendances ? 'export' : 'import');
     $defaultTabJson = \Illuminate\Support\Js::from($defaultTab);
     $importLockedPayload = \Illuminate\Support\Js::from([
         'title' => __('Import Locked'),
@@ -9,7 +16,15 @@
     ]);
 @endphp
 
-<div x-data="{ activeTab: {{ $defaultTabJson }} }">
+<div x-data="{
+    activeTab: {{ $defaultTabJson }},
+    setTab(tab) {
+        this.activeTab = tab;
+        const url = new URL(window.location.href);
+        url.searchParams.set('activeTab', tab);
+        window.history.replaceState({}, '', url);
+    },
+}">
     <x-admin.page-shell
         :title="__('Attendance Data Management')"
         :description="__('Export and import attendance data in bulk.')"
@@ -38,7 +53,7 @@
                                 aria-controls="attendance-export-panel"
                                 x-bind:aria-selected="(activeTab === 'export').toString()"
                                 x-bind:tabindex="activeTab === 'export' ? 0 : -1"
-                                @click="activeTab = 'export'"
+                                @click="setTab('export')"
                                 :class="activeTab === 'export'
                                     ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white'
                                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
@@ -57,7 +72,7 @@
                                 aria-controls="attendance-import-panel"
                                 x-bind:aria-selected="(activeTab === 'import').toString()"
                                 x-bind:tabindex="activeTab === 'import' ? 0 : -1"
-                                @click="activeTab = 'import'"
+                                @click="setTab('import')"
                                 :class="activeTab === 'import'
                                     ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white'
                                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"

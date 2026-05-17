@@ -86,6 +86,100 @@ test('tenant scoped admin cannot create project for another company', function (
         ->and($admin->fresh()->company_id)->toBe($companyA->id);
 });
 
+test('operations form scopes related options to selected company and project', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Ops Scope A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Ops Scope B');
+    $clientA = Client::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Client Scope A',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $clientB = Client::query()->create([
+        'company_id' => $companyB->id,
+        'name' => 'Client Scope B',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $branchA = CompanyBranch::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Branch Scope A',
+        'type' => 'branch',
+        'status' => CompanyBranch::STATUS_ACTIVE,
+    ]);
+    $branchB = CompanyBranch::query()->create([
+        'company_id' => $companyB->id,
+        'name' => 'Branch Scope B',
+        'type' => 'branch',
+        'status' => CompanyBranch::STATUS_ACTIVE,
+    ]);
+    $assigneeA = User::factory()->create(['company_id' => $companyA->id, 'name' => 'Assignee Scope A']);
+    $assigneeB = User::factory()->create(['company_id' => $companyB->id, 'name' => 'Assignee Scope B']);
+    $projectA = Project::query()->create([
+        'company_id' => $companyA->id,
+        'client_id' => $clientA->id,
+        'branch_id' => $branchA->id,
+        'name' => 'Project Scope A',
+        'status' => Project::STATUS_ACTIVE,
+    ]);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(OperationalWorkspace::class)
+        ->set('projectCompanyId', (string) $companyA->id)
+        ->assertSee('Client Scope A')
+        ->assertSee('Branch Scope A')
+        ->assertSee('Assignee Scope A')
+        ->assertDontSee('Client Scope B')
+        ->assertDontSee('Branch Scope B')
+        ->assertDontSee('Assignee Scope B')
+        ->set('activeTab', 'tasks')
+        ->set('taskProjectId', (string) $projectA->id)
+        ->assertSee('Assignee Scope A')
+        ->assertDontSee('Assignee Scope B');
+
+    expect($clientB->exists)->toBeTrue()
+        ->and($branchB->exists)->toBeTrue()
+        ->and($assigneeB->exists)->toBeTrue();
+});
+
+test('operations workspace keeps selected tab from query string on reload', function () {
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin);
+
+    Livewire::withQueryParams(['activeTab' => 'tasks'])
+        ->test(OperationalWorkspace::class)
+        ->assertSet('activeTab', 'tasks');
+
+    Livewire::withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(OperationalWorkspace::class)
+        ->assertSet('activeTab', 'projects');
+});
+
+test('operations task form shows validation error for assignee from another company', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Ops Task A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Ops Task B');
+    $project = Project::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Company Scoped Project',
+        'status' => Project::STATUS_ACTIVE,
+    ]);
+    $crossCompanyAssignee = User::factory()->create(['company_id' => $companyB->id]);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(OperationalWorkspace::class)
+        ->set('activeTab', 'tasks')
+        ->set('taskProjectId', (string) $project->id)
+        ->set('taskAssignedTo', $crossCompanyAssignee->id)
+        ->set('taskTitle', 'Wrong company assignment')
+        ->call('createTask')
+        ->assertHasErrors(['taskAssignedTo']);
+
+    expect(ProjectTask::query()->where('title', 'Wrong company assignment')->exists())->toBeFalse();
+});
+
 test('operations project financial summary includes linked commercial records', function () {
     $superadmin = User::factory()->admin(true)->create();
     $company = app(MultiCompanyService::class)->createCompany('PT Project Finance');

@@ -175,6 +175,47 @@ test('custom forms are company scoped for template creation and submission', fun
     ]);
 })->throws(HttpException::class);
 
+test('custom form automation project selector follows selected company', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Form Scope A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Form Scope B');
+    $projectA = Project::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Form Project A',
+        'status' => Project::STATUS_ACTIVE,
+    ]);
+    $projectB = Project::query()->create([
+        'company_id' => $companyB->id,
+        'name' => 'Form Project B',
+        'status' => Project::STATUS_ACTIVE,
+    ]);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(CustomFormManager::class)
+        ->set('templateCompanyId', (string) $companyA->id)
+        ->set('automationEnabled', true)
+        ->assertSee('Form Project A')
+        ->assertDontSee('Form Project B');
+
+    expect($projectA->exists)->toBeTrue()
+        ->and($projectB->exists)->toBeTrue();
+});
+
+test('custom form manager keeps selected tab from query string on reload', function () {
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin);
+
+    Livewire::withQueryParams(['activeTab' => 'submissions'])
+        ->test(CustomFormManager::class)
+        ->assertSet('activeTab', 'submissions');
+
+    Livewire::withQueryParams(['activeTab' => 'bad-tab'])
+        ->test(CustomFormManager::class)
+        ->assertSet('activeTab', 'templates');
+});
+
 test('custom form admin route requires explicit permission', function () {
     $admin = User::factory()->admin()->create();
     $admin->roles()->detach();

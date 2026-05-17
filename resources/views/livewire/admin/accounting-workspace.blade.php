@@ -541,23 +541,40 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Account') }}</h2>
                         <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Create one chart-of-account record with company, code, name, and type.') }}</p>
                     </div>
-                    <form wire:submit.prevent="createAccount" class="space-y-3 p-4">
-                        <x-forms.select id="account-company" wire:model.live="accountCompanyId" class="w-full" aria-label="{{ __('Company') }}">
-                            <option value="">{{ __('Company') }}</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="accountCompanyId" />
-                        <x-forms.input wire:model.live="accountCode" placeholder="{{ __('Account code') }}" />
-                        <x-forms.input-error for="accountCode" />
-                        <x-forms.input wire:model.live="accountName" placeholder="{{ __('Account name') }}" />
-                        <x-forms.input-error for="accountName" />
-                        <x-forms.select id="account-type" wire:model.live="accountType" class="w-full" aria-label="{{ __('Account type') }}">
-                            @foreach ($accountTypes as $type)
-                                <option value="{{ $type }}">{{ __(str($type)->headline()->toString()) }}</option>
-                            @endforeach
-                        </x-forms.select>
+                    <form wire:submit.prevent="createAccount" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="account-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="account-company" wire:model.live="accountCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="accountCompanyId" />
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <x-forms.label for="account-code" value="{{ __('Account code') }}" />
+                                <x-forms.input id="account-code" wire:model.live="accountCode" placeholder="{{ __('e.g. 1100') }}" />
+                                <x-forms.input-error for="accountCode" />
+                            </div>
+                            <div class="space-y-1.5">
+                                <x-forms.label for="account-type" value="{{ __('Account type') }}" />
+                                <x-forms.select id="account-type" wire:model.live="accountType" class="w-full" placeholder="{{ __('Account type') }}">
+                                    @foreach ($accountTypes as $type)
+                                        <option value="{{ $type }}">{{ __(str($type)->headline()->toString()) }}</option>
+                                    @endforeach
+                                </x-forms.select>
+                                <x-forms.input-error for="accountType" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="account-name" value="{{ __('Account name') }}" />
+                            <x-forms.input id="account-name" wire:model.live="accountName" placeholder="{{ __('e.g. Cash / Bank') }}" />
+                            <x-forms.input-error for="accountName" />
+                        </div>
                         <x-actions.button type="submit" class="w-full">{{ __('Create Account') }}</x-actions.button>
                     </form>
                 </x-admin.panel>
@@ -568,33 +585,64 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Post Journal') }}</h2>
                         <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Post a balanced debit and credit journal with reference and description.') }}</p>
                     </div>
-                    <form wire:submit.prevent="createJournal" class="space-y-3 p-4">
-                        <x-forms.select id="journal-company" wire:model.live="journalCompanyId" class="w-full" aria-label="{{ __('Company') }}">
-                            <option value="">{{ __('Company') }}</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="journalCompanyId" />
-                        <x-forms.input type="date" wire:model.live="journalDate" />
-                        <x-forms.select id="journal-debit-account" wire:model.live="journalDebitAccountId" class="w-full" aria-label="{{ __('Debit account') }}">
-                            <option value="">{{ __('Debit account') }}</option>
-                            @foreach ($accounts as $account)
-                                <option value="{{ $account->id }}">{{ $account->code }} · {{ $account->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="journalDebitAccountId" />
-                        <x-forms.select id="journal-credit-account" wire:model.live="journalCreditAccountId" class="w-full" aria-label="{{ __('Credit account') }}">
-                            <option value="">{{ __('Credit account') }}</option>
-                            @foreach ($accounts as $account)
-                                <option value="{{ $account->id }}">{{ $account->code }} · {{ $account->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="journalCreditAccountId" />
-                        <x-forms.input type="number" min="0.01" step="0.01" wire:model.live="journalAmount" placeholder="{{ __('Amount') }}" />
-                        <x-forms.input-error for="journalAmount" />
-                        <x-forms.input wire:model.live="journalReference" placeholder="{{ __('Reference optional') }}" />
-                        <x-forms.textarea wire:model.live="journalDescription" rows="2" placeholder="{{ __('Description') }}" />
+                    <form wire:submit.prevent="createJournal" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="journal-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="journal-company" wire:model.live="journalCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="journalCompanyId" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="journal-date" value="{{ __('Journal date') }}" />
+                            <x-forms.input id="journal-date" type="date" wire:model.live="journalDate" />
+                            <x-forms.input-error for="journalDate" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="journal-debit-account" value="{{ __('Debit account') }}" />
+                            <x-forms.select id="journal-debit-account" wire:model.live="journalDebitAccountId" class="w-full" placeholder="{{ __('Choose debit account') }}">
+                                <option value="">{{ __('Choose debit account') }}</option>
+                                @foreach ($journalAccountOptions as $account)
+                                    <option value="{{ $account->id }}">{{ $account->code }} · {{ $account->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="journalDebitAccountId" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="journal-credit-account" value="{{ __('Credit account') }}" />
+                            <x-forms.select id="journal-credit-account" wire:model.live="journalCreditAccountId" class="w-full" placeholder="{{ __('Choose credit account') }}">
+                                <option value="">{{ __('Choose credit account') }}</option>
+                                @foreach ($journalAccountOptions as $account)
+                                    <option value="{{ $account->id }}">{{ $account->code }} · {{ $account->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="journalCreditAccountId" />
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <x-forms.label for="journal-amount" value="{{ __('Amount') }}" />
+                                <x-forms.input id="journal-amount" type="number" min="0.01" step="0.01" wire:model.live="journalAmount" placeholder="0" />
+                                <x-forms.input-error for="journalAmount" />
+                            </div>
+                            <div class="space-y-1.5">
+                                <x-forms.label for="journal-reference" value="{{ __('Reference') }}" />
+                                <x-forms.input id="journal-reference" wire:model.live="journalReference" placeholder="{{ __('Optional') }}" />
+                                <x-forms.input-error for="journalReference" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="journal-description" value="{{ __('Description') }}" />
+                            <x-forms.textarea id="journal-description" wire:model.live="journalDescription" rows="3" placeholder="{{ __('Transaction memo, source document, or approval note.') }}" />
+                            <x-forms.input-error for="journalDescription" />
+                        </div>
                         <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Post Journal') }}</x-actions.button>
                     </form>
                 </x-admin.panel>
@@ -605,26 +653,36 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Close Period') }}</h2>
                         <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Lock posted accounting periods so new journals cannot change approved reports.') }}</p>
                     </div>
-                    <form wire:submit.prevent="closeAccountingPeriod" class="space-y-3 p-4">
-                        <x-forms.select id="closing-company" wire:model.live="closingCompanyId" class="w-full" aria-label="{{ __('Company') }}">
-                            <option value="">{{ __('Company') }}</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-forms.select>
-                        <x-forms.input-error for="closingCompanyId" />
-                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                            <div>
-                                <x-forms.input type="date" wire:model.live="closingStartDate" />
+                    <form wire:submit.prevent="closeAccountingPeriod" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="closing-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="closing-company" wire:model.live="closingCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="closingCompanyId" />
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <x-forms.label for="closing-start-date" value="{{ __('Period start') }}" />
+                                <x-forms.input id="closing-start-date" type="date" wire:model.live="closingStartDate" />
                                 <x-forms.input-error for="closingStartDate" />
                             </div>
-                            <div>
-                                <x-forms.input type="date" wire:model.live="closingEndDate" />
+                            <div class="space-y-1.5">
+                                <x-forms.label for="closing-end-date" value="{{ __('Period end') }}" />
+                                <x-forms.input id="closing-end-date" type="date" wire:model.live="closingEndDate" />
                                 <x-forms.input-error for="closingEndDate" />
                             </div>
                         </div>
-                        <x-forms.textarea wire:model.live="closingNotes" rows="2" placeholder="{{ __('Closing note optional') }}" />
-                        <x-forms.input-error for="closingNotes" />
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="closing-notes" value="{{ __('Closing note') }}" />
+                            <x-forms.textarea id="closing-notes" wire:model.live="closingNotes" rows="3" placeholder="{{ __('Optional approval, report, or handover note.') }}" />
+                            <x-forms.input-error for="closingNotes" />
+                        </div>
                         <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Close Period') }}</x-actions.button>
                     </form>
                 </x-admin.panel>

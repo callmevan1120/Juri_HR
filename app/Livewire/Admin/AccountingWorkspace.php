@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
@@ -18,8 +19,11 @@ class AccountingWorkspace extends Component
 {
     use InteractsWithBanner;
 
+    private const TABS = ['journals', 'accounts', 'reports'];
+
     protected AccountingWorkspaceService $accounting;
 
+    #[Url(history: true)]
     public string $activeTab = 'journals';
 
     public string $search = '';
@@ -67,11 +71,33 @@ class AccountingWorkspace extends Component
 
     public function mount(): void
     {
+        $this->normalizeActiveTab();
+
         $this->journalDate = now()->toDateString();
         $this->reportStartDate = now()->startOfMonth()->toDateString();
         $this->reportEndDate = now()->endOfMonth()->toDateString();
         $this->closingStartDate = now()->startOfMonth()->toDateString();
         $this->closingEndDate = now()->endOfMonth()->toDateString();
+
+        $companyId = $this->defaultCompanyId();
+
+        if ($companyId === null) {
+            return;
+        }
+
+        $this->accountCompanyId = $companyId;
+        $this->journalCompanyId = $companyId;
+        $this->closingCompanyId = $companyId;
+    }
+
+    public function updatedJournalCompanyId(): void
+    {
+        $this->reset(['journalDebitAccountId', 'journalCreditAccountId']);
+    }
+
+    public function updatedActiveTab(): void
+    {
+        $this->normalizeActiveTab();
     }
 
     public function createAccount(): void
@@ -103,8 +129,17 @@ class AccountingWorkspace extends Component
         $validated = $this->validate([
             'journalCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
             'journalDate' => ['required', 'date'],
-            'journalDebitAccountId' => ['required', 'integer', Rule::exists('accounting_accounts', 'id')],
-            'journalCreditAccountId' => ['required', 'integer', 'different:journalDebitAccountId', Rule::exists('accounting_accounts', 'id')],
+            'journalDebitAccountId' => [
+                'required',
+                'integer',
+                Rule::exists('accounting_accounts', 'id')->where('company_id', (int) $this->journalCompanyId)->where('is_active', true),
+            ],
+            'journalCreditAccountId' => [
+                'required',
+                'integer',
+                'different:journalDebitAccountId',
+                Rule::exists('accounting_accounts', 'id')->where('company_id', (int) $this->journalCompanyId)->where('is_active', true),
+            ],
             'journalAmount' => ['required', 'numeric', 'min:0.01', 'max:999999999999'],
             'journalReference' => ['nullable', 'string', 'max:120'],
             'journalDescription' => ['nullable', 'string', 'max:1000'],
@@ -193,10 +228,14 @@ class AccountingWorkspace extends Component
             ->latest('entry_date')
             ->latest()
             ->get();
+        $selectedJournalCompanyId = $this->scopedCompanyId($companyIds, $this->journalCompanyId);
 
         return view('livewire.admin.accounting-workspace', [
             'companies' => $companies,
             'accounts' => $accounts,
+            'journalAccountOptions' => $selectedJournalCompanyId === null
+                ? $accounts->where('is_active', true)->values()
+                : $accounts->where('company_id', $selectedJournalCompanyId)->where('is_active', true)->values(),
             'journals' => $journals,
             'totals' => $this->accounting->totalsForCompanies($companyIds, $this->reportStartDate, $this->reportEndDate),
             'financialSummary' => $this->accounting->financialSummaryForCompanies($companyIds, $this->reportStartDate, $this->reportEndDate),
@@ -225,5 +264,42 @@ class AccountingWorkspace extends Component
             AccountingAccount::TYPE_REVENUE,
             AccountingAccount::TYPE_EXPENSE,
         ];
+    }
+
+    private function defaultCompanyId(): ?string
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $companyId = $this->accounting
+            ->scopeCompanies(Company::query(), $user)
+            ->orderBy('name')
+            ->value('id');
+
+        return $companyId === null ? null : (string) $companyId;
+    }
+
+    /**
+     * @param  list<int|string>  $companyIds
+     */
+    private function scopedCompanyId(array $companyIds, string $companyId): ?int
+    {
+        if ($companyId === '') {
+            return null;
+        }
+
+        $companyId = (int) $companyId;
+
+        return in_array($companyId, array_map('intval', $companyIds), true) ? $companyId : null;
+    }
+
+    private function normalizeActiveTab(): void
+    {
+        if (! in_array($this->activeTab, self::TABS, true)) {
+            $this->activeTab = 'journals';
+        }
     }
 }

@@ -15,6 +15,15 @@ class TeamApprovalsHistory extends Component
 {
     use WithPagination;
 
+    private const TABS = [
+        'leaves',
+        'attendance-corrections',
+        'shift-swaps',
+        'reimbursements',
+        'overtimes',
+        'kasbons',
+    ];
+
     protected TeamApprovalQueryService $teamApprovalQueries;
 
     protected ApprovalActorService $approvalActors;
@@ -33,11 +42,22 @@ class TeamApprovalsHistory extends Component
     public function mount()
     {
         Gate::authorize('reviewSubordinateRequests');
+        $this->normalizeActiveTab();
     }
 
     public function switchTab($tab)
     {
+        if (! in_array($tab, self::TABS, true)) {
+            return;
+        }
+
         $this->activeTab = $tab;
+        $this->resetPage();
+    }
+
+    public function updatedActiveTab(): void
+    {
+        $this->normalizeActiveTab();
         $this->resetPage();
     }
 
@@ -68,5 +88,12 @@ class TeamApprovalsHistory extends Component
             'overtimes' => $overtimes,
             'kasbons' => $kasbons,
         ])->layout('layouts.app');
+    }
+
+    private function normalizeActiveTab(): void
+    {
+        if (! in_array($this->activeTab, self::TABS, true)) {
+            $this->activeTab = 'leaves';
+        }
     }
 }

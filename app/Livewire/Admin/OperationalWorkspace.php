@@ -13,8 +13,10 @@ use App\Support\OperationalWorkspaceService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
@@ -22,8 +24,13 @@ class OperationalWorkspace extends Component
 {
     use InteractsWithBanner;
 
+    private const BRANCH_TYPES = ['branch', 'store', 'office', 'warehouse', 'site'];
+
+    private const TABS = ['projects', 'tasks', 'clients', 'branches'];
+
     protected OperationalWorkspaceService $operations;
 
+    #[Url(history: true)]
     public string $activeTab = 'projects';
 
     public string $search = '';
@@ -75,6 +82,36 @@ class OperationalWorkspace extends Component
         $this->operations = $operations;
     }
 
+    public function mount(): void
+    {
+        $this->normalizeActiveTab();
+
+        $companyId = $this->defaultCompanyId();
+
+        if ($companyId === null) {
+            return;
+        }
+
+        $this->branchCompanyId = $companyId;
+        $this->clientCompanyId = $companyId;
+        $this->projectCompanyId = $companyId;
+    }
+
+    public function updatedProjectCompanyId(): void
+    {
+        $this->reset(['projectClientId', 'projectBranchId', 'projectManagerId', 'taskProjectId', 'taskAssignedTo']);
+    }
+
+    public function updatedTaskProjectId(): void
+    {
+        $this->reset('taskAssignedTo');
+    }
+
+    public function updatedActiveTab(): void
+    {
+        $this->normalizeActiveTab();
+    }
+
     public function createBranch(): void
     {
         Gate::authorize('manageOperationsWorkspace');
@@ -82,7 +119,7 @@ class OperationalWorkspace extends Component
         $validated = $this->validate([
             'branchCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
             'branchName' => ['required', 'string', 'max:160'],
-            'branchType' => ['required', 'string', 'max:40'],
+            'branchType' => ['required', 'string', Rule::in(self::BRANCH_TYPES)],
             'branchAddress' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -128,9 +165,23 @@ class OperationalWorkspace extends Component
 
         $validated = $this->validate([
             'projectCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
-            'projectClientId' => ['nullable', 'integer', Rule::exists('clients', 'id')],
-            'projectBranchId' => ['nullable', 'integer', Rule::exists('company_branches', 'id')],
-            'projectManagerId' => ['nullable', 'string', Rule::exists('users', 'id')],
+            'projectClientId' => [
+                'nullable',
+                'integer',
+                Rule::exists('clients', 'id')->where('company_id', (int) $this->projectCompanyId),
+            ],
+            'projectBranchId' => [
+                'nullable',
+                'integer',
+                Rule::exists('company_branches', 'id')->where('company_id', (int) $this->projectCompanyId),
+            ],
+            'projectManagerId' => [
+                'nullable',
+                'string',
+                Rule::exists('users', 'id')->where(fn ($query) => $query
+                    ->whereNull('company_id')
+                    ->orWhere('company_id', (int) $this->projectCompanyId)),
+            ],
             'projectName' => ['required', 'string', 'max:180'],
             'projectDescription' => ['nullable', 'string', 'max:1500'],
         ]);
@@ -164,6 +215,13 @@ class OperationalWorkspace extends Component
         ]);
 
         $project = Project::query()->findOrFail((int) $validated['taskProjectId']);
+
+        if (! $this->assigneeBelongsToProjectCompany($validated['taskAssignedTo'] ?? null, $project)) {
+            throw ValidationException::withMessages([
+                'taskAssignedTo' => __('Selected user does not belong to the selected project company.'),
+            ]);
+        }
+
         $checklistItems = collect(preg_split('/\r\n|\r|\n/', (string) $validated['taskChecklist']))
             ->map(fn (string $item): string => trim($item))
             ->filter()
@@ -254,14 +312,82 @@ class OperationalWorkspace extends Component
             ->orderBy('name')
             ->get(['id', 'company_id', 'name', 'email']);
 
+        $selectedProjectCompanyId = $this->scopedCompanyId($companyIds, $this->projectCompanyId);
+        $selectedTaskProject = $projects->firstWhere('id', (int) $this->taskProjectId);
+        $selectedTaskCompanyId = $selectedTaskProject?->company_id;
+
         return view('livewire.admin.operational-workspace', [
             'companies' => $companies,
             'branches' => $branches,
             'clients' => $clients,
             'projects' => $projects,
+            'projectClientOptions' => $selectedProjectCompanyId === null
+                ? $clients
+                : $clients->where('company_id', $selectedProjectCompanyId)->values(),
+            'projectBranchOptions' => $selectedProjectCompanyId === null
+                ? $branches
+                : $branches->where('company_id', $selectedProjectCompanyId)->values(),
+            'projectManagerOptions' => $selectedProjectCompanyId === null
+                ? $users
+                : $users->filter(fn (User $option): bool => $option->company_id === null || (int) $option->company_id === $selectedProjectCompanyId)->values(),
+            'taskAssigneeOptions' => $selectedTaskCompanyId === null
+                ? $users
+                : $users->filter(fn (User $option): bool => $option->company_id === null || (int) $option->company_id === (int) $selectedTaskCompanyId)->values(),
             'projectFinancials' => $projectFinancials,
             'users' => $users,
+            'branchTypes' => self::BRANCH_TYPES,
             'canManage' => $user->can('manageOperationsWorkspace'),
         ]);
+    }
+
+    private function defaultCompanyId(): ?string
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $companyId = $this->operations
+            ->scopeCompanies(Company::query(), $user)
+            ->orderBy('name')
+            ->value('id');
+
+        return $companyId === null ? null : (string) $companyId;
+    }
+
+    /**
+     * @param  list<int|string>  $companyIds
+     */
+    private function scopedCompanyId(array $companyIds, string $companyId): ?int
+    {
+        if ($companyId === '') {
+            return null;
+        }
+
+        $companyId = (int) $companyId;
+
+        return in_array($companyId, array_map('intval', $companyIds), true) ? $companyId : null;
+    }
+
+    private function assigneeBelongsToProjectCompany(mixed $userId, Project $project): bool
+    {
+        if ($userId === null || $userId === '') {
+            return true;
+        }
+
+        return User::query()
+            ->whereKey($userId)
+            ->where(fn (Builder $query) => $query
+                ->whereNull('company_id')
+                ->orWhere('company_id', $project->company_id))
+            ->exists();
+    }
+
+    private function normalizeActiveTab(): void
+    {
+        if (! in_array($this->activeTab, self::TABS, true)) {
+            $this->activeTab = 'projects';
+        }
     }
 }

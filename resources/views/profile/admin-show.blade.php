@@ -29,9 +29,29 @@
             'title' => __('Browser Sessions'),
             'description' => __('Review active sessions and sign out from other devices.'),
         ];
+
+        $defaultProfileTab = array_key_first($profileSections);
+        $profileTabKeys = array_keys($profileSections);
     @endphp
 
-    <x-admin.page-shell :title="__('Admin Profile')" :description="__('Manage your administrator account, security, and preferences.')" x-data="{ activeTab: 'details' }">
+    <x-admin.page-shell
+        :title="__('Admin Profile')"
+        :description="__('Manage your administrator account, security, and preferences.')"
+        x-data="{
+            tabs: @js($profileTabKeys),
+            activeTab: @js($defaultProfileTab),
+            init() {
+                const hash = window.location.hash.slice(1);
+                if (this.tabs.includes(hash)) {
+                    this.activeTab = hash;
+                }
+            },
+            setTab(tab) {
+                this.activeTab = tab;
+                window.history.replaceState({}, '', '#' + tab);
+            },
+        }"
+    >
         <x-slot name="toolbar">
             <x-admin.page-tools grid-class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div class="min-w-0">
@@ -83,7 +103,7 @@
             <aside class="space-y-2">
                 @foreach ($profileSections as $sectionKey => $section)
                     <button type="button" class="w-full rounded-xl border px-4 py-3 text-left transition"
-                        x-on:click="activeTab = @js($sectionKey)"
+                        x-on:click="setTab(@js($sectionKey))"
                         x-bind:class="activeTab === @js($sectionKey) ?
                             'border-primary-300 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-700 dark:bg-primary-900/20 dark:text-primary-100' :
                             'border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600'">
