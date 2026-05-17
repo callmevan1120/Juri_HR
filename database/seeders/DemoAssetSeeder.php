@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use App\Models\CompanyAsset;
 use App\Models\CompanyAssetHistory;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class DemoAssetSeeder extends Seeder
 {
@@ -25,7 +25,7 @@ class DemoAssetSeeder extends Seeder
         $demoUser = User::where('email', 'user123@paspapan.com')->first();
 
         if (! $demoUser) {
-            $this->command->warn('Demo user (user123@paspapan.com) not found. Skipping DemoAssetSeeder.');
+            $this->command?->warn('Demo user (user123@paspapan.com) not found. Skipping DemoAssetSeeder.');
 
             return;
         }
@@ -43,7 +43,7 @@ class DemoAssetSeeder extends Seeder
                 'user_id' => $demoUser->id,
                 'date_assigned' => $now->copy()->subMonths(6)->format('Y-m-d'),
                 'return_date' => null,
-                'status' => 'assigned',
+                'status' => CompanyAsset::STATUS_ASSIGNED,
                 'notes' => 'RAM 16GB, Storage 512GB SSD',
             ],
             [
@@ -56,7 +56,7 @@ class DemoAssetSeeder extends Seeder
                 'user_id' => $demoUser->id,
                 'date_assigned' => $now->copy()->subMonths(3)->format('Y-m-d'),
                 'return_date' => null,
-                'status' => 'assigned',
+                'status' => CompanyAsset::STATUS_ASSIGNED,
                 'notes' => '128GB, Graphite - For testing purposes',
             ],
             [
@@ -69,7 +69,7 @@ class DemoAssetSeeder extends Seeder
                 'user_id' => $demoUser->id,
                 'date_assigned' => $now->copy()->subMonth()->format('Y-m-d'),
                 'return_date' => $now->copy()->addMonths(5)->format('Y-m-d'),
-                'status' => 'assigned',
+                'status' => CompanyAsset::STATUS_ASSIGNED,
                 'notes' => 'Operational vehicle for client visits',
             ],
         ];
@@ -106,7 +106,7 @@ class DemoAssetSeeder extends Seeder
             );
         }
 
-        $this->command->info('Assets seeded for Demo User!');
+        $this->command?->info('Assets seeded for Demo User!');
     }
 
     private function demoSeedingEnabled(): bool

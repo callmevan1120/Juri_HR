@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Holiday;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class HolidaySeeder extends Seeder
 {
@@ -334,9 +335,17 @@ class HolidaySeeder extends Seeder
         ];
 
         foreach ($holidays as $holiday) {
+            $date = Carbon::parse($holiday['date'])->startOfDay();
+
             Holiday::updateOrCreate(
-                ['date' => $holiday['date']],
-                $holiday
+                [
+                    'date' => $date,
+                    'is_recurring' => (bool) $holiday['is_recurring'],
+                ],
+                [
+                    ...$holiday,
+                    'date' => $date,
+                ]
             );
         }
     }

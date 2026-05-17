@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use App\Models\Division;
 use App\Models\Education;
 use App\Models\JobTitle;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
 class FakeDataSeeder extends Seeder
 {
     private ?array $cachedLocationFields = null;
+
+    private ?Company $cachedCompany = null;
 
     /**
      * Seed the application's database.
@@ -147,6 +150,7 @@ class FakeDataSeeder extends Seeder
             'name' => $name,
             'group' => 'user',
             'password' => Hash::make($password),
+            'company_id' => $this->defaultCompany()?->id,
             'division_id' => $division?->id,
             'job_title_id' => $jobTitle?->id,
             'education_id' => $this->educationId(),
@@ -154,6 +158,10 @@ class FakeDataSeeder extends Seeder
             'language' => 'id',
             'basic_salary' => $basicSalary,
             'hourly_rate' => round($basicSalary / 173),
+            'ptkp_status' => $this->ptkpStatus($seedOffset),
+            'bank_name' => 'Bank Mandiri',
+            'bank_account_name' => $name,
+            'bank_account_number' => $this->bankAccountNumber($email),
             'payslip_password' => Hash::make('password'),
             'payslip_password_set_at' => now(),
             'employment_status' => User::EMPLOYMENT_STATUS_ACTIVE,
@@ -170,16 +178,17 @@ class FakeDataSeeder extends Seeder
 
     private function profileFields(?Division $division, int $seedOffset = 0): array
     {
-        $gender = fake()->randomElement(['male', 'female']);
+        $gender = $seedOffset % 2 === 0 ? 'male' : 'female';
         $divisionName = $division?->name ?: 'General';
+        $employeeHash = $this->numericHash($divisionName.'-'.$seedOffset);
 
         return [
-            'nip' => fake()->unique()->numerify('#################'),
-            'phone' => fake()->unique()->numerify('08##########'),
+            'nip' => $this->nip($divisionName, $seedOffset),
+            'phone' => '08'.substr($employeeHash, 0, 10),
             'gender' => $gender,
-            'birth_date' => now()->subYears(25 + ($seedOffset % 18))->subDays(fake()->numberBetween(0, 300))->toDateString(),
-            'birth_place' => fake()->city(),
-            'address' => fake()->streetAddress().', Area '.$divisionName,
+            'birth_date' => now()->subYears(25 + ($seedOffset % 18))->subDays(($seedOffset * 17) % 300)->toDateString(),
+            'birth_place' => 'Jakarta',
+            'address' => 'Jl. '.$divisionName.' Raya No. '.(10 + $seedOffset).', Jakarta',
             'email_verified_at' => now(),
         ];
     }
@@ -246,6 +255,53 @@ class FakeDataSeeder extends Seeder
         ] as $kode => $nama) {
             Wilayah::query()->firstOrCreate(['kode' => $kode], ['nama' => $nama]);
         }
+    }
+
+    private function defaultCompany(): ?Company
+    {
+        if (! Schema::hasTable('companies')) {
+            return null;
+        }
+
+        if ($this->cachedCompany !== null) {
+            return $this->cachedCompany;
+        }
+
+        return $this->cachedCompany = Company::query()->updateOrCreate([
+            'slug' => 'paspapan-demo',
+        ], [
+            'name' => 'PasPapan Demo',
+            'status' => Company::STATUS_ACTIVE,
+            'metadata' => [
+                'segment' => 'Head Office',
+                'seeded' => true,
+            ],
+        ]);
+    }
+
+    private function nip(string $divisionName, int $seedOffset): string
+    {
+        return '26'.substr($this->numericHash($divisionName.'-'.$seedOffset), 0, 14);
+    }
+
+    private function bankAccountNumber(string $email): string
+    {
+        return substr($this->numericHash($email), 0, 12);
+    }
+
+    private function numericHash(string $value): string
+    {
+        return str_pad((string) sprintf('%u', crc32($value)), 14, '0', STR_PAD_LEFT);
+    }
+
+    private function ptkpStatus(int $seedOffset): string
+    {
+        return match ($seedOffset % 4) {
+            1 => 'K/0',
+            2 => 'K/1',
+            3 => 'TK/1',
+            default => 'TK/0',
+        };
     }
 
     private function normalizeUniqueLeadership(
