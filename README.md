@@ -107,7 +107,7 @@ Sorotan branch `chore/major-upgrade-audit`:
 - Laravel 13, Livewire 4, Tailwind CSS 4, Vite 7, PHP 8.3+, Node 20+, Bun 1.3.6+, dan Capacitor 8 sudah menjadi baseline modern stack.
 - Foundation produk diperluas ke multi-company/branch, operations workspace, commercial/CRM workspace, accounting workspace, custom form builder, leave entitlement, WFH request, command center, dan payroll period/Coretax export.
 - Evidence terakhir: `php artisan test` pass `505` tests / `10246` assertions setelah enterprise obfuscator salted dijalankan ulang, `composer check:enterprise-boundary`, `composer phpstan`, Pint, composer/bun audit, `bun run build`, `php artisan rbac:audit`, browser smoke, APK smoke, APK attendance E2E, dan APK document upload E2E pass.
-- Commit evidence sebelumnya: `99cde52` untuk screenshot APK smoke, `0ed8b9f` untuk refresh dokumen release evidence, dan `c4d69fe` untuk sinkronisasi README.
+- Commit evidence terbaru: `99cde52` untuk screenshot APK smoke, `0ed8b9f` untuk refresh dokumen release evidence, `c4d69fe` untuk sinkronisasi README, `e5063be` untuk refresh salted enterprise artifacts, dan `df23827` untuk enterprise boundary gate docs.
 
 ## Enterprise Offline
 

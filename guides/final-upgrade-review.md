@@ -2,7 +2,7 @@
 
 Reviewed branch: `chore/major-upgrade-audit`
 
-Latest evidence baseline: README/docs sync at `c4d69fe`, followed by a salted enterprise obfuscator rerun and validation in the final release pass.
+Latest evidence baseline: `df23827`, including the salted enterprise artifact refresh at `e5063be` and the enterprise boundary gate documentation sync.
 
 Branch: `chore/major-upgrade-audit`
 
@@ -10,11 +10,11 @@ Suggested final PR/merge title: `chore(app): upgrade Laravel 13 and Livewire 4`
 
 ## Files Changed In Final Pass
 
-The final reviewed code baseline includes the product/platform expansion, APK evidence commits, README/docs sync, and the final salted enterprise obfuscator rerun.
+The final reviewed code baseline includes the product/platform expansion, APK evidence commits, README/docs sync, the final salted enterprise obfuscator rerun, and the enterprise boundary gate documentation sync.
 
 The major stabilization commit is `9ab163e` (`129 files changed, 12889 insertions(+), 61 deletions(-)`). It expanded PasPapan into broader HR, operations, commercial, accounting, payroll, leave entitlement, WFH, custom form, command center, and multi-company foundations while keeping the Laravel 13, Livewire 4, Tailwind 4 upgrade gates green.
 
-The follow-up evidence commits are `99cde52`, which updated APK smoke screenshots after running the physical device smoke suite, `0ed8b9f`, which refreshed release evidence docs, and `c4d69fe`, which synced the README summary. The final release pass reran `php secure_tools/build_enterprise.php` in salted mode before committing enterprise artifacts.
+The follow-up evidence commits are `99cde52`, which updated APK smoke screenshots after running the physical device smoke suite, `0ed8b9f`, which refreshed release evidence docs, `c4d69fe`, which synced the README summary, `e5063be`, which refreshed salted enterprise artifacts, and `df23827`, which documented the enterprise boundary gate in the reviewer evidence set.
 
 The final pass covered:
 
@@ -26,7 +26,7 @@ The final pass covered:
 - route/RBAC registration, policies, and direct policy coverage
 - APK smoke screenshots in `screenshots/apk-device-smoke.png`, `screenshots/apk-attendance-e2e.png`, and `screenshots/apk-document-upload-e2e.png`
 - salted enterprise obfuscated PHP artifacts generated from private `*.Source.php` mirrors
-- `guides/final-upgrade-review.md`, `guides/reviewer-evidence.md`, `guides/operations.md`, and `RELEASE_CHECKLIST.md`
+- `README.md`, `guides/final-upgrade-review.md`, `guides/reviewer-evidence.md`, `guides/operations.md`, and `RELEASE_CHECKLIST.md`
 
 ## Typo Audit
 
@@ -39,8 +39,8 @@ The final pass covered:
 - CSS-first directives include forms/typography plugins, Blade/compiled/Jetstream sources, and `../js/**/*.js` plus `../js/**/*.ts`.
 - `@custom-variant dark (&:where(.dark, .dark *));` and `@theme` primary/brand tokens are present.
 - No `@config` directive was found.
-- `tailwind.config.js` remains absent.
-- `postcss.config.js` remains documented as autoprefixer-only.
+- No standalone Tailwind JavaScript config file is tracked; Tailwind 4 config stays CSS-first in `resources/css/app.css`.
+- No legacy PostCSS Tailwind plugin path is tracked; Vite remains the Tailwind integration path.
 - `vite.config.js` uses `@tailwindcss/vite`.
 - `bun run build` passed without Tailwind/PostCSS warnings.
 
