@@ -4081,5 +4081,7 @@
     "You can view commercial records, but need manage permission to create products, stock movements, quotations, or invoices.": "You can view commercial records, but need manage permission to create products, stock movements, quotations, or invoices.",
     "You can view custom forms, but need manage permission to create or disable templates.": "You can view custom forms, but need manage permission to create or disable templates.",
     "You can view this workspace, but need manage permission to create or update operational records.": "You can view this workspace, but need manage permission to create or update operational records.",
-    "Your submitted work-from-home requests will appear here.": "Your submitted work-from-home requests will appear here."
+    "Your submitted work-from-home requests will appear here.": "Your submitted work-from-home requests will appear here.",
+    "Stage": "Tahap",
+    "Stock type": "Tipe stok"
 }

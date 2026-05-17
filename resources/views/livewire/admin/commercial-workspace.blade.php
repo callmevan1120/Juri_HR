@@ -3,6 +3,10 @@
     :description="__('Manage products, stock movements, quotations, and invoices with company-scoped controls.')"
     :show-description="true"
 >
+    @php
+        $commercialFieldClass = 'h-11 min-h-11 w-full rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm leading-5 text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark] dark:focus:border-primary-600 dark:focus:ring-primary-600';
+    @endphp
+
     <x-slot name="toolbar">
         <x-admin.page-tools grid-class="grid grid-cols-1 items-end gap-3 lg:grid-cols-12">
             <div class="lg:col-span-7">
@@ -420,20 +424,20 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Opportunity') }}</h2>
                     </div>
                     <form wire:submit.prevent="createOpportunity" class="space-y-3 p-4">
-                        <select wire:model.live="opportunityCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="opportunityCompanyId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Company') }}">
                             <option value="">{{ __('Company') }}</option>
                             @foreach ($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                             @endforeach
                         </select>
                         <x-forms.input-error for="opportunityCompanyId" />
-                        <select wire:model.live="opportunityClientId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="opportunityClientId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Client optional') }}">
                             <option value="">{{ __('Client optional') }}</option>
                             @foreach ($clients as $client)
                                 <option value="{{ $client->id }}">{{ $client->name }}</option>
                             @endforeach
                         </select>
-                        <select wire:model.live="opportunityProjectId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="opportunityProjectId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Project optional') }}">
                             <option value="">{{ __('Project optional') }}</option>
                             @foreach ($projects as $project)
                                 <option value="{{ $project->id }}">{{ $project->name }}</option>
@@ -441,15 +445,15 @@
                         </select>
                         <x-forms.input wire:model.live="opportunityTitle" placeholder="{{ __('Opportunity title') }}" />
                         <x-forms.input-error for="opportunityTitle" />
-                        <div class="grid grid-cols-2 gap-2">
-                            <select wire:model.live="opportunityStage" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <div class="grid grid-cols-1 gap-2">
+                            <select wire:model.live="opportunityStage" class="{{ $commercialFieldClass }}" aria-label="{{ __('Stage') }}">
                                 @foreach ($opportunityStages as $stage)
                                     <option value="{{ $stage }}">{{ __(str($stage)->headline()->toString()) }}</option>
                                 @endforeach
                             </select>
                             <x-forms.input type="number" min="0" step="0.01" wire:model.live="opportunityExpectedValue" placeholder="{{ __('Value') }}" />
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 gap-2">
                             <x-forms.input type="date" wire:model.live="opportunityExpectedCloseAt" />
                             <x-forms.input type="date" wire:model.live="opportunityNextFollowUpAt" />
                         </div>
@@ -464,7 +468,7 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Product') }}</h2>
                     </div>
                     <form wire:submit.prevent="createProduct" class="space-y-3 p-4">
-                        <select wire:model.live="productCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="productCompanyId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Company') }}">
                             <option value="">{{ __('Company') }}</option>
                             @foreach ($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
@@ -474,11 +478,11 @@
                         <x-forms.input wire:model.live="productName" placeholder="{{ __('Product name') }}" />
                         <x-forms.input-error for="productName" />
                         <x-forms.input wire:model.live="productSku" placeholder="{{ __('SKU optional') }}" />
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 gap-2">
                             <x-forms.input wire:model.live="productUnit" placeholder="{{ __('Unit') }}" />
                             <x-forms.input type="number" min="0" step="0.01" wire:model.live="productSellingPrice" placeholder="{{ __('Selling price') }}" />
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 gap-2">
                             <x-forms.input type="number" min="0" step="0.01" wire:model.live="productCostPrice" placeholder="{{ __('Cost price') }}" />
                             <x-forms.input type="number" min="0" step="0.001" wire:model.live="productReorderPoint" placeholder="{{ __('Min stock') }}" />
                         </div>
@@ -494,14 +498,14 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Record Stock') }}</h2>
                     </div>
                     <form wire:submit.prevent="recordStockMovement" class="space-y-3 p-4">
-                        <select wire:model.live="stockProductId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="stockProductId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Product') }}">
                             <option value="">{{ __('Product') }}</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
                             @endforeach
                         </select>
-                        <div class="grid grid-cols-2 gap-2">
-                            <select wire:model.live="stockType" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <div class="grid grid-cols-1 gap-2">
+                            <select wire:model.live="stockType" class="{{ $commercialFieldClass }}" aria-label="{{ __('Stock type') }}">
                                 <option value="{{ \App\Models\StockMovement::TYPE_IN }}">{{ __('Stock In') }}</option>
                                 <option value="{{ \App\Models\StockMovement::TYPE_OUT }}">{{ __('Stock Out') }}</option>
                                 <option value="{{ \App\Models\StockMovement::TYPE_ADJUSTMENT }}">{{ __('Adjustment') }}</option>
@@ -519,7 +523,7 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Vendor') }}</h2>
                     </div>
                     <form wire:submit.prevent="createVendor" class="space-y-3 p-4">
-                        <select wire:model.live="vendorCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="vendorCompanyId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Company') }}">
                             <option value="">{{ __('Company') }}</option>
                             @foreach ($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
@@ -529,7 +533,7 @@
                         <x-forms.input wire:model.live="vendorName" placeholder="{{ __('Vendor name') }}" />
                         <x-forms.input-error for="vendorName" />
                         <x-forms.input wire:model.live="vendorContactName" placeholder="{{ __('Contact optional') }}" />
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 gap-2">
                             <x-forms.input type="email" wire:model.live="vendorEmail" placeholder="{{ __('Email optional') }}" />
                             <x-forms.input wire:model.live="vendorPhone" placeholder="{{ __('Phone optional') }}" />
                         </div>
@@ -542,14 +546,14 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Post Vendor Bill') }}</h2>
                     </div>
                     <form wire:submit.prevent="createVendorBill" class="space-y-3 p-4">
-                        <select wire:model.live="billVendorId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="billVendorId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Vendor') }}">
                             <option value="">{{ __('Vendor') }}</option>
                             @foreach ($vendors as $vendor)
                                 <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
                             @endforeach
                         </select>
                         <x-forms.input-error for="billVendorId" />
-                        <select wire:model.live="billProductId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="billProductId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Expense line / no product') }}">
                             <option value="">{{ __('Expense line / no product') }}</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
@@ -557,7 +561,7 @@
                         </select>
                         <x-forms.input wire:model.live="billDescription" placeholder="{{ __('Bill line description') }}" />
                         <x-forms.input-error for="billDescription" />
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-1 gap-2">
                             <x-forms.input type="number" min="0.001" step="0.001" wire:model.live="billQuantity" placeholder="{{ __('Qty') }}" />
                             <x-forms.input type="number" min="0" step="0.01" wire:model.live="billUnitCost" placeholder="{{ __('Cost') }}" />
                             <x-forms.input type="number" min="0" max="100" step="0.01" wire:model.live="billTaxRate" placeholder="{{ __('Tax') }}" />
@@ -573,32 +577,32 @@
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Quotation / Invoice') }}</h2>
                     </div>
                     <div class="space-y-3 p-4">
-                        <select wire:model.live="documentCompanyId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="documentCompanyId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Company') }}">
                             <option value="">{{ __('Company') }}</option>
                             @foreach ($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                             @endforeach
                         </select>
-                        <select wire:model.live="documentClientId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="documentClientId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Client optional') }}">
                             <option value="">{{ __('Client optional') }}</option>
                             @foreach ($clients as $client)
                                 <option value="{{ $client->id }}">{{ $client->name }}</option>
                             @endforeach
                         </select>
-                        <select wire:model.live="documentProjectId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="documentProjectId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Project optional') }}">
                             <option value="">{{ __('Project optional') }}</option>
                             @foreach ($projects as $project)
                                 <option value="{{ $project->id }}">{{ $project->name }}</option>
                             @endforeach
                         </select>
-                        <select wire:model.live="documentProductId" class="w-full rounded-xl border-gray-300 bg-white text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                        <select wire:model.live="documentProductId" class="{{ $commercialFieldClass }}" aria-label="{{ __('Product optional') }}">
                             <option value="">{{ __('Product optional') }}</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
                             @endforeach
                         </select>
                         <x-forms.input wire:model.live="documentDescription" placeholder="{{ __('Line description') }}" />
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-1 gap-2">
                             <x-forms.input type="number" min="0.001" step="0.001" wire:model.live="documentQuantity" placeholder="{{ __('Qty') }}" />
                             <x-forms.input type="number" min="0" step="0.01" wire:model.live="documentUnitPrice" placeholder="{{ __('Price') }}" />
                             <x-forms.input type="number" min="0" max="100" step="0.01" wire:model.live="documentTaxRate" placeholder="{{ __('Tax') }}" />
