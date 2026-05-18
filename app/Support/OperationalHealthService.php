@@ -328,20 +328,12 @@ class OperationalHealthService
      */
     protected function tableSummary(): array
     {
-        if (DB::connection()->getDriverName() !== 'mysql') {
-            return [];
-        }
-
         try {
-            $database = DB::connection()->getDatabaseName();
-            $rows = DB::select(
-                'select table_name, table_rows, data_length + index_length as total_bytes
-                from information_schema.tables
-                where table_schema = ?
-                order by total_bytes desc
-                limit 5',
-                [$database]
-            );
+            $rows = match (DB::connection()->getDriverName()) {
+                'mysql', 'mariadb' => $this->mysqlTableSummaryRows(),
+                'pgsql' => $this->postgresTableSummaryRows(),
+                default => [],
+            };
 
             return collect($rows)
                 ->map(fn (object $row): array => [
@@ -355,5 +347,41 @@ class OperationalHealthService
         } catch (\Throwable) {
             return [];
         }
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function mysqlTableSummaryRows(): array
+    {
+        $database = DB::connection()->getDatabaseName();
+
+        return DB::select(
+            'select table_name, table_rows, data_length + index_length as total_bytes
+            from information_schema.tables
+            where table_schema = ?
+            order by total_bytes desc
+            limit 5',
+            [$database]
+        );
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function postgresTableSummaryRows(): array
+    {
+        $schema = (string) config('database.connections.pgsql.search_path', 'public');
+
+        return DB::select(
+            'select relname as table_name,
+                n_live_tup as table_rows,
+                pg_total_relation_size(relid) as total_bytes
+            from pg_stat_user_tables
+            where schemaname = ?
+            order by pg_total_relation_size(relid) desc
+            limit 5',
+            [$schema]
+        );
     }
 }

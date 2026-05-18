@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\ReimbursementStatusUpdated;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class ReimbursementApprovalService
 {
@@ -19,66 +20,78 @@ class ReimbursementApprovalService
 
     public function approve(Reimbursement $reimbursement, User $actor): string
     {
-        $matrixMessage = $this->approveWithMatrix($reimbursement, $actor);
+        return DB::transaction(function () use ($reimbursement, $actor): string {
+            $reimbursement = $this->lock($reimbursement);
+            $matrixMessage = $this->approveWithMatrix($reimbursement, $actor);
 
-        if ($matrixMessage !== null) {
-            return $matrixMessage;
-        }
+            if ($matrixMessage !== null) {
+                return $matrixMessage;
+            }
 
-        if ($this->approvalActors->canFinalizeReimbursementApproval($actor)) {
+            $canFinalize = $this->approvalActors->canFinalizeReimbursementApproval($actor);
+            $this->ensureReviewable($reimbursement, $canFinalize ? ['pending', 'pending_finance'] : ['pending']);
+
+            if ($canFinalize) {
+                $reimbursement->update([
+                    'status' => 'approved',
+                    'finance_approved_by' => $actor->id,
+                    'finance_approved_at' => now(),
+                    'approved_by' => $actor->id,
+                ]);
+
+                $this->notifyStatusUpdated($reimbursement);
+                $this->accounting->postReimbursement($actor, $reimbursement->fresh(['user']));
+
+                return __('Reimbursement approved.');
+            }
+
             $reimbursement->update([
-                'status' => 'approved',
-                'finance_approved_by' => $actor->id,
-                'finance_approved_at' => now(),
-                'approved_by' => $actor->id,
+                'status' => 'pending_finance',
+                'head_approved_by' => $actor->id,
+                'head_approved_at' => now(),
             ]);
 
             $this->notifyStatusUpdated($reimbursement);
-            $this->accounting->postReimbursement($actor, $reimbursement->fresh(['user']));
 
-            return __('Reimbursement approved.');
-        }
-
-        $reimbursement->update([
-            'status' => 'pending_finance',
-            'head_approved_by' => $actor->id,
-            'head_approved_at' => now(),
-        ]);
-
-        $this->notifyStatusUpdated($reimbursement);
-
-        return __('Reimbursement forwarded to Finance for final approval.');
+            return __('Reimbursement forwarded to Finance for final approval.');
+        });
     }
 
     public function reject(Reimbursement $reimbursement, User $actor): string
     {
-        $matrixMessage = $this->rejectWithMatrix($reimbursement, $actor);
+        return DB::transaction(function () use ($reimbursement, $actor): string {
+            $reimbursement = $this->lock($reimbursement);
+            $matrixMessage = $this->rejectWithMatrix($reimbursement, $actor);
 
-        if ($matrixMessage !== null) {
-            return $matrixMessage;
-        }
+            if ($matrixMessage !== null) {
+                return $matrixMessage;
+            }
 
-        $payload = [
-            'status' => 'rejected',
-        ];
+            $canFinalize = $this->approvalActors->canFinalizeReimbursementApproval($actor);
+            $this->ensureReviewable($reimbursement, $canFinalize ? ['pending', 'pending_finance'] : ['pending']);
 
-        if ($this->approvalActors->canFinalizeReimbursementApproval($actor)) {
-            $payload += [
-                'finance_approved_by' => $actor->id,
-                'finance_approved_at' => now(),
-                'approved_by' => $actor->id,
+            $payload = [
+                'status' => 'rejected',
             ];
-        } else {
-            $payload += [
-                'head_approved_by' => $actor->id,
-                'head_approved_at' => now(),
-            ];
-        }
 
-        $reimbursement->update($payload);
-        $this->notifyStatusUpdated($reimbursement);
+            if ($canFinalize) {
+                $payload += [
+                    'finance_approved_by' => $actor->id,
+                    'finance_approved_at' => now(),
+                    'approved_by' => $actor->id,
+                ];
+            } else {
+                $payload += [
+                    'head_approved_by' => $actor->id,
+                    'head_approved_at' => now(),
+                ];
+            }
 
-        return __('Reimbursement rejected.');
+            $reimbursement->update($payload);
+            $this->notifyStatusUpdated($reimbursement);
+
+            return __('Reimbursement rejected.');
+        });
     }
 
     public function managementQuery(User $actor, string $statusFilter = 'pending', string $search = ''): Builder
@@ -123,6 +136,8 @@ class ReimbursementApprovalService
         if ($steps === []) {
             return null;
         }
+
+        $this->ensureReviewable($reimbursement, ['pending', 'pending_finance', 'pending_matrix']);
 
         $completed = $this->approvalMatrix->completedSteps($reimbursement);
         $currentStep = $this->approvalMatrix->currentStep($steps, $completed);
@@ -183,6 +198,8 @@ class ReimbursementApprovalService
             return null;
         }
 
+        $this->ensureReviewable($reimbursement, ['pending', 'pending_finance', 'pending_matrix']);
+
         $currentStep = $this->approvalMatrix->currentStep($steps, $this->approvalMatrix->completedSteps($reimbursement));
 
         if (! $this->approvalMatrix->canActorApproveStep($actor, $reimbursement, $currentStep)) {
@@ -226,5 +243,23 @@ class ReimbursementApprovalService
             'approval_current_step' => $nextStep['key'] ?? null,
             'approval_completed_steps' => $completed,
         ];
+    }
+
+    private function lock(Reimbursement $reimbursement): Reimbursement
+    {
+        return Reimbursement::query()
+            ->whereKey($reimbursement->getKey())
+            ->lockForUpdate()
+            ->firstOrFail();
+    }
+
+    /**
+     * @param  list<string>  $allowedStatuses
+     */
+    private function ensureReviewable(Reimbursement $reimbursement, array $allowedStatuses): void
+    {
+        if (! in_array((string) $reimbursement->status, $allowedStatuses, true)) {
+            throw new AuthorizationException(__('This reimbursement has already been reviewed.'));
+        }
     }
 }

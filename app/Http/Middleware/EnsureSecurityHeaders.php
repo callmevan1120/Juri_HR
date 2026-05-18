@@ -84,7 +84,12 @@ class EnsureSecurityHeaders
                 ]);
             }
 
+            $localConnectHosts = array_values(array_unique(array_merge(
+                $viteHosts,
+                $this->localRealtimeConnectHosts($host),
+            )));
             $viteHostStr = implode(' ', $viteHosts);
+            $localConnectHostStr = implode(' ', $localConnectHosts);
 
             foreach ($cspConfig as &$directive) {
                 if (str_starts_with($directive, 'script-src')) {
@@ -100,7 +105,7 @@ class EnsureSecurityHeaders
                     $directive .= ' '.$viteHostStr;
                 }
                 if (str_starts_with($directive, 'connect-src')) {
-                    $directive .= ' '.$viteHostStr;
+                    $directive .= ' '.$localConnectHostStr;
                 }
             }
         }
@@ -109,5 +114,45 @@ class EnsureSecurityHeaders
         $response->headers->set('Content-Security-Policy', $csp);
 
         return $response;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function localRealtimeConnectHosts(string $requestHost): array
+    {
+        if (config('broadcasting.default') !== 'reverb') {
+            return [];
+        }
+
+        $host = (string) config('broadcasting.connections.reverb.options.host', '');
+        $port = (int) config('broadcasting.connections.reverb.options.port', 0);
+
+        if ($host === '' || $port <= 0) {
+            return [];
+        }
+
+        $hosts = [$host];
+
+        if ($requestHost !== '' && $requestHost !== '[::1]') {
+            $hosts[] = $requestHost;
+        }
+
+        if ($host === '127.0.0.1') {
+            $hosts[] = 'localhost';
+        }
+
+        if ($host === 'localhost') {
+            $hosts[] = '127.0.0.1';
+        }
+
+        $origins = [];
+
+        foreach (array_unique($hosts) as $candidateHost) {
+            $origins[] = "ws://{$candidateHost}:{$port}";
+            $origins[] = "wss://{$candidateHost}:{$port}";
+        }
+
+        return array_values(array_unique($origins));
     }
 }

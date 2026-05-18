@@ -70,6 +70,49 @@ test('payroll period service supports monthly weekly and daily payroll windows',
         ]);
 });
 
+test('payroll period service rejects invalid year and month inputs', function () {
+    $service = app(PayrollPeriodService::class);
+
+    expect(fn () => $service->resolve('monthly', 1999, 5))->toThrow(InvalidArgumentException::class)
+        ->and(fn () => $service->resolve('monthly', 2026, 13))->toThrow(InvalidArgumentException::class);
+});
+
+test('indonesia payroll calculator rejects reversed custom periods and clamps negative payroll inputs', function () {
+    $user = User::factory()->create([
+        'basic_salary' => 5000000,
+        'ptkp_status' => 'TK/0',
+    ]);
+
+    expect(fn () => app(IndonesiaPayrollCalculator::class)->calculate($user, [
+        'period_start' => '2026-05-31',
+        'period_end' => '2026-05-01',
+    ]))->toThrow(InvalidArgumentException::class);
+
+    $result = app(IndonesiaPayrollCalculator::class)->calculate($user, [
+        'basic_salary' => -5000000,
+        'period_start' => '2026-05-01',
+        'period_end' => '2026-05-15',
+        'fixed_allowances' => [
+            ['name' => 'Adjustment', 'amount' => -1000000],
+        ],
+        'variable_allowances' => [
+            ['name' => 'Bonus', 'amount' => -500000],
+        ],
+        'deductions' => [
+            ['name' => 'Manual', 'amount' => -100000],
+        ],
+        'overtime_pay' => -200000,
+        'bpjs_wage_base' => -1,
+    ]);
+
+    expect($result['gross_salary'])->toBe(0.0)
+        ->and($result['total_deduction'])->toBe(0.0)
+        ->and($result['net_salary'])->toBe(0.0)
+        ->and($result['details']['period_start'])->toBe('2026-05-01')
+        ->and($result['details']['period_end'])->toBe('2026-05-15')
+        ->and($result['details']['work_days'])->toBe(15);
+});
+
 test('indonesia payroll separates taxable and non taxable income for coretax rows', function () {
     $user = User::factory()->create([
         'nip' => 'TAX001',

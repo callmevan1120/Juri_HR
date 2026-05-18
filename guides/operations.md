@@ -4,13 +4,23 @@ Dokumen ini memuat operasi harian, background job, update, testing, dan Android 
 
 ## Runtime Baseline
 
-Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, shared hosting, dan CI. PHP 8.4 direkomendasikan untuk production baru.
+Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, local development, dan CI. PHP 8.4 direkomendasikan untuk production baru.
+
+Database default local/VPS adalah PostgreSQL 15+. MySQL/MariaDB tetap ada sebagai compatibility path, tetapi bukan baseline utama; lihat `guides/database-portability.md` sebelum migrasi engine.
 
 Preflight install/update:
 
 ```bash
 php -v
 composer check-platform-reqs
+composer check:database-portability
+```
+
+Optional local portability smoke:
+
+```bash
+composer check:database-portability:sqlite
+PASPAPAN_PG_USER=lutuk PASPAPAN_PG_ADMIN_DB=absensi composer check:database-portability:pgsql
 ```
 
 ## Queue
@@ -64,7 +74,7 @@ Artinya:
 
 - cron wajib aktif
 - queue worker wajib aktif
-- shared hosting bisa memakai fallback worker scheduler dengan `SCHEDULE_QUEUE_WORKER=true`
+- legacy cron-only install bisa memakai fallback worker scheduler dengan `SCHEDULE_QUEUE_WORKER=true`
 - VPS dengan Supervisor sebaiknya memakai `SCHEDULE_QUEUE_WORKER=false`
 - run import/export `completed` dan `failed` yang lebih lama dari 24 jam akan dipangkas otomatis
 
@@ -182,7 +192,7 @@ Gunakan script hanya jika workflow hard reset memang aman untuk server Anda.
 CI menjalankan quality gate berikut pada push ke `main` dan `develop`, serta pada pull request:
 
 ```bash
-php artisan test --without-tty
+php artisan test
 composer check:ui
 ./vendor/bin/pint --test
 composer phpstan
@@ -193,7 +203,8 @@ bun run build
 CI tambahan:
 
 - `.github/workflows/security.yml` menjalankan CodeQL untuk PHP dan JavaScript/TypeScript, Semgrep, Gitleaks, dan TruffleHog.
-- `.github/workflows/e2e.yml` menjalankan Playwright smoke dengan MySQL 8, migration, build frontend, dan Laravel dev server.
+- `.github/workflows/e2e.yml` menjalankan Playwright smoke dengan PostgreSQL 16, migration, build frontend, dan Laravel dev server.
+- `.github/workflows/database-portability.yml` menjalankan migration smoke PostgreSQL, SQLite, dan MySQL compatibility agar VPS multi-RDBMS tetap terjaga tanpa mengubah default PostgreSQL-first.
 
 Untuk perubahan lokal kecil, jalankan test yang paling dekat dengan area yang diubah terlebih dahulu, lalu lanjutkan ke gate CI penuh sebelum merge/push rilis. Contoh:
 
@@ -226,9 +237,11 @@ bun run screenshots:apk
 
 Catatan runtime CI:
 
-- CI memakai PHP `8.3`, Node.js `20`, Bun `1.3.6`, MySQL `8.0`, `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=array`, `MAIL_MAILER=array`, dan `BROADCAST_CONNECTION=log`.
+- CI utama memakai PHP `8.3`, Node.js `20`, Bun `1.3.6`, PostgreSQL `16`, `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=array`, `MAIL_MAILER=array`, dan `BROADCAST_CONNECTION=log`.
+- CI portability memakai PostgreSQL `16` untuk mendekati default VPS dan SQLite untuk test/local migration smoke.
 - `composer check:ui` menjalankan `scripts/check-ui-rules.php`.
 - `composer check:modern-stack` memastikan baseline Laravel 13, Livewire 4, Tailwind 4 CSS-first, Capacitor 8, PHP 8.3+, Node 20+, dan Bun 1.3.6+ tidak tercampur wording/config lama.
+- `composer check:database-portability` menjalankan static guard multi-RDBMS; `composer check:database-portability:sqlite`, `composer check:database-portability:pgsql`, dan `composer check:database-portability:mysql` menjalankan migration smoke lokal sesuai engine yang tersedia.
 - `composer phpstan` menjalankan PHPStan dengan memory limit `1G`.
 - Review evidence bundle diupload dari workflow CI sebagai artifact `review-evidence-ci`, `review-evidence-playwright`, dan `review-evidence-apk-smoke`. Detail ada di `guides/reviewer-evidence.md`.
 - Bundle lokal dapat dibuat dengan `bun run evidence:review`; tambahkan `RUN_E2E=1` atau `RUN_APK_SMOKE=1` bila server E2E/device ADB sudah siap.
@@ -303,7 +316,7 @@ Sebelum go-live:
 - ganti password
 - hapus user demo yang tidak boleh ada di produksi
 - jangan menjalankan seeder sembarang pada database produksi
-- master wilayah Indonesia ikut `DatabaseSeeder`; gunakan `WILAYAH_SEED_REFRESH=true php artisan db:seed --class=WilayahSeeder` hanya saat perlu reload dataset wilayah penuh
+- master wilayah Indonesia ikut `DatabaseSeeder` dan import-nya idempotent; operator/automation tidak boleh refresh/truncate lewat seeder production. Penggantian dataset penuh tetap mungkin, tetapi harus lewat runbook migration/restore terpisah dengan backup, staging rehearsal, dan approval.
 - gunakan `php artisan paspapan:seed-real` untuk master data aman dan `php artisan paspapan:seed-fake` hanya untuk lokal, QA, atau staging demo
 
 ### Storage dan Attachment Privat

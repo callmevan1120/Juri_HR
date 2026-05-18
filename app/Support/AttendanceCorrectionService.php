@@ -69,24 +69,29 @@ class AttendanceCorrectionService
 
     public function approve(AttendanceCorrection $correction, User $actor): string
     {
-        if (! $actor->can('manageAttendanceCorrections')) {
-            if (! $this->canSupervisorReview($correction, $actor) || $correction->status !== AttendanceCorrection::STATUS_PENDING) {
-                throw new AuthorizationException;
+        $message = DB::transaction(function () use ($correction, $actor): string {
+            $correction = $this->lock($correction);
+
+            if (! $actor->can('manageAttendanceCorrections')) {
+                if (! $this->canSupervisorReview($correction, $actor) || $correction->status !== AttendanceCorrection::STATUS_PENDING) {
+                    throw new AuthorizationException;
+                }
+
+                $correction->update([
+                    'status' => AttendanceCorrection::STATUS_PENDING_ADMIN,
+                    'head_approved_by' => $actor->id,
+                    'head_approved_at' => now(),
+                    'rejection_note' => null,
+                ]);
+
+                return __('Attendance correction forwarded to admin for final review.');
             }
 
-            $correction->update([
-                'status' => AttendanceCorrection::STATUS_PENDING_ADMIN,
-                'head_approved_by' => $actor->id,
-                'head_approved_at' => now(),
-                'rejection_note' => null,
+            $this->ensureReviewable($correction, [
+                AttendanceCorrection::STATUS_PENDING,
+                AttendanceCorrection::STATUS_PENDING_ADMIN,
             ]);
 
-            $this->notifyStatusUpdated($correction);
-
-            return __('Attendance correction forwarded to admin for final review.');
-        }
-
-        DB::transaction(function () use ($correction, $actor) {
             $correction->loadMissing(['user', 'attendance.shift', 'requestedShift']);
 
             $attendance = $correction->attendance ?? Attendance::query()->firstOrNew([
@@ -127,25 +132,38 @@ class AttendanceCorrectionService
             ]);
 
             Attendance::clearUserAttendanceCache($correction->user, Carbon::parse($correction->attendance_date));
+
+            return __('Attendance correction approved and applied.');
         });
 
         $this->notifyStatusUpdated($correction);
 
-        return __('Attendance correction approved and applied.');
+        return $message;
     }
 
     public function reject(AttendanceCorrection $correction, User $actor, ?string $note = null): string
     {
-        if (! $actor->can('manageAttendanceCorrections') && ! $this->canSupervisorReview($correction, $actor)) {
-            throw new AuthorizationException;
-        }
+        DB::transaction(function () use ($correction, $actor, $note): void {
+            $correction = $this->lock($correction);
 
-        $correction->update([
-            'status' => AttendanceCorrection::STATUS_REJECTED,
-            'reviewed_by' => $actor->id,
-            'reviewed_at' => now(),
-            'rejection_note' => $note,
-        ]);
+            if (! $actor->can('manageAttendanceCorrections')) {
+                if (! $this->canSupervisorReview($correction, $actor) || $correction->status !== AttendanceCorrection::STATUS_PENDING) {
+                    throw new AuthorizationException;
+                }
+            } else {
+                $this->ensureReviewable($correction, [
+                    AttendanceCorrection::STATUS_PENDING,
+                    AttendanceCorrection::STATUS_PENDING_ADMIN,
+                ]);
+            }
+
+            $correction->update([
+                'status' => AttendanceCorrection::STATUS_REJECTED,
+                'reviewed_by' => $actor->id,
+                'reviewed_at' => now(),
+                'rejection_note' => $note,
+            ]);
+        });
 
         $this->notifyStatusUpdated($correction);
 
@@ -205,5 +223,23 @@ class AttendanceCorrectionService
     {
         $correction->refresh()->loadMissing('user');
         $correction->user?->notify(new AttendanceCorrectionStatusUpdated($correction));
+    }
+
+    private function lock(AttendanceCorrection $correction): AttendanceCorrection
+    {
+        return AttendanceCorrection::query()
+            ->whereKey($correction->getKey())
+            ->lockForUpdate()
+            ->firstOrFail();
+    }
+
+    /**
+     * @param  list<string>  $allowedStatuses
+     */
+    private function ensureReviewable(AttendanceCorrection $correction, array $allowedStatuses): void
+    {
+        if (! in_array((string) $correction->status, $allowedStatuses, true)) {
+            throw new AuthorizationException(__('This attendance correction has already been reviewed.'));
+        }
     }
 }

@@ -69,15 +69,38 @@ class Holiday extends Model
         $today = Carbon::today();
         $endDate = $today->copy()->addDays($days);
 
-        return self::whereBetween('date', [$today, $endDate])
-            ->orWhere(function ($query) use ($today, $endDate) {
-                $query->where('is_recurring', true)
-                    ->whereRaw('DAYOFYEAR(date) BETWEEN DAYOFYEAR(?) AND DAYOFYEAR(?)', [
-                        $today->format('Y-m-d'),
-                        $endDate->format('Y-m-d'),
-                    ]);
+        return self::query()
+            ->whereBetween('date', [$today, $endDate])
+            ->orWhere('is_recurring', true)
+            ->get()
+            ->filter(function (self $holiday) use ($today, $endDate): bool {
+                if (! $holiday->is_recurring) {
+                    return true;
+                }
+
+                $recurringDate = $holiday->date
+                    ->copy()
+                    ->year($today->year);
+
+                if ($recurringDate->lt($today)) {
+                    $recurringDate->addYear();
+                }
+
+                return $recurringDate->betweenIncluded($today, $endDate);
             })
-            ->orderBy('date')
-            ->get();
+            ->sortBy(function (self $holiday) use ($today): string {
+                if (! $holiday->is_recurring) {
+                    return $holiday->date->toDateString();
+                }
+
+                $recurringDate = $holiday->date->copy()->year($today->year);
+
+                if ($recurringDate->lt($today)) {
+                    $recurringDate->addYear();
+                }
+
+                return $recurringDate->toDateString();
+            })
+            ->values();
     }
 }

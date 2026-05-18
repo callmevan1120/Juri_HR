@@ -8,7 +8,9 @@ Commit `37cf13b` is the UI/accessibility final pass for the user-facing native-a
 
 Current working-tree follow-up adds the collaboration workspace foundation for the broader “1 platform” goal: company-scoped chat threads, user collaboration inbox, message history, private file upload/download, meeting link registry, optional VPS-only realtime broadcast hooks, RBAC/menu/policy coverage, fake/demo seeding, and regression tests.
 
-Latest realtime follow-up hardens the broadcast runtime so local and production Reverb/Pusher modes only disable polling when the selected broadcast driver is actually configured with a client key. The browser Echo bootstrap now receives `/broadcasting/auth` and CSRF headers from the Laravel layout, while shared hosting stays on safe polling fallback.
+Latest realtime follow-up hardens the broadcast runtime so local and production Reverb/Pusher modes only disable polling when the selected broadcast driver is actually configured with a client key. The browser Echo bootstrap now receives `/broadcasting/auth` and CSRF headers from the Laravel layout, while non-realtime environments stay on safe polling fallback.
+
+Latest database follow-up makes PostgreSQL the local, CI, and VPS release baseline. `.env.example`, CI workflows, deployment docs, database config fallback, and portability smoke scripts now default to PostgreSQL 15+/16 while keeping MySQL/MariaDB as explicit compatibility paths.
 
 Branch: `chore/major-upgrade-audit`
 
@@ -85,6 +87,9 @@ The final pass covered:
 
 - `composer validate`: passed after `37cf13b`; `composer.json` is valid.
 - `composer check-platform-reqs`: passed on PHP `8.3.31`.
+- `composer check:database-portability`: passed after the PostgreSQL-first follow-up.
+- `composer check:database-portability:sqlite`: passed after the PostgreSQL-first follow-up.
+- `PASPAPAN_PG_USER=lutuk PASPAPAN_PG_ADMIN_DB=absensi composer check:database-portability:pgsql`: passed after the PostgreSQL-first follow-up; the command created and dropped a temporary `paspapan_pg_smoke_*` database.
 - `php artisan about`: passed; Laravel `13.9.0`, Livewire `v4.3.0`, PHP `8.3.31`.
 - `php artisan config:cache`: passed after the collaboration private upload/download follow-up.
 - `php artisan route:cache`: passed after the collaboration private upload/download follow-up.

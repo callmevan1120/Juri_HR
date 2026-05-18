@@ -76,6 +76,18 @@
         "check:modern-stack": [
             "@php scripts/check-modern-stack.php"
         ],
+        "check:database-portability": [
+            "@php artisan test tests/Unit/DatabasePortabilityStaticTest.php"
+        ],
+        "check:database-portability:sqlite": [
+            "bash scripts/database-portability-smoke.sh sqlite"
+        ],
+        "check:database-portability:pgsql": [
+            "bash scripts/database-portability-smoke.sh pgsql"
+        ],
+        "check:database-portability:mysql": [
+            "bash scripts/database-portability-smoke.sh mysql"
+        ],
         "check:enterprise-boundary": [
             "@php scripts/check-enterprise-boundary.php"
         ],

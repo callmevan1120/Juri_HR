@@ -41,6 +41,14 @@ return new class extends Migration
                     ->default('draft')
                     ->after('period_year');
             });
+        } elseif (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE appraisals ALTER COLUMN evaluator_id DROP NOT NULL');
+
+            Schema::table('appraisals', function (Blueprint $table) {
+                $table->enum('status', ['draft', 'self_assessment', 'manager_review', '1on1_scheduled', 'completed'])
+                    ->default('draft')
+                    ->after('period_year');
+            });
         } else {
             DB::statement('ALTER TABLE appraisals MODIFY evaluator_id CHAR(26) NULL');
             DB::statement("ALTER TABLE appraisals ADD COLUMN status ENUM('draft', 'self_assessment', 'manager_review', '1on1_scheduled', 'completed') DEFAULT 'draft' AFTER period_year");

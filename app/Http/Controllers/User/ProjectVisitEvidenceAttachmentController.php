@@ -20,10 +20,12 @@ class ProjectVisitEvidenceAttachmentController extends Controller
         abort_unless($validator->isSafeRelativePath($path), 404);
         abort_unless(Storage::disk('local')->exists($path), 404);
 
-        $name = basename((string) ($evidence->photo_original_name ?: 'visit-evidence-'.$evidence->id.'.jpg'));
+        $name = $validator->safeDownloadName($evidence->photo_original_name ?: 'visit-evidence-'.$evidence->id.'.jpg', 'visit-evidence');
 
         return Storage::disk('local')->download($path, $name, [
             'Content-Type' => 'application/octet-stream',
+            'Cache-Control' => 'no-store, private',
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 }

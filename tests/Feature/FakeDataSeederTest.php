@@ -53,7 +53,7 @@ test('database seeder is idempotent for real master data', function () {
         ->and(Wilayah::query()->whereRaw('LENGTH(kode) = 2')->count())->toBeGreaterThan(30)
         ->and(Wilayah::query()->where('kode', '11')->value('nama'))->toBe('Aceh')
         ->and(AccountingAccount::query()->where('code', '1100')->exists())->toBeTrue()
-        ->and(JobTitle::query()->whereIn('name', ['Head', 'Manager', 'Senior', 'Staff'])->whereNotNull('job_level_id')->count())->toBe(4);
+        ->and(JobTitle::query()->whereIn('name', ['Head', 'Manager', 'Senior', 'Officer', 'Staff'])->whereNotNull('job_level_id')->count())->toBe(5);
 });
 
 test('fake employee seeder keeps one head and manager per division and fills employee fields', function () {
@@ -63,7 +63,7 @@ test('fake employee seeder keeps one head and manager per division and fills emp
     $headTitle = JobTitle::query()->where('name', 'Head')->firstOrFail();
     $managerTitle = JobTitle::query()->where('name', 'Manager')->firstOrFail();
     $seniorTitle = JobTitle::query()->where('name', 'Senior')->firstOrFail();
-    $staffTitle = JobTitle::query()->where('name', 'Staff')->firstOrFail();
+    $officerTitle = JobTitle::query()->where('name', 'Officer')->firstOrFail();
 
     User::factory()->create([
         'email' => 'duplicate.head@example.com',
@@ -101,9 +101,9 @@ test('fake employee seeder keeps one head and manager per division and fills emp
             "head.{$divisionKey}@example.com",
             "manager.{$divisionKey}@example.com",
             "senior.{$divisionKey}@example.com",
-            "staff.{$divisionKey}@example.com",
-            "staff2.{$divisionKey}@example.com",
-            "staff3.{$divisionKey}@example.com",
+            "officer.{$divisionKey}@example.com",
+            "officer2.{$divisionKey}@example.com",
+            "officer3.{$divisionKey}@example.com",
         );
 
         $head = User::query()
@@ -159,7 +159,7 @@ test('fake employee seeder keeps one head and manager per division and fills emp
 
         if ($employee->job_title_id === $headTitle->id) {
             $this->assertNull($employee->manager_id);
-        } elseif (in_array($employee->job_title_id, [$managerTitle->id, $seniorTitle->id, $staffTitle->id], true)) {
+        } elseif (in_array($employee->job_title_id, [$managerTitle->id, $seniorTitle->id, $officerTitle->id], true)) {
             $this->assertNotEmpty($employee->manager_id, "Expected {$employee->email} manager_id to be filled.");
         }
     }
@@ -214,4 +214,11 @@ test('paspapan seeding commands keep real and fake data separated', function () 
 
     expect(Product::query()->where('sku', 'DEVICE-BUNDLE-001')->exists())->toBeTrue()
         ->and(CustomFormTemplate::query()->where('title', 'Bukti Kunjungan Lokasi')->exists())->toBeTrue();
+});
+
+test('real master seeding command keeps destructive refresh outside routine automation', function () {
+    $this->artisan('paspapan:seed-real --help')
+        ->expectsOutputToContain('Seed production-safe master data only. This command is idempotent; destructive refresh belongs in a separate approved runbook.')
+        ->doesntExpectOutputToContain('refresh-wilayah')
+        ->assertSuccessful();
 });

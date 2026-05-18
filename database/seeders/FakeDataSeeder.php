@@ -33,13 +33,14 @@ class FakeDataSeeder extends Seeder
 
         $divisions = Division::query()->orderBy('name')->get();
         $jobTitles = JobTitle::query()->with('jobLevel')->get()->keyBy('name');
-        $staffTitle = $jobTitles->get('Staff');
+        $officerTitle = $jobTitles->get('Officer') ?? $jobTitles->get('Staff');
         $seniorTitle = $jobTitles->get('Senior');
         $headTitle = $jobTitles->get('Head');
         $managerTitle = $jobTitles->get('Manager');
 
         foreach ($divisions as $division) {
             $divKey = Str::slug($division->name, '');
+            $this->renameLegacyStaffEmployeesToOfficers($division, $officerTitle);
 
             $head = $this->upsertEmployee(
                 email: 'head.'.$divKey.'@example.com',
@@ -68,29 +69,29 @@ class FakeDataSeeder extends Seeder
             );
 
             $this->upsertEmployee(
-                email: 'staff.'.$divKey.'@example.com',
-                name: 'Staff '.$division->name,
+                email: 'officer.'.$divKey.'@example.com',
+                name: 'Officer '.$division->name,
                 division: $division,
-                jobTitle: $staffTitle,
+                jobTitle: $officerTitle,
                 basicSalary: 5000000,
                 manager: $senior,
             );
 
             foreach (range(2, 3) as $index) {
                 $this->upsertEmployee(
-                    email: 'staff'.$index.'.'.$divKey.'@example.com',
-                    name: 'Staff '.$index.' '.$division->name,
+                    email: 'officer'.$index.'.'.$divKey.'@example.com',
+                    name: 'Officer '.$index.' '.$division->name,
                     division: $division,
-                    jobTitle: $index % 2 === 0 ? $staffTitle : $seniorTitle,
+                    jobTitle: $index % 2 === 0 ? $officerTitle : $officerTitle,
                     basicSalary: $index % 2 === 0 ? 5200000 : 7800000,
-                    manager: $index % 2 === 0 ? $senior : $manager,
+                    manager: $senior ?? $manager,
                     seedOffset: $index,
                 );
             }
         }
 
-        $this->normalizeUniqueLeadership($divisions, $headTitle, $managerTitle, $seniorTitle, $staffTitle);
-        $this->assignDirectManagers($divisions, $headTitle, $managerTitle, $seniorTitle, $staffTitle);
+        $this->normalizeUniqueLeadership($divisions, $headTitle, $managerTitle, $seniorTitle, $officerTitle);
+        $this->assignDirectManagers($divisions, $headTitle, $managerTitle, $seniorTitle, $officerTitle);
 
         $defaultDivision = $divisions->first();
         $defaultManager = $defaultDivision
@@ -104,7 +105,7 @@ class FakeDataSeeder extends Seeder
             email: 'user@example.com',
             name: 'Test User',
             division: $defaultDivision,
-            jobTitle: $staffTitle,
+            jobTitle: $officerTitle,
             basicSalary: 5000000,
             manager: $defaultManager,
         );
@@ -113,7 +114,7 @@ class FakeDataSeeder extends Seeder
             email: 'user123@paspapan.com',
             name: 'Demo User',
             division: $defaultDivision,
-            jobTitle: $staffTitle,
+            jobTitle: $officerTitle,
             basicSalary: 5000000,
             manager: $defaultManager,
             password: '12345678',
@@ -130,6 +131,33 @@ class FakeDataSeeder extends Seeder
             DemoFinanceWorkflowSeeder::class,
             DemoCustomFormSeeder::class,
         ]);
+    }
+
+    private function renameLegacyStaffEmployeesToOfficers(Division $division, ?JobTitle $officerTitle): void
+    {
+        if (! $officerTitle) {
+            return;
+        }
+
+        $divKey = Str::slug($division->name, '');
+
+        foreach ([null, 2, 3] as $index) {
+            $legacyEmail = ($index === null ? 'staff' : 'staff'.$index).'.'.$divKey.'@example.com';
+            $officerEmail = ($index === null ? 'officer' : 'officer'.$index).'.'.$divKey.'@example.com';
+
+            if (User::query()->where('email', $officerEmail)->exists()) {
+                continue;
+            }
+
+            User::query()
+                ->where('email', $legacyEmail)
+                ->where('division_id', $division->id)
+                ->update([
+                    'email' => $officerEmail,
+                    'name' => trim('Officer '.($index ?: '').' '.$division->name),
+                    'job_title_id' => $officerTitle->id,
+                ]);
+        }
     }
 
     private function upsertEmployee(
@@ -306,11 +334,11 @@ class FakeDataSeeder extends Seeder
         ?JobTitle $headTitle,
         ?JobTitle $managerTitle,
         ?JobTitle $seniorTitle,
-        ?JobTitle $staffTitle,
+        ?JobTitle $officerTitle,
     ): void {
         foreach ($divisions as $division) {
             $head = $this->keepOneTitlePerDivision($division, $headTitle, $seniorTitle);
-            $manager = $this->keepOneTitlePerDivision($division, $managerTitle, $staffTitle);
+            $manager = $this->keepOneTitlePerDivision($division, $managerTitle, $officerTitle);
 
             if ($head && $manager && $manager->manager_id !== $head->id) {
                 $manager->forceFill(['manager_id' => $head->id])->save();
@@ -348,7 +376,7 @@ class FakeDataSeeder extends Seeder
         ?JobTitle $headTitle,
         ?JobTitle $managerTitle,
         ?JobTitle $seniorTitle,
-        ?JobTitle $staffTitle,
+        ?JobTitle $officerTitle,
     ): void {
         foreach ($divisions as $division) {
             $head = $headTitle
@@ -369,10 +397,10 @@ class FakeDataSeeder extends Seeder
                 $senior->forceFill(['manager_id' => $manager->id])->save();
             }
 
-            if ($staffTitle && ($senior || $manager)) {
+            if ($officerTitle && ($senior || $manager)) {
                 User::query()
                     ->where('division_id', $division->id)
-                    ->where('job_title_id', $staffTitle->id)
+                    ->where('job_title_id', $officerTitle->id)
                     ->update(['manager_id' => ($senior ?? $manager)->id]);
             }
         }

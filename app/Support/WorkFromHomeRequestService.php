@@ -4,7 +4,9 @@ namespace App\Support;
 
 use App\Models\User;
 use App\Models\WorkFromHomeRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class WorkFromHomeRequestService
@@ -33,12 +35,17 @@ class WorkFromHomeRequestService
     {
         Gate::forUser($actor)->authorize('approve', $request);
 
-        $request->forceFill([
-            'status' => WorkFromHomeRequest::STATUS_APPROVED,
-            'reviewed_by' => $actor->id,
-            'reviewed_at' => now(),
-            'review_note' => $note,
-        ])->save();
+        DB::transaction(function () use ($request, $actor, $note): void {
+            $request = $this->lock($request);
+            $this->ensurePending($request);
+
+            $request->forceFill([
+                'status' => WorkFromHomeRequest::STATUS_APPROVED,
+                'reviewed_by' => $actor->id,
+                'reviewed_at' => now(),
+                'review_note' => $note,
+            ])->save();
+        });
 
         return __('WFH request approved.');
     }
@@ -47,12 +54,17 @@ class WorkFromHomeRequestService
     {
         Gate::forUser($actor)->authorize('reject', $request);
 
-        $request->forceFill([
-            'status' => WorkFromHomeRequest::STATUS_REJECTED,
-            'reviewed_by' => $actor->id,
-            'reviewed_at' => now(),
-            'review_note' => $note,
-        ])->save();
+        DB::transaction(function () use ($request, $actor, $note): void {
+            $request = $this->lock($request);
+            $this->ensurePending($request);
+
+            $request->forceFill([
+                'status' => WorkFromHomeRequest::STATUS_REJECTED,
+                'reviewed_by' => $actor->id,
+                'reviewed_at' => now(),
+                'review_note' => $note,
+            ])->save();
+        });
 
         return __('WFH request rejected.');
     }
@@ -64,5 +76,20 @@ class WorkFromHomeRequestService
             ->where('user_id', $user->id)
             ->latest('date')
             ->latest();
+    }
+
+    private function lock(WorkFromHomeRequest $request): WorkFromHomeRequest
+    {
+        return WorkFromHomeRequest::query()
+            ->whereKey($request->getKey())
+            ->lockForUpdate()
+            ->firstOrFail();
+    }
+
+    private function ensurePending(WorkFromHomeRequest $request): void
+    {
+        if ($request->status !== WorkFromHomeRequest::STATUS_PENDING) {
+            throw new AuthorizationException(__('This WFH request has already been reviewed.'));
+        }
     }
 }

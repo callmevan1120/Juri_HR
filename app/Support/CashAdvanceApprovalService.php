@@ -11,6 +11,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class CashAdvanceApprovalService
 {
@@ -21,67 +22,79 @@ class CashAdvanceApprovalService
 
     public function approve(CashAdvance $advance, User $actor): string
     {
-        $matrixMessage = $this->approveWithMatrix($advance, $actor);
+        return DB::transaction(function () use ($advance, $actor): string {
+            $advance = $this->lock($advance);
+            $matrixMessage = $this->approveWithMatrix($advance, $actor);
 
-        if ($matrixMessage !== null) {
-            return $matrixMessage;
-        }
+            if ($matrixMessage !== null) {
+                return $matrixMessage;
+            }
 
-        if ($this->approvalActors->canFinalizeCashAdvanceApproval($actor)) {
+            $canFinalize = $this->approvalActors->canFinalizeCashAdvanceApproval($actor);
+            $this->ensureReviewable($advance, $canFinalize ? ['pending', 'pending_finance'] : ['pending']);
+
+            if ($canFinalize) {
+                $advance->update([
+                    'status' => 'approved',
+                    'finance_approved_by' => $actor->id,
+                    'finance_approved_at' => now(),
+                    'approved_by' => $actor->id,
+                    'approved_at' => now(),
+                ]);
+
+                $this->notifyStatusUpdated($advance);
+
+                return __('Kasbon approved.');
+            }
+
             $advance->update([
-                'status' => 'approved',
-                'finance_approved_by' => $actor->id,
-                'finance_approved_at' => now(),
-                'approved_by' => $actor->id,
-                'approved_at' => now(),
+                'status' => 'pending_finance',
+                'head_approved_by' => $actor->id,
+                'head_approved_at' => now(),
             ]);
 
             $this->notifyStatusUpdated($advance);
 
-            return __('Kasbon approved.');
-        }
-
-        $advance->update([
-            'status' => 'pending_finance',
-            'head_approved_by' => $actor->id,
-            'head_approved_at' => now(),
-        ]);
-
-        $this->notifyStatusUpdated($advance);
-
-        return __('Kasbon forwarded to Finance for final approval.');
+            return __('Kasbon forwarded to Finance for final approval.');
+        });
     }
 
     public function reject(CashAdvance $advance, User $actor): string
     {
-        $matrixMessage = $this->rejectWithMatrix($advance, $actor);
+        return DB::transaction(function () use ($advance, $actor): string {
+            $advance = $this->lock($advance);
+            $matrixMessage = $this->rejectWithMatrix($advance, $actor);
 
-        if ($matrixMessage !== null) {
-            return $matrixMessage;
-        }
+            if ($matrixMessage !== null) {
+                return $matrixMessage;
+            }
 
-        $payload = [
-            'status' => 'rejected',
-        ];
+            $canFinalize = $this->approvalActors->canFinalizeCashAdvanceApproval($actor);
+            $this->ensureReviewable($advance, $canFinalize ? ['pending', 'pending_finance'] : ['pending']);
 
-        if ($this->approvalActors->canFinalizeCashAdvanceApproval($actor)) {
-            $payload += [
-                'finance_approved_by' => $actor->id,
-                'finance_approved_at' => now(),
-                'approved_by' => $actor->id,
-                'approved_at' => now(),
+            $payload = [
+                'status' => 'rejected',
             ];
-        } else {
-            $payload += [
-                'head_approved_by' => $actor->id,
-                'head_approved_at' => now(),
-            ];
-        }
 
-        $advance->update($payload);
-        $this->notifyStatusUpdated($advance);
+            if ($canFinalize) {
+                $payload += [
+                    'finance_approved_by' => $actor->id,
+                    'finance_approved_at' => now(),
+                    'approved_by' => $actor->id,
+                    'approved_at' => now(),
+                ];
+            } else {
+                $payload += [
+                    'head_approved_by' => $actor->id,
+                    'head_approved_at' => now(),
+                ];
+            }
 
-        return __('Kasbon rejected.');
+            $advance->update($payload);
+            $this->notifyStatusUpdated($advance);
+
+            return __('Kasbon rejected.');
+        });
     }
 
     public function canManage(CashAdvance $advance, User $user): bool
@@ -218,6 +231,8 @@ class CashAdvanceApprovalService
             return null;
         }
 
+        $this->ensureReviewable($advance, ['pending', 'pending_finance', 'pending_matrix']);
+
         $completed = $this->approvalMatrix->completedSteps($advance);
         $currentStep = $this->approvalMatrix->currentStep($steps, $completed);
 
@@ -274,6 +289,8 @@ class CashAdvanceApprovalService
             return null;
         }
 
+        $this->ensureReviewable($advance, ['pending', 'pending_finance', 'pending_matrix']);
+
         $currentStep = $this->approvalMatrix->currentStep($steps, $this->approvalMatrix->completedSteps($advance));
 
         if (! $this->approvalMatrix->canActorApproveStep($actor, $advance, $currentStep)) {
@@ -318,5 +335,23 @@ class CashAdvanceApprovalService
             'approval_current_step' => $nextStep['key'] ?? null,
             'approval_completed_steps' => $completed,
         ];
+    }
+
+    private function lock(CashAdvance $advance): CashAdvance
+    {
+        return CashAdvance::query()
+            ->whereKey($advance->getKey())
+            ->lockForUpdate()
+            ->firstOrFail();
+    }
+
+    /**
+     * @param  list<string>  $allowedStatuses
+     */
+    private function ensureReviewable(CashAdvance $advance, array $allowedStatuses): void
+    {
+        if (! in_array((string) $advance->status, $allowedStatuses, true)) {
+            throw new AuthorizationException(__('This kasbon has already been reviewed.'));
+        }
     }
 }

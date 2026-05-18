@@ -16,17 +16,16 @@ jobs:
       EVIDENCE_DIR: storage/review-evidence
 
     services:
-      mysql:
-        image: mysql:8.0
+      postgres:
+        image: postgres:16
         env:
-          MYSQL_DATABASE: paspapan_ci
-          MYSQL_USER: paspapan
-          MYSQL_PASSWORD: secret
-          MYSQL_ROOT_PASSWORD: root
+          POSTGRES_DB: paspapan_ci
+          POSTGRES_USER: paspapan
+          POSTGRES_PASSWORD: secret
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-cmd="pg_isready -U paspapan -d paspapan_ci"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=12
@@ -39,7 +38,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: bcmath, gd, intl, mbstring, pdo_mysql, zip
+          extensions: bcmath, gd, intl, mbstring, pdo_pgsql, zip
           coverage: none
           tools: composer:v2
 
@@ -83,12 +82,14 @@ jobs:
           APP_ENV=testing
           APP_DEBUG=true
           APP_URL=http://127.0.0.1
-          DB_CONNECTION=mysql
+          DB_CONNECTION=pgsql
           DB_HOST=127.0.0.1
-          DB_PORT=3306
+          DB_PORT=5432
           DB_DATABASE=paspapan_ci
           DB_USERNAME=paspapan
           DB_PASSWORD=secret
+          DB_SCHEMA=public
+          DB_SSLMODE=prefer
           CACHE_STORE=array
           QUEUE_CONNECTION=sync
           SESSION_DRIVER=array
@@ -104,30 +105,34 @@ jobs:
 
       - name: Run database migrations
         env:
-          DB_CONNECTION: mysql
+          DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
-          DB_PORT: 3306
+          DB_PORT: 5432
           DB_DATABASE: paspapan_ci
           DB_USERNAME: paspapan
           DB_PASSWORD: secret
+          DB_SCHEMA: public
+          DB_SSLMODE: prefer
         run: php artisan migrate --force
 
       - name: Run test suite
         env:
           APP_ENV: testing
-          DB_CONNECTION: mysql
+          DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
-          DB_PORT: 3306
+          DB_PORT: 5432
           DB_DATABASE: paspapan_ci
           DB_USERNAME: paspapan
           DB_PASSWORD: secret
+          DB_SCHEMA: public
+          DB_SSLMODE: prefer
           CACHE_STORE: array
           QUEUE_CONNECTION: sync
           SESSION_DRIVER: array
           MAIL_MAILER: array
         run: |
           set -o pipefail
-          php artisan test --without-tty 2>&1 | tee "${EVIDENCE_DIR}/php-artisan-test.log"
+          php artisan test 2>&1 | tee "${EVIDENCE_DIR}/php-artisan-test.log"
 
       - name: UI Rules Check
         run: |
@@ -144,6 +149,11 @@ jobs:
           set -o pipefail
           composer check:modern-stack 2>&1 | tee "${EVIDENCE_DIR}/composer-check-modern-stack.log"
 
+      - name: Database portability static check
+        run: |
+          set -o pipefail
+          composer check:database-portability 2>&1 | tee "${EVIDENCE_DIR}/composer-check-database-portability.log"
+
       - name: Pint
         run: |
           set -o pipefail
@@ -152,12 +162,14 @@ jobs:
       - name: PHPStan
         env:
           APP_ENV: testing
-          DB_CONNECTION: mysql
+          DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
-          DB_PORT: 3306
+          DB_PORT: 5432
           DB_DATABASE: paspapan_ci
           DB_USERNAME: paspapan
           DB_PASSWORD: secret
+          DB_SCHEMA: public
+          DB_SSLMODE: prefer
           CACHE_STORE: array
           QUEUE_CONNECTION: sync
           SESSION_DRIVER: array
@@ -178,12 +190,14 @@ jobs:
       - name: RBAC audit
         env:
           APP_ENV: testing
-          DB_CONNECTION: mysql
+          DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
-          DB_PORT: 3306
+          DB_PORT: 5432
           DB_DATABASE: paspapan_ci
           DB_USERNAME: paspapan
           DB_PASSWORD: secret
+          DB_SCHEMA: public
+          DB_SSLMODE: prefer
           CACHE_STORE: array
           QUEUE_CONNECTION: sync
           SESSION_DRIVER: array
@@ -213,6 +227,7 @@ jobs:
             echo "| RBAC audit | php-artisan-rbac-audit.log |"
             echo "| UI rules | composer-check-ui.log |"
             echo "| Modern stack | composer-check-modern-stack.log |"
+            echo "| Database portability | composer-check-database-portability.log |"
             echo "| Enterprise boundary | composer-check-enterprise-boundary.log |"
             echo
             echo "Runtime baseline: PHP ${PHP_VERSION}, Node ${NODE_VERSION}+ compatible, Bun ${BUN_VERSION}."

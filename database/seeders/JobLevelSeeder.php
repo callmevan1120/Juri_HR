@@ -15,13 +15,14 @@ class JobLevelSeeder extends Seeder
             1 => 'Head',
             2 => 'Manager',
             3 => 'Senior',
-            4 => 'Staff',
+            4 => 'Officer',
+            5 => 'Staff',
         ];
 
         foreach ($levels as $rank => $name) {
-            JobLevel::firstOrCreate(
+            JobLevel::updateOrCreate(
+                ['name' => $name],
                 ['rank' => $rank],
-                ['name' => $name]
             );
         }
 

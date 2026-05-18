@@ -26,6 +26,7 @@ const bootEcho = () => {
     const scheme = driver.scheme || (window.location.protocol === "https:" ? "https" : "http");
     const port = Number(driver.port || (scheme === "https" ? 443 : 80));
     const forceTLS = scheme === "https";
+    const enabledTransports = forceTLS ? ["wss"] : ["ws"];
     const auth = {
         headers: {
             "X-CSRF-TOKEN": config.csrfToken
@@ -47,7 +48,7 @@ const bootEcho = () => {
             encrypted: forceTLS,
             authEndpoint,
             auth,
-            enabledTransports: ["ws", "wss"],
+            enabledTransports,
         };
 
         if (driver.path) {
@@ -72,7 +73,7 @@ const bootEcho = () => {
             authEndpoint,
             auth,
             disableStats: true,
-            enabledTransports: ["ws", "wss"],
+            enabledTransports,
         });
     }
 };

@@ -83,20 +83,26 @@ class ShiftSwapRequestService
 
     public function approve(ShiftSwapRequest $request, User $actor): string
     {
-        if (! $this->canManagerReview($request, $actor)) {
-            return __('You are not allowed to review this shift swap request.');
-        }
+        return DB::transaction(function () use ($request, $actor): string {
+            $request = $this->lock($request);
+            $request->loadMissing('schedule');
 
-        $request->loadMissing('schedule');
-        $scheduleDate = $request->effectiveScheduleDate()?->toDateString();
+            if (! $this->canManagerReview($request, $actor)) {
+                return __('You are not allowed to review this shift swap request.');
+            }
 
-        if (! $scheduleDate) {
-            return __('Schedule date is missing for this shift swap request.');
-        }
+            $scheduleDate = $request->effectiveScheduleDate()?->toDateString();
 
-        DB::transaction(function () use ($request, $actor): void {
+            if (! $scheduleDate) {
+                return __('Schedule date is missing for this shift swap request.');
+            }
+
             $scheduleDate = $request->effectiveScheduleDate()->toDateString();
-            $schedule = $request->schedule ?? Schedule::query()->firstOrNew([
+            $schedule = $request->schedule
+                ? Schedule::query()->whereKey($request->schedule_id)->lockForUpdate()->first()
+                : null;
+
+            $schedule ??= Schedule::query()->firstOrNew([
                 'user_id' => $request->user_id,
                 'date' => $scheduleDate,
             ]);
@@ -114,25 +120,29 @@ class ShiftSwapRequestService
                 'reviewed_at' => now(),
                 'rejection_note' => null,
             ]);
-        });
 
-        return __('Shift swap request approved and schedule updated.');
+            return __('Shift swap request approved and schedule updated.');
+        });
     }
 
     public function reject(ShiftSwapRequest $request, User $actor, ?string $note = null): string
     {
-        if (! $this->canManagerReview($request, $actor)) {
-            return __('You are not allowed to review this shift swap request.');
-        }
+        return DB::transaction(function () use ($request, $actor, $note): string {
+            $request = $this->lock($request);
 
-        $request->update([
-            'status' => ShiftSwapRequest::STATUS_REJECTED,
-            'reviewed_by' => $actor->id,
-            'reviewed_at' => now(),
-            'rejection_note' => $note,
-        ]);
+            if (! $this->canManagerReview($request, $actor)) {
+                return __('You are not allowed to review this shift swap request.');
+            }
 
-        return __('Shift swap request rejected.');
+            $request->update([
+                'status' => ShiftSwapRequest::STATUS_REJECTED,
+                'reviewed_by' => $actor->id,
+                'reviewed_at' => now(),
+                'rejection_note' => $note,
+            ]);
+
+            return __('Shift swap request rejected.');
+        });
     }
 
     public function paginateForUser(User $user, int $perPage = 10): LengthAwarePaginator
@@ -194,5 +204,13 @@ class ShiftSwapRequestService
         }
 
         return $this->approvalActors->subordinateIds($actor)->contains($request->user_id);
+    }
+
+    private function lock(ShiftSwapRequest $request): ShiftSwapRequest
+    {
+        return ShiftSwapRequest::query()
+            ->whereKey($request->getKey())
+            ->lockForUpdate()
+            ->firstOrFail();
     }
 }

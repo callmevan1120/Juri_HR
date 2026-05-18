@@ -31,8 +31,12 @@ class HighPriorityAnnouncementModal extends Component
         $this->syncAnnouncementState();
     }
 
-    public function dismiss(): void
+    public function dismiss(bool $acknowledged = false): void
     {
+        if ($acknowledged) {
+            $this->hasReadAndUnderstood = true;
+        }
+
         $announcement = $this->currentAnnouncement();
 
         if ($announcement) {

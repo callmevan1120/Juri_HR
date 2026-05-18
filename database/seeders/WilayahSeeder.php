@@ -29,10 +29,9 @@ class WilayahSeeder extends Seeder
         }
 
         $existingCount = Wilayah::query()->count();
-        $refresh = filter_var(config('paspapan.wilayah_seed_refresh', false), FILTER_VALIDATE_BOOL);
 
-        if ($existingCount >= self::COMPLETE_DATA_THRESHOLD && ! $refresh) {
-            $this->command?->info("Wilayah data already looks complete ({$existingCount} rows). Set WILAYAH_SEED_REFRESH=true to refresh it.");
+        if ($existingCount >= self::COMPLETE_DATA_THRESHOLD) {
+            $this->command?->info("Wilayah data already looks complete ({$existingCount} rows). Skipping idempotent import.");
 
             return;
         }
@@ -45,10 +44,6 @@ class WilayahSeeder extends Seeder
             $this->command?->error('Failed to extract gzip file.');
 
             return;
-        }
-
-        if ($refresh) {
-            Wilayah::query()->delete();
         }
 
         $imported = 0;

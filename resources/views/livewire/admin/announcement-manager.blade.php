@@ -201,12 +201,12 @@
                         <div>
                             <x-forms.label for="publish_date" value="{{ __('Publish Date') }}" />
                             <x-forms.input id="publish_date" type="date" class="mt-1 block w-full"
-                                wire:model="publish_date" required />
+                                wire:model="publish_date" data-ui-picker-static="true" required />
                         </div>
                         <div>
                             <x-forms.label for="expire_date" value="{{ __('Expire Date') }} (Optional)" />
                             <x-forms.input id="expire_date" type="date" class="mt-1 block w-full"
-                                wire:model="expire_date" />
+                                wire:model="expire_date" data-ui-picker-static="true" />
                         </div>
                     </div>
                 </div>

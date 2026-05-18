@@ -18,8 +18,19 @@ return new class extends Migration
             $table->date('expiration_date')->nullable()->after('purchase_cost');
         });
 
-        // Safely alter ENUM using Raw SQL to avoid Doctrine/DBAL issues
-        if (DB::getDriverName() !== 'sqlite') {
+        // Safely alter ENUM/check constraints using driver-specific SQL.
+        if (DB::getDriverName() === 'pgsql') {
+            $this->replacePostgresStatusConstraint([
+                'available',
+                'assigned',
+                'maintenance',
+                'lost',
+                'retired',
+                'sold',
+                'auctioned',
+                'disposed',
+            ]);
+        } elseif (DB::getDriverName() !== 'sqlite') {
             DB::statement("ALTER TABLE company_assets MODIFY status ENUM('available', 'assigned', 'maintenance', 'lost', 'retired', 'sold', 'auctioned', 'disposed') DEFAULT 'available'");
         }
     }
@@ -33,8 +44,31 @@ return new class extends Migration
             $table->dropColumn(['purchase_date', 'purchase_cost', 'expiration_date']);
         });
 
-        if (DB::getDriverName() !== 'sqlite') {
+        if (DB::getDriverName() === 'pgsql') {
+            $this->replacePostgresStatusConstraint([
+                'available',
+                'assigned',
+                'maintenance',
+                'lost',
+                'retired',
+            ]);
+        } elseif (DB::getDriverName() !== 'sqlite') {
             DB::statement("ALTER TABLE company_assets MODIFY status ENUM('available', 'assigned', 'maintenance', 'lost', 'retired') DEFAULT 'available'");
         }
+    }
+
+    /**
+     * @param  list<string>  $statuses
+     */
+    private function replacePostgresStatusConstraint(array $statuses): void
+    {
+        DB::statement('ALTER TABLE company_assets DROP CONSTRAINT IF EXISTS company_assets_status_check');
+
+        $quotedStatuses = collect($statuses)
+            ->map(fn (string $status): string => "'".str_replace("'", "''", $status)."'")
+            ->implode(', ');
+
+        DB::statement("ALTER TABLE company_assets ADD CONSTRAINT company_assets_status_check CHECK (status in ({$quotedStatuses}))");
+        DB::statement("ALTER TABLE company_assets ALTER COLUMN status SET DEFAULT 'available'");
     }
 };

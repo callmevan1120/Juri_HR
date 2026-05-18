@@ -68,6 +68,7 @@ test('dynamic barcode token can be used by device attendance api', function () {
     $attendance = Attendance::firstOrFail();
 
     expect($attendance->barcode_id)->toBe($barcode->id)
+        ->and($attendance->date?->toDateString())->toBe('2026-04-18')
         ->and($attendance->time_in?->format('Y-m-d H:i:s'))->toBe('2026-04-18 08:00:00')
         ->and(app(DynamicBarcodeTokenService::class)->resolveScannedBarcode($token))->toBeNull();
 });

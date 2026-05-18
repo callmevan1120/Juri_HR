@@ -46,6 +46,7 @@ test('device offline attendance sync processes queued local submissions with ris
 
     expect($submission->processed_attendance_id)->toBe($attendance->id)
         ->and($submission->status)->toBe('processed')
+        ->and($attendance->date?->toDateString())->toBe('2026-05-11')
         ->and($submission->risk_score)->toBe($attendance->risk_score)
         ->and($attendance->risk_level)->toBe('high')
         ->and($codes)->toContain('offline_submitted')

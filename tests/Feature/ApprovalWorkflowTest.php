@@ -22,6 +22,7 @@ use App\Support\CashAdvanceApprovalService;
 use App\Support\MultiCompanyService;
 use App\Support\ReimbursementApprovalService;
 use App\Support\TeamApprovalQueryService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
@@ -425,4 +426,36 @@ test('team cash advance manager forbids unrelated users from approving subordina
         ->assertForbidden();
 
     expect($advance->fresh()->status)->toBe('pending');
+});
+
+test('review services reject stale reimbursement and cash advance approvals', function () {
+    [$manager, $employee] = createApprovalHierarchy();
+
+    $reimbursement = Reimbursement::create([
+        'user_id' => $employee->id,
+        'date' => now()->toDateString(),
+        'type' => 'Transport',
+        'amount' => 125000,
+        'description' => 'Already settled claim.',
+        'status' => 'approved',
+        'approved_by' => $manager->id,
+    ]);
+
+    $advance = CashAdvance::create([
+        'user_id' => $employee->id,
+        'amount' => 350000,
+        'purpose' => 'Already rejected kasbon.',
+        'payment_month' => (int) now()->month,
+        'payment_year' => (int) now()->year,
+        'status' => 'rejected',
+    ]);
+
+    expect(fn () => app(ReimbursementApprovalService::class)->approve($reimbursement, $manager))
+        ->toThrow(AuthorizationException::class);
+
+    expect(fn () => app(CashAdvanceApprovalService::class)->approve($advance, $manager))
+        ->toThrow(AuthorizationException::class);
+
+    expect($reimbursement->fresh()->status)->toBe('approved')
+        ->and($advance->fresh()->status)->toBe('rejected');
 });

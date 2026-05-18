@@ -142,7 +142,8 @@ class LeaveApprovalService
     {
         $query = Attendance::query()
             ->whereIn('id', $ids)
-            ->whereIn('status', Attendance::REQUEST_STATUSES);
+            ->whereIn('status', Attendance::REQUEST_STATUSES)
+            ->where('approval_status', Attendance::STATUS_PENDING);
 
         if ($actor->can('manageLeaveApprovals')) {
             return $query->pluck('id')->map(fn ($id) => (int) $id)->all();

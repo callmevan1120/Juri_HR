@@ -102,7 +102,7 @@ RUN_E2E=1 RUN_APK_SMOKE=1 bun run evidence:review
 Command manual yang setara:
 
 ```bash
-php artisan test --without-tty
+php artisan test
 composer phpstan
 ./vendor/bin/pint --test
 composer audit

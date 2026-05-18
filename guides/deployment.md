@@ -1,6 +1,6 @@
 # Deployment
 
-Target produksi paling lengkap untuk PasPapan adalah VPS. Shared hosting dan Vercel bisa dipakai, tetapi ada batasan operasional.
+Target produksi resmi PasPapan adalah VPS. Shared hosting tidak lagi menjadi target utama karena fitur penuh membutuhkan worker, scheduler, storage privat stabil, backup, dan WebSocket.
 
 ## Kebutuhan Sistem
 
@@ -10,10 +10,12 @@ Minimum produksi:
 - Composer `2.x`
 - Node.js `20+`
 - Bun `1.3.6+`
-- MySQL `8+` atau MariaDB setara
-- ekstensi PHP umum Laravel 13: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `zip`, `ctype`, `json`, `tokenizer`, `xml`
+- PostgreSQL `15+`
+- ekstensi PHP umum Laravel 13: `pdo_pgsql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `zip`, `ctype`, `json`, `tokenizer`, `xml`
 
-Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, dan shared hosting. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4. PHP 8.5 juga dapat berjalan; aplikasi sudah memakai constant MySQL SSL CA baru saat tersedia dengan fallback kompatibel untuk PHP 8.3.
+Baseline runtime resmi PasPapan adalah PHP 8.3+ untuk production, VPS, dan CI. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4.
+
+Default database local/VPS adalah PostgreSQL 15+. MySQL/MariaDB tetap bisa diuji sebagai compatibility path untuk provider tertentu, tetapi bukan baseline deployment utama.
 
 Direkomendasikan untuk VPS:
 
@@ -26,7 +28,7 @@ Direkomendasikan untuk VPS:
 
 | Area | Vercel | Shared hosting | VPS |
 | --- | --- | --- | --- |
-| Target | Demo, staging, instalasi ringan | Production kecil/UMKM terbatas | Production penuh dan enterprise |
+| Target | Demo, staging, instalasi ringan | Legacy compatibility, bukan target release | Production penuh dan enterprise |
 | Runtime PHP | `vercel-php@0.7.4` PHP 8.3.x | PHP 8.3+ dari provider | PHP 8.3+; PHP 8.4 direkomendasikan |
 | Build frontend | CI/Vercel build dengan Node 20+ dan Bun 1.3.6+ | Build lokal atau host jika tersedia | Build di server/CI dengan Node 20+ dan Bun 1.3.6+ |
 | Queue | `sync`; tidak ada worker permanen | Database queue via cron pendek | Worker permanen via Supervisor/systemd |
@@ -37,7 +39,7 @@ Direkomendasikan untuk VPS:
 | Reverb/WebSocket | Tidak disarankan | Umumnya tidak tersedia | Didukung dengan proses Reverb dan reverse proxy |
 | APK backend production | Hanya untuk demo/ringan | Bisa untuk tim kecil | Direkomendasikan |
 
-VPS adalah target production penuh PasPapan. Vercel dan shared hosting tetap didukung untuk skenario yang sadar batasan, tetapi fitur yang bergantung pada worker, scheduler, storage persisten, backup lokal, dan WebSocket harus divalidasi ulang di environment masing-masing.
+VPS adalah target production penuh PasPapan. Vercel hanya untuk demo/staging ringan. Shared hosting hanya dokumentasi kompatibilitas legacy, bukan target release utama.
 
 ## Deploy VPS
 
@@ -49,7 +51,7 @@ sudo chown -R $USER:$USER /var/www/paspapan
 cd /var/www/paspapan
 ```
 
-Install PHP, Composer, MySQL/MariaDB, Bun atau Node.js, web server, dan Supervisor.
+Install PHP, Composer, PostgreSQL, Bun atau Node.js, web server, dan Supervisor/systemd.
 
 Preflight runtime sebelum install dependency:
 
@@ -78,12 +80,16 @@ APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://your-domain.com
 
-DB_CONNECTION=mysql
+DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=5432
 DB_DATABASE=your_database
 DB_USERNAME=your_database_user
 DB_PASSWORD=your_database_password
+DB_SCHEMA=public
+DB_SSLMODE=prefer
+# Managed MySQL/MariaDB compatibility path should be validated with
+# composer check:database-portability before production use.
 
 QUEUE_CONNECTION=database
 SCHEDULE_QUEUE_WORKER=false
@@ -104,7 +110,7 @@ MAIL_FROM_ADDRESS=no-reply@your-domain.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
-`BROADCAST_CONNECTION=log` adalah mode aman untuk instalasi tanpa WebSocket. Dengan `ANNOUNCEMENT_REFRESH_MODE=auto`, announcement dan notifikasi memakai fallback polling ringan. Jika `BROADCAST_CONNECTION=reverb` dipilih tetapi `REVERB_APP_KEY` belum lengkap, aplikasi tetap menganggap broadcast belum siap dan mempertahankan polling fallback. Untuk VPS yang siap WebSocket, aktifkan Reverb:
+`BROADCAST_CONNECTION=reverb` adalah mode production VPS. Dengan `ANNOUNCEMENT_REFRESH_MODE=auto`, aplikasi fallback ke polling jika driver/key Reverb belum lengkap. Untuk VPS yang siap WebSocket, aktifkan Reverb:
 
 Generate app key/secret Reverb sendiri. Nilai ini tidak perlu berasal dari layanan eksternal, tetapi harus random dan hanya disimpan di `.env` runtime:
 
@@ -127,7 +133,7 @@ REVERB_SERVER_HOST=0.0.0.0
 REVERB_SERVER_PORT=8080
 ```
 
-Gunakan host publik pada `REVERB_HOST`. `REVERB_SERVER_HOST` dan `REVERB_SERVER_PORT` adalah alamat bind proses Reverb di server. `COLLABORATION_REALTIME_ENABLED=true` hanya direkomendasikan untuk VPS karena membutuhkan broadcast connection yang berjalan stabil; biarkan `false` pada shared hosting.
+Gunakan host publik pada `REVERB_HOST`. `REVERB_SERVER_HOST` dan `REVERB_SERVER_PORT` adalah alamat bind proses Reverb di server. `COLLABORATION_REALTIME_ENABLED=true` direkomendasikan pada VPS karena membutuhkan broadcast connection yang berjalan stabil.
 
 Untuk local smoke test, gunakan `REVERB_HOST=127.0.0.1`, `REVERB_PORT=8080`, `REVERB_SCHEME=http`, lalu jalankan `php artisan reverb:start` di terminal terpisah bersama queue worker. `REVERB_APP_ID`, `REVERB_APP_KEY`, dan `REVERB_APP_SECRET` boleh custom, tetapi tetap gunakan nilai random:
 
@@ -287,9 +293,11 @@ REVERB_SCHEME=https
 - queued job seperti backup atau export report berhasil
 - akun demo/bootstrap sudah diaudit sebelum go-live
 
-## Deploy Shared Hosting
+## Legacy Shared Hosting Compatibility
 
-Shared hosting bisa dipakai hanya jika provider memberi PHP 8.3+, MySQL/MariaDB, SSH atau terminal, cron, dan kemampuan mengarahkan document root ke `public/`. PHP 8.4 direkomendasikan bila tersedia.
+Bagian ini dipertahankan untuk instalasi lama atau provider terbatas. Jalur ini bukan target release utama PasPapan karena fitur penuh membutuhkan worker long-running, scheduler stabil, storage privat persisten, backup, dan Reverb/WebSocket. Gunakan VPS PostgreSQL untuk deployment baru.
+
+Shared hosting hanya layak dicoba jika provider memberi PHP 8.3+, SSH atau terminal, cron, kemampuan mengarahkan document root ke `public/`, dan database managed yang stabil. PHP 8.4 direkomendasikan bila tersedia. Jika provider hanya menyediakan MySQL/MariaDB, jalankan portability smoke dan treat sebagai compatibility path.
 
 ### 1. Build lokal
 
@@ -327,7 +335,7 @@ ANNOUNCEMENT_REFRESH_MODE=auto
 ANNOUNCEMENT_POLL_INTERVAL=60s
 ```
 
-Shared hosting biasa tidak menjalankan Reverb karena butuh proses long-running `php artisan reverb:start` dan WebSocket port/proxy. Biarkan `BROADCAST_CONNECTION=log`; aplikasi akan tetap support announcement/notifikasi memakai fallback polling ringan.
+Shared hosting biasa tidak menjalankan Reverb karena butuh proses long-running `php artisan reverb:start` dan WebSocket port/proxy. Biarkan `BROADCAST_CONNECTION=log`; aplikasi akan memakai fallback polling ringan, tetapi fitur realtime penuh tetap target VPS.
 
 ### 4. Command Laravel
 
@@ -407,7 +415,7 @@ Konfigurasi saat ini:
 
 ### 5. Bagaimana database-nya?
 
-Vercel tidak menyediakan MySQL lokal. Pakai database MySQL/MariaDB eksternal seperti PlanetScale, Railway, Aiven, VPS database, atau provider managed database lain.
+Vercel tidak menyediakan database lokal. Pakai database PostgreSQL eksternal seperti Railway, Aiven, Neon, Supabase Postgres, VPS database, atau provider lain yang dapat diakses dari Vercel.
 
 Jalankan migration dari mesin lokal atau CI yang bisa mengakses database:
 
@@ -438,12 +446,17 @@ LOG_STACK=stderr
 LOG_LEVEL=info
 BCRYPT_ROUNDS=12
 
-DB_CONNECTION=mysql
+DB_CONNECTION=pgsql
 DB_HOST=your-db-host
-DB_PORT=3306
+DB_PORT=5432
 DB_DATABASE=your-db-name
 DB_USERNAME=your-db-user
 DB_PASSWORD=your-db-password
+DB_SCHEMA=public
+DB_SSLMODE=require
+# MySQL/TiDB managed compatibility alternative:
+# DB_CONNECTION=mysql
+# DB_PORT=3306
 MYSQL_ATTR_SSL_CA=/etc/ssl/cert.pem
 
 CACHE_STORE=array

@@ -44,7 +44,7 @@ Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
 
 ## Test Gate
 
-- [x] `php artisan test --without-tty`
+- [x] `php artisan test`
 - [x] `composer phpstan`
 - [x] `./vendor/bin/pint --test`
 - [x] `composer audit`
@@ -52,9 +52,13 @@ Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
 - [x] `bun run build`
 - [x] `php artisan rbac:audit`
 - [x] `composer check:modern-stack`
+- [x] `composer check:database-portability`
+- [x] `composer check:database-portability:sqlite`
+- [x] `composer check:database-portability:pgsql`
+- [x] `composer check:database-portability:mysql` atau CI MySQL compatibility job untuk provider legacy/managed MySQL
 - [x] `composer check:enterprise-boundary`
 - [x] Review evidence bundle tersedia di CI.
-  Evidence: `.github/workflows/laravel.yml` upload `review-evidence-ci`; `.github/workflows/e2e.yml` upload `review-evidence-playwright`; `.github/workflows/apk-smoke.yml` upload `review-evidence-apk-smoke` dari self-hosted Android/ADB runner.
+  Evidence: `.github/workflows/laravel.yml` upload `review-evidence-ci`; `.github/workflows/e2e.yml` upload `review-evidence-playwright`; `.github/workflows/apk-smoke.yml` upload `review-evidence-apk-smoke` dari self-hosted Android/ADB runner; `.github/workflows/database-portability.yml` menjalankan smoke migration PostgreSQL, SQLite, dan MySQL compatibility.
 - [x] Coverage baseline workflow reviewed.
 - [x] Playwright smoke utama.
 - [x] APK smoke pada device fisik.

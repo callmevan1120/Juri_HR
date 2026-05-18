@@ -18,7 +18,8 @@ class DownloadCloudFileController extends Controller
         abort_unless($file->disk === 'local', 404);
         abort_unless(Storage::disk('local')->exists($file->path), 404);
 
-        return Storage::disk('local')->download($file->path, basename($file->original_name), [
+        return Storage::disk('local')->download($file->path, $validator->safeDownloadName($file->original_name ?: basename($file->path), 'cloud-file'), [
+            'Cache-Control' => 'no-store, private',
             'Content-Type' => $file->mime_type ?: 'application/octet-stream',
             'X-Content-Type-Options' => 'nosniff',
         ]);

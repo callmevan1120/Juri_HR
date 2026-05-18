@@ -2,6 +2,8 @@
 
 Dokumen ini mencatat area yang sudah punya implementasi/foundation dan area yang sengaja tidak dipaksakan sebagai rewrite besar.
 
+Fase berikutnya adalah feature maturity, bukan ekspansi modul. Perubahan baru harus memperkuat logic, security, data integrity, UX, test coverage, atau operational readiness dari fitur yang sudah ada. Prinsip kerja lengkap ada di `guides/feature-maturity.md`.
+
 ## Covered
 
 - Manager Inbox v2 foundation: pending summary, overdue summary, workflow badges, pending/overdue filter, quick approve/reject existing workflow, and managed-user/RBAC scope.
@@ -33,4 +35,4 @@ Dokumen ini mencatat area yang sudah punya implementasi/foundation dan area yang
 - Mobile redesign for every list page should be handled page-by-page with screenshots because it changes user-facing layout.
 - Full staging promotion automation should be wired to the real staging host/secrets rather than guessed in source.
 - APK release automation should run on a runner with Android SDK signing secrets and should never store signing credentials in the repository.
-- Database portability beyond MySQL-first guard needs a separate migration/raw-SQL audit pass.
+- PostgreSQL-first local/VPS mode is now the default; remaining database work is keeping MySQL/MariaDB as compatibility paths without blocking the VPS release baseline.

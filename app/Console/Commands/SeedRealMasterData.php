@@ -4,20 +4,15 @@ namespace App\Console\Commands;
 
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Config;
 
 class SeedRealMasterData extends Command
 {
-    protected $signature = 'paspapan:seed-real {--refresh-wilayah : Refresh the full wilayah dataset from database/data/wilayah.sql.gz}';
+    protected $signature = 'paspapan:seed-real';
 
-    protected $description = 'Seed production-safe master data only.';
+    protected $description = 'Seed production-safe master data only. This command is idempotent; destructive refresh belongs in a separate approved runbook.';
 
     public function handle(): int
     {
-        if ($this->option('refresh-wilayah')) {
-            Config::set('paspapan.wilayah_seed_refresh', true);
-        }
-
         $this->info('Seeding production-safe master data...');
         $this->call('db:seed', [
             '--class' => DatabaseSeeder::class,

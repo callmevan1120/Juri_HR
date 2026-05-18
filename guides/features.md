@@ -146,7 +146,7 @@ Authorization:
 - route user `hr-tasks` memakai `HrChecklistTaskPolicy@viewAny`
 - task hanya dapat diubah oleh admin/HR dengan manage permission atau user yang menjadi assignee task tersebut
 
-Modul ini shared-hosting friendly karena tidak membutuhkan Redis, Horizon, Reverb, queue worker long-running, atau WebSocket sebagai baseline.
+Modul ini tetap ringan di VPS karena tidak membutuhkan Redis atau Horizon sebagai baseline. Untuk production penuh, queue worker, scheduler, storage privat, dan Reverb mengikuti baseline VPS PostgreSQL.
 
 ## Import, Export, dan Report Background
 
@@ -183,7 +183,7 @@ Area `Operations` di admin menggabungkan fondasi kerja lintas tim:
 - `Accounting` untuk chart of accounts, journal, ledger detail, AR/AP aging, cashflow, dan closing period.
 - `Forms` untuk custom form builder company-scoped.
 
-Modul collaboration tetap shared-hosting friendly secara default: aplikasi menyimpan thread, pesan, metadata file, file aktual di private `local` disk, dan link meeting di database. User mendapatkan inbox `/collaboration` untuk membaca thread tempat ia menjadi anggota, mengirim pesan, dan mengunduh file thread yang lolos policy. Download file selalu lewat route terproteksi + policy company scope; video meeting tidak di-host sendiri agar deployment shared hosting tetap ringan. Untuk VPS/WebSocket-ready deployment, `COLLABORATION_REALTIME_ENABLED=true` mengaktifkan broadcast update workspace lewat Reverb/Pusher/Ably tanpa membuka akses lintas perusahaan.
+Modul collaboration mengikuti baseline VPS: aplikasi menyimpan thread, pesan, metadata file, file aktual di private `local` disk, dan link meeting di database PostgreSQL. User mendapatkan inbox `/collaboration` untuk membaca thread tempat ia menjadi anggota, mengirim pesan, dan mengunduh file thread yang lolos policy. Download file selalu lewat route terproteksi + policy company scope. Untuk VPS/WebSocket-ready deployment, `COLLABORATION_REALTIME_ENABLED=true` mengaktifkan broadcast update workspace lewat Reverb/Pusher/Ably tanpa membuka akses lintas perusahaan.
 
 ## Modul Enterprise
 
@@ -213,7 +213,7 @@ php artisan enterprise:hwid
 
 ## Roadmap Fase dan Task
 
-Roadmap ini disusun mobile-first, shared-hosting first, dan tetap mengikuti RBAC/policy yang sudah ada.
+Roadmap ini disusun mobile-first, VPS-first, PostgreSQL-first, dan tetap mengikuti RBAC/policy yang sudah ada.
 
 Status implementasi fondasi:
 
@@ -289,7 +289,8 @@ Backend:
 - Bun `1.3.6+`
 - Livewire `4`
 - Jetstream, Fortify, dan Sanctum
-- MySQL atau MariaDB
+- PostgreSQL `15+` sebagai default local/VPS
+- MySQL/MariaDB hanya compatibility path
 - queue, cache, notification, dan session berbasis database sebagai default
 
 Frontend:

@@ -3,8 +3,10 @@
 use App\Livewire\Admin\LeaveApproval;
 use App\Models\Attendance;
 use App\Models\User;
+use App\Support\LeaveApprovalService;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 test('admin leave approvals show all request statuses by default', function () {
     $admin = User::factory()->admin()->create();
@@ -81,4 +83,21 @@ test('rejecting leave keeps request type visible under rejected approval filter'
         ->set('statusFilter', Attendance::STATUS_REJECTED)
         ->assertSee('Rejected Leave Employee')
         ->assertSee('Permit quota is full');
+});
+
+test('leave approval service only reviews pending requests', function () {
+    $admin = User::factory()->admin()->create();
+    $employee = User::factory()->create();
+    $attendance = Attendance::create([
+        'user_id' => $employee->id,
+        'date' => now()->toDateString(),
+        'status' => 'leave',
+        'approval_status' => Attendance::STATUS_APPROVED,
+        'note' => 'Already approved leave',
+    ]);
+
+    expect(fn () => app(LeaveApprovalService::class)->approve([$attendance->id], $admin))
+        ->toThrow(HttpException::class);
+
+    expect($attendance->fresh()->approval_status)->toBe(Attendance::STATUS_APPROVED);
 });

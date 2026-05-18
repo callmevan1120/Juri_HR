@@ -13,6 +13,15 @@ class PayrollPeriodService
     public function resolve(string $type, int $year, int $month, ?int $sequence = null): array
     {
         $type = strtolower($type);
+
+        if ($year < 2000 || $year > 2200) {
+            throw new InvalidArgumentException("Unsupported payroll period year [{$year}].");
+        }
+
+        if ($month < 1 || $month > 12) {
+            throw new InvalidArgumentException("Unsupported payroll period month [{$month}].");
+        }
+
         $monthStart = Carbon::create($year, $month, 1)->startOfDay();
         $monthEnd = $monthStart->copy()->endOfMonth()->startOfDay();
 

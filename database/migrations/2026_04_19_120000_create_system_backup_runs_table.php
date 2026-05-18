@@ -48,6 +48,10 @@ return new class extends Migration
             });
         }
 
+        if (! in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            return;
+        }
+
         try {
             DB::statement('ALTER TABLE `system_backup_runs` DROP FOREIGN KEY `system_backup_runs_requested_by_user_id_foreign`');
         } catch (Throwable $e) {

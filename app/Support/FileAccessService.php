@@ -56,7 +56,11 @@ class FileAccessService
             }
 
             ActivityLog::record($auditAction, $this->describe($path, $description, $diskName));
-            $headers = ['Content-Type' => $this->contentTypeForPath($path)];
+            $headers = [
+                'Content-Type' => $this->contentTypeForPath($path),
+                'Cache-Control' => 'no-store, private',
+                'X-Content-Type-Options' => 'nosniff',
+            ];
 
             return $download
                 ? $disk->download($path, null, $headers)

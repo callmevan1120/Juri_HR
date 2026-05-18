@@ -12,6 +12,8 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class CollaborationWorkspaceService
 {
@@ -265,6 +267,16 @@ class CollaborationWorkspaceService
             return;
         }
 
-        CollaborationWorkspaceUpdated::dispatch((int) $companyId, $action, $resource, $resourceId);
+        try {
+            CollaborationWorkspaceUpdated::dispatch((int) $companyId, $action, $resource, $resourceId);
+        } catch (Throwable $exception) {
+            Log::warning('Collaboration realtime broadcast failed; falling back to polling.', [
+                'company_id' => $companyId,
+                'action' => $action,
+                'resource' => $resource,
+                'resource_id' => $resourceId,
+                'exception' => $exception->getMessage(),
+            ]);
+        }
     }
 }

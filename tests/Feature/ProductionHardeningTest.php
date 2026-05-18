@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureSecurityHeaders;
 use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\AdminSeeder;
@@ -7,9 +8,11 @@ use Database\Seeders\AttendanceSeeder;
 use Database\Seeders\DemoAssetSeeder;
 use Database\Seeders\FakeDataSeeder;
 use Database\Seeders\SettingSeeder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 test('demo and bootstrap seeders skip known accounts in production by default', function () {
     putenv('DEMO_SEEDING_ENABLED=false');
@@ -97,6 +100,31 @@ test('repository and public htaccess block sensitive paths as defense in depth',
         ->toContain('\.(sql|zip|tar|gz|tgz|bak|old)$')
         ->and($publicHtaccess)->toContain('^temp(/|$)')
         ->and($vercel)->not->toContain('|temp)');
+});
+
+test('local content security policy allows configured reverb websocket origin', function () {
+    Config::set('app.env', 'local');
+    Config::set('broadcasting.default', 'reverb');
+    Config::set('broadcasting.connections.reverb.options.host', '127.0.0.1');
+    Config::set('broadcasting.connections.reverb.options.port', 8081);
+
+    app()->detectEnvironment(fn () => 'local');
+
+    try {
+        $response = app(EnsureSecurityHeaders::class)->handle(
+            Request::create('http://127.0.0.1:8000/admin/dashboard', 'GET'),
+            fn () => new Response('ok'),
+        );
+        $csp = $response->headers->get('Content-Security-Policy');
+
+        expect(str_contains((string) $csp, 'ws://127.0.0.1:8081'))->toBeTrue()
+            ->and(str_contains((string) $csp, 'wss://127.0.0.1:8081'))->toBeTrue()
+            ->and(str_contains((string) $csp, 'ws://localhost:8081'))->toBeTrue()
+            ->and(str_contains((string) $csp, 'wss://localhost:8081'))->toBeTrue();
+    } finally {
+        app()->detectEnvironment(fn () => 'testing');
+        Config::set('app.env', 'testing');
+    }
 });
 
 test('wilayah routes use dedicated throttle middleware', function () {

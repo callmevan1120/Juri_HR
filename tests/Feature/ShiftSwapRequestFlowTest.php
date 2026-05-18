@@ -11,6 +11,7 @@ use App\Models\Schedule;
 use App\Models\Shift;
 use App\Models\ShiftSwapRequest;
 use App\Models\User;
+use App\Support\ShiftSwapRequestService;
 use App\Support\TeamApprovalQueryService;
 use Livewire\Livewire;
 
@@ -277,4 +278,32 @@ test('admin superadmin and hr can open shift swap approvals page', function () {
     $this->actingAs($hr)
         ->get(route('admin.shift-swaps'))
         ->assertOk();
+});
+
+test('shift swap approval service ignores already reviewed requests', function () {
+    [$manager, $employee] = createShiftSwapApprovalHierarchy();
+    $currentShift = Shift::create(['name' => 'Morning', 'start_time' => '07:00', 'end_time' => '15:00']);
+    $requestedShift = Shift::create(['name' => 'Evening', 'start_time' => '15:00', 'end_time' => '23:00']);
+    $schedule = Schedule::create([
+        'user_id' => $employee->id,
+        'shift_id' => $currentShift->id,
+        'date' => now()->addDays(6)->toDateString(),
+    ]);
+
+    $request = ShiftSwapRequest::create([
+        'user_id' => $employee->id,
+        'schedule_id' => $schedule->id,
+        'current_shift_id' => $currentShift->id,
+        'requested_shift_id' => $requestedShift->id,
+        'reason' => 'Already approved request.',
+        'status' => ShiftSwapRequest::STATUS_APPROVED,
+        'reviewed_by' => $manager->id,
+        'reviewed_at' => now(),
+    ]);
+
+    $message = app(ShiftSwapRequestService::class)->approve($request, $manager);
+
+    expect($message)->toBe(__('You are not allowed to review this shift swap request.'))
+        ->and($request->fresh()->status)->toBe(ShiftSwapRequest::STATUS_APPROVED)
+        ->and($schedule->fresh()->shift_id)->toBe($currentShift->id);
 });

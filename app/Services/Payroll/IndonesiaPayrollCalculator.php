@@ -3,6 +3,8 @@
 namespace App\Services\Payroll;
 
 use App\Models\User;
+use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 
 class IndonesiaPayrollCalculator
 {
@@ -12,7 +14,7 @@ class IndonesiaPayrollCalculator
      */
     public function calculate(User $user, array $options = []): array
     {
-        $baseSalary = (float) ($options['basic_salary'] ?? $user->basic_salary ?? 0);
+        $baseSalary = max(0.0, (float) ($options['basic_salary'] ?? $user->basic_salary ?? 0));
         $period = $this->resolvePeriod($options);
         $workDays = max(1, (int) ($options['work_days'] ?? $period['work_days']));
         $paidDays = max(0, min($workDays, (int) ($options['paid_days'] ?? $workDays)));
@@ -22,14 +24,14 @@ class IndonesiaPayrollCalculator
         $variableAllowanceItems = $options['variable_allowances'] ?? [];
         $fixedAllowances = $this->sumNamedAmounts($fixedAllowanceItems);
         $variableAllowances = $this->sumNamedAmounts($variableAllowanceItems);
-        $overtimePay = (float) ($options['overtime_pay'] ?? 0);
+        $overtimePay = max(0.0, (float) ($options['overtime_pay'] ?? 0));
         $thr = $this->calculateThr($baseSalary, (int) ($options['months_worked'] ?? 12), (bool) ($options['include_thr'] ?? false));
 
         $gross = round($proratedSalary + $fixedAllowances + $variableAllowances + $overtimePay + $thr, 2);
         $nonTaxableIncome = round($this->sumNamedAmounts($this->nonTaxableItems($fixedAllowanceItems)) + $this->sumNamedAmounts($this->nonTaxableItems($variableAllowanceItems)), 2);
         $taxableAllowances = round($fixedAllowances + $variableAllowances - $nonTaxableIncome, 2);
         $taxableIncome = round($proratedSalary + $taxableAllowances + $overtimePay + $thr, 2);
-        $bpjsWageBase = round((float) ($options['bpjs_wage_base'] ?? $gross), 2);
+        $bpjsWageBase = round(max(0.0, (float) ($options['bpjs_wage_base'] ?? $gross)), 2);
 
         $bpjs = [
             'kesehatan_employee' => TaxCalculatorService::calculateBPJSKesehatan($bpjsWageBase, true),
@@ -109,7 +111,7 @@ class IndonesiaPayrollCalculator
             return 0.0;
         }
 
-        return round(collect($items)->sum(fn ($item): float => (float) data_get($item, 'amount', 0)), 2);
+        return round(collect($items)->sum(fn ($item): float => max(0.0, (float) data_get($item, 'amount', 0))), 2);
     }
 
     /**
@@ -119,15 +121,21 @@ class IndonesiaPayrollCalculator
     private function resolvePeriod(array $options): array
     {
         if (isset($options['period_start'], $options['period_end'])) {
-            $start = (string) $options['period_start'];
-            $end = (string) $options['period_end'];
+            $startDate = Carbon::parse((string) $options['period_start'])->startOfDay();
+            $endDate = Carbon::parse((string) $options['period_end'])->startOfDay();
+
+            if ($endDate->lt($startDate)) {
+                throw new InvalidArgumentException('Payroll period end date must be after or equal to the start date.');
+            }
+
+            $workDays = max(1, (int) ($options['work_days'] ?? ((int) $startDate->diffInDays($endDate) + 1)));
 
             return [
-                'period_type' => (string) ($options['period_type'] ?? 'custom'),
-                'period_start' => $start,
-                'period_end' => $end,
+                'period_type' => strtolower((string) ($options['period_type'] ?? 'custom')),
+                'period_start' => $startDate->toDateString(),
+                'period_end' => $endDate->toDateString(),
                 'period_sequence' => (int) ($options['period_sequence'] ?? 1),
-                'work_days' => (int) ($options['work_days'] ?? 30),
+                'work_days' => $workDays,
             ];
         }
 

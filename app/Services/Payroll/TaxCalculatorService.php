@@ -11,7 +11,7 @@ class TaxCalculatorService
     public static function calculateBPJSKesehatan($grossSalary, $isEmployeeShare = true)
     {
         $cap = 12000000;
-        $base = min($grossSalary, $cap);
+        $base = max(0, min((float) $grossSalary, $cap));
         $rate = $isEmployeeShare ? 0.01 : 0.04;
 
         return round($base * $rate, 2);
@@ -25,7 +25,7 @@ class TaxCalculatorService
     {
         $rate = $isEmployeeShare ? 0.02 : 0.037;
 
-        return round($grossSalary * $rate, 2);
+        return round(max(0, (float) $grossSalary) * $rate, 2);
     }
 
     /**
@@ -36,7 +36,7 @@ class TaxCalculatorService
     public static function calculateBPJSKetenagakerjaanJP($grossSalary, $isEmployeeShare = true)
     {
         $cap = 10042300;
-        $base = min($grossSalary, $cap);
+        $base = max(0, min((float) $grossSalary, $cap));
         $rate = $isEmployeeShare ? 0.01 : 0.02;
 
         return round($base * $rate, 2);
@@ -49,6 +49,8 @@ class TaxCalculatorService
      */
     public static function calculatePPh21TER($grossSalary, $ptkpStatus = 'TK/0')
     {
+        $grossSalary = max(0, (float) $grossSalary);
+
         // Define Categories based on PTKP Status
         $categoryA = ['TK/0', 'TK/1', 'K/0'];
         $categoryB = ['TK/2', 'TK/3', 'K/1', 'K/2'];

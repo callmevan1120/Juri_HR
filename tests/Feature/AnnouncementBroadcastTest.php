@@ -4,6 +4,7 @@ use App\Events\AnnouncementsChanged;
 use App\Livewire\Admin\AnnouncementManager;
 use App\Livewire\Shared\HighPriorityAnnouncementModal;
 use App\Livewire\Shared\NotificationsDropdown;
+use App\Models\Announcement;
 use App\Models\User;
 use App\Support\AnnouncementRefresh;
 use App\Support\BroadcastRuntime;
@@ -114,6 +115,39 @@ test('echo listeners are only registered when realtime broadcasting is enabled',
         ->toHaveKey('echo:announcements,.announcements.changed')
         ->and(componentListeners(new NotificationsDropdown))
         ->toHaveKey('echo:announcements,.announcements.changed');
+});
+
+test('high priority acknowledgement can be dismissed with explicit button acknowledgement', function () {
+    $user = User::factory()->create([
+        'group' => 'user',
+        'employment_status' => User::EMPLOYMENT_STATUS_ACTIVE,
+    ]);
+    $creator = User::factory()->admin(true)->create();
+
+    $announcement = Announcement::create([
+        'title' => 'Critical Policy',
+        'content' => 'Please acknowledge.',
+        'priority' => 'high',
+        'modal_behavior' => 'acknowledge',
+        'publish_date' => now()->toDateString(),
+        'expire_date' => null,
+        'is_active' => true,
+        'created_by' => $creator->id,
+    ]);
+
+    $this->actingAs($user);
+
+    Livewire::test(HighPriorityAnnouncementModal::class)
+        ->assertSet('showModal', true)
+        ->call('dismiss')
+        ->assertSet('showModal', true)
+        ->call('dismiss', true)
+        ->assertSet('showModal', false);
+
+    $this->assertDatabaseHas('announcement_user_dismissals', [
+        'announcement_id' => $announcement->id,
+        'user_id' => $user->id,
+    ]);
 });
 
 test('broadcast runtime exposes safe echo client config for local and production reverb', function () {

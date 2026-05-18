@@ -5,7 +5,9 @@ namespace App\Support;
 use App\Models\Overtime;
 use App\Models\User;
 use App\Notifications\OvertimeStatusUpdated;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class OvertimeApprovalService
 {
@@ -33,21 +35,31 @@ class OvertimeApprovalService
 
     public function approve(Overtime $overtime, User $actor): void
     {
-        $overtime->update([
-            'status' => 'approved',
-            'approved_by' => $actor->id,
-        ]);
+        DB::transaction(function () use ($overtime, $actor): void {
+            $overtime = $this->lock($overtime);
+            $this->ensurePending($overtime);
+
+            $overtime->update([
+                'status' => 'approved',
+                'approved_by' => $actor->id,
+            ]);
+        });
 
         $this->notifyStatusUpdated($overtime);
     }
 
     public function reject(Overtime $overtime, User $actor, ?string $rejectionReason = null): void
     {
-        $overtime->update([
-            'status' => 'rejected',
-            'approved_by' => $actor->id,
-            'rejection_reason' => $rejectionReason,
-        ]);
+        DB::transaction(function () use ($overtime, $actor, $rejectionReason): void {
+            $overtime = $this->lock($overtime);
+            $this->ensurePending($overtime);
+
+            $overtime->update([
+                'status' => 'rejected',
+                'approved_by' => $actor->id,
+                'rejection_reason' => $rejectionReason,
+            ]);
+        });
 
         $this->notifyStatusUpdated($overtime);
     }
@@ -60,5 +72,20 @@ class OvertimeApprovalService
 
         $overtime->loadMissing('user');
         $overtime->user?->notify(new OvertimeStatusUpdated($overtime));
+    }
+
+    private function lock(Overtime $overtime): Overtime
+    {
+        return Overtime::query()
+            ->whereKey($overtime->getKey())
+            ->lockForUpdate()
+            ->firstOrFail();
+    }
+
+    private function ensurePending(Overtime $overtime): void
+    {
+        if ($overtime->status !== 'pending') {
+            throw new AuthorizationException(__('This overtime request has already been reviewed.'));
+        }
     }
 }

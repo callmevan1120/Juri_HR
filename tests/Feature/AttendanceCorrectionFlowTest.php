@@ -11,7 +11,9 @@ use App\Models\JobTitle;
 use App\Models\Shift;
 use App\Models\User;
 use App\Notifications\AttendanceCorrectionStatusUpdated;
+use App\Support\AttendanceCorrectionService;
 use App\Support\TeamApprovalQueryService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
@@ -375,4 +377,23 @@ test('admin approval applies the attendance correction and notifies employee', f
         ->and($attendance->status)->toBe('late');
 
     Notification::assertSentTo($user, AttendanceCorrectionStatusUpdated::class);
+});
+
+test('attendance correction review rejects stale terminal status', function () {
+    $admin = User::factory()->admin(true)->create();
+    [, $user] = createAttendanceApprovalHierarchy();
+
+    $correction = AttendanceCorrection::create([
+        'user_id' => $user->id,
+        'attendance_date' => now()->toDateString(),
+        'request_type' => AttendanceCorrection::TYPE_WRONG_TIME,
+        'requested_time_in' => Carbon::parse(now()->toDateString().' 08:15:00'),
+        'reason' => 'Already rejected correction.',
+        'status' => AttendanceCorrection::STATUS_REJECTED,
+    ]);
+
+    expect(fn () => app(AttendanceCorrectionService::class)->approve($correction, $admin))
+        ->toThrow(AuthorizationException::class);
+
+    expect($correction->fresh()->status)->toBe(AttendanceCorrection::STATUS_REJECTED);
 });

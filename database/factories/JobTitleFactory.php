@@ -14,6 +14,7 @@ class JobTitleFactory extends Factory
         'Head',
         'Manager',
         'Senior',
+        'Officer',
         'Staff',
     ];
 

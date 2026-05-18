@@ -45,6 +45,8 @@ Fokus utama aplikasi:
 Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Panduan integrasi mesin absensi ada di [guides/attendance-integration.md](./guides/attendance-integration.md). Baseline stack modern ada di [guides/modern-stack.md](./guides/modern-stack.md). Coverage roadmap menuju 10/10 ada di [guides/roadmap-10-coverage.md](./guides/roadmap-10-coverage.md). Checklist rilis publik tersedia di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
 Evidence bundle untuk reviewer tersedia di [guides/reviewer-evidence.md](./guides/reviewer-evidence.md).
 
+Fokus pengembangan saat ini adalah pematangan fitur yang sudah ada: logic correctness, security, data integrity, UX polish, test coverage, dan operational readiness. Modul baru tidak menjadi prioritas kecuali langsung memperkuat flow existing. Detail prinsip kerja ada di [guides/feature-maturity.md](./guides/feature-maturity.md).
+
 ## Stack
 
 - Laravel `13`
@@ -54,28 +56,28 @@ Evidence bundle untuk reviewer tersedia di [guides/reviewer-evidence.md](./guide
 - Vite `7`
 - Node.js `20+`
 - Bun `1.3.6+`
-- MySQL atau MariaDB
+- PostgreSQL `15+` sebagai default local/VPS
 - Pest untuk test suite
 - Capacitor `8`
 - Android SDK `35` dengan minimum Android API `24`
 
 Runtime default aplikasi database-centric:
 
-- `DB_CONNECTION=mysql`
+- `DB_CONNECTION=pgsql`
 - `QUEUE_CONNECTION=database`
 - `CACHE_STORE=database`
 - `SESSION_DRIVER=database`
 - `FILESYSTEM_DISK=local`
 - `FILESYSTEM_ATTACHMENT_DISKS=local`
-- realtime announcement hybrid: shared hosting memakai fallback polling ringan, VPS bisa memakai Reverb WebSocket
+- realtime: Reverb WebSocket di VPS, polling fallback hanya untuk degraded mode
 - timezone `Asia/Jakarta`
 - locale `id`
 
-Modul HR Checklist berjalan tanpa Redis, Horizon, atau Reverb sebagai baseline. Data checklist disimpan di database dan dapat dipakai di shared hosting selama migration, session, cache, dan queue database dasar tersedia.
+Baseline runtime resmi PasPapan adalah PHP 8.3+. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4.
 
-Baseline runtime resmi PasPapan adalah PHP 8.3+. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4. Konfigurasi MySQL/MariaDB memakai `Pdo\Mysql::ATTR_SSL_CA` ketika tersedia dengan fallback kompatibel untuk runtime PHP 8.3.
+Target production resmi sekarang adalah VPS dengan PostgreSQL 15+ sebagai default. Deployment MySQL/MariaDB tetap tersedia sebagai compatibility path untuk provider managed database tertentu, tetapi bukan baseline utama; lihat [Database Portability](./guides/database-portability.md).
 
-Vercel memakai runtime serverless, jadi default production-nya berbeda dari VPS/shared hosting:
+Vercel memakai runtime serverless, jadi default production-nya berbeda dari VPS penuh:
 
 - `SESSION_DRIVER=cookie`
 - `CACHE_STORE=array`
@@ -151,7 +153,7 @@ php artisan migrate --seed
 php artisan storage:link
 ```
 
-Seeder default mengisi master data aman, termasuk dataset wilayah Indonesia dari `database/data/wilayah.sql.gz`. Jika dataset wilayah perlu di-refresh ulang, set sementara `WILAYAH_SEED_REFRESH=true` lalu jalankan `php artisan db:seed --class=WilayahSeeder`.
+Seeder default mengisi master data aman secara idempotent, termasuk dataset wilayah Indonesia dari `database/data/wilayah.sql.gz`. Operasional harian dan automation tidak boleh melakukan refresh/truncate lewat seeder; jika dataset perlu diganti total, jalankan runbook migration/restore terpisah dengan backup, staging rehearsal, dan approval.
 
 Untuk setup yang lebih eksplisit:
 
@@ -183,12 +185,14 @@ APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://127.0.0.1:8000
 
-DB_CONNECTION=mysql
+DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=5432
 DB_DATABASE=absensi
 DB_USERNAME=your_user
 DB_PASSWORD=your_password
+DB_SCHEMA=public
+DB_SSLMODE=prefer
 
 QUEUE_CONNECTION=database
 SESSION_DRIVER=database
@@ -203,8 +207,8 @@ COLLABORATION_REALTIME_ENABLED=false
 
 PasPapan mendukung dua mode announcement/notification refresh dan collaboration update:
 
-- Shared hosting UMKM: gunakan `BROADCAST_CONNECTION=log` dengan `ANNOUNCEMENT_REFRESH_MODE=auto`. Aplikasi fallback ke polling ringan setiap `ANNOUNCEMENT_POLL_INTERVAL`.
-- VPS: gunakan `BROADCAST_CONNECTION=reverb`. Aplikasi memakai Laravel Reverb + Echo sehingga announcement baru dan update collaboration workspace dikirim lewat WebSocket. Aktifkan `COLLABORATION_REALTIME_ENABLED=true` hanya di VPS/WebSocket-ready deployment. Mode `auto` tetap fallback ke polling kalau driver/key Reverb belum lengkap, jadi local install tidak akan kehilangan refresh.
+- VPS: gunakan `BROADCAST_CONNECTION=reverb`. Aplikasi memakai Laravel Reverb + Echo sehingga announcement baru dan update collaboration workspace dikirim lewat WebSocket. Aktifkan `COLLABORATION_REALTIME_ENABLED=true` di deployment WebSocket-ready. Mode `auto` tetap fallback ke polling kalau driver/key Reverb belum lengkap, jadi local install tidak akan kehilangan refresh.
+- Degraded mode: gunakan `BROADCAST_CONNECTION=log` dengan `ANNOUNCEMENT_REFRESH_MODE=auto` hanya untuk staging ringan atau troubleshooting tanpa WebSocket.
 
 Contoh local Reverb smoke:
 
@@ -263,17 +267,16 @@ Target produksi paling lengkap adalah VPS karena PasPapan memakai queue worker, 
 
 Panduan deployment dipisahkan di [guides/deployment.md](./guides/deployment.md):
 
-- VPS dengan Nginx/Apache, Supervisor, dan cron
-- shared hosting dengan cron fallback
+- VPS dengan Nginx/Apache, Supervisor/systemd, cron, PostgreSQL, dan Reverb
 - Vercel memakai [`vercel-community/php`](https://github.com/vercel-community/php)
 
 Ringkasan target deploy:
 
 | Target | Status | Catatan |
 | --- | --- | --- |
-| VPS | Production penuh | Target utama karena mendukung queue worker, scheduler, storage lokal/private, backup, Reverb, dan job background panjang. |
-| Shared hosting | Production terbatas | Aman untuk instalasi kecil jika PHP 8.3+, cron, MySQL, dan document root `public/` tersedia; Reverb dan worker permanen biasanya tidak tersedia. |
+| VPS | Production penuh | Target utama dan baseline resmi: PostgreSQL 15+, queue worker, scheduler, storage lokal/private, backup, Reverb, dan job background panjang. |
 | Vercel | Demo/staging/ringan | Aman untuk demo serverless; queue `sync`, storage `/tmp` ephemeral, tanpa scheduler/worker permanen, dan tidak cocok untuk backup/file-heavy production. |
+| Shared hosting | Legacy/best-effort | Tidak lagi menjadi target utama karena fitur penuh membutuhkan worker, scheduler, storage privat stabil, backup, dan WebSocket. |
 
 File pendukung Vercel yang sudah tersedia:
 
@@ -283,7 +286,7 @@ File pendukung Vercel yang sudah tersedia:
 - [`.env.vercel.example`](./.env.vercel.example)
 - [`.vercelignore`](./.vercelignore)
 
-Catatan Vercel: set semua environment variable lewat Vercel Dashboard atau CLI, lalu redeploy. Untuk TiDB/MySQL managed yang butuh TLS, isi `MYSQL_ATTR_SSL_CA` sesuai path CA runtime provider.
+Catatan Vercel: set semua environment variable lewat Vercel Dashboard atau CLI, lalu redeploy. Gunakan managed PostgreSQL untuk default baru.
 
 ## Operasi
 
@@ -310,9 +313,10 @@ php artisan queue:restart
 ## Testing
 
 ```bash
-php artisan test --without-tty
+php artisan test
 composer check:ui
 composer check:modern-stack
+composer check:database-portability
 composer check:enterprise-boundary
 ./vendor/bin/pint --test
 composer phpstan
@@ -320,6 +324,15 @@ composer audit
 bun audit
 bun run build
 php artisan rbac:audit
+```
+
+Smoke database lintas engine:
+
+```bash
+composer check:database-portability:sqlite
+PASPAPAN_PG_USER=lutuk PASPAPAN_PG_ADMIN_DB=absensi composer check:database-portability:pgsql
+# optional managed MySQL compatibility path:
+# PASPAPAN_MYSQL_USER=root PASPAPAN_MYSQL_PASSWORD=<password> composer check:database-portability:mysql
 ```
 
 Smoke dan screenshot tambahan:
@@ -359,7 +372,7 @@ Akun demo:
 | Admin | `admin123@paspapan.com` | `12345678` |
 | User | `user123@paspapan.com` | `12345678` |
 
-Akun demo hanya boleh dipakai untuk environment lokal/staging atau demo publik yang sengaja disiapkan oleh operator. Kredensial di atas adalah kredensial demo dan tidak boleh digunakan ulang sebagai kredensial produksi. Demo Vercel berjalan di runtime serverless, sehingga fitur yang bergantung pada worker/background job panjang, storage lokal permanen, atau proses realtime long-running lebih cocok diuji di deployment VPS/shared hosting.
+Akun demo hanya boleh dipakai untuk environment lokal/staging atau demo publik yang sengaja disiapkan oleh operator. Kredensial di atas adalah kredensial demo dan tidak boleh digunakan ulang sebagai kredensial produksi. Demo Vercel berjalan di runtime serverless, sehingga fitur yang bergantung pada worker/background job panjang, storage lokal permanen, atau proses realtime long-running harus diuji di deployment VPS.
 
 ## Dukung Pengembangan
 

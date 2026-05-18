@@ -10,6 +10,7 @@ use Ballen\Distical\Calculator as DistanceCalculator;
 use Ballen\Distical\Entities\LatLong;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DeviceAttendanceService
 {
@@ -55,117 +56,139 @@ class DeviceAttendanceService
             ];
         }
 
-        $attendance = Attendance::firstOrNew([
-            'user_id' => $userId,
-            'date' => now()->toDateString(),
-        ]);
-
-        if (
-            $attendance->exists &&
-            in_array($attendance->status, ['sick', 'excused', 'permission', 'leave'], true) &&
-            $attendance->approval_status === Attendance::STATUS_APPROVED
-        ) {
-            return [
-                'ok' => false,
-                'message' => 'Attendance is blocked because the user is on approved leave.',
-                'status' => 422,
-            ];
-        }
-
         $attendanceTime = $timestamp
             ? Carbon::createFromFormat('Y-m-d H:i:s', $timestamp)
             : now();
 
-        if (is_null($attendance->time_in)) {
-            $attendance->fill([
-                'barcode_id' => $barcode->id,
-                'time_in' => $attendanceTime,
-                'latitude_in' => $latitude,
-                'longitude_in' => $longitude,
-                'accuracy_in' => $gpsAccuracy,
-                'gps_variance_in' => $gpsVariance,
-                'status' => $attendance->status === 'absent' ? 'present' : ($attendance->status ?: 'present'),
+        return DB::transaction(function () use (
+            $userId,
+            $barcode,
+            $scanSource,
+            $latitude,
+            $longitude,
+            $attendanceTime,
+            $gpsAccuracy,
+            $gpsVariance,
+            $distance,
+            $mockLocationDetected,
+            $offlineSubmitted,
+            $qrTokenRetries,
+            $barcodePayload,
+        ): array {
+            $attendance = Attendance::query()
+                ->where('user_id', $userId)
+                ->where('date', $attendanceTime->toDateString())
+                ->lockForUpdate()
+                ->first();
+
+            $attendance ??= new Attendance([
+                'user_id' => $userId,
+                'date' => $attendanceTime->toDateString(),
             ]);
-            $action = 'check_in';
-        } elseif (is_null($attendance->time_out)) {
-            if ((int) $attendance->barcode_id !== (int) $barcode->id) {
+
+            if (
+                $attendance->exists &&
+                in_array($attendance->status, ['sick', 'excused', 'permission', 'leave'], true) &&
+                $attendance->approval_status === Attendance::STATUS_APPROVED
+            ) {
                 return [
                     'ok' => false,
-                    'message' => __('Please scan the same checkpoint used for check in.'),
+                    'message' => 'Attendance is blocked because the user is on approved leave.',
                     'status' => 422,
                 ];
             }
 
-            $attendance->fill([
-                'barcode_id' => $attendance->barcode_id,
-                'time_out' => $attendanceTime,
-                'latitude_out' => $latitude,
-                'longitude_out' => $longitude,
-                'accuracy_out' => $gpsAccuracy,
-                'gps_variance_out' => $gpsVariance,
-            ]);
-            $action = 'check_out';
-        } else {
-            return [
-                'ok' => false,
-                'message' => 'Attendance for today is already complete.',
-                'status' => 409,
-            ];
-        }
+            if (is_null($attendance->time_in)) {
+                $attendance->fill([
+                    'barcode_id' => $barcode->id,
+                    'time_in' => $attendanceTime,
+                    'latitude_in' => $latitude,
+                    'longitude_in' => $longitude,
+                    'accuracy_in' => $gpsAccuracy,
+                    'gps_variance_in' => $gpsVariance,
+                    'status' => $attendance->status === 'absent' ? 'present' : ($attendance->status ?: 'present'),
+                ]);
+                $action = 'check_in';
+            } elseif (is_null($attendance->time_out)) {
+                if ((int) $attendance->barcode_id !== (int) $barcode->id) {
+                    return [
+                        'ok' => false,
+                        'message' => __('Please scan the same checkpoint used for check in.'),
+                        'status' => 422,
+                    ];
+                }
 
-        $risk = $this->attendanceRiskScorer->score(
-            attendance: $attendance,
-            barcode: $barcode,
-            shift: $attendance->shift,
-            event: $action,
-            context: [
-                'distance' => $distance,
-                'gps_accuracy' => $gpsAccuracy,
-                'gps_variance' => $gpsVariance,
-                'mock_location_detected' => $mockLocationDetected,
-                'offline_submitted' => $offlineSubmitted,
-                'qr_token_retries' => $qrTokenRetries,
-                'source' => $scanSource,
-            ],
-        );
+                $attendance->fill([
+                    'barcode_id' => $attendance->barcode_id,
+                    'time_out' => $attendanceTime,
+                    'latitude_out' => $latitude,
+                    'longitude_out' => $longitude,
+                    'accuracy_out' => $gpsAccuracy,
+                    'gps_variance_out' => $gpsVariance,
+                ]);
+                $action = 'check_out';
+            } else {
+                return [
+                    'ok' => false,
+                    'message' => 'Attendance for today is already complete.',
+                    'status' => 409,
+                ];
+            }
 
-        if ($attendance->exists) {
-            $risk = $this->attendanceRiskScorer->merge(
-                $attendance->risk_factors,
-                (int) ($attendance->risk_score ?? 0),
-                $risk,
+            $risk = $this->attendanceRiskScorer->score(
+                attendance: $attendance,
+                barcode: $barcode,
+                shift: $attendance->shift,
+                event: $action,
+                context: [
+                    'distance' => $distance,
+                    'gps_accuracy' => $gpsAccuracy,
+                    'gps_variance' => $gpsVariance,
+                    'mock_location_detected' => $mockLocationDetected,
+                    'offline_submitted' => $offlineSubmitted,
+                    'qr_token_retries' => $qrTokenRetries,
+                    'source' => $scanSource,
+                ],
             );
-        }
 
-        $attendance->fill([
-            'is_suspicious' => (bool) $attendance->is_suspicious || $risk['score'] >= 25,
-            'risk_score' => $risk['score'],
-            'risk_level' => $risk['level'],
-            'risk_factors' => $risk['factors'],
-            'risk_evaluated_at' => $risk['evaluated_at'],
-        ]);
+            if ($attendance->exists) {
+                $risk = $this->attendanceRiskScorer->merge(
+                    $attendance->risk_factors,
+                    (int) ($attendance->risk_score ?? 0),
+                    $risk,
+                );
+            }
 
-        $attendance->save();
+            $attendance->fill([
+                'is_suspicious' => (bool) $attendance->is_suspicious || $risk['score'] >= 25,
+                'risk_score' => $risk['score'],
+                'risk_level' => $risk['level'],
+                'risk_factors' => $risk['factors'],
+                'risk_evaluated_at' => $risk['evaluated_at'],
+            ]);
 
-        if ($scanSource === 'dynamic') {
-            $this->dynamicBarcodeTokenService->consumeScannedToken($barcode, $barcodePayload);
-        }
+            $attendance->save();
 
-        Attendance::clearUserAttendanceCache($attendance->user, Carbon::parse($attendance->date));
-        ActivityLog::record(
-            $scanSource === 'dynamic'
-                ? ($action === 'check_in' ? 'Dynamic Check In' : 'Dynamic Check Out')
-                : ($action === 'check_in' ? 'Check In' : 'Check Out'),
-            ($action === 'check_in' ? 'User checked in via ' : 'User checked out via ')
-                .($scanSource === 'dynamic' ? 'dynamic barcode: ' : 'barcode: ')
-                .$barcode->name
-        );
+            if ($scanSource === 'dynamic') {
+                $this->dynamicBarcodeTokenService->consumeScannedToken($barcode, $barcodePayload);
+            }
 
-        return [
-            'ok' => true,
-            'attendance' => $attendance,
-            'action' => $action,
-        ];
+            Attendance::clearUserAttendanceCache($attendance->user, Carbon::parse($attendance->date));
+            ActivityLog::record(
+                $scanSource === 'dynamic'
+                    ? ($action === 'check_in' ? 'Dynamic Check In' : 'Dynamic Check Out')
+                    : ($action === 'check_in' ? 'Check In' : 'Check Out'),
+                ($action === 'check_in' ? 'User checked in via ' : 'User checked out via ')
+                    .($scanSource === 'dynamic' ? 'dynamic barcode: ' : 'barcode: ')
+                    .$barcode->name
+            );
+
+            return [
+                'ok' => true,
+                'attendance' => $attendance,
+                'action' => $action,
+            ];
+        });
     }
 
     public function uploadPhoto(int|string $userId, UploadedFile $photo, ?float $latitude = null, ?float $longitude = null): array

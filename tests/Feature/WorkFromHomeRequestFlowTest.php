@@ -5,6 +5,8 @@ use App\Livewire\User\WorkFromHomeRequestPage;
 use App\Models\User;
 use App\Models\WorkFromHomeRequest;
 use App\Support\MultiCompanyService;
+use App\Support\WorkFromHomeRequestService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 
@@ -75,4 +77,26 @@ test('unrelated user cannot approve another employee wfh request', function () {
         ->call('approveWfh', $request->id);
 
     expect($request->fresh()->status)->toBe(WorkFromHomeRequest::STATUS_PENDING);
+});
+
+test('wfh approval service rejects stale reviewed request', function () {
+    $manager = User::factory()->create();
+    $employee = User::factory()->create(['manager_id' => $manager->id]);
+    $company = app(MultiCompanyService::class)->createCompany('PT WFH Stale', $manager);
+    app(MultiCompanyService::class)->assignUser($employee, $company);
+
+    $request = WorkFromHomeRequest::query()->create([
+        'user_id' => $employee->id,
+        'company_id' => $company->id,
+        'date' => now()->addDay()->toDateString(),
+        'reason' => 'Already reviewed request.',
+        'status' => WorkFromHomeRequest::STATUS_APPROVED,
+        'reviewed_by' => $manager->id,
+        'reviewed_at' => now(),
+    ]);
+
+    expect(fn () => app(WorkFromHomeRequestService::class)->approve($request, $manager))
+        ->toThrow(AuthorizationException::class);
+
+    expect($request->fresh()->status)->toBe(WorkFromHomeRequest::STATUS_APPROVED);
 });
