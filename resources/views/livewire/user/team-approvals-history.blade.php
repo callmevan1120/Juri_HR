@@ -6,14 +6,12 @@
                 :title="__('Approval History')"
                 title-id="approval-history-title">
                 <x-slot name="icon">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <x-heroicon-o-clock class="h-5 w-5" />
                 </x-slot>
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+	        <div class="user-compact-filter mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <!-- Tabs -->
             <div class="flex-1">
                 <nav class="user-segmented-tabs" aria-label="{{ __('Tabs') }}">
@@ -59,8 +57,8 @@
         <div class="space-y-4">
             @if ($activeTab === 'leaves')
             <!-- Desktop Table -->
-            <div class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="overflow-x-auto">
+            <div class="user-list-card hidden overflow-hidden p-0 md:block">
+                <div class="user-desktop-table-scroll">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-900">
                             <tr>
@@ -166,7 +164,7 @@
             <!-- Mobile Cards -->
             <div class="md:hidden space-y-4">
                 @forelse ($leaves as $leave)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+                <div class="user-list-card">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center">
                             <img class="h-10 w-10 rounded-full object-cover"
@@ -221,7 +219,7 @@
                     @endif
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
+                <div class="user-empty-state">
                     {{ __('No leave requests found') }}
                 </div>
                 @endforelse
@@ -236,8 +234,8 @@
             @include('livewire.user.partials.team-shift-swaps-history')
             @elseif ($activeTab === 'reimbursements')
             <!-- Desktop Table -->
-            <div class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="overflow-x-auto">
+            <div class="user-list-card hidden overflow-hidden p-0 md:block">
+                <div class="user-desktop-table-scroll">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-900">
                             <tr>
@@ -337,7 +335,7 @@
             <!-- Mobile Cards -->
             <div class="md:hidden space-y-4">
                 @forelse ($reimbursements as $reimbursement)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+                <div class="user-list-card">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center">
                             <img class="h-10 w-10 rounded-full object-cover"
@@ -392,7 +390,7 @@
                     </div>
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
+                <div class="user-empty-state">
                     {{ __('No reimbursement requests found') }}
                 </div>
                 @endforelse
@@ -402,8 +400,8 @@
             </div>
             @elseif ($activeTab === 'overtimes')
             <!-- Desktop Table -->
-            <div class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="overflow-x-auto">
+            <div class="user-list-card hidden overflow-hidden p-0 md:block">
+                <div class="user-desktop-table-scroll">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-900">
                             <tr>
@@ -471,7 +469,7 @@
             <!-- Mobile Cards -->
             <div class="md:hidden space-y-4">
                 @forelse ($overtimes as $overtime)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+                <div class="user-list-card">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center">
                             <img class="h-10 w-10 rounded-full object-cover" src="{{ $overtime->user->profile_photo_url }}" alt="{{ $overtime->user->name }}">
@@ -511,7 +509,7 @@
                     <div class="mt-2 text-sm text-gray-600 dark:text-gray-300 italic">"{{ $overtime->reason }}"</div>
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">{{ __('No overtime records found') }}</div>
+                <div class="user-empty-state">{{ __('No overtime records found') }}</div>
                 @endforelse
             </div>
             <div class="px-4 py-3">
@@ -519,8 +517,8 @@
             </div>
             @else
             <!-- Kasbons Table -->
-            <div class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="overflow-x-auto">
+            <div class="user-list-card hidden overflow-hidden p-0 md:block">
+                <div class="user-desktop-table-scroll">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-900">
                             <tr>
@@ -589,7 +587,7 @@
             <!-- Mobile List -->
             <div class="md:hidden space-y-4">
                 @forelse ($kasbons as $kasbon)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+                <div class="user-list-card">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center">
                             <img class="h-10 w-10 rounded-full object-cover" src="{{ $kasbon->user->profile_photo_url }}" alt="{{ $kasbon->user->name }}">
@@ -598,7 +596,7 @@
                                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ $kasbon->user->jobTitle->name ?? __('N/A') }}</div>
                             </div>
                         </div>
-                        <span class="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 px-2 py-1 text-xs font-semibold rounded-full">Rp</span>
+                        <span class="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 px-2 py-1 text-xs font-semibold rounded-full">{{ __('Rp') }}</span>
                     </div>
                     <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
                         <div>
@@ -621,7 +619,7 @@
                     <div class="mt-2 text-sm text-gray-600 dark:text-gray-300 italic">"{{ $kasbon->purpose }}"</div>
                 </div>
                 @empty
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">{{ __('No kasbon records found') }}</div>
+                <div class="user-empty-state">{{ __('No kasbon records found') }}</div>
                 @endforelse
             </div>
             <div class="px-4 py-3">

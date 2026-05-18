@@ -1,5 +1,5 @@
 <div id="scan-wrapper"
-    class="scan-attendance-flow mx-auto w-full max-w-6xl px-4 py-2 to-slate-100 dark:from-slate-900 dark:to-slate-800 sm:px-6 sm:py-3 lg:px-8">
+    class="scan-attendance-flow mx-auto w-full">
     @php
         use Illuminate\Support\Carbon;
         $hasCheckedIn = !is_null($attendance?->time_in);
@@ -42,7 +42,7 @@
             <div x-data="faceVerificationModal()" x-show="showModal" x-cloak
                 class="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm"
                 @face-verify.window="openModal($event.detail)">
-                <div class="mx-4 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-gray-800"
+                <div class="user-list-card mx-4 w-full max-w-md overflow-hidden p-0"
                     @click.stop>
                     {{-- Header --}}
                     <div
@@ -312,27 +312,27 @@
         @include('components.feedback.alert-messages')
 
         @if ($approvedAbsence)
-            <div class="mx-auto mt-4 w-full max-w-md overflow-hidden rounded-2xl bg-white p-4 text-center shadow-sm">
+            <div class="user-list-card mx-auto mt-4 w-full max-w-md text-center">
                 <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
                     <x-heroicon-o-check class="h-8 w-8 text-green-700" />
                 </div>
 
-                <h2 class="mb-2 text-xl font-semibold text-gray-900">{{ __('You are on Leave') }}</h2>
+                <h2 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">{{ __('You are on Leave') }}</h2>
                 <div
                     class="mb-4 inline-flex items-center rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-green-700">
                     {{ __(ucfirst($approvedAbsence->status)) }}
                 </div>
 
-                <div class="mb-4 rounded-2xl bg-gray-50 p-3 text-left">
-                    <p class="text-sm text-gray-500 mb-1">{{ __('Date') }}</p>
-                    <p class="font-semibold text-gray-900 mb-3">{{ $approvedAbsence->date->format('d F Y') }}</p>
+                <div class="user-soft-panel mb-4 text-left">
+                    <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">{{ __('Date') }}</p>
+                    <p class="mb-3 font-semibold text-gray-900 dark:text-white">{{ $approvedAbsence->date->format('d F Y') }}</p>
 
                     <p class="sr-only">{{ __('Note') }}</p>
                     <p class="sr-only">"{{ $approvedAbsence->note }}"</p>
                 </div>
 
                 <a href="{{ route('home') }}"
-                    class="block w-full py-4 rounded-xl bg-gray-900 text-white font-bold shadow-lg hover:shadow-xl hover:bg-black transition transform hover:-translate-y-1">
+                    class="block w-full rounded-[1.05rem] bg-gray-900 py-4 text-center font-semibold text-white transition hover:bg-black">
                     {{ __('Back to Dashboard') }}
                 </a>
             </div>
@@ -340,12 +340,12 @@
             {{-- Completion View --}}
             <div class="space-y-3 sm:space-y-4">
                 <div
-                    class="rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 text-center">
+                    class="user-list-card text-center">
                     <div
-                        class="success-checkmark mb-4 inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-500 dark:to-green-700 rounded-full shadow-lg">
+                        class="success-checkmark mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200">
                         <x-heroicon-o-check class="h-10 w-10 text-green-700 dark:text-white" />
                     </div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ __('Attendance Complete!') }}
+                    <h2 class="scan-processing-title mb-2">{{ __('Attendance Complete!') }}
                     </h2>
                     <p class="sr-only">
                         {{ __('You\'ve successfully completed today\'s attendance') }}</p>
@@ -384,11 +384,11 @@
 
                     {{-- Selfie UI (Hidden by default) --}}
                     <div id="selfie-card-container"
-                        class="hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 relative overflow-hidden">
+                        class="scan-selfie-panel relative hidden overflow-hidden">
                         <h3
-                            class="text-sm font-bold text-gray-900 dark:text-white mb-3 text-center uppercase tracking-wider">
+                            class="scan-selfie-title mb-3 text-center">
                             {{ __('Take a Selfie') }}</h3>
-                        <div class="relative w-full aspect-square bg-gray-900 rounded-xl overflow-hidden mb-4">
+                        <div class="scan-selfie-camera relative mb-4 aspect-square w-full">
                             <video id="selfie-video" autoplay playsinline
                                 class="w-full h-full object-cover transform -scale-x-100"></video>
                             <div
@@ -400,7 +400,7 @@
                             {{ __('Center your face inside the guide') }}
                         </div>
                         <button data-selfie-capture-button onclick="window.captureAndSubmit()" disabled
-                            class="w-full py-3 bg-gray-300 text-white font-bold rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-not-allowed transition">
+                            class="scan-selfie-button cursor-not-allowed">
                             <x-heroicon-o-camera class="h-5 w-5" />
                             {{ __('Capture & Check Out') }}
                         </button>
@@ -427,11 +427,11 @@
 
                         {{-- Selfie UI (Hidden by default) --}}
                         <div id="selfie-card-container"
-                            class="hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 relative overflow-hidden">
+                            class="scan-selfie-panel relative hidden overflow-hidden">
                             <h3
-                                class="text-sm font-bold text-gray-900 dark:text-white mb-3 text-center uppercase tracking-wider">
+                                class="scan-selfie-title mb-3 text-center">
                                 {{ __('Take a Selfie') }}</h3>
-                            <div class="relative w-full aspect-square bg-gray-900 rounded-xl overflow-hidden mb-4">
+                            <div class="scan-selfie-camera relative mb-4 aspect-square w-full">
                                 <video id="selfie-video" autoplay playsinline
                                     class="w-full h-full object-cover transform -scale-x-100"></video>
                                 <div
@@ -443,14 +443,14 @@
                                 {{ __('Center your face inside the guide') }}
                             </div>
                             <button data-selfie-capture-button onclick="window.captureAndSubmit()" disabled
-                                class="w-full py-3 bg-gray-300 text-white font-bold rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-not-allowed transition">
+                                class="scan-selfie-button cursor-not-allowed">
                                 <x-heroicon-o-camera class="h-5 w-5" />
                                 {{ __('Capture & Check In') }}
                             </button>
 
                             {{-- Processing UI (Hidden by default) --}}
                             <div id="processing-card-container"
-                                class="hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 text-center">
+                                class="scan-processing-panel hidden text-center">
                                 <div class="relative w-20 h-20 mx-auto mb-6">
                                     <div
                                         class="absolute inset-0 border-4 border-gray-200 dark:border-gray-700 rounded-full">
@@ -466,7 +466,7 @@
                                     </div>
                                 </div>
                                 <h3 id="processing-title"
-                                    class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                    class="scan-processing-title mb-2">
                                     {{ __('Verifying...') }}</h3>
                                 <p id="processing-text"
                                     class="text-sm text-gray-500 dark:text-gray-400 animate-pulse">

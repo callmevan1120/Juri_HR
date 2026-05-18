@@ -326,7 +326,7 @@
                                         @endif
                                         @if ($item['locked'])
                                             <span
-                                                class="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                class="user-lock-badge"
                                                 aria-hidden="true">
                                                 <x-heroicon-o-lock-closed class="h-3.5 w-3.5" />
                                             </span>
@@ -349,7 +349,7 @@
                                         @endif
                                         @if ($item['locked'])
                                             <span
-                                                class="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                class="user-lock-badge"
                                                 aria-hidden="true">
                                                 <x-heroicon-o-lock-closed class="h-3.5 w-3.5" />
                                             </span>
@@ -382,7 +382,7 @@
                                             @endif
                                             @if ($item['locked'])
                                                 <span
-                                                    class="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                    class="user-lock-badge"
                                                     aria-hidden="true">
                                                     <x-heroicon-o-lock-closed class="h-3.5 w-3.5" />
                                                 </span>

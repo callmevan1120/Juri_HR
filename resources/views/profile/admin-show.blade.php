@@ -78,12 +78,12 @@
                                 aria-label="{{ __('Switch language to :language', ['language' => app()->getLocale() == 'id' ? 'English' : 'Bahasa Indonesia']) }}">
                                 <span class="sr-only">{{ __('Switch Language') }}</span>
                                 <span class="language-toggle__labels">
-                                    <span class="language-toggle__label">ID</span>
-                                    <span class="language-toggle__label">EN</span>
+                                    <span class="language-toggle__label">{{ __('ID') }}</span>
+                                    <span class="language-toggle__label">{{ __('EN') }}</span>
                                 </span>
                                 <span class="language-toggle__thumb {{ app()->getLocale() == 'en' ? 'language-toggle__thumb--end' : 'translate-x-0' }}">
                                     <span class="absolute inset-0 flex h-full w-full items-center justify-center">
-                                        {{ app()->getLocale() == 'id' ? 'ID' : 'EN' }}
+                                        {{ app()->getLocale() == 'id' ? __('ID') : __('EN') }}
                                     </span>
                                 </span>
                             </button>

@@ -7,9 +7,7 @@
                 title-id="document-request-title"
                 class="border-b-0">
                 <x-slot name="icon">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-sky-50 text-indigo-700 ring-1 ring-inset ring-indigo-100 shadow-sm dark:from-indigo-900/30 dark:via-gray-800 dark:to-sky-900/20 dark:text-indigo-300 dark:ring-indigo-800/60">
-                        <x-heroicon-o-document-text class="h-5 w-5" />
-                    </div>
+                    <x-heroicon-o-document-text class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
                     <x-actions.button type="button" wire:click="create" class="w-full sm:w-auto">
@@ -20,30 +18,30 @@
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-                <div class="mb-3 rounded-2xl border border-gray-100 bg-gray-50/70 p-1 shadow-sm backdrop-blur dark:border-gray-700/70 dark:bg-gray-900/25">
+                <div class="user-stat-strip mb-3">
                     <div class="grid grid-cols-2 gap-1 min-[420px]:grid-cols-4">
-                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                        <div class="user-stat-pill">
                             <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
                                 <x-heroicon-m-folder-open class="h-3.5 w-3.5" />
                             </div>
                             <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['total'] }}</div>
                             <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-primary-800 dark:text-primary-200">{{ __('Total') }}</div>
                         </div>
-                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                        <div class="user-stat-pill">
                             <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
                                 <x-heroicon-m-clock class="h-3.5 w-3.5" />
                             </div>
                             <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['in_progress'] }}</div>
                             <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-200">{{ __('Process') }}</div>
                         </div>
-                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                        <div class="user-stat-pill">
                             <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
                                 <x-heroicon-m-check-circle class="h-3.5 w-3.5" />
                             </div>
                             <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['ready'] }}</div>
                             <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">{{ __('Ready') }}</div>
                         </div>
-                        <div class="min-w-0 rounded-xl bg-white/80 px-1.5 py-1.5 text-center shadow-[0_8px_18px_-18px_rgba(15,23,42,0.4)] dark:bg-white/[0.035]">
+                        <div class="user-stat-pill">
                             <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
                                 <x-heroicon-m-arrow-up-tray class="h-3.5 w-3.5" />
                             </div>
@@ -53,7 +51,7 @@
                     </div>
                 </div>
 
-                <div class="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
+                <div class="user-list-card hidden overflow-hidden p-0 md:block">
                     <div class="overflow-x-visible">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
@@ -138,7 +136,7 @@
 
                 <div class="space-y-4 md:hidden">
                     @forelse ($requests as $request)
-                        <article class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        <article class="user-list-card">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $request->documentTypeLabel() }}</div>
@@ -203,7 +201,7 @@
                             </div>
                         </article>
                     @empty
-                        <div class="rounded-2xl border border-gray-100 bg-white p-5 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                        <div class="user-empty-state">
                             <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
                                 <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
                                     <x-heroicon-o-document-plus class="h-6 w-6" />
@@ -229,7 +227,7 @@
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-request-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
                 <div class="fixed inset-0 z-0 bg-gray-900/60" wire:click="close"></div>
-                <div class="relative z-10 w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
+                <div class="user-list-card relative z-10 w-full max-w-xl overflow-y-auto p-4 sm:p-5"
                     wire:click.stop
                     style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
                     <h2 id="document-request-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('New Document Request') }}</h2>
@@ -277,7 +275,7 @@
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-upload-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
                 <div class="fixed inset-0 z-0 bg-gray-900/60" wire:click="cancelUpload"></div>
-                <div class="relative z-10 w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-xl dark:bg-gray-800 sm:p-5"
+                <div class="user-list-card relative z-10 w-full max-w-lg overflow-y-auto p-4 sm:p-5"
                     wire:click.stop
                     style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
                     <h2 id="document-upload-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Upload Document') }}</h2>

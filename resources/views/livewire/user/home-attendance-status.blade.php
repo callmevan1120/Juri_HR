@@ -40,7 +40,7 @@
         </section>
     @elseif($requiresFaceEnrollment)
         <section aria-labelledby="face-enrollment-heading"
-            class="wcag-card group relative overflow-hidden rounded-2xl p-4 text-center transition-all hover:shadow-lg">
+            class="wcag-card group relative overflow-hidden rounded-2xl p-4 text-center transition-all">
             <div class="relative z-10">
                 <div
                     class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/40 dark:text-primary-300">
@@ -57,7 +57,7 @@
                     <button type="button"
                         aria-label="{{ __('Register Face ID Now') }}"
                         @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
-                        class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition-all sm:w-auto">
+                        class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition-all sm:w-auto">
                         <x-heroicon-m-camera class="w-5 h-5" />
                         {{ __('Register Face ID Now') }}
                         <x-heroicon-o-lock-closed class="h-4 w-4" />
@@ -65,7 +65,7 @@
                 @else
                     <a href="{{ route('face.enrollment') }}"
                         aria-label="{{ __('Register Face ID Now') }}"
-                        class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition-all hover:bg-primary-800 sm:w-auto">
+                        class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-800 sm:w-auto">
                         <x-heroicon-m-camera class="w-5 h-5" />
                         {{ __('Register Face ID Now') }}
                     </a>
@@ -75,6 +75,6 @@
     @elseif($hasCheckedIn && $hasCheckedOut)
         <x-user.attendance-hero-card :attendance="$attendance" />
     @else
-        <x-user.home-actions-card :hasCheckedIn="$hasCheckedIn" :hasCheckedOut="$hasCheckedOut" :attendance="$attendance" :hasApprovedOvertime="$hasApprovedOvertime" />
+        <x-user.home-actions-card :hasCheckedIn="$hasCheckedIn" :hasCheckedOut="$hasCheckedOut" :attendance="$attendance" :hasApprovedOvertime="$hasApprovedOvertime" :shiftSummary="$todayShiftSummary" />
     @endif
 </div>

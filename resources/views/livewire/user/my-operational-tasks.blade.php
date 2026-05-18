@@ -14,7 +14,7 @@
             <div class="user-page-body bg-gray-50/50 dark:bg-gray-900/20">
                 @include('components.feedback.alert-messages')
 
-                <div class="mb-5 grid gap-3 sm:grid-cols-[1fr_220px]">
+                <div class="user-compact-filter mb-4 grid gap-3 sm:grid-cols-[1fr_220px]">
                     <div>
                         <x-forms.label for="operational-task-search" value="{{ __('Search') }}" class="mb-1.5 block" />
                         <x-forms.input id="operational-task-search" type="search" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search task or project...') }}" />
@@ -38,8 +38,8 @@
                                 default => 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200',
                             };
                         @endphp
-                        <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                            <div class="border-b border-gray-100 p-4 dark:border-gray-700 sm:p-5">
+                        <article class="user-list-card overflow-hidden">
+                            <div class="border-b border-slate-200/70 p-4 dark:border-slate-800/80">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
                                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -59,17 +59,17 @@
                                 </div>
                             </div>
 
-                            <div class="space-y-5 p-4 sm:p-5">
+                            <div class="space-y-4 p-4">
                                 <dl class="grid gap-3 text-sm sm:grid-cols-3">
-                                    <div class="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
+                                    <div class="rounded-xl bg-slate-50/70 p-3 dark:bg-slate-950/35">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Priority') }}</dt>
                                         <dd class="mt-1 font-semibold text-gray-900 dark:text-white">{{ __(str($task->priority)->headline()->toString()) }}</dd>
                                     </div>
-                                    <div class="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
+                                    <div class="rounded-xl bg-slate-50/70 p-3 dark:bg-slate-950/35">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Due Date') }}</dt>
                                         <dd class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $task->due_date?->translatedFormat('d M Y') ?? '-' }}</dd>
                                     </div>
-                                    <div class="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
+                                    <div class="rounded-xl bg-slate-50/70 p-3 dark:bg-slate-950/35">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Visit Evidence') }}</dt>
                                         <dd class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $task->visitEvidences->count() }}</dd>
                                     </div>
@@ -103,7 +103,7 @@
                                     <x-actions.button type="button" wire:click="updateTaskStatus({{ $task->id }}, '{{ \App\Models\ProjectTask::STATUS_TODO }}')" variant="ghost" size="sm">{{ __('Reopen') }}</x-actions.button>
                                 </div>
 
-                                <form wire:submit.prevent="submitVisitEvidence({{ $task->id }})" class="rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/40">
+                                <form wire:submit.prevent="submitVisitEvidence({{ $task->id }})" class="user-upload-dropzone">
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Submit Visit Evidence') }}</h3>
                                     <div class="mt-3 grid gap-3 sm:grid-cols-3">
                                         <x-forms.input type="number" step="0.0000001" wire:model="visitLatitude.{{ $task->id }}" placeholder="{{ __('Latitude') }}" />
@@ -128,7 +128,7 @@
                                 </form>
 
                                 @if ($task->visitEvidences->isNotEmpty())
-                                    <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30">
+                                    <div class="rounded-[1.15rem] border border-slate-200/70 bg-white/55 p-3 dark:border-slate-800/80 dark:bg-slate-950/30">
                                         <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Recent Evidence') }}</h3>
                                         <div class="mt-3 space-y-2">
                                             @foreach ($task->visitEvidences->take(3) as $evidence)
@@ -163,7 +163,7 @@
                     @endforelse
                 </div>
 
-                <div class="mt-5 rounded-2xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
+                <div class="mt-4">
                     {{ $tasks->links() }}
                 </div>
             </div>

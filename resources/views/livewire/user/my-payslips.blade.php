@@ -7,18 +7,16 @@
                 title-id="my-payslips-title"
                 class="border-b-0">
                 <x-slot name="icon">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-lime-50 text-emerald-700 ring-1 ring-inset ring-emerald-100 shadow-sm dark:from-emerald-900/30 dark:via-gray-800 dark:to-lime-900/20 dark:text-emerald-300 dark:ring-emerald-800/60">
-                        <x-heroicon-o-banknotes class="h-5 w-5" />
-                    </div>
+                    <x-heroicon-o-banknotes class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
                     @if($needsSetup && Auth::user()->hasValidPayslipPassword())
-                        <button wire:click="cancelReset" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                        <button wire:click="cancelReset" aria-label="{{ __('Back') }}" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                             <x-heroicon-o-arrow-left class="h-5 w-5" />
                             <span>{{ __('Back') }}</span>
                         </button>
                     @elseif(!$needsSetup)
-                        <button wire:click="triggerReset" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                        <button wire:click="triggerReset" aria-label="{{ __('Reset Password') }}" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                             <x-heroicon-o-lock-closed class="h-5 w-5" />
                             <span>{{ __('Reset Password') }}</span>
                         </button>
@@ -30,7 +28,7 @@
                 @if($needsSetup)
                     {{-- Password Setup Form --}}
                     <div class="p-3 sm:p-4">
-                        <div class="max-w-md mx-auto">
+                        <div class="user-native-form mx-auto max-w-md p-4 sm:p-5">
                             <div class="mb-5 text-center">
                                 <div class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20">
                                     <x-heroicon-o-lock-closed class="h-5 w-5" />
@@ -73,9 +71,9 @@
                             <p class="user-empty-state__copy">{{ __('Salary statements will appear here.') }}</p>
                         </div>
                     @else
-                        <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                        <div class="space-y-3">
                             @foreach($payrolls as $payroll)
-                                <div class="p-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-4">
+                                <div class="user-list-card">
                                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div class="flex items-center gap-4">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
@@ -86,9 +84,9 @@
                                                 {{ \Carbon\Carbon::createFromDate(null, $payroll->month)->translatedFormat('F') }} {{ $payroll->year }}
                                             </h4>
                                             <div x-data="{ show: false }" class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                                <span x-show="!show">Rp *********</span>
+                                                <span x-show="!show">{{ __('Masked salary amount') }}</span>
                                                 <span x-show="show" style="display: none;">Rp {{ number_format($payroll->net_salary, 0, ',', '.') }}</span>
-                                                <button @click="show = !show" class="text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none">
+                                                <button @click="show = !show" :aria-label="show ? @js(__('Hide salary')) : @js(__('Show salary'))" class="text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none">
                                                     <x-heroicon-o-eye x-show="!show" class="h-3.5 w-3.5" />
                                                     <x-heroicon-o-eye-slash x-show="show" class="h-3.5 w-3.5" style="display: none;" />
                                                 </button>
@@ -100,7 +98,7 @@
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-medium bg-green-50 text-green-700 border border-green-100 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30">
                                             {{ __(ucfirst($payroll->status)) }}
                                         </span>
-                                        <button wire:click="download('{{ $payroll->id }}')" class="px-3 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 font-bold text-xs uppercase tracking-widest transition shadow-lg shadow-primary-500/30 flex items-center gap-2">
+                                        <button wire:click="download('{{ $payroll->id }}')" class="px-3 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 font-bold text-xs uppercase tracking-widest transition flex items-center gap-2">
                                             <x-heroicon-o-arrow-down-tray class="h-4 w-4" />
                                             <span class="hidden sm:inline">{{ __('Download') }}</span>
                                         </button>
@@ -109,7 +107,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div class="rounded-b-2xl border-t border-gray-100 p-4 dark:border-gray-700">
+                        <div class="mt-4">
                             {{ $payrolls->links() }}
                         </div>
                     @endif

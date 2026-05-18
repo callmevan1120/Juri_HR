@@ -11,7 +11,7 @@
             <x-user.page-header :back-href="!$isCreating ? route('home') : null" :title="$isCreating ? __('New Claim') : __('Reimbursement')" title-id="reimbursement-page-title"
                 class="border-b-0">
                 <x-slot name="icon">
-                    <span class="text-lg leading-none">💳</span>
+                    <x-heroicon-o-credit-card class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
                     @if ($isCreating)
@@ -22,7 +22,7 @@
                         </button>
                     @else
                         <button wire:click="create"
-                            class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700">
+                            class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
                             <x-heroicon-o-plus class="h-5 w-5" />
                             <span>{{ __('New Request') }}</span>
                         </button>
@@ -35,7 +35,7 @@
                 @if ($isCreating)
                     {{-- CREATE FORM --}}
                     <div
-                        class="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-5">
+                        class="user-native-form mx-auto max-w-2xl p-4 sm:p-5">
                         <form wire:submit.prevent="save" class="space-y-4">
 
                             {{-- Date & Type --}}
@@ -97,7 +97,7 @@
 
                             {{-- Attachment --}}
                             <div
-                                class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
+                                class="user-upload-dropzone">
                                 <label class="mb-3 font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                     <x-heroicon-o-paper-clip class="h-5 w-5 text-gray-400" />
                                     {{ __('Attachment (Recall/Bill)') }}
@@ -132,11 +132,11 @@
 
                             <div class="flex flex-col-reverse items-stretch justify-end gap-2 pt-3 sm:flex-row">
                                 <button type="button" wire:click="cancel"
-                                    class="px-5 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                                    class="user-secondary-action">
                                     {{ __('Cancel') }}
                                 </button>
                                 <button type="submit"
-                                    class="flex-1 sm:flex-none px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold shadow-lg shadow-primary-500/30 transition transform active:scale-95">
+                                    class="user-primary-action flex-1 sm:flex-none">
                                     {{ __('Submit Claim') }}
                                 </button>
                             </div>
@@ -146,7 +146,7 @@
                     {{-- LIST VIEW --}}
 
                     <div
-                        class="mb-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-4">
+                        class="user-compact-filter mb-4">
                         <div class="user-filter-grid">
                             <div>
                                 <label
@@ -198,7 +198,7 @@
                         <div class="space-y-3">
                             @foreach ($claims as $claim)
                                 <div
-                                    class="group rounded-2xl border border-gray-100 bg-white p-3 transition-all duration-200 hover:border-primary-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-800 sm:p-4">
+                                    class="user-list-card group">
                                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                         <div class="flex items-center gap-3 overflow-hidden sm:gap-4">
                                             {{-- Icon --}}

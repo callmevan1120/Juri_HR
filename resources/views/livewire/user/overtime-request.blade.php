@@ -18,8 +18,8 @@
                             <span>{{ __('Back') }}</span>
                         </button>
                     @else
-                        <button wire:click="create" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <button wire:click="create" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
+                            <x-heroicon-o-plus class="h-5 w-5" />
                             <span>{{ __('New Request') }}</span>
                         </button>
                     @endif
@@ -29,36 +29,48 @@
             <div class="user-page-body pt-0">
                 @if($showModal)
                     {{-- Create Form --}}
-                    <div class="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-5">
+                    <div class="user-native-form mx-auto max-w-2xl p-4 sm:p-5">
                         <form wire:submit.prevent="store" class="space-y-4">
                             
                             {{-- Date --}}
-                            <div>
-                                <x-forms.label for="date" value="{{ __('Overtime Date') }}" />
-                                <x-forms.input id="date" type="date" class="mt-1 block w-full" wire:model="date" />
-                                <x-forms.input-error for="date" class="mt-2" />
-                            </div>
+                            <x-user.native-date-field
+                                id="date"
+                                :label="__('Overtime Date')"
+                                model="date"
+                                error="date"
+                                modifier="default"
+                            />
 
                             {{-- Time Range --}}
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <x-forms.label for="start_time" value="{{ __('Start Time') }}" />
-                                    <x-forms.input id="start_time" type="time" class="mt-1 block w-full" wire:model="start_time" />
-                                    <x-forms.input-error for="start_time" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-forms.label for="end_time" value="{{ __('End Time') }}" />
-                                    <x-forms.input id="end_time" type="time" class="mt-1 block w-full" wire:model="end_time" />
-                                    <x-forms.input-error for="end_time" class="mt-2" />
-                                </div>
+                                <x-user.native-date-field
+                                    id="start_time"
+                                    :label="__('Start Time')"
+                                    model="start_time"
+                                    error="start_time"
+                                    type="time"
+                                    modifier="default"
+                                />
+                                <x-user.native-date-field
+                                    id="end_time"
+                                    :label="__('End Time')"
+                                    model="end_time"
+                                    error="end_time"
+                                    type="time"
+                                    modifier="default"
+                                />
                             </div>
 
                             {{-- Reason --}}
-                            <div>
-                                <x-forms.label for="reason" value="{{ __('Reason') }}" />
-                                <x-forms.textarea id="reason" wire:model="reason" rows="3" class="mt-1 block w-full" placeholder="{{ __('e.g. Project Deadline') }}" />
-                                <x-forms.input-error for="reason" class="mt-2" />
-                            </div>
+                            <x-user.native-textarea-field
+                                id="reason"
+                                :label="__('Reason')"
+                                model="reason"
+                                error="reason"
+                                rows="3"
+                                modifier="default"
+                                placeholder="{{ __('e.g. Project Deadline') }}"
+                            />
 
                             <div class="flex flex-col-reverse items-stretch gap-2 border-t border-gray-100 pt-3 dark:border-gray-700 sm:flex-row sm:justify-end">
                                 <x-actions.secondary-button wire:click="close" wire:loading.attr="disabled">
@@ -77,9 +89,7 @@
                     @if($overtimes->isEmpty())
                         <div class="user-empty-state">
                             <div class="user-empty-state__icon">
-                                <svg class="w-12 h-12 text-gray-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
+                                <x-heroicon-o-clock class="h-10 w-10" />
                             </div>
                             <h3 class="user-empty-state__title">{{ __('No Overtime Requests') }}</h3>
                             <p class="user-empty-state__copy">{{ __('You haven\'t submitted any overtime requests yet.') }}</p>

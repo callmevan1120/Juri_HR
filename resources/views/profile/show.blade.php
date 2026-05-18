@@ -48,6 +48,12 @@
                             </span>
                         @endif
                     </x-slot>
+
+                    <x-slot name="actions">
+                        <div class="profile-header-notification">
+                            <livewire:shared.notifications-dropdown />
+                        </div>
+                    </x-slot>
                 </x-user.page-header>
 
                 <section class="profile-control-grid" aria-label="{{ __('Profile controls') }}">
@@ -64,8 +70,8 @@
                                 aria-label="{{ __('Switch language to :language', ['language' => app()->getLocale() == 'id' ? 'English' : 'Bahasa Indonesia']) }}">
                                 <span class="sr-only">{{ __('Switch Language') }}</span>
                                 <span class="language-toggle__labels">
-                                    <span class="language-toggle__label">ID</span>
-                                    <span class="language-toggle__label">EN</span>
+                                    <span class="language-toggle__label">{{ __('ID') }}</span>
+                                    <span class="language-toggle__label">{{ __('EN') }}</span>
                                 </span>
                                 <span class="language-toggle__thumb {{ app()->getLocale() == 'en' ? 'language-toggle__thumb--end' : 'translate-x-0' }}">
                                     <span class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-100">

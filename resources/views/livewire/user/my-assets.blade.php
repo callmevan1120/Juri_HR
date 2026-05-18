@@ -186,7 +186,7 @@
                                             type="button"
                                             disabled
                                             aria-label="{{ __('Request Return') }}"
-                                            class="wcag-touch-target inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-400 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500">
+                                            class="user-disabled-action">
                                             <x-heroicon-m-arrow-path class="h-4 w-4" />
                                             {{ __('Request Return') }}
                                         </button>

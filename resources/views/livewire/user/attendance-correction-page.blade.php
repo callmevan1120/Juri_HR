@@ -4,21 +4,12 @@
             <x-user.page-header :back-href="route('home')" :title="__('Attendance Corrections')" title-id="attendance-correction-title"
                 class="border-b-0">
                 <x-slot name="icon">
-                    <div
-                        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-lime-50 text-emerald-700 ring-1 ring-inset ring-emerald-100 shadow-sm dark:from-emerald-900/30 dark:via-gray-800 dark:to-lime-900/20 dark:text-emerald-300 dark:ring-emerald-800/60">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                d="M9 12h6m-6 4h6M9 8h6m-8 12h10a2 2 0 002-2V6a2 2 0 00-2-2h-1.172a2 2 0 01-1.414-.586l-.828-.828A2 2 0 0012.172 2h-.344a2 2 0 00-1.414.586l-.828.828A2 2 0 018.828 4H7a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
+                    <x-heroicon-o-clipboard-document-check class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
-                    <button type="button" wire:click="create"
-                        class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
-                            </path>
-                        </svg>
+                    <button type="button" wire:click="create" aria-label="{{ __('New Request') }}"
+                        class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
+                        <x-heroicon-o-plus class="h-5 w-5" />
                         <span>{{ __('New Request') }}</span>
                     </button>
                 </x-slot>
@@ -26,7 +17,7 @@
 
             <div class="user-page-body pt-0">
                 <div
-                    class="mb-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-4">
+                    class="user-compact-filter mb-4">
                     <div class="user-filter-grid">
                         <div>
                             <label
@@ -51,7 +42,7 @@
                 </div>
 
                 <div class="hidden overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 md:block">
-                    <div class="overflow-x-auto">
+                    <div class="user-desktop-table-scroll">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900/40">
                                 <tr
@@ -137,7 +128,7 @@
                 <div class="space-y-3 md:hidden">
                     @forelse ($corrections as $correction)
                         <article
-                            class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="user-list-card">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -213,7 +204,7 @@
                         </article>
                     @empty
                         <div
-                            class="rounded-xl border border-gray-100 bg-white p-4 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            class="user-empty-state">
                             {{ __('No attendance correction requests found.') }}
                         </div>
                     @endforelse
@@ -233,7 +224,7 @@
 
         <x-slot name="content">
             <div class="space-y-5 pb-48">
-                <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+                <div class="user-soft-panel">
                     <x-forms.label for="attendance-date" value="{{ __('Attendance Date') }}" class="mb-1.5 block" />
                     <p class="sr-only">
                         {{ __('Choose the date first, then fill the corrected times below for that same day.') }}
@@ -279,7 +270,7 @@
 
                     <div class="space-y-4">
                         <div
-                            class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+                            class="user-soft-panel">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -319,7 +310,7 @@
                         </div>
 
                         <div
-                            class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+                            class="user-soft-panel">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -359,7 +350,7 @@
                         </div>
 
                         <div
-                            class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/30">
+                            class="user-soft-panel">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">

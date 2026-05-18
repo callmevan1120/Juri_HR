@@ -6,7 +6,9 @@ use App\Contracts\AttendanceServiceInterface;
 use App\Helpers\Editions;
 use App\Models\Attendance;
 use App\Models\Overtime;
+use App\Models\Schedule;
 use App\Models\Setting;
+use App\Models\Shift;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -27,6 +29,8 @@ class HomeAttendanceStatus extends Component
     public $overtime = null;
 
     public bool $hasApprovedOvertime = false;
+
+    public array $todayShiftSummary = [];
 
     public function boot(AttendanceServiceInterface $attendanceService): void
     {
@@ -65,6 +69,24 @@ class HomeAttendanceStatus extends Component
             ->where('date', $today)
             ->first();
 
+        $todaySchedule = Schedule::query()
+            ->with('shift')
+            ->where('user_id', $user->id)
+            ->whereDate('date', $today)
+            ->first();
+
+        $shift = $this->attendance?->shift
+            ?? $todaySchedule?->shift
+            ?? ($todaySchedule?->is_off ? null : $this->defaultMorningShift());
+
+        $this->todayShiftSummary = [
+            'is_off' => (bool) ($todaySchedule?->is_off ?? false),
+            'name' => $shift?->name,
+            'start' => $shift?->formatted_start_time,
+            'end' => $shift?->formatted_end_time,
+            'duration' => $shift?->duration_label,
+        ];
+
         if ($this->attendance) {
             $this->hasCheckedIn = ! is_null($this->attendance->time_in);
             $this->hasCheckedOut = ! is_null($this->attendance->time_out);
@@ -91,5 +113,23 @@ class HomeAttendanceStatus extends Component
     public function render()
     {
         return view('livewire.user.home-attendance-status');
+    }
+
+    private function defaultMorningShift(): ?Shift
+    {
+        return Shift::query()
+            ->where('name', 'Shift Pagi')
+            ->first()
+            ?? Shift::query()
+                ->where('name', 'like', '%Pagi%')
+                ->orderBy('start_time')
+                ->first()
+            ?? Shift::query()
+                ->where('name', 'like', '%Morning%')
+                ->orderBy('start_time')
+                ->first()
+            ?? Shift::query()
+                ->orderBy('start_time')
+                ->first();
     }
 }

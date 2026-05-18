@@ -9,80 +9,58 @@
                 <x-slot name="icon">
                     <x-heroicon-o-home-modern class="h-5 w-5" />
                 </x-slot>
+                <x-slot name="actions">
+                    <button type="button" wire:click="create" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-none transition hover:bg-primary-700" aria-label="{{ __('New Request') }}">
+                        <x-heroicon-o-plus class="h-5 w-5" />
+                        <span>{{ __('New Request') }}</span>
+                    </button>
+                </x-slot>
             </x-user.page-header>
 
             <div class="user-page-body bg-gray-50/50 dark:bg-gray-900/20">
                 @include('components.feedback.alert-messages')
 
-                <div class="grid grid-cols-1 gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
-                    <form wire:submit.prevent="submit" class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                        <h2 class="text-base font-bold text-gray-950 dark:text-white">{{ __('New Request') }}</h2>
-                        <div class="mt-4 space-y-3">
-                            <div>
-                                <x-forms.label for="wfh-date" value="{{ __('Date') }}" class="mb-1.5 block" />
-                                <x-forms.input id="wfh-date" type="date" wire:model.live="date" />
-                                <x-forms.input-error for="date" class="mt-2" />
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <x-forms.label for="wfh-start" value="{{ __('Start') }}" class="mb-1.5 block" />
-                                    <x-forms.input id="wfh-start" type="time" wire:model.live="startTime" />
-                                    <x-forms.input-error for="startTime" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-forms.label for="wfh-end" value="{{ __('End') }}" class="mb-1.5 block" />
-                                    <x-forms.input id="wfh-end" type="time" wire:model.live="endTime" />
-                                    <x-forms.input-error for="endTime" class="mt-2" />
-                                </div>
-                            </div>
-
-                            <div>
-                                <x-forms.label for="wfh-location" value="{{ __('Location') }}" class="mb-1.5 block" />
-                                <x-forms.input id="wfh-location" wire:model.live="locationAddress" placeholder="{{ __('Home address or work location') }}" />
-                                <x-forms.input-error for="locationAddress" class="mt-2" />
-                            </div>
-
-                            <div>
-                                <x-forms.label for="wfh-reason" value="{{ __('Reason') }}" class="mb-1.5 block" />
-                                <x-forms.textarea id="wfh-reason" rows="4" wire:model.live="reason" placeholder="{{ __('Explain why you need to work from home...') }}" />
-                                <x-forms.input-error for="reason" class="mt-2" />
-                            </div>
-
-                            <x-actions.button type="submit" class="w-full">
-                                <x-heroicon-m-paper-airplane class="h-5 w-5" />
-                                <span>{{ __('Submit WFH Request') }}</span>
-                            </x-actions.button>
-                        </div>
-                    </form>
-
-                    <div class="space-y-3">
+                <div class="wfh-request-list">
                         @forelse ($requests as $request)
                             @php
                                 $tone = match ($request->status) {
-                                    \App\Models\WorkFromHomeRequest::STATUS_APPROVED => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200',
-                                    \App\Models\WorkFromHomeRequest::STATUS_REJECTED => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200',
-                                    default => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200',
+                                    \App\Models\WorkFromHomeRequest::STATUS_APPROVED => 'wfh-request-item__status--approved',
+                                    \App\Models\WorkFromHomeRequest::STATUS_REJECTED => 'wfh-request-item__status--rejected',
+                                    default => 'wfh-request-item__status--pending',
                                 };
                             @endphp
-                            <article class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                    <div>
-                                        <h3 class="text-base font-bold text-gray-950 dark:text-white">{{ $request->date?->translatedFormat('d M Y') }}</h3>
-                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $request->start_time ?: '--:--' }} - {{ $request->end_time ?: '--:--' }}
-                                            @if ($request->location_address)
-                                                · {{ $request->location_address }}
-                                            @endif
-                                        </p>
+                            <article class="wfh-request-item">
+                                <div class="wfh-request-item__top">
+                                    <div class="wfh-request-item__date">
+                                        <span class="wfh-request-item__day">{{ $request->date?->translatedFormat('d') }}</span>
+                                        <span class="wfh-request-item__month">{{ $request->date?->translatedFormat('M') }}</span>
                                     </div>
-                                    <span class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide {{ $tone }}">
-                                        {{ __(str($request->status)->headline()->toString()) }}
-                                    </span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <h3 class="wfh-request-item__title">{{ $request->date?->translatedFormat('l') }}</h3>
+                                                <p class="wfh-request-item__meta">
+                                                    {{ $request->start_time ?: '--:--' }} - {{ $request->end_time ?: '--:--' }}
+                                                </p>
+                                            </div>
+                                            <span class="wfh-request-item__status {{ $tone }}">
+                                                {{ __(str($request->status)->headline()->toString()) }}
+                                            </span>
+                                        </div>
+
+                                        @if ($request->location_address)
+                                            <p class="wfh-request-item__line">
+                                                <x-heroicon-o-map-pin class="h-4 w-4" />
+                                                <span>{{ $request->location_address }}</span>
+                                            </p>
+                                        @endif
+
+                                        <p class="wfh-request-item__reason">{{ $request->reason }}</p>
+                                    </div>
                                 </div>
-                                <p class="mt-3 text-sm text-gray-700 dark:text-gray-200">{{ $request->reason }}</p>
+
                                 @if ($request->reviewer)
-                                    <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                                    <p class="wfh-request-item__review">
                                         {{ __('Reviewed by :name', ['name' => $request->reviewer->name]) }}
                                         @if ($request->review_note)
                                             · {{ $request->review_note }}
@@ -93,19 +71,94 @@
                         @empty
                             <div class="user-empty-state">
                                 <div class="user-empty-state__icon">
-                                    <x-heroicon-o-home-modern class="h-12 w-12 text-gray-300 dark:text-gray-500" />
+                                    <x-heroicon-o-home-modern class="h-10 w-10" />
                                 </div>
                                 <h3 class="user-empty-state__title">{{ __('No WFH requests yet') }}</h3>
                                 <p class="user-empty-state__copy">{{ __('Your submitted work-from-home requests will appear here.') }}</p>
                             </div>
                         @endforelse
 
-                        <div class="rounded-2xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
-                            {{ $requests->links() }}
-                        </div>
-                    </div>
+                        @if ($requests->hasPages())
+                            <div class="wfh-request-pagination">
+                                {{ $requests->links() }}
+                            </div>
+                        @endif
                 </div>
             </div>
         </section>
+
+        <x-overlays.dialog-modal wire:model.live="showCreateModal">
+            <x-slot name="title">{{ __('New Request') }}</x-slot>
+
+            <x-slot name="content">
+                <form wire:submit.prevent="submit" class="wfh-request-form wfh-request-form--modal">
+                    <div class="wfh-request-form__header">
+                        <div class="wfh-request-form__icon">
+                            <x-heroicon-o-home-modern class="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h2 class="wfh-request-form__title">{{ __('WFH Request') }}</h2>
+                            <p class="wfh-request-form__copy">{{ __('Request work-from-home approval with date, time, location, and reason.') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="wfh-request-form__fields">
+                        <x-user.native-date-field
+                            id="wfh-date"
+                            :label="__('Date')"
+                            model="date"
+                            error="date"
+                            :min="now()->toDateString()"
+                        />
+
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <x-user.native-date-field
+                                id="wfh-start"
+                                :label="__('Start')"
+                                model="startTime"
+                                error="startTime"
+                                type="time"
+                            />
+                            <x-user.native-date-field
+                                id="wfh-end"
+                                :label="__('End')"
+                                model="endTime"
+                                error="endTime"
+                                type="time"
+                            />
+                        </div>
+
+                        <x-user.native-text-field
+                            id="wfh-location"
+                            :label="__('Location')"
+                            model="locationAddress"
+                            error="locationAddress"
+                            icon="heroicon-o-map-pin"
+                            placeholder="{{ __('Home address or work location') }}"
+                        />
+
+                        <x-user.native-textarea-field
+                            id="wfh-reason"
+                            :label="__('Reason')"
+                            model="reason"
+                            error="reason"
+                            placeholder="{{ __('Explain why you need to work from home...') }}"
+                        />
+
+                        <div class="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
+                            <x-actions.secondary-button type="button" wire:click="close" wire:loading.attr="disabled">
+                                {{ __('Cancel') }}
+                            </x-actions.secondary-button>
+                            <button type="submit" class="wfh-submit-button sm:w-auto" aria-label="{{ __('Submit WFH Request') }}" wire:loading.attr="disabled">
+                                <x-heroicon-m-paper-airplane class="h-5 w-5" />
+                                <span>{{ __('Submit WFH Request') }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </x-slot>
+
+            <x-slot name="footer"></x-slot>
+        </x-overlays.dialog-modal>
     </div>
 </div>

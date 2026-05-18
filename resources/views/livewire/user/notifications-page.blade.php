@@ -8,9 +8,7 @@
                 :title="__('Inbox')"
                 title-id="notifications-title">
                 <x-slot name="icon">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 ring-1 ring-inset ring-primary-200 shadow-sm dark:bg-primary-900/30 dark:text-primary-300 dark:ring-primary-800/60">
-                        <x-heroicon-o-bell class="h-5 w-5" />
-                    </div>
+                    <x-heroicon-o-bell class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
                     <div class="flex items-center gap-2">
@@ -27,7 +25,7 @@
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-                <div class="border-b border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/20 sm:px-5">
+                <div class="user-compact-filter mb-4">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-wrap items-center gap-2">
                             <button
@@ -67,11 +65,11 @@
                         <p class="sr-only">{{ __('We\'ll let you know when something important arrives.') }}</p>
                     </div>
                 @else
-                    <div id="notifications-list" class="divide-y divide-gray-100 dark:divide-gray-700/50">
+                    <div id="notifications-list" class="space-y-3">
                         @forelse($notifications as $notification)
                             @php($targetUrl = \App\Support\Helpers::normalizeInternalUrl($notification->data['url'] ?? $notification->data['action_url'] ?? null))
-                            <article class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
-                                <div class="flex gap-4 p-4">
+                            <article class="user-list-card group relative">
+                                <div class="flex gap-4">
                                     <div class="mt-0.5 shrink-0">
                                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white shadow-md shadow-primary-500/25 dark:bg-primary-500 dark:shadow-none" aria-hidden="true">
                                             <x-heroicon-o-bell class="h-5 w-5" />
@@ -136,8 +134,8 @@
                         @endforelse
 
                         @foreach($announcements as $announcement)
-                            <article class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
-                                <div class="flex gap-4 p-4">
+                            <article class="user-list-card group relative">
+                                <div class="flex gap-4">
                                     <div class="mt-0.5 shrink-0">
                                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white shadow-md shadow-amber-500/25 dark:bg-amber-500 dark:shadow-none" aria-hidden="true">
                                             <x-heroicon-o-megaphone class="h-5 w-5" />

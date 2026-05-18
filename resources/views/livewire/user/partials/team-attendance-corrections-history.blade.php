@@ -1,5 +1,5 @@
-<div class="hidden md:block rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
-    <div class="overflow-x-auto">
+<div class="user-list-card hidden overflow-hidden p-0 md:block">
+    <div class="user-desktop-table-scroll">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-900">
                 <tr>
@@ -62,7 +62,7 @@
 
 <div class="space-y-4 md:hidden">
     @forelse ($attendanceCorrections as $correction)
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+        <div class="user-list-card">
             <div class="flex items-start justify-between">
                 <div class="flex items-center">
                     <img class="h-10 w-10 rounded-full object-cover"
@@ -102,7 +102,7 @@
             </div>
         </div>
     @empty
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
+        <div class="user-empty-state">
             {{ __('No attendance correction history found') }}
         </div>
     @endforelse

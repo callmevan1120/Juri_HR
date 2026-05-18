@@ -13,9 +13,7 @@
                     :title="__('Attendance History')"
                     title-id="attendance-history-title">
                     <x-slot name="icon">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <x-heroicon-o-clock class="h-5 w-5" />
                     </x-slot>
                 </x-user.page-header>
 

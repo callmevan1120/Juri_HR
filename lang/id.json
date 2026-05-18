@@ -3920,7 +3920,7 @@
     "Notes optional": "Notes optional",
     "No users assigned yet.": "No users assigned yet.",
     "No vendor bills yet": "No vendor bills yet",
-    "No WFH requests found": "No WFH requests found",
+    "No WFH requests found": "Pengajuan WFH tidak ditemukan",
     "No WFH requests yet": "No WFH requests yet",
     "One operational cockpit for approvals, field work, forms, pipeline, and invoice risk.": "One operational cockpit for approvals, field work, forms, pipeline, and invoice risk.",
     "Open AP": "Open AP",
@@ -4223,5 +4223,16 @@
     "HTTP": "HTTP",
     "Open profile": "Buka profil",
     "Switch camera": "Ganti kamera",
-    "Toggle map": "Tampilkan atau sembunyikan peta"
+    "Align the QR code inside the frame.": "Arahkan kode QR ke dalam bingkai.",
+    "Working hours": "Jam kerja",
+    "Tap to open camera": "Ketuk untuk membuka kamera",
+    "Camera permission is required for attendance.": "Izin kamera diperlukan untuk absensi.",
+    "Toggle map": "Tampilkan atau sembunyikan peta",
+    "Masked salary amount": "Rp *********",
+    "Limit": "Limit",
+    "Hide salary": "Sembunyikan gaji",
+    "Show salary": "Tampilkan gaji",
+    "Holiday initial": "L",
+    "ID": "ID",
+    "EN": "EN"
 }

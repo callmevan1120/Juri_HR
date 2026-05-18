@@ -1,4 +1,14 @@
-@props(['hasCheckedIn', 'hasCheckedOut', 'attendance', 'hasApprovedOvertime' => false])
+@props(['hasCheckedIn', 'hasCheckedOut', 'attendance', 'hasApprovedOvertime' => false, 'shiftSummary' => []])
+
+@php
+    $shiftName = data_get($shiftSummary, 'is_off')
+        ? __('Off Day')
+        : (data_get($shiftSummary, 'name') ?: __('No shift assigned'));
+    $shiftStart = data_get($shiftSummary, 'start');
+    $shiftEnd = data_get($shiftSummary, 'end');
+    $shiftDuration = data_get($shiftSummary, 'duration');
+    $workHours = $shiftStart && $shiftEnd ? "{$shiftStart} - {$shiftEnd}" : __('Flexible');
+@endphp
 
 <section aria-labelledby="attendance-card-title" class="attendance-panel">
     <div class="attendance-panel__header">
@@ -7,9 +17,6 @@
             <h2 id="attendance-card-title" class="attendance-panel__title">
                 {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
             </h2>
-            <p class="attendance-panel__copy">
-                {{ __('Track today\'s check-in and check-out from one place.') }}
-            </p>
         </div>
 
         <div class="attendance-panel__badge attendance-panel__badge--live" role="status" aria-live="polite">
@@ -21,57 +28,84 @@
         </div>
     </div>
 
-    <div class="attendance-panel__stats" role="list" aria-label="{{ __('Today attendance times') }}">
-        <article class="attendance-panel__stat" role="listitem">
-            <div class="attendance-panel__stat-head">
-                <span class="attendance-panel__stat-indicator attendance-panel__stat-indicator--in">
-                    <span class="attendance-panel__stat-dot"></span>
+    <div class="attendance-panel__worktime" aria-label="{{ __('Working hours') }}">
+        <div class="attendance-panel__worktime-icon">
+            <x-heroicon-o-calendar-days class="h-4 w-4" />
+        </div>
+        <div class="min-w-0">
+            <p class="attendance-panel__worktime-label">{{ $shiftName }}</p>
+            <p class="attendance-panel__worktime-copy">
+                {{ __('Working hours') }}:
+                <span class="font-semibold text-slate-950 dark:text-white">{{ $workHours }}</span>
+                @if ($shiftDuration)
+                    <span class="text-slate-400">•</span>
+                    {{ $shiftDuration }}
+                @endif
+            </p>
+        </div>
+    </div>
+
+    <div class="attendance-panel__timeline" role="list" aria-label="{{ __('Today attendance times') }}">
+        <article class="attendance-panel__step {{ $hasCheckedIn ? 'is-complete' : 'is-current' }}" role="listitem">
+            <span class="attendance-panel__step-icon attendance-panel__step-icon--in">
+                @if ($hasCheckedIn)
+                    <x-heroicon-o-check class="h-4 w-4" />
+                @else
+                    <x-heroicon-o-arrow-left-on-rectangle class="h-4 w-4" />
+                @endif
+            </span>
+
+            <div class="attendance-panel__step-body">
+                <div>
+                    <p class="attendance-panel__step-label">{{ __('Check In') }}</p>
+                    <p class="attendance-panel__step-copy">
+                        {{ $attendance?->time_in ? __('Already recorded') : __('Start your day') }}
+                    </p>
+                </div>
+                <span class="attendance-panel__step-time">
+                    {{ $attendance?->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '--:--' }}
                 </span>
-                <span class="attendance-panel__stat-label">{{ __('Check In') }}</span>
-            </div>
-            <div class="attendance-panel__time">
-                {{ $attendance?->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '--:--' }}
             </div>
         </article>
 
-        <article class="attendance-panel__stat" role="listitem">
-            <div class="attendance-panel__stat-head">
-                <span class="attendance-panel__stat-indicator attendance-panel__stat-indicator--out">
-                    <span class="attendance-panel__stat-dot"></span>
+        <article class="attendance-panel__step {{ $hasCheckedOut ? 'is-complete' : ($hasCheckedIn ? 'is-current' : 'is-locked') }}" role="listitem">
+            <span class="attendance-panel__step-icon attendance-panel__step-icon--out">
+                @if ($hasCheckedOut)
+                    <x-heroicon-o-check class="h-4 w-4" />
+                @else
+                    <x-heroicon-o-arrow-right-on-rectangle class="h-4 w-4" />
+                @endif
+            </span>
+
+            <div class="attendance-panel__step-body">
+                <div>
+                    <p class="attendance-panel__step-label">{{ __('Check Out') }}</p>
+                    <p class="attendance-panel__step-copy">
+                        {{ $attendance?->time_out ? __('Already recorded') : ($hasCheckedIn ? __('Complete today') : __('Available after check in')) }}
+                    </p>
+                </div>
+                <span class="attendance-panel__step-time">
+                    {{ $attendance?->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i') : '--:--' }}
                 </span>
-                <span class="attendance-panel__stat-label">{{ __('Check Out') }}</span>
-            </div>
-            <div class="attendance-panel__time">
-                {{ $attendance?->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i') : '--:--' }}
             </div>
         </article>
     </div>
 
     @if (!$hasCheckedIn)
-        <p class="attendance-panel__helper">{{ __('Ready to start your shift?') }}</p>
-
-        <div class="attendance-panel__actions">
-            <a
-                href="{{ route('scan') }}"
-                @mouseenter="window.prefetchAttendanceScan?.()"
-                @touchstart.passive="window.prefetchAttendanceScan?.()"
-                @focus="window.prefetchAttendanceScan?.()"
-                class="attendance-panel__action attendance-panel__action--primary">
-                <span class="attendance-panel__action-icon attendance-panel__action-icon--primary">
-                    <x-heroicon-o-arrow-left-on-rectangle class="h-5 w-5" />
-                </span>
-                <span class="attendance-panel__action-label">{{ __('Clock In') }}</span>
-                <span class="attendance-panel__action-copy attendance-panel__action-copy--primary">{{ __('Start your day') }}</span>
-            </a>
-
-            <button type="button" disabled class="attendance-panel__action attendance-panel__action--disabled" aria-disabled="true">
-                <span class="attendance-panel__action-icon attendance-panel__action-icon--disabled">
-                    <x-heroicon-o-arrow-right-on-rectangle class="h-5 w-5" />
-                </span>
-                <span class="attendance-panel__action-label">{{ __('Clock Out') }}</span>
-                <span class="attendance-panel__action-copy attendance-panel__action-copy--disabled">{{ __('Available after check in') }}</span>
-            </button>
-        </div>
+        <a
+            href="{{ route('scan') }}"
+            @mouseenter="window.prefetchAttendanceScan?.()"
+            @touchstart.passive="window.prefetchAttendanceScan?.()"
+            @focus="window.prefetchAttendanceScan?.()"
+            class="attendance-panel__cta attendance-panel__cta--primary">
+            <span class="attendance-panel__cta-icon">
+                <x-heroicon-o-arrow-left-on-rectangle class="h-5 w-5" />
+            </span>
+            <span class="min-w-0">
+                <span class="attendance-panel__cta-label">{{ __('Clock In') }}</span>
+                <span class="attendance-panel__cta-copy">{{ __('Ready to start your shift?') }}</span>
+            </span>
+        </a>
     @elseif (!$hasCheckedOut)
         @php
             $shiftEndTime = ($attendance && $attendance->shift)
@@ -152,27 +186,19 @@
 </script>
 @endpushOnce
 
-        <div class="attendance-panel__actions">
-            <button type="button" disabled class="attendance-panel__action attendance-panel__action--disabled" aria-disabled="true">
-                <span class="attendance-panel__action-icon attendance-panel__action-icon--disabled">
-                    <x-heroicon-o-arrow-left-on-rectangle class="h-5 w-5" />
-                </span>
-                <span class="attendance-panel__action-label">{{ __('Clock In') }}</span>
-                <span class="attendance-panel__action-copy attendance-panel__action-copy--disabled">{{ __('Already recorded') }}</span>
-            </button>
-
-            <a
-                href="{{ route('scan') }}"
-                @mouseenter="window.prefetchAttendanceScan?.()"
-                @touchstart.passive="window.prefetchAttendanceScan?.()"
-                @focus="window.prefetchAttendanceScan?.()"
-                class="attendance-panel__action attendance-panel__action--accent">
-                <span class="attendance-panel__action-icon attendance-panel__action-icon--accent">
-                    <x-heroicon-o-arrow-right-on-rectangle class="h-5 w-5" />
-                </span>
-                <span class="attendance-panel__action-label">{{ __('Clock Out') }}</span>
-                <span class="attendance-panel__action-copy attendance-panel__action-copy--accent">{{ __('Complete today') }}</span>
-            </a>
-        </div>
+        <a
+            href="{{ route('scan') }}"
+            @mouseenter="window.prefetchAttendanceScan?.()"
+            @touchstart.passive="window.prefetchAttendanceScan?.()"
+            @focus="window.prefetchAttendanceScan?.()"
+            class="attendance-panel__cta attendance-panel__cta--accent">
+            <span class="attendance-panel__cta-icon">
+                <x-heroicon-o-arrow-right-on-rectangle class="h-5 w-5" />
+            </span>
+            <span class="min-w-0">
+                <span class="attendance-panel__cta-label">{{ __('Clock Out') }}</span>
+                <span class="attendance-panel__cta-copy">{{ __('Complete today') }}</span>
+            </span>
+        </a>
     @endif
 </section>

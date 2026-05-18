@@ -3,14 +3,11 @@
         <section aria-labelledby="shift-swap-title" class="user-page-surface">
             <x-user.page-header :back-href="route('my-schedule')" :title="__('Shift Swap Requests')" title-id="shift-swap-title" class="border-b-0">
                 <x-slot name="icon">
-                    <div
-                        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-50 via-white to-emerald-50 text-sky-700 ring-1 ring-inset ring-sky-100 shadow-sm dark:from-sky-900/30 dark:via-gray-800 dark:to-emerald-900/20 dark:text-sky-300 dark:ring-sky-800/60">
-                        <x-heroicon-o-arrows-right-left class="h-5 w-5" />
-                    </div>
+                    <x-heroicon-o-arrows-right-left class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
-                    <button type="button" wire:click="create"
-                        class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700">
+                    <button type="button" wire:click="create" aria-label="{{ __('New Request') }}"
+                        class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
                         <x-heroicon-o-plus class="h-5 w-5" />
                         <span>{{ __('New Request') }}</span>
                     </button>
@@ -19,8 +16,8 @@
 
             <div class="user-page-body pt-0">
                 <div
-                    class="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
-                    <div class="overflow-x-auto">
+                    class="hidden overflow-hidden rounded-[1.15rem] border border-slate-200/70 bg-white/72 shadow-none backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-900/60 md:block">
+                    <div class="user-desktop-table-scroll">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -90,7 +87,7 @@
                 <div class="space-y-3 md:hidden">
                     @forelse ($requests as $request)
                         <article
-                            class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="user-list-card">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -144,7 +141,7 @@
                         </article>
                     @empty
                         <div
-                            class="rounded-xl border border-gray-100 bg-white p-4 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            class="user-empty-state">
                             {{ __('No shift swap requests found.') }}
                         </div>
                     @endforelse
@@ -167,7 +164,7 @@
             @php($selectedReplacement = $replacementUsers->first(fn($replacement) => (string) $replacement->id === (string) $replacementUserId))
 
             <form wire:submit="store" class="space-y-4">
-                <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
+                <div class="user-list-card">
                     <x-forms.label for="swap-schedule" value="{{ __('Schedule Date') }}" class="mb-1.5 block" />
                     <p class="sr-only">
                         {{ __('Choose the work date you want to change first. The assigned shift for that date will be loaded automatically below.') }}
@@ -182,12 +179,12 @@
 
                 @if ($selectedSchedule)
                     <div
-                        class="rounded-2xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-200 sm:p-4">
+                        class="rounded-[1.15rem] border border-slate-200/70 bg-slate-50/70 p-3 text-sm text-slate-700 dark:border-slate-800/80 dark:bg-slate-950/35 dark:text-slate-200">
                         <p class="font-semibold text-gray-900 dark:text-white">{{ __('Current Schedule Snapshot') }}
                         </p>
                         <div class="mt-3 grid gap-3 sm:grid-cols-2">
                             <div
-                                class="rounded-2xl border border-white/70 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
+                                class="rounded-[1rem] border border-white/70 bg-white/72 p-3 shadow-none dark:border-slate-800 dark:bg-slate-950/45">
                                 <div
                                     class="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">
                                     {{ __('Schedule Date') }}</div>
@@ -196,7 +193,7 @@
                                 </div>
                             </div>
                             <div
-                                class="rounded-2xl border border-white/70 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
+                                class="rounded-[1rem] border border-white/70 bg-white/72 p-3 shadow-none dark:border-slate-800 dark:bg-slate-950/45">
                                 <div
                                     class="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">
                                     {{ __('Current') }}</div>
@@ -221,7 +218,7 @@
                     </div>
                 @endif
 
-                <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
+                <div class="user-list-card">
                     <x-forms.label for="swap-shift" value="{{ __('Requested Shift') }}" class="mb-1.5 block" />
                     <p class="sr-only">
                         {{ __('Choose the replacement shift you want for that same date.') }}
@@ -254,7 +251,7 @@
                     @endif
                 </div>
 
-                <div class="rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/30 sm:p-4">
+                <div class="user-list-card">
                     <x-forms.label for="swap-replacement"
                         value="{{ __('Replacement Employee') }} ({{ __('Optional') }})" class="mb-1.5 block" />
                     <p class="sr-only">
@@ -298,8 +295,7 @@
                         class="rounded-2xl border border-primary-100 bg-primary-50/60 p-3 dark:border-primary-900/50 dark:bg-primary-950/10 sm:p-4">
                         <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Request Summary') }}</p>
                         <div class="mt-3 grid gap-3 sm:grid-cols-2">
-                            <div
-                                class="rounded-2xl border border-white/70 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
+                            <div class="user-soft-panel">
                                 <div
                                     class="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">
                                     {{ __('Current') }}</div>
@@ -314,8 +310,7 @@
                                     </div>
                                 @endif
                             </div>
-                            <div
-                                class="rounded-2xl border border-white/70 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
+                            <div class="user-soft-panel">
                                 <div
                                     class="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">
                                     {{ __('Requested Shift') }}</div>

@@ -11,18 +11,18 @@
                 </x-slot>
                 <x-slot name="actions">
                     @if($showCreateModal)
-                        <button wire:click="$set('showCreateModal', false)" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                        <button wire:click="$set('showCreateModal', false)" aria-label="{{ __('Back') }}" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                             <x-heroicon-o-arrow-left class="h-5 w-5" />
                             <span>{{ __('Back') }}</span>
                         </button>
                     @elseif(!$canRequestCashAdvance)
                         <button type="button" disabled title="{{ __('Kasbon is available after your basic salary has been updated.') }}"
-                            class="wcag-touch-target inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-400 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500">
+                            class="user-disabled-action">
                             <x-heroicon-m-plus class="h-5 w-5" />
                             <span>{{ __('Request Kasbon') }}</span>
                         </button>
                     @else
-                        <button wire:click="openCreateModal" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700">
+                        <button wire:click="openCreateModal" aria-label="{{ __('Request Kasbon') }}" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
                             <x-heroicon-m-plus class="h-5 w-5" />
                             <span>{{ __('Request Kasbon') }}</span>
                         </button>
@@ -39,19 +39,19 @@
 
                 @if($showCreateModal)
                 {{-- CREATE FORM --}}
-                <div class="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-5">
+	                <div class="user-native-form mx-auto max-w-2xl p-4 sm:p-5">
                 <form wire:submit.prevent="submit" class="space-y-4">
 
                     {{-- Amount --}}
                     <div>
-                        <label class="mb-2 block font-bold text-gray-700 dark:text-gray-300">{{ __('Kasbon Amount') }}</label>
-                        <div class="relative rounded-xl shadow-sm">
+	                        <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Kasbon Amount') }}</label>
+	                        <div class="relative">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                                 <span class="text-gray-500 dark:text-gray-400 font-bold">Rp</span>
                             </div>
                             <x-forms.input
                                 type="text"
-                                class="block w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-12 text-lg font-bold dark:border-gray-700 dark:bg-gray-900/50"
+	                                class="block w-full py-3 pl-12 text-lg font-semibold"
                                 x-data
                                 x-mask:dynamic="$money($input, '.', ',')"
                                 wire:model.defer="amount"
@@ -62,8 +62,8 @@
 
                     {{-- Purpose --}}
                     <div>
-                        <label class="mb-2 block font-bold text-gray-700 dark:text-gray-300">{{ __('Kasbon Purpose') }}</label>
-                        <x-forms.textarea wire:model.defer="purpose" rows="3" class="block w-full rounded-xl border-gray-200 bg-gray-50 py-3 dark:border-gray-700 dark:bg-gray-900/50" placeholder="{{ __('Explain the purpose of this kasbon') }}" />
+	                        <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Kasbon Purpose') }}</label>
+	                        <x-forms.textarea wire:model.defer="purpose" rows="3" class="block w-full py-3" placeholder="{{ __('Explain the purpose of this kasbon') }}" />
                         <x-forms.input-error for="purpose" class="mt-2" />
                     </div>
 
@@ -71,8 +71,8 @@
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         {{-- Payment Month --}}
                         <div>
-                            <label class="mb-2 block font-bold text-gray-700 dark:text-gray-300">{{ __('Salary Deduction Month') }}</label>
-                            <x-forms.select wire:model.defer="payment_month" class="block w-full rounded-xl border-gray-200 bg-gray-50 text-gray-900 shadow-sm transition-all dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-100">
+	                            <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Salary Deduction Month') }}</label>
+	                            <x-forms.select wire:model.defer="payment_month" class="block w-full text-gray-900 transition-all dark:text-gray-100">
                                 @for($i = 1; $i <= 12; $i++)
                                     <option value="{{ $i }}">{{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}</option>
                                     @endfor
@@ -82,8 +82,8 @@
 
                         {{-- Payment Year --}}
                         <div>
-                            <label class="mb-2 block font-bold text-gray-700 dark:text-gray-300">{{ __('Salary Deduction Year') }}</label>
-                            <x-forms.input type="number" wire:model.defer="payment_year" class="block w-full rounded-xl border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900/50" />
+	                            <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Salary Deduction Year') }}</label>
+	                            <x-forms.input type="number" wire:model.defer="payment_year" class="block w-full" />
                             <x-forms.input-error for="payment_year" class="mt-2" />
                         </div>
                     </div>
@@ -97,10 +97,10 @@
                     </div>
 
                     <div class="flex flex-col-reverse items-stretch justify-end gap-2 pt-3 sm:flex-row">
-                        <button type="button" wire:click="$set('showCreateModal', false)" class="px-5 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        <button type="button" wire:click="$set('showCreateModal', false)" class="user-secondary-action">
                             {{ __('Cancel') }}
                         </button>
-                        <button type="submit" wire:loading.attr="disabled" class="flex-1 sm:flex-none px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold shadow-lg shadow-primary-500/30 transition transform active:scale-95 disabled:opacity-50">
+                        <button type="submit" wire:loading.attr="disabled" class="user-primary-action flex-1 sm:flex-none">
                             {{ __('Submit Kasbon Request') }}
                         </button>
                     </div>
@@ -111,37 +111,37 @@
                 {{-- LIST VIEW --}}
 
                 {{-- Summary Cards (Compact Mode) --}}
-                <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+	                <div class="user-stat-strip mb-4 grid grid-cols-3 gap-1.5">
                     {{-- Unpaid --}}
-                    <div class="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10 p-3 flex items-center gap-3">
-                        <div class="h-10 w-10 shrink-0 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+	                    <div class="user-stat-pill flex flex-col items-center gap-1">
+	                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
                             <x-heroicon-m-clock class="h-5 w-5 text-amber-600 dark:text-amber-400" />
                         </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">{{ __('Unpaid') }}</p>
-                            <p class="text-sm font-black text-amber-900 dark:text-amber-200 mt-0.5">Rp {{ number_format($totalUnpaid, 0, ',', '.') }}</p>
+	                        <div class="min-w-0 text-center">
+	                            <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">{{ __('Unpaid') }}</p>
+	                            <p class="mt-0.5 truncate text-xs font-black text-amber-900 dark:text-amber-200">Rp {{ number_format($totalUnpaid, 0, ',', '.') }}</p>
                         </div>
                     </div>
 
                     {{-- Paid --}}
-                    <div class="rounded-xl border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10 p-3 flex items-center gap-3">
-                        <div class="h-10 w-10 shrink-0 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+	                    <div class="user-stat-pill flex flex-col items-center gap-1">
+	                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
                             <x-heroicon-m-check-badge class="h-5 w-5 text-green-600 dark:text-green-400" />
                         </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">{{ __('Paid') }}</p>
-                            <p class="text-sm font-black text-green-900 dark:text-green-200 mt-0.5">Rp {{ number_format($totalPaid, 0, ',', '.') }}</p>
+	                        <div class="min-w-0 text-center">
+	                            <p class="text-[10px] font-bold uppercase tracking-wider text-green-700 dark:text-green-400">{{ __('Paid') }}</p>
+	                            <p class="mt-0.5 truncate text-xs font-black text-green-900 dark:text-green-200">Rp {{ number_format($totalPaid, 0, ',', '.') }}</p>
                         </div>
                     </div>
 
                     {{-- Limit --}}
-                    <div class="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10 p-3 flex items-center gap-3">
-                        <div class="h-10 w-10 shrink-0 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+	                    <div class="user-stat-pill flex flex-col items-center gap-1">
+	                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
                             <x-heroicon-m-shield-check class="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">{{ __('Kasbon Limit') }}</p>
-                            <p class="text-sm font-black text-blue-900 dark:text-blue-200 mt-0.5">Rp {{ number_format($basicSalary, 0, ',', '.') }}</p>
+	                        <div class="min-w-0 text-center">
+	                            <p class="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">{{ __('Limit') }}</p>
+	                            <p class="mt-0.5 truncate text-xs font-black text-blue-900 dark:text-blue-200">Rp {{ number_format($basicSalary, 0, ',', '.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                 @else
                 <div class="space-y-3">
                     @foreach($advances as $advance)
-                    <div class="group rounded-2xl border border-gray-100 bg-white p-3 transition-all duration-200 hover:border-primary-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-800 sm:p-4">
+	                    <div class="user-list-card group">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-center gap-3 overflow-hidden sm:gap-4">
                                 {{-- Icon --}}
@@ -199,7 +199,7 @@
                     @endforeach
                 </div>
 
-                <div class="mt-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+	                <div class="mt-4">
                     {{ $advances->links() }}
                 </div>
                 @endif

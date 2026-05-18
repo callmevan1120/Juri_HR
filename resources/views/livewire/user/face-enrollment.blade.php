@@ -54,7 +54,7 @@
                     <div data-face-enrollment-root
                         wire:key="face-enrollment-{{ $isEnrolled ? 'enrolled' : 'capture' }}-{{ $isCapturing ? 'capturing' : 'idle' }}"
                         x-data="faceEnrollment()" x-init="init()" class="max-w-lg mx-auto">
-                        <div class="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl bg-slate-950 shadow-xl shadow-slate-950/15 ring-1 ring-white/10">
+                        <div class="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl bg-slate-950 ring-1 ring-white/10">
                             <video x-ref="video" autoplay playsinline muted class="h-full w-full object-cover contrast-105 saturate-105"></video>
                             <canvas x-ref="overlay" class="absolute inset-0 w-full h-full"></canvas>
                         </div>

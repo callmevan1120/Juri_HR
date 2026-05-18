@@ -8,6 +8,7 @@ use App\Livewire\ScanComponent;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\Setting;
+use App\Models\Shift;
 use App\Models\User;
 use App\Services\Attendance\CommunityService;
 use Illuminate\Http\UploadedFile;
@@ -282,4 +283,16 @@ test('home attendance status keeps approved overtime for active overtime label',
 
     Livewire::test(HomeAttendanceStatus::class)
         ->assertSet('hasApprovedOvertime', true);
+});
+
+test('home attendance status falls back to morning shift when no schedule is defined', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Shift::create(['name' => 'Shift Sore', 'start_time' => '15:00', 'end_time' => '23:00']);
+    Shift::create(['name' => 'Shift Pagi', 'start_time' => '07:00', 'end_time' => '15:00']);
+
+    Livewire::test(HomeAttendanceStatus::class)
+        ->assertSet('todayShiftSummary.name', 'Shift Pagi')
+        ->assertSet('todayShiftSummary.duration', '8h');
 });

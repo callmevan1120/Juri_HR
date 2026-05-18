@@ -1,5 +1,5 @@
-<div class="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 md:block">
-    <div class="overflow-x-auto">
+<div class="user-list-card hidden overflow-hidden p-0 md:block">
+    <div class="user-desktop-table-scroll">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-900">
                 <tr>
@@ -60,7 +60,7 @@
 
 <div class="space-y-4 md:hidden">
     @forelse ($shiftSwapRequests as $request)
-        <article class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <article class="user-list-card">
             <div class="flex items-start gap-3">
                 <div class="flex min-w-0 flex-1 items-center">
                     <img class="h-10 w-10 rounded-full object-cover" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
@@ -101,7 +101,7 @@
             </div>
         </article>
     @empty
-        <div class="rounded-xl border border-gray-100 bg-white p-4 text-center text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+        <div class="user-empty-state">
             {{ __('No shift swap requests found') }}
         </div>
     @endforelse

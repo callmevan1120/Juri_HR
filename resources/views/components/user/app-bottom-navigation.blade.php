@@ -1,4 +1,12 @@
 @php
+    $currentUser = request()->user();
+    $profileNotificationCount = 0;
+
+    if ($currentUser) {
+        $profileNotificationCount = $currentUser->unreadNotifications()->count()
+            + \App\Models\Announcement::visibleForUser($currentUser->id)->count();
+    }
+
     $items = [
         [
             'label' => __('Home'),
@@ -30,6 +38,7 @@
             'href' => route('profile.show'),
             'active' => request()->routeIs('profile.show'),
             'icon' => 'heroicon-o-user-circle',
+            'badge' => $profileNotificationCount,
         ],
     ];
 @endphp
@@ -43,6 +52,7 @@
             @php
                 $active = (bool) $item['active'];
                 $isPrimary = (bool) ($item['primary'] ?? false);
+                $badgeCount = (int) ($item['badge'] ?? 0);
             @endphp
 
             <a
@@ -52,6 +62,12 @@
             >
                 <span class="user-bottom-navigation__icon">
                     <x-dynamic-component :component="$item['icon']" class="h-5 w-5" />
+
+                    @if ($badgeCount > 0)
+                        <span class="user-bottom-navigation__badge" aria-label="{{ __('Unread notifications') }}: {{ $badgeCount }}">
+                            {{ $badgeCount > 99 ? '99+' : $badgeCount }}
+                        </span>
+                    @endif
                 </span>
                 <span class="user-bottom-navigation__label">
                     {{ $item['label'] }}

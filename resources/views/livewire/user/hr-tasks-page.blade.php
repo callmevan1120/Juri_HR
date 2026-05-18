@@ -14,7 +14,7 @@
             <div class="user-page-body bg-gray-50/50 dark:bg-gray-900/20">
                 @include('components.feedback.alert-messages')
 
-                <div class="mb-5 grid gap-3 sm:grid-cols-[1fr_220px]">
+                <div class="user-compact-filter mb-4 grid gap-3 sm:grid-cols-[1fr_220px]">
                     <div>
                         <x-forms.label for="hr-task-search" value="{{ __('Search') }}" class="mb-1.5 block" />
                         <x-forms.input id="hr-task-search" type="search" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search task or employee...') }}" />
@@ -40,8 +40,8 @@
                                 default => $task->isOverdue() ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' : 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200',
                             };
                         @endphp
-                        <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                            <div class="border-b border-gray-100 p-4 dark:border-gray-700 sm:p-5">
+                        <article class="user-list-card overflow-hidden">
+                            <div class="border-b border-slate-200/70 p-4 dark:border-slate-800/80">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
                                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ $task->case->template->typeLabel() }}</p>
@@ -54,17 +54,17 @@
                                 </div>
                             </div>
 
-                            <div class="space-y-4 p-4 sm:p-5">
+                            <div class="space-y-4 p-4">
                                 <dl class="grid gap-3 text-sm sm:grid-cols-3">
-                                    <div class="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
+                                    <div class="rounded-xl bg-slate-50/70 p-3 dark:bg-slate-950/35">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Employee') }}</dt>
                                         <dd class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $task->case->user->name }}</dd>
                                     </div>
-                                    <div class="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
+                                    <div class="rounded-xl bg-slate-50/70 p-3 dark:bg-slate-950/35">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Due Date') }}</dt>
                                         <dd class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $task->due_date?->translatedFormat('d M Y') ?? '-' }}</dd>
                                     </div>
-                                    <div class="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
+                                    <div class="rounded-xl bg-slate-50/70 p-3 dark:bg-slate-950/35">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Effective Date') }}</dt>
                                         <dd class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $task->case->effective_date->translatedFormat('d M Y') }}</dd>
                                     </div>
@@ -104,7 +104,7 @@
                     @endforelse
                 </div>
 
-                <div class="mt-5 rounded-2xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
+                <div class="mt-4">
                     {{ $tasks->links() }}
                 </div>
             </div>

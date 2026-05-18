@@ -8,9 +8,11 @@
                 <h1 id="home-page-title" class="user-home-hero__title">{{ $currentUser->name }}</h1>
             </div>
 
-            <a href="{{ route('profile.show') }}" class="user-home-hero__profile" aria-label="{{ __('Open profile') }}">
-                <img class="h-full w-full object-cover" src="{{ $currentUser->profile_photo_url }}" alt="{{ $currentUser->name }}" />
-            </a>
+            <div class="user-home-hero__tools">
+                <a href="{{ route('profile.show') }}" class="user-home-hero__profile" aria-label="{{ __('Open profile') }}">
+                    <img class="h-full w-full object-cover" src="{{ $currentUser->profile_photo_url }}" alt="{{ $currentUser->name }}" />
+                </a>
+            </div>
         </div>
     </section>
 

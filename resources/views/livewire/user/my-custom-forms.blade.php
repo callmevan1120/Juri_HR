@@ -1,5 +1,6 @@
-<div class="mx-auto max-w-5xl space-y-4 px-4 py-4 sm:px-6 lg:px-8">
-    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="user-page-shell">
+    <div class="user-page-container user-page-container--wide space-y-4">
+    <div class="user-list-card">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-lg font-bold text-slate-950 dark:text-white">{{ __('Forms') }}</h1>
@@ -17,7 +18,7 @@
                 <button
                     type="button"
                     wire:click="selectTemplate({{ $template->id }})"
-                    class="w-full rounded-xl border p-4 text-left shadow-sm transition {{ (int) $selectedTemplateId === $template->id ? 'border-primary-300 bg-primary-50 dark:border-primary-700 dark:bg-primary-950/30' : 'border-slate-200 bg-white hover:border-primary-200 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-primary-800' }}"
+                    class="w-full rounded-[1.05rem] border p-4 text-left shadow-none transition {{ (int) $selectedTemplateId === $template->id ? 'border-primary-300 bg-primary-50 dark:border-primary-700 dark:bg-primary-950/30' : 'border-slate-200/70 bg-white/72 hover:border-primary-200 dark:border-slate-800/80 dark:bg-slate-900/60 dark:hover:border-primary-800' }}"
                 >
                     <p class="font-semibold text-slate-950 dark:text-white">{{ $template->title }}</p>
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __(str($template->category)->headline()->toString()) }} · {{ $template->company?->name }}</p>
@@ -26,7 +27,7 @@
                     @endif
                 </button>
             @empty
-                <div class="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+                <div class="user-empty-state min-h-[10rem]">
                     {{ __('No forms are available for your company yet.') }}
                 </div>
             @endforelse
@@ -34,7 +35,7 @@
 
         <div class="space-y-4">
             @if ($selectedTemplate)
-                <form wire:submit.prevent="submit" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <form wire:submit.prevent="submit" class="user-native-form p-4 sm:p-5">
                     <div class="border-b border-slate-200 pb-4 dark:border-slate-800">
                         <h2 class="text-base font-bold text-slate-950 dark:text-white">{{ $selectedTemplate->title }}</h2>
                         @if ($selectedTemplate->description)
@@ -68,18 +69,18 @@
                     </x-actions.button>
                 </form>
             @else
-                <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center dark:border-slate-700 dark:bg-slate-900">
+                <div class="user-empty-state">
                     <x-heroicon-o-clipboard-document-list class="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
                     <h2 class="mt-3 font-semibold text-slate-950 dark:text-white">{{ __('Choose a form') }}</h2>
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Pick a form from the list to start filling it out.') }}</p>
                 </div>
             @endif
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div class="user-list-card">
                 <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Recent Submissions') }}</h2>
                 <div class="mt-3 space-y-2">
                     @forelse ($submissions as $submission)
-                        <div class="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-950/50">
+                        <div class="rounded-xl bg-slate-50/70 p-3 text-sm dark:bg-slate-950/35">
                             <p class="font-semibold text-slate-900 dark:text-white">{{ $submission->template?->title }}</p>
                             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $submission->created_at?->format('d M Y H:i') }}</p>
                         </div>

@@ -42,7 +42,7 @@
                     </p>
                 </div>
 
-                <div class="mt-4 inline-block max-w-full overflow-x-auto rounded-xl bg-white p-2">
+                <div class="profile-qr-code">
                     {!! $this->user->twoFactorQrCodeSvg() !!}
                 </div>
 

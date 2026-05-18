@@ -376,7 +376,7 @@
                         </h4>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div class="admin-table-scroll">
                         @php
                             $thClass = 'px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap text-gray-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-300';
                             $tdClass = 'px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700';

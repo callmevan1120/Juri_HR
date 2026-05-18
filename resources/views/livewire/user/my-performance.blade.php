@@ -7,9 +7,7 @@
                 :title="__('My Performance Reviews')"
                 title-id="my-performance-title">
                 <x-slot name="icon">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-50 via-white to-indigo-50 text-violet-700 ring-1 ring-inset ring-violet-100 shadow-sm dark:from-violet-900/30 dark:via-gray-800 dark:to-indigo-900/20 dark:text-violet-300 dark:ring-violet-800/60">
-                        <x-heroicon-o-chart-bar-square class="h-5 w-5" />
-                    </div>
+                    <x-heroicon-o-chart-bar-square class="h-5 w-5" />
                 </x-slot>
             </x-user.page-header>
 
@@ -23,9 +21,9 @@
                         <p class="sr-only">{{ __('Your managers have not initiated any appraisals yet.') }}</p>
                     </div>
                 @else
-                    <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <div class="space-y-3">
                         @foreach($appraisals as $appraisal)
-                            <div class="p-4 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-4">
+                            <div class="user-list-card">
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div class="flex items-center gap-4">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/30">
@@ -73,7 +71,7 @@
                                                 <span class="hidden sm:inline">{{ __('Assessment') }}</span>
                                             </button>
                                         @elseif($appraisal->status === 'completed' && !$appraisal->employee_acknowledgement)
-                                            <button wire:click="acknowledge({{ $appraisal->id }})" class="px-3 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 shadow-lg shadow-green-500/30 font-bold text-xs uppercase tracking-widest transition flex items-center gap-1">
+                                            <button wire:click="acknowledge({{ $appraisal->id }})" class="px-3 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 font-bold text-xs uppercase tracking-widest transition flex items-center gap-1">
                                                 <x-heroicon-m-check class="w-4 h-4" />
                                                 <span class="hidden sm:inline">{{ __('Acknowledge') }}</span>
                                             </button>
@@ -150,8 +148,8 @@
 
                         <div class="space-y-3">
                             @foreach($groupEvals as $evaluation)
-                            <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 transition hover:shadow-md">
-                                <div class="px-4 py-3 flex items-center justify-between bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+                            <div class="user-list-card overflow-hidden p-0">
+                                <div class="flex items-center justify-between border-b border-slate-200/70 px-4 py-3 dark:border-slate-800/80">
                                     <div class="flex items-center gap-2 min-w-0">
                                         <span class="shrink-0 h-2 w-2 rounded-full bg-primary-400"></span>
                                         <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{{ $evaluation->kpiTemplate->name ?? __('KPI') }}</h4>
@@ -205,8 +203,8 @@
                 @endforeach
                 
                 <!-- ── Section: Notes ── -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden mt-6">
-                    <div class="px-5 py-3 bg-gray-50 dark:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700">
+                <div class="user-list-card mt-6 overflow-hidden p-0">
+                    <div class="border-b border-slate-200/70 px-5 py-3 dark:border-slate-800/80">
                         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                             <x-heroicon-m-chat-bubble-bottom-center-text class="h-4 w-4 text-gray-400" />
                             {{ __('General Notes') }}
@@ -237,7 +235,7 @@
                         {{ __('Close') }}
                     </x-actions.secondary-button>
         
-                    <x-actions.button class="h-[40px] px-6 !bg-primary-600 hover:!bg-primary-700 shadow-lg shadow-primary-500/20" wire:click="submitSelfAssessment" wire:confirm="{{ __('Are you sure? Once submitted, you cannot change this assessment.') }}">
+                    <x-actions.button class="h-[40px] px-6 !bg-primary-600 hover:!bg-primary-700" wire:click="submitSelfAssessment" wire:confirm="{{ __('Are you sure? Once submitted, you cannot change this assessment.') }}">
                         <x-heroicon-m-paper-airplane class="w-4 h-4 mr-1.5 -rotate-45" />
                         {{ __('Submit') }}
                     </x-actions.button>

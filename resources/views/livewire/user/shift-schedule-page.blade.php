@@ -6,9 +6,7 @@
                 :title="__('My Schedule')"
                 title-id="my-schedule-title">
                 <x-slot name="icon">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-50 via-white to-orange-50 text-rose-700 ring-1 ring-inset ring-rose-100 shadow-sm dark:from-rose-900/30 dark:via-gray-800 dark:to-orange-900/20 dark:text-rose-300 dark:ring-rose-800/60">
-                        <x-heroicon-o-calendar-days class="h-5 w-5" />
-                    </div>
+                    <x-heroicon-o-calendar-days class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
                     <a href="{{ route('shift-swap-requests') }}"
@@ -21,12 +19,12 @@
 
             <div class="user-page-body pt-0">
                 @if($schedules->isNotEmpty())
-                    <ul role="list" class="divide-y divide-gray-100 dark:divide-gray-700/50">
+                    <ul role="list" class="space-y-3">
                         @foreach($schedules as $schedule)
-                            <li class="group relative hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors duration-200">
-                                <div class="p-4 sm:p-5 flex items-center gap-4">
+                            <li class="user-list-card group relative">
+                                <div class="flex items-center gap-4">
                                      {{-- Date Box --}}
-                                    <div class="flex flex-col items-center justify-center w-12 h-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-600 shadow-sm">
+                                    <div class="flex h-12 w-12 flex-col items-center justify-center rounded-xl border border-slate-200/70 bg-white/72 shadow-none dark:border-slate-800/80 dark:bg-slate-950/35">
                                         <span class="text-[10px] font-bold text-red-500 uppercase leading-none mb-0.5">{{ $schedule->date->format('M') }}</span>
                                         <span class="text-lg font-black text-gray-800 dark:text-white leading-none">{{ $schedule->date->format('d') }}</span>
                                     </div>

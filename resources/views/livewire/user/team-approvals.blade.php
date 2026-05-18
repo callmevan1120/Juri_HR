@@ -64,8 +64,8 @@
             @if ($activeTab === 'leaves')
                 <!-- Desktop Table -->
                 <div
-                    class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div >
+                    class="user-list-card hidden overflow-hidden p-0 md:block">
+                    <div class="user-desktop-table-scroll">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -188,7 +188,7 @@
                 <div class="space-y-4 md:hidden">
                     @forelse ($leaves as $leave)
                         <div
-                            class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="user-list-card">
                             <div class="flex items-start gap-3">
                                 <div class="flex min-w-0 flex-1 items-center">
                                     <img class="h-10 w-10 rounded-full object-cover"
@@ -260,7 +260,7 @@
                         </div>
                     @empty
                         <div
-                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
+                            class="user-empty-state">
                             {{ __('No leave requests found') }}
                         </div>
                     @endforelse
@@ -277,8 +277,8 @@
                 <!-- Reimbursement Desktop/Mobile Table (Existing Code) -->
                 <!-- Desktop Table -->
                 <div
-                    class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div >
+                    class="user-list-card hidden overflow-hidden p-0 md:block">
+                    <div class="user-desktop-table-scroll">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -400,7 +400,7 @@
                 <div class="space-y-4 md:hidden">
                     @forelse ($reimbursements as $reimbursement)
                         <div
-                            class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="user-list-card">
                             <div class="flex items-start gap-3">
                                 <div class="flex min-w-0 flex-1 items-center">
                                     <img class="h-10 w-10 rounded-full object-cover"
@@ -479,7 +479,7 @@
                         </div>
                     @empty
                         <div
-                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
+                            class="user-empty-state">
                             {{ __('No reimbursement requests found') }}
                         </div>
                     @endforelse
@@ -490,8 +490,8 @@
             @elseif ($activeTab === 'overtimes')
                 <!-- Overtime Table -->
                 <div
-                    class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div >
+                    class="user-list-card hidden overflow-hidden p-0 md:block">
+                    <div class="user-desktop-table-scroll">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -598,7 +598,7 @@
                 <div class="space-y-4 md:hidden">
                     @forelse ($overtimes as $overtime)
                         <div
-                            class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="user-list-card">
                             <div class="flex items-start gap-3">
                                 <div class="flex min-w-0 flex-1 items-center">
                                     <img class="h-10 w-10 rounded-full object-cover"
@@ -662,7 +662,7 @@
                         </div>
                     @empty
                         <div
-                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
+                            class="user-empty-state">
                             {{ __('No overtime requests found') }}</div>
                     @endforelse
                 </div>
@@ -672,7 +672,7 @@
             @elseif ($activeTab === 'wfh')
                 <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     @forelse ($wfhRequests as $request)
-                        <article class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        <article class="user-list-card">
                             <div class="flex items-start gap-3">
                                 <img class="h-10 w-10 rounded-full object-cover" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
                                 <div class="min-w-0 flex-1">
@@ -715,7 +715,7 @@
                             </div>
                         </article>
                     @empty
-                        <div class="rounded-xl border border-gray-100 bg-white p-4 text-center text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 lg:col-span-2">
+                        <div class="user-empty-state lg:col-span-2">
                             {{ __('No WFH requests found') }}
                         </div>
                     @endforelse
@@ -726,8 +726,8 @@
             @else
                 <!-- Kasbons Table -->
                 <div
-                    class="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div >
+                    class="user-list-card hidden overflow-hidden p-0 md:block">
+                    <div class="user-desktop-table-scroll">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
@@ -836,7 +836,7 @@
                 <div class="space-y-4 md:hidden">
                     @forelse ($kasbons as $kasbon)
                         <div
-                            class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            class="user-list-card">
                             <div class="flex items-start gap-3">
                                 <div class="flex min-w-0 flex-1 items-center">
                                     <img class="h-10 w-10 rounded-full object-cover"
@@ -900,7 +900,7 @@
                         </div>
                     @empty
                         <div
-                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 text-center text-gray-500 dark:text-gray-400">
+                            class="user-empty-state">
                             {{ __('No kasbon requests found') }}</div>
                     @endforelse
                 </div>

@@ -98,13 +98,7 @@
 
                                     <span x-show="uploading" x-cloak
                                         class="inline-flex items-center gap-2 text-sm font-medium text-primary-700 dark:text-primary-300">
-                                        <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"
-                                            aria-hidden="true">
-                                            <circle class="opacity-30" cx="12" cy="12" r="9"
-                                                stroke="currentColor" stroke-width="3"></circle>
-                                            <path class="opacity-100" d="M21 12a9 9 0 0 0-9-9" stroke="currentColor"
-                                                stroke-width="3" stroke-linecap="round"></path>
-                                        </svg>
+                                        <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden="true"></span>
                                         <span>{{ __('Uploading photo...') }}</span>
                                     </span>
                                 </div>
@@ -126,7 +120,7 @@
 
                         <div class="relative z-10 flex min-h-[100dvh] items-start justify-center sm:items-center">
                             <div
-                                class="w-full max-w-xl overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-xl dark:border-primary-900/60 dark:bg-gray-900"
+                                class="w-full max-w-xl overflow-hidden rounded-2xl border border-primary-100 bg-white/95 shadow-none backdrop-blur-xl dark:border-primary-900/60 dark:bg-gray-900/95"
                                 x-on:click.stop
                                 style="max-height: calc(100dvh - 1.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
                             <div class="border-b border-primary-100 px-4 py-3 dark:border-primary-900/50 sm:px-5">
@@ -192,13 +186,7 @@
                                 <button type="button" x-on:click="saveCroppedPhoto()" x-bind:disabled="uploading"
                                     title="{{ __('Save Photo') }}"
                                     class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-primary-500 dark:hover:bg-primary-400">
-                                    <svg x-show="uploading" x-cloak class="h-4 w-4 animate-spin" viewBox="0 0 24 24"
-                                        fill="none" aria-hidden="true">
-                                        <circle class="opacity-30" cx="12" cy="12" r="9"
-                                            stroke="currentColor" stroke-width="3"></circle>
-                                        <path class="opacity-100" d="M21 12a9 9 0 0 0-9-9" stroke="currentColor"
-                                            stroke-width="3" stroke-linecap="round"></path>
-                                    </svg>
+                                    <span x-show="uploading" x-cloak class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden="true"></span>
                                     <span>{{ __('Save Photo') }}</span>
                                 </button>
                             </div>

@@ -1,68 +1,64 @@
-<div class="scanner-card-surface p-4 relative overflow-visible" id="scanner-card" wire:ignore>
-    <div class="scanner-header relative mb-3 flex flex-col gap-4">
-        <div class="flex justify-between items-center">
-            <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <div class="p-1.5 bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400 rounded-lg">
-                    <x-heroicon-o-qr-code class="h-5 w-5" />
-                </div>
-                {{ $title }}
-            </h3>
-            <button type="button" id="switch-camera-btn" onclick="window.switchCamera?.()" aria-label="{{ __('Switch camera') }}" class="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-1.5">
-                <x-heroicon-o-arrow-path class="h-3.5 w-3.5" />
+<div class="scanner-card-surface native-scan-surface relative overflow-visible" id="scanner-card" wire:ignore>
+    <div class="scanner-header relative flex flex-col gap-3">
+        <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+                <h3 class="flex items-center gap-2 text-base font-semibold text-slate-950 dark:text-white">
+                    <span class="scanner-title-icon">
+                        <x-heroicon-o-qr-code class="h-5 w-5" />
+                    </span>
+                    <span class="truncate">{{ $title }}</span>
+                </h3>
+                <p class="scanner-helper-text">{{ __('Align the QR code inside the frame.') }}</p>
+            </div>
+            <button type="button" id="switch-camera-btn" onclick="window.switchCamera?.()"
+                aria-label="{{ __('Switch camera') }}" class="scanner-camera-toggle">
+                <x-heroicon-o-arrow-path class="h-4 w-4" />
                 <span>{{ __('Switch') }}</span>
             </button>
         </div>
 
-        @if(isset($headerActions))
+        @if (isset($headerActions))
             <div class="w-full">
                 {{ $headerActions }}
             </div>
         @endif
     </div>
 
-    <!-- On-screen Debug Log for Camera Issues -->
-    <div class="hidden mb-3 w-full max-w-sm mx-auto bg-gray-900 border border-red-500/50 rounded-lg p-2 overflow-y-auto max-h-32 shadow-inner">
-        <div class="text-[10px] text-gray-400 font-mono flex items-center justify-between mb-1 border-b border-gray-700 pb-1">
+    <div class="hidden mb-3 max-h-32 w-full max-w-sm overflow-y-auto rounded-lg border border-red-500/50 bg-gray-900 p-2 shadow-inner">
+        <div class="mb-1 flex items-center justify-between border-b border-gray-700 pb-1 font-mono text-[10px] text-gray-400">
             <span>{{ __('Camera Debug Log') }}</span>
             <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-gray-500 hover:text-white" aria-label="{{ __('Dismiss') }}">
                 <x-heroicon-o-x-mark class="h-4 w-4" />
             </button>
         </div>
-        <div id="debug-log" class="text-[10px] font-mono text-green-400 space-y-0.5 whitespace-pre-wrap word-break"></div>
+        <div id="debug-log" class="word-break space-y-0.5 whitespace-pre-wrap font-mono text-[10px] text-green-400"></div>
     </div>
 
-    <div class="scanner-container w-full max-w-sm mx-auto aspect-square rounded-2xl bg-gray-100 dark:bg-gray-900
-                cursor-pointer flex items-center justify-center overflow-hidden relative group"
+    <div class="scanner-container group relative mx-auto flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden"
         id="scanner" onclick="handleScanClick()">
-        
-        <!-- Custom Overlay (Visible when scanning) -->
-        <div id="scanner-overlay" class="absolute inset-0 z-10 pointer-events-none hidden">
-            <!-- Scan Line Animation -->
-            <div class="absolute inset-x-4 h-0.5 bg-blue-500/80 shadow-[0_0_15px_rgba(59,130,246,0.8)] z-20 animate-scan-line"></div>
-            
-            <!-- Standard QR Box Border (For Both Web & Native) -->
-            <div class="absolute inset-4 border-2 border-white/50 rounded-xl"></div>
-            
-            <!-- Corner Accents -->
-            <div class="absolute top-4 left-4 w-6 h-6 border-l-4 border-t-4 border-blue-500 rounded-tl-xl"></div>
-            <div class="absolute top-4 right-4 w-6 h-6 border-r-4 border-t-4 border-blue-500 rounded-tr-xl"></div>
-            <div class="absolute bottom-4 left-4 w-6 h-6 border-l-4 border-b-4 border-blue-500 rounded-bl-xl"></div>
-            <div class="absolute bottom-4 right-4 w-6 h-6 border-r-4 border-b-4 border-blue-500 rounded-br-xl"></div>
+        <div id="scanner-overlay" class="pointer-events-none absolute inset-0 z-10 hidden">
+            <div class="animate-scan-line absolute inset-x-4 z-20 h-0.5 bg-blue-500/80 shadow-[0_0_15px_rgba(59,130,246,0.8)]"></div>
+            <div class="absolute inset-4 rounded-xl border-2 border-white/50"></div>
+            <div class="absolute left-4 top-4 h-6 w-6 rounded-tl-xl border-l-4 border-t-4 border-blue-500"></div>
+            <div class="absolute right-4 top-4 h-6 w-6 rounded-tr-xl border-r-4 border-t-4 border-blue-500"></div>
+            <div class="absolute bottom-4 left-4 h-6 w-6 rounded-bl-xl border-b-4 border-l-4 border-blue-500"></div>
+            <div class="absolute bottom-4 right-4 h-6 w-6 rounded-br-xl border-b-4 border-r-4 border-blue-500"></div>
         </div>
 
-        <span id="scanner-placeholder" class="text-gray-400 dark:text-gray-500 z-0">
-            <x-heroicon-o-camera class="h-16 w-16 opacity-50" />
+        <span id="scanner-placeholder" class="scanner-placeholder z-0">
+            <span class="scanner-placeholder__icon">
+                <x-heroicon-o-camera class="h-8 w-8" />
+            </span>
+            <span class="scanner-placeholder__title">{{ __('Tap to open camera') }}</span>
+            <span class="scanner-placeholder__copy">{{ __('Camera permission is required for attendance.') }}</span>
         </span>
     </div>
 
-    <div id="scanner-result" class="hidden mt-3 text-green-600 dark:text-green-400 font-medium text-center text-sm">
-    </div>
+    <div id="scanner-result" class="mt-3 hidden text-center text-sm font-medium text-green-600 dark:text-green-400"></div>
+    <div id="scanner-error" class="mt-3 hidden text-center text-sm font-medium text-red-600 dark:text-red-400"></div>
 
-    <div id="scanner-error" class="hidden mt-3 text-red-600 dark:text-red-400 font-medium text-center text-sm">
-    </div>
-
-    @if(isset($slot) && $slot->isNotEmpty())
-        <div class="scanner-footer mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+    @if (isset($slot) && $slot->isNotEmpty())
+        <div class="scanner-footer">
             {{ $slot }}
         </div>
     @endif

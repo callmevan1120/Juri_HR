@@ -4223,5 +4223,16 @@
     "HTTP": "HTTP",
     "Open profile": "Open profile",
     "Switch camera": "Switch camera",
-    "Toggle map": "Toggle map"
+    "Align the QR code inside the frame.": "Align the QR code inside the frame.",
+    "Working hours": "Working hours",
+    "Tap to open camera": "Tap to open camera",
+    "Camera permission is required for attendance.": "Camera permission is required for attendance.",
+    "Toggle map": "Toggle map",
+    "Masked salary amount": "Rp *********",
+    "Limit": "Limit",
+    "Hide salary": "Hide salary",
+    "Show salary": "Show salary",
+    "Holiday initial": "H",
+    "ID": "ID",
+    "EN": "EN"
 }

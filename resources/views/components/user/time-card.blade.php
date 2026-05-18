@@ -8,9 +8,9 @@
     $isCompact = $compact ?? false;
 @endphp
 
-<div class="rounded-lg border border-gray-200 bg-white p-{{ $isCompact ? '2' : '4' }} sm:p-{{ $isCompact ? '2' : '6' }} shadow dark:border-gray-700 dark:bg-gray-800">
+<div class="user-list-card p-{{ $isCompact ? '2' : '4' }} sm:p-{{ $isCompact ? '2' : '5' }}">
     <div class="flex items-center gap-3 mb-{{ $isCompact ? '2' : '3' }}">
-        <div class="p-2 {{ $bgClass }} rounded-lg">
+        <div class="rounded-full p-2 {{ $bgClass }}">
             <x-heroicon-o-clock class="h-5 w-5 {{ $textClass }}" />
         </div>
         @if (isset($status))

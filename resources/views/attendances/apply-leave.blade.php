@@ -21,23 +21,29 @@
                     
                     {{-- Leave Quota Summary --}}
                     <div class="mb-4 grid grid-cols-1 gap-3">
-                        <div class="flex flex-col items-center justify-center rounded-2xl border border-primary-200 bg-primary-50 p-3 text-center transition-colors hover:bg-primary-100/50 dark:border-primary-800/30 dark:bg-primary-900/20">
-                            <p class="mb-1 text-sm font-semibold text-primary-800 dark:text-primary-200">{{ __('Annual Leave Quota') }}</p>
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-xl font-semibold text-primary-800 dark:text-primary-200">{{ $remainingExcused ?? 0 }}</span>
-                                <span class="text-sm font-semibold text-primary-700/80 dark:text-primary-300/80">/ {{ $annualQuota ?? 12 }}</span>
+                        <div class="leave-quota-pill">
+                            <div class="leave-quota-pill__icon">
+                                <x-heroicon-o-calendar-days class="h-5 w-5" />
                             </div>
-                            <p class="mt-2 text-sm text-primary-800/80 dark:text-primary-200/80">{{ __('Used') }}: {{ $usedExcused ?? 0 }}</p>
-                            @if ($annualLeaveExpiresAt ?? null)
-                                <p class="mt-1 text-xs font-semibold {{ ($annualLeaveExpired ?? false) ? 'text-rose-700 dark:text-rose-300' : 'text-primary-700/80 dark:text-primary-300/80' }}">
-                                    {{ ($annualLeaveExpired ?? false) ? __('Expired') : __('Valid until') }}:
-                                    {{ \Illuminate\Support\Carbon::parse($annualLeaveExpiresAt)->translatedFormat('d M Y') }}
+                            <div class="min-w-0 flex-1">
+                                <p class="leave-quota-pill__label">{{ __('Annual Leave Quota') }}</p>
+                                <p class="leave-quota-pill__meta">
+                                    {{ __('Used') }}: {{ $usedExcused ?? 0 }}
+                                    @if ($annualLeaveExpiresAt ?? null)
+                                        <span class="text-slate-400">•</span>
+                                        {{ ($annualLeaveExpired ?? false) ? __('Expired') : __('Valid until') }}
+                                        {{ \Illuminate\Support\Carbon::parse($annualLeaveExpiresAt)->translatedFormat('d M Y') }}
+                                    @endif
                                 </p>
-                            @endif
+                            </div>
+                            <div class="leave-quota-pill__count">
+                                <span>{{ $remainingExcused ?? 0 }}</span>
+                                <small>/ {{ $annualQuota ?? 12 }}</small>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-4 rounded-2xl border border-gray-200 bg-gray-50/80 p-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/30 dark:text-gray-300">
+                    <div class="mb-4 rounded-[1.05rem] border border-slate-200/70 bg-white/50 p-3 text-sm text-slate-600 dark:border-slate-800/80 dark:bg-slate-950/30 dark:text-slate-300">
                         <p class="font-semibold text-gray-800 dark:text-gray-100">{{ __('Before you submit') }}</p>
                         <p class="sr-only">
                             {{ __('Choose the correct leave type, set the date range carefully, and attach supporting files when required. Only annual leave types reduce the annual quota; sick leave and special leave types do not use quota.') }}
@@ -60,7 +66,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('store-leave-request') }}" enctype="multipart/form-data" class="space-y-5" aria-describedby="leave-form-help">
+                    <form method="POST" action="{{ route('store-leave-request') }}" enctype="multipart/form-data" class="user-native-form space-y-4 p-4 sm:p-5" aria-describedby="leave-form-help">
                         @csrf
                         <p id="leave-form-help" class="sr-only">{{ __('Complete the leave type, dates, reason, and optional attachment before submitting your request.') }}</p>
 
@@ -128,7 +134,7 @@
 
                         <div
                             x-data="{ fileName: '' }"
-                            class="relative rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-900/30"
+                            class="user-upload-dropzone relative"
                         >
                             <input
                                 type="file"
@@ -169,7 +175,7 @@
                         <input type="hidden" name="lng" id="lng" />
 
                         <div class="pt-4">
-                            <button type="submit" class="flex min-h-[2.75rem] w-full items-center justify-center rounded-xl border border-transparent bg-primary-700 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition-all hover:bg-primary-800">
+                            <button type="submit" class="flex min-h-[2.75rem] w-full items-center justify-center rounded-xl border border-transparent bg-primary-700 px-4 py-3.5 text-sm font-semibold text-white transition-all hover:bg-primary-800">
                                 {{ __('Submit Request') }}
                             </button>
                             <div class="mt-4 text-center">

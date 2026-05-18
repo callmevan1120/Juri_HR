@@ -27,6 +27,8 @@ class WorkFromHomeRequestPage extends Component
 
     public string $reason = '';
 
+    public bool $showCreateModal = false;
+
     public function boot(WorkFromHomeRequestService $wfhRequests): void
     {
         $this->wfhRequests = $wfhRequests;
@@ -35,6 +37,21 @@ class WorkFromHomeRequestPage extends Component
     public function mount(): void
     {
         $this->authorize('viewAny', WorkFromHomeRequest::class);
+    }
+
+    public function create(): void
+    {
+        $this->authorize('create', WorkFromHomeRequest::class);
+
+        $this->resetValidation();
+        $this->showCreateModal = true;
+    }
+
+    public function close(): void
+    {
+        $this->reset(['date', 'startTime', 'endTime', 'locationAddress', 'reason']);
+        $this->resetValidation();
+        $this->showCreateModal = false;
     }
 
     public function submit(): void
@@ -61,7 +78,7 @@ class WorkFromHomeRequestPage extends Component
             ],
         ]);
 
-        $this->reset(['date', 'startTime', 'endTime', 'locationAddress', 'reason']);
+        $this->close();
         $this->banner(__('WFH request submitted.'));
     }
 
