@@ -51,6 +51,7 @@ test('core user menu pages resolve cleanly for a regular user', function () {
         'my-performance',
         'my-kasbon',
         'hr-tasks',
+        'collaboration',
     ];
 
     foreach ($routes as $routeName) {

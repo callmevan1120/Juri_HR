@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Collaboration\DownloadCloudFileController;
 use App\Http\Controllers\User\AppraisalExportPdfController;
 use App\Http\Controllers\User\AttendanceController;
 use App\Http\Controllers\User\EmployeeDocumentDownloadController;
@@ -62,6 +63,10 @@ Route::middleware([
             ->name('hr-tasks')
             ->can('viewAny', HrChecklistTask::class);
         Route::livewire('/my-tasks', 'user.my-operational-tasks')->name('my-tasks');
+        Route::livewire('/collaboration', 'user.collaboration-inbox')->name('collaboration');
+        Route::get('/collaboration/files/{file}/download', DownloadCloudFileController::class)
+            ->name('collaboration.files.download')
+            ->can('download', 'file');
         Route::livewire('/forms', 'user.my-custom-forms')->name('my-forms');
         Route::livewire('/approvals', 'user.team-approvals')
             ->name('approvals')

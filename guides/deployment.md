@@ -104,15 +104,22 @@ MAIL_FROM_ADDRESS=no-reply@your-domain.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
-`BROADCAST_CONNECTION=log` adalah mode aman untuk instalasi tanpa WebSocket. Dengan `ANNOUNCEMENT_REFRESH_MODE=auto`, announcement dan notifikasi memakai fallback polling ringan. Untuk VPS yang siap WebSocket, aktifkan Reverb:
+`BROADCAST_CONNECTION=log` adalah mode aman untuk instalasi tanpa WebSocket. Dengan `ANNOUNCEMENT_REFRESH_MODE=auto`, announcement dan notifikasi memakai fallback polling ringan. Jika `BROADCAST_CONNECTION=reverb` dipilih tetapi `REVERB_APP_KEY` belum lengkap, aplikasi tetap menganggap broadcast belum siap dan mempertahankan polling fallback. Untuk VPS yang siap WebSocket, aktifkan Reverb:
+
+Generate app key/secret Reverb sendiri. Nilai ini tidak perlu berasal dari layanan eksternal, tetapi harus random dan hanya disimpan di `.env` runtime:
+
+```bash
+php -r 'echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
+```
 
 ```dotenv
 BROADCAST_CONNECTION=reverb
 ANNOUNCEMENT_REFRESH_MODE=auto
+COLLABORATION_REALTIME_ENABLED=true
 
-REVERB_APP_ID=local-paspapan
-REVERB_APP_KEY=change-me
-REVERB_APP_SECRET=change-me-secret
+REVERB_APP_ID=paspapan-production
+REVERB_APP_KEY=<random-hex>
+REVERB_APP_SECRET=<random-hex>
 REVERB_HOST=your-domain.com
 REVERB_PORT=443
 REVERB_SCHEME=https
@@ -120,7 +127,15 @@ REVERB_SERVER_HOST=0.0.0.0
 REVERB_SERVER_PORT=8080
 ```
 
-Gunakan host publik pada `REVERB_HOST`. `REVERB_SERVER_HOST` dan `REVERB_SERVER_PORT` adalah alamat bind proses Reverb di server.
+Gunakan host publik pada `REVERB_HOST`. `REVERB_SERVER_HOST` dan `REVERB_SERVER_PORT` adalah alamat bind proses Reverb di server. `COLLABORATION_REALTIME_ENABLED=true` hanya direkomendasikan untuk VPS karena membutuhkan broadcast connection yang berjalan stabil; biarkan `false` pada shared hosting.
+
+Untuk local smoke test, gunakan `REVERB_HOST=127.0.0.1`, `REVERB_PORT=8080`, `REVERB_SCHEME=http`, lalu jalankan `php artisan reverb:start` di terminal terpisah bersama queue worker. `REVERB_APP_ID`, `REVERB_APP_KEY`, dan `REVERB_APP_SECRET` boleh custom, tetapi tetap gunakan nilai random:
+
+```bash
+php -r 'echo "REVERB_APP_ID=local-".bin2hex(random_bytes(6)).PHP_EOL; echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
+```
+
+Browser akan menerima konfigurasi Echo dari layout aplikasi, termasuk `/broadcasting/auth` dan CSRF header, sehingga private channel seperti `collaboration.company.{id}` bisa diuji tanpa hardcode `VITE_*` key.
 
 ### 4. Build dan migrate
 

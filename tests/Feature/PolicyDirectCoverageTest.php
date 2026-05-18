@@ -5,6 +5,7 @@ use App\Models\Appraisal;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\CloudFile;
 use App\Models\CompanyAsset;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\Holiday;
@@ -23,6 +24,7 @@ use App\Policies\AppraisalPolicy;
 use App\Policies\AttendanceCorrectionPolicy;
 use App\Policies\AttendancePolicy;
 use App\Policies\CashAdvancePolicy;
+use App\Policies\CloudFilePolicy;
 use App\Policies\CompanyAssetPolicy;
 use App\Policies\EmployeeDocumentRequestPolicy;
 use App\Policies\HolidayPolicy;
@@ -45,6 +47,7 @@ test('registered policy classes resolve through the gate', function () {
         Attendance::class => AttendancePolicy::class,
         AttendanceCorrection::class => AttendanceCorrectionPolicy::class,
         CashAdvance::class => CashAdvancePolicy::class,
+        CloudFile::class => CloudFilePolicy::class,
         CompanyAsset::class => CompanyAssetPolicy::class,
         EmployeeDocumentRequest::class => EmployeeDocumentRequestPolicy::class,
         Holiday::class => HolidayPolicy::class,

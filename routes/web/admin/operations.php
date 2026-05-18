@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Collaboration\DownloadCloudFileController;
 use App\Http\Controllers\Admin\Commercial\DownloadCommercialDocumentPdfController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,14 @@ Route::livewire('/operations', 'admin.operational-workspace')
 Route::livewire('/commercial', 'admin.commercial-workspace')
     ->name('admin.commercial')
     ->can('viewCommercialWorkspace');
+
+Route::livewire('/collaboration', 'admin.collaboration-workspace')
+    ->name('admin.collaboration')
+    ->can('viewCollaborationWorkspace');
+
+Route::get('/collaboration/files/{file}/download', DownloadCloudFileController::class)
+    ->name('admin.collaboration.files.download')
+    ->can('download', 'file');
 
 Route::get('/commercial/quotations/{quotation}/pdf', [DownloadCommercialDocumentPdfController::class, 'quotation'])
     ->name('admin.commercial.quotations.pdf')

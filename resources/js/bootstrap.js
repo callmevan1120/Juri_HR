@@ -26,6 +26,15 @@ const bootEcho = () => {
     const scheme = driver.scheme || (window.location.protocol === "https:" ? "https" : "http");
     const port = Number(driver.port || (scheme === "https" ? 443 : 80));
     const forceTLS = scheme === "https";
+    const auth = {
+        headers: {
+            "X-CSRF-TOKEN": config.csrfToken
+                || document.querySelector('meta[name="csrf-token"]')?.getAttribute("content")
+                || "",
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    };
+    const authEndpoint = config.authEndpoint || "/broadcasting/auth";
 
     if (connection === "reverb") {
         const options = {
@@ -35,6 +44,9 @@ const bootEcho = () => {
             wsPort: port,
             wssPort: port,
             forceTLS,
+            encrypted: forceTLS,
+            authEndpoint,
+            auth,
             enabledTransports: ["ws", "wss"],
         };
 
@@ -56,6 +68,10 @@ const bootEcho = () => {
             wsPort: port,
             wssPort: port,
             forceTLS,
+            encrypted: forceTLS,
+            authEndpoint,
+            auth,
+            disableStats: true,
             enabledTransports: ["ws", "wss"],
         });
     }

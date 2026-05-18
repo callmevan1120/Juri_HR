@@ -5,7 +5,7 @@ Dokumen ini menjelaskan endpoint inbound generik untuk mesin absensi eksternal s
 ## Ringkasan
 
 - Endpoint: `POST /api/integrations/attendance-events`
-- Proteksi: HMAC SHA-256 dengan timestamp pendek
+- Proteksi: API key integrasi + HMAC SHA-256 dengan timestamp pendek
 - Rate limit: `attendance-integrations`
 - Mapping karyawan: `employee_code` dicocokkan ke `users.nip`
 - Idempotency: kombinasi `source` + `idempotency_key` hanya diproses sekali
@@ -18,20 +18,30 @@ Endpoint ini cocok untuk integrasi mesin yang bisa push data ke server PasPapan.
 
 Isi secret integrasi di environment server:
 
-```dotenv
-ATTENDANCE_INTEGRATION_SECRET=change-with-random-long-secret
-ATTENDANCE_INTEGRATION_SIGNATURE_TOLERANCE_SECONDS=300
+Generate API key dan HMAC secret sendiri. Keduanya boleh custom, tetapi production wajib random dan tidak dibagikan ke user biasa:
+
+```bash
+php -r 'echo "ATTENDANCE_INTEGRATION_API_KEY=".bin2hex(random_bytes(32)).PHP_EOL; echo "ATTENDANCE_INTEGRATION_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
 ```
 
-Jangan pakai secret yang sama dengan `APP_KEY`, token API user, atau secret enterprise license.
+```dotenv
+ATTENDANCE_INTEGRATION_API_KEY=change-with-random-api-key
+ATTENDANCE_INTEGRATION_SECRET=change-with-random-long-secret
+ATTENDANCE_INTEGRATION_SIGNATURE_TOLERANCE_SECONDS=300
+ATTENDANCE_INTEGRATION_ALLOWED_SOURCES=solution,sbg
+```
 
-## Header HMAC
+Jangan pakai API key/secret yang sama dengan `APP_KEY`, token API user, atau secret enterprise license. Rotasi `ATTENDANCE_INTEGRATION_API_KEY` jika gateway vendor/customer berganti.
+`ATTENDANCE_INTEGRATION_ALLOWED_SOURCES` opsional; biarkan kosong jika gateway belum distandarkan, atau isi daftar `source` yang diizinkan agar vendor lain tidak bisa mengirim event walaupun format payload benar.
+
+## Header API Key dan HMAC
 
 Client wajib mengirim:
 
 ```http
 Content-Type: application/json
 Accept: application/json
+X-PasPapan-Api-Key: <integration api key>
 X-PasPapan-Timestamp: 1778659200
 X-PasPapan-Signature: sha256=<hmac>
 ```
@@ -43,6 +53,7 @@ sha256=<hmac_sha256(timestamp + "." + raw_json_body, ATTENDANCE_INTEGRATION_SECR
 ```
 
 Server menolak request tanpa signature, timestamp non-numeric, timestamp kadaluarsa, atau body yang berubah setelah signature dibuat.
+Server juga menolak request tanpa `X-PasPapan-Api-Key` atau API key yang tidak cocok dengan konfigurasi server.
 
 ## Payload
 
@@ -76,14 +87,17 @@ Field utama:
 
 ## Contoh Curl
 
+Local smoke test bisa memakai `APP_URL=http://127.0.0.1:8000`. Pastikan `php artisan serve` berjalan dan `.env` sudah memiliki `ATTENDANCE_INTEGRATION_API_KEY`, `ATTENDANCE_INTEGRATION_SECRET`, serta `ATTENDANCE_INTEGRATION_ALLOWED_SOURCES` yang memuat `local-curl` jika allowlist diaktifkan.
+
 ```bash
-BODY='{"source":"solution","idempotency_key":"solution-1001","employee_code":"EMP-001","event_type":"clock_in","occurred_at":"2026-05-13 08:03:00","device_id":"machine-a"}'
+BODY='{"source":"local-curl","idempotency_key":"local-curl-'"$(date +%s)"'","employee_code":"EMP-001","event_type":"clock_in","occurred_at":"2026-05-13 08:03:00","device_id":"local-terminal"}'
 TS="$(date +%s)"
 SIG="sha256=$(printf '%s.%s' "$TS" "$BODY" | openssl dgst -sha256 -hmac "$ATTENDANCE_INTEGRATION_SECRET" -binary | xxd -p -c 256)"
 
-curl -X POST "https://example.com/api/integrations/attendance-events" \
+curl -X POST "${APP_URL:-http://127.0.0.1:8000}/api/integrations/attendance-events" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
+  -H "X-PasPapan-Api-Key: $ATTENDANCE_INTEGRATION_API_KEY" \
   -H "X-PasPapan-Timestamp: $TS" \
   -H "X-PasPapan-Signature: $SIG" \
   --data "$BODY"
@@ -134,6 +148,7 @@ Karyawan tidak ditemukan:
 
 Coverage utama ada di `tests/Feature/AttendanceIntegrationApiTest.php`:
 
+- API key integrasi wajib valid.
 - HMAC signature wajib valid.
 - `employee_code` memetakan event ke user.
 - `source` + `idempotency_key` mencegah replay duplicate.

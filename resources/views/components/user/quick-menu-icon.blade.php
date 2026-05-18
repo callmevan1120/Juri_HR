@@ -8,6 +8,7 @@
         'clock' => 'heroicon-o-clock',
         'calendar' => 'heroicon-o-calendar-days',
         'tasks' => 'heroicon-o-clipboard-document-check',
+        'chat' => 'heroicon-o-chat-bubble-left-right',
         'forms' => 'heroicon-o-clipboard-document-list',
         'swap' => 'heroicon-o-arrows-right-left',
         'home' => 'heroicon-o-home-modern',

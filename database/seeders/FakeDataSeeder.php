@@ -126,6 +126,7 @@ class FakeDataSeeder extends Seeder
             DemoAssetSeeder::class,
             DemoOperationsSeeder::class,
             DemoCommercialSeeder::class,
+            DemoCollaborationSeeder::class,
             DemoFinanceWorkflowSeeder::class,
             DemoCustomFormSeeder::class,
         ]);

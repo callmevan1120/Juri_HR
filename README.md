@@ -4,7 +4,7 @@
 
 # PasPapan
 
-Platform kerja terpadu berbasis Laravel untuk HR, absensi aman, approval, payroll preparation, accounting foundation, CRM/operasional, reporting, aset, dan mobile workforce.
+Platform kerja terpadu berbasis Laravel untuk HR, absensi aman, approval, payroll preparation, accounting foundation, CRM/operasional, kolaborasi internal, reporting, aset, dan mobile workforce.
 
 [![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
 [![Livewire 4](https://img.shields.io/badge/Livewire-4-4E56A6?style=flat-square&logo=livewire&logoColor=white)](https://livewire.laravel.com)
@@ -17,7 +17,7 @@ Platform kerja terpadu berbasis Laravel untuk HR, absensi aman, approval, payrol
 
 ## Ringkasan
 
-PasPapan adalah aplikasi workforce untuk organisasi yang membutuhkan absensi mobile, HR checklist onboarding/offboarding, workflow approval, persiapan payroll, import/export, reporting, accounting foundation, CRM/operasional, dan maintenance system dalam satu aplikasi Laravel deployable.
+PasPapan adalah aplikasi workforce untuk organisasi yang membutuhkan absensi mobile, HR checklist onboarding/offboarding, workflow approval, persiapan payroll, import/export, reporting, accounting foundation, CRM/operasional, kolaborasi internal, dan maintenance system dalam satu aplikasi Laravel deployable.
 
 Fokus utama aplikasi:
 
@@ -31,6 +31,7 @@ Fokus utama aplikasi:
 - operations workspace untuk client, project, task, checklist, bukti kunjungan, dan bukti foto
 - commercial workspace untuk client, product, stock movement, quotation, invoice, sales opportunity, follow-up, dan vendor bill foundation
 - accounting workspace untuk chart of accounts, journal, AR/AP aging, cashflow, ledger detail, export Excel, dan closing period
+- collaboration workspace untuk admin dan user: thread chat personal/grup/proyek, upload file kerja private dengan secure download policy, link online meeting, dan optional realtime update di VPS
 - command center untuk pending approval, overdue HR task, attendance risk, payroll readiness, profile completeness, dan contract expiry
 - custom form builder untuk request/form operasional yang bisa berubah tanpa migration baru
 - WFH request dan leave entitlement untuk alokasi/expiry cuti
@@ -105,7 +106,7 @@ Sorotan `v4.3.0`:
 Sorotan branch `chore/major-upgrade-audit`:
 
 - Laravel 13, Livewire 4, Tailwind CSS 4, Vite 7, PHP 8.3+, Node 20+, Bun 1.3.6+, dan Capacitor 8 sudah menjadi baseline modern stack.
-- Foundation produk diperluas ke multi-company/branch, operations workspace, commercial/CRM workspace, accounting workspace, custom form builder, leave entitlement, WFH request, command center, dan payroll period/Coretax export.
+- Foundation produk diperluas ke multi-company/branch, operations workspace, commercial/CRM workspace, accounting workspace, collaboration workspace, custom form builder, leave entitlement, WFH request, command center, dan payroll period/Coretax export.
 - Evidence terakhir: `php artisan test` pass `505` tests / `10246` assertions setelah enterprise obfuscator salted dijalankan ulang, `composer check:enterprise-boundary`, `composer phpstan`, Pint, composer/bun audit, `bun run build`, `php artisan rbac:audit`, browser smoke, APK smoke, APK attendance E2E, dan APK document upload E2E pass.
 - Commit evidence terbaru: `99cde52` untuk screenshot APK smoke, `0ed8b9f` untuk refresh dokumen release evidence, `c4d69fe` untuk sinkronisasi README, `e5063be` untuk refresh salted enterprise artifacts, dan `df23827` untuk enterprise boundary gate docs.
 
@@ -195,23 +196,53 @@ CACHE_STORE=database
 BROADCAST_CONNECTION=log
 ANNOUNCEMENT_REFRESH_MODE=auto
 ANNOUNCEMENT_POLL_INTERVAL=60s
+COLLABORATION_REALTIME_ENABLED=false
 ```
 
 ## Realtime Hybrid
 
-PasPapan mendukung dua mode announcement/notification refresh:
+PasPapan mendukung dua mode announcement/notification refresh dan collaboration update:
 
 - Shared hosting UMKM: gunakan `BROADCAST_CONNECTION=log` dengan `ANNOUNCEMENT_REFRESH_MODE=auto`. Aplikasi fallback ke polling ringan setiap `ANNOUNCEMENT_POLL_INTERVAL`.
-- VPS: gunakan `BROADCAST_CONNECTION=reverb`. Aplikasi memakai Laravel Reverb + Echo sehingga announcement baru dikirim lewat WebSocket tanpa polling berkala.
+- VPS: gunakan `BROADCAST_CONNECTION=reverb`. Aplikasi memakai Laravel Reverb + Echo sehingga announcement baru dan update collaboration workspace dikirim lewat WebSocket. Aktifkan `COLLABORATION_REALTIME_ENABLED=true` hanya di VPS/WebSocket-ready deployment. Mode `auto` tetap fallback ke polling kalau driver/key Reverb belum lengkap, jadi local install tidak akan kehilangan refresh.
 
-Contoh VPS Reverb:
+Contoh local Reverb smoke:
+
+Generate key lokal:
+
+```bash
+php -r 'echo "REVERB_APP_ID=local-".bin2hex(random_bytes(6)).PHP_EOL; echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
+```
 
 ```dotenv
 BROADCAST_CONNECTION=reverb
 ANNOUNCEMENT_REFRESH_MODE=auto
-REVERB_APP_ID=local-paspapan
-REVERB_APP_KEY=change-me
-REVERB_APP_SECRET=change-me-secret
+COLLABORATION_REALTIME_ENABLED=true
+REVERB_APP_ID=local-<random>
+REVERB_APP_KEY=<random-hex>
+REVERB_APP_SECRET=<random-hex>
+REVERB_HOST=127.0.0.1
+REVERB_PORT=8080
+REVERB_SCHEME=http
+REVERB_SERVER_HOST=0.0.0.0
+REVERB_SERVER_PORT=8080
+```
+
+Contoh production VPS Reverb:
+
+Generate key production di server/CI secret manager, lalu simpan hanya di `.env` production:
+
+```bash
+php -r 'echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
+```
+
+```dotenv
+BROADCAST_CONNECTION=reverb
+ANNOUNCEMENT_REFRESH_MODE=auto
+COLLABORATION_REALTIME_ENABLED=true
+REVERB_APP_ID=paspapan-production
+REVERB_APP_KEY=<random-hex>
+REVERB_APP_SECRET=<random-hex>
 REVERB_HOST=your-domain.com
 REVERB_PORT=443
 REVERB_SCHEME=https

@@ -81,6 +81,16 @@
         ],
         [
             'kind' => 'link',
+            'href' => route('collaboration'),
+            'label' => __('Team Chat'),
+            'description' => __('Open conversations and shared files.'),
+            'icon' => 'chat',
+            'tone' => 'bg-teal-100 text-teal-700 dark:bg-teal-950/40 dark:text-teal-200',
+            'locked' => false,
+            'completed' => false,
+        ],
+        [
+            'kind' => 'link',
             'href' => route('my-forms'),
             'label' => __('Forms'),
             'description' => __('Submit HR and operations forms.'),

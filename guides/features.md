@@ -34,6 +34,7 @@ Area admin mencakup:
 - activity log
 - pengumuman
 - system maintenance, cache operations, backup center, restore center, dan cleanup tools
+- collaboration workspace untuk thread chat, upload file kerja privat, secure download policy, dan link online meeting
 
 ## Self-Service Karyawan
 
@@ -172,6 +173,18 @@ Template user mencakup field schema terbaru seperti status karyawan, bahasa, man
 
 Run terminal yang lebih lama dari 24 jam disembunyikan dari daftar terbaru dan dipangkas otomatis oleh scheduler.
 
+## Operations, CRM, Accounting, dan Kolaborasi
+
+Area `Operations` di admin menggabungkan fondasi kerja lintas tim:
+
+- `Workspace` untuk company branch, client, project, task, checklist, dan bukti kunjungan lokasi.
+- `Commercial` untuk product, stock movement, quotation, invoice, vendor bill, sales opportunity, follow-up, dan document PDF.
+- `Collaboration` untuk admin dan user: thread chat personal/grup/proyek, pesan, upload file kerja private dengan secure download policy, dan link meeting eksternal seperti Jitsi, Zoom, Teams, atau Google Meet.
+- `Accounting` untuk chart of accounts, journal, ledger detail, AR/AP aging, cashflow, dan closing period.
+- `Forms` untuk custom form builder company-scoped.
+
+Modul collaboration tetap shared-hosting friendly secara default: aplikasi menyimpan thread, pesan, metadata file, file aktual di private `local` disk, dan link meeting di database. User mendapatkan inbox `/collaboration` untuk membaca thread tempat ia menjadi anggota, mengirim pesan, dan mengunduh file thread yang lolos policy. Download file selalu lewat route terproteksi + policy company scope; video meeting tidak di-host sendiri agar deployment shared hosting tetap ringan. Untuk VPS/WebSocket-ready deployment, `COLLABORATION_REALTIME_ENABLED=true` mengaktifkan broadcast update workspace lewat Reverb/Pusher/Ably tanpa membuka akses lintas perusahaan.
+
 ## Modul Enterprise
 
 Repository ini memuat modul dan penguncian enterprise untuk:
@@ -211,7 +224,7 @@ Status implementasi fondasi:
 - Fase 5: lifecycle, shift planning, notification preference, webhook/API integration, dan KPI service sudah tersedia sebagai foundation backend.
 - Fase 6: multi-company ringan, marketplace template HR, dan issue labels komunitas sudah tersedia sebagai foundation produk.
 - Rilis 4.3.0: screenshot katalog menu desktop/APK sudah diperluas menjadi 62 halaman, Playwright smoke masuk CI, Android attendance smoke berjalan di device ADB, dan security scan CI mencakup CodeQL PHP/JS, Semgrep, Gitleaks, serta TruffleHog.
-- Branch `chore/major-upgrade-audit`: foundation multi-company, company branch, operations workspace, commercial/CRM workspace, accounting workspace, custom form builder, leave entitlement, WFH request, payroll period/Coretax export, command center, dan physical APK smoke evidence sudah tersedia dengan test coverage.
+- Branch `chore/major-upgrade-audit`: foundation multi-company, company branch, operations workspace, commercial/CRM workspace, accounting workspace, collaboration workspace, custom form builder, leave entitlement, WFH request, payroll period/Coretax export, command center, dan physical APK smoke evidence sudah tersedia dengan test coverage.
 
 ### Fase 1 - Trust, Audit, dan Risiko Absensi
 

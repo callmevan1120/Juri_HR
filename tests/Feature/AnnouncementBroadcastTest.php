@@ -6,13 +6,14 @@ use App\Livewire\Shared\HighPriorityAnnouncementModal;
 use App\Livewire\Shared\NotificationsDropdown;
 use App\Models\User;
 use App\Support\AnnouncementRefresh;
+use App\Support\BroadcastRuntime;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
 
 test('announcement manager broadcasts queued change events', function () {
     Event::fake([AnnouncementsChanged::class]);
-    Config::set('broadcasting.default', 'reverb');
+    enableReverbBroadcasting();
 
     $superadmin = User::factory()->admin(true)->create();
 
@@ -62,9 +63,19 @@ test('announcement refresh uses broadcast on vps and polling fallback on shared 
 
     expect(AnnouncementRefresh::shouldPoll())->toBeTrue();
 
-    Config::set('broadcasting.default', 'reverb');
+    enableReverbBroadcasting();
 
     expect(AnnouncementRefresh::shouldPoll())->toBeFalse();
+});
+
+test('announcement auto mode keeps polling when broadcast driver is not fully configured', function () {
+    Config::set('broadcasting.default', 'reverb');
+    Config::set('broadcasting.connections.reverb.key', null);
+    Config::set('realtime.announcements.refresh_mode', 'auto');
+    Config::set('realtime.announcements.broadcast_connections', ['reverb', 'pusher', 'ably']);
+
+    expect(AnnouncementRefresh::broadcastingEnabled())->toBeFalse()
+        ->and(AnnouncementRefresh::shouldPoll())->toBeTrue();
 });
 
 test('announcement refresh mode can force poll broadcast or off', function () {
@@ -97,12 +108,42 @@ test('echo listeners are only registered when realtime broadcasting is enabled',
         ->and(componentListeners(new NotificationsDropdown))
         ->not->toHaveKey('echo:announcements,.announcements.changed');
 
-    Config::set('broadcasting.default', 'reverb');
+    enableReverbBroadcasting();
 
     expect(componentListeners(new HighPriorityAnnouncementModal))
         ->toHaveKey('echo:announcements,.announcements.changed')
         ->and(componentListeners(new NotificationsDropdown))
         ->toHaveKey('echo:announcements,.announcements.changed');
+});
+
+test('broadcast runtime exposes safe echo client config for local and production reverb', function () {
+    enableReverbBroadcasting([
+        'host' => '127.0.0.1',
+        'port' => 8080,
+        'scheme' => 'http',
+    ]);
+
+    $local = BroadcastRuntime::clientConfig(request());
+
+    expect($local['enabled'])->toBeTrue()
+        ->and($local['connection'])->toBe('reverb')
+        ->and($local['authEndpoint'])->toBe('/broadcasting/auth')
+        ->and($local['reverb']['host'])->toBe('127.0.0.1')
+        ->and($local['reverb']['port'])->toBe(8080)
+        ->and($local['reverb']['scheme'])->toBe('http');
+
+    enableReverbBroadcasting([
+        'host' => 'paspapan.example.com',
+        'port' => 443,
+        'scheme' => 'https',
+    ]);
+
+    $production = BroadcastRuntime::clientConfig(request());
+
+    expect($production['enabled'])->toBeTrue()
+        ->and($production['reverb']['host'])->toBe('paspapan.example.com')
+        ->and($production['reverb']['port'])->toBe(443)
+        ->and($production['reverb']['scheme'])->toBe('https');
 });
 
 function componentListeners(object $component): array
@@ -111,6 +152,18 @@ function componentListeners(object $component): array
     $method->setAccessible(true);
 
     return $method->invoke($component);
+}
+
+/**
+ * @param  array{host?: string, port?: int, scheme?: string}  $options
+ */
+function enableReverbBroadcasting(array $options = []): void
+{
+    Config::set('broadcasting.default', 'reverb');
+    Config::set('broadcasting.connections.reverb.key', 'test-reverb-key');
+    Config::set('broadcasting.connections.reverb.options.host', $options['host'] ?? '127.0.0.1');
+    Config::set('broadcasting.connections.reverb.options.port', $options['port'] ?? 8080);
+    Config::set('broadcasting.connections.reverb.options.scheme', $options['scheme'] ?? 'http');
 }
 
 test('announcement event uses public announcement channel payload', function () {

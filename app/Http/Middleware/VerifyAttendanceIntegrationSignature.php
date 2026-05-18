@@ -10,14 +10,24 @@ class VerifyAttendanceIntegrationSignature
 {
     public function handle(Request $request, Closure $next): Response
     {
+        $apiKey = (string) config('services.attendance_integration.api_key', '');
         $secret = (string) config('services.attendance_integration.secret', '');
 
-        if (trim($secret) === '') {
+        if (trim($apiKey) === '' || trim($secret) === '') {
             return response()->json(['message' => 'Attendance integration is not configured.'], 503);
         }
 
+        $providedApiKey = (string) $request->header('X-PasPapan-Api-Key', '');
         $timestamp = (string) $request->header('X-PasPapan-Timestamp', '');
         $signature = (string) $request->header('X-PasPapan-Signature', '');
+
+        if ($providedApiKey === '') {
+            return response()->json(['message' => 'Missing integration API key.'], 401);
+        }
+
+        if (! hash_equals($apiKey, $providedApiKey)) {
+            return response()->json(['message' => 'Invalid integration API key.'], 401);
+        }
 
         if ($timestamp === '' || $signature === '') {
             return response()->json(['message' => 'Missing integration signature.'], 401);

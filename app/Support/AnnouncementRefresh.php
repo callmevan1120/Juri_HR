@@ -21,10 +21,9 @@ class AnnouncementRefresh
 
     public static function broadcastingEnabled(): bool
     {
-        $connection = strtolower((string) config('broadcasting.default', 'null'));
         $broadcastConnections = config('realtime.announcements.broadcast_connections', ['reverb', 'pusher', 'ably']);
 
-        return in_array($connection, $broadcastConnections, true);
+        return BroadcastRuntime::enabledFor($broadcastConnections);
     }
 
     public static function pollInterval(): string

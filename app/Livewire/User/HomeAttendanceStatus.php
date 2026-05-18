@@ -117,6 +117,8 @@ class HomeAttendanceStatus extends Component
 
     private function defaultMorningShift(): ?Shift
     {
+        // Shifts are still global master data; scope this query by company/branch
+        // once the shifts table gets tenant columns.
         return Shift::query()
             ->where('name', 'Shift Pagi')
             ->first()

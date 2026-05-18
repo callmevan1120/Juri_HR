@@ -13,17 +13,20 @@ function signedAttendanceIntegrationHeaders(string $body, int|string|null $times
     return [
         'CONTENT_TYPE' => 'application/json',
         'HTTP_ACCEPT' => 'application/json',
+        'HTTP_X_PASPAPAN_API_KEY' => 'integration-test-key',
         'HTTP_X_PASPAPAN_TIMESTAMP' => (string) $timestamp,
         'HTTP_X_PASPAPAN_SIGNATURE' => 'sha256='.hash_hmac('sha256', $timestamp.'.'.$body, $secret),
     ];
 }
 
 beforeEach(function (): void {
+    Config::set('services.attendance_integration.api_key', 'integration-test-key');
     Config::set('services.attendance_integration.secret', 'integration-test-secret');
     Config::set('services.attendance_integration.signature_tolerance_seconds', 300);
+    Config::set('services.attendance_integration.allowed_sources', []);
 });
 
-test('attendance integration endpoint requires a valid hmac signature', function () {
+test('attendance integration endpoint requires an api key before signature validation', function () {
     $payload = [
         'source' => 'solution',
         'idempotency_key' => 'evt-unauthorized',
@@ -34,6 +37,54 @@ test('attendance integration endpoint requires a valid hmac signature', function
 
     $this->postJson('/api/integrations/attendance-events', $payload)
         ->assertUnauthorized();
+});
+
+test('attendance integration endpoint rejects invalid api key', function () {
+    $payload = [
+        'source' => 'solution',
+        'idempotency_key' => 'evt-invalid-key',
+        'employee_code' => 'EMP-001',
+        'event_type' => 'check_in',
+        'occurred_at' => '2026-05-13 08:00:00',
+    ];
+    $body = json_encode($payload, JSON_THROW_ON_ERROR);
+    $headers = signedAttendanceIntegrationHeaders($body);
+    $headers['HTTP_X_PASPAPAN_API_KEY'] = 'wrong-key';
+
+    $this->call('POST', '/api/integrations/attendance-events', [], [], [], $headers, $body)
+        ->assertUnauthorized()
+        ->assertJsonPath('message', 'Invalid integration API key.');
+});
+
+test('attendance integration endpoint requires a valid hmac signature after api key passes', function () {
+    $payload = [
+        'source' => 'solution',
+        'idempotency_key' => 'evt-invalid-signature',
+        'employee_code' => 'EMP-001',
+        'event_type' => 'check_in',
+        'occurred_at' => '2026-05-13 08:00:00',
+    ];
+
+    $this->postJson('/api/integrations/attendance-events', $payload, [
+        'X-PasPapan-Api-Key' => 'integration-test-key',
+    ])->assertUnauthorized();
+});
+
+test('attendance integration can restrict allowed sources', function () {
+    Config::set('services.attendance_integration.allowed_sources', ['solution']);
+
+    $payload = [
+        'source' => 'unknown-gateway',
+        'idempotency_key' => 'evt-invalid-source',
+        'employee_code' => 'EMP-001',
+        'event_type' => 'check_in',
+        'occurred_at' => '2026-05-13 08:00:00',
+    ];
+    $body = json_encode($payload, JSON_THROW_ON_ERROR);
+
+    $this->call('POST', '/api/integrations/attendance-events', [], [], [], signedAttendanceIntegrationHeaders($body), $body)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('source');
 });
 
 test('attendance integration event maps employee code and records check in', function () {

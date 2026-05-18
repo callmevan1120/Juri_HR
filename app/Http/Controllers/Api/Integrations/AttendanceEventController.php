@@ -16,8 +16,15 @@ class AttendanceEventController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $allowedSources = config('services.attendance_integration.allowed_sources', []);
+        $sourceRules = ['nullable', 'string', 'max:80', 'regex:/^[A-Za-z0-9_.-]+$/'];
+
+        if (is_array($allowedSources) && $allowedSources !== []) {
+            $sourceRules = ['required', 'string', 'max:80', 'regex:/^[A-Za-z0-9_.-]+$/', Rule::in($allowedSources)];
+        }
+
         $validated = $request->validate([
-            'source' => ['nullable', 'string', 'max:80', 'regex:/^[A-Za-z0-9_.-]+$/'],
+            'source' => $sourceRules,
             'idempotency_key' => ['required', 'string', 'max:160'],
             'employee_code' => ['required', 'string', 'max:120'],
             'event_type' => ['required', 'string', Rule::in(['check_in', 'check_out', 'clock_in', 'clock_out', 'in', 'out'])],

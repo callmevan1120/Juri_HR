@@ -8,6 +8,7 @@ use App\Models\Appraisal;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\CloudFile;
 use App\Models\CompanyAsset;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\Holiday;
@@ -27,6 +28,7 @@ use App\Policies\AppraisalPolicy;
 use App\Policies\AttendanceCorrectionPolicy;
 use App\Policies\AttendancePolicy;
 use App\Policies\CashAdvancePolicy;
+use App\Policies\CloudFilePolicy;
 use App\Policies\CompanyAssetPolicy;
 use App\Policies\EmployeeDocumentRequestPolicy;
 use App\Policies\HolidayPolicy;
@@ -57,6 +59,7 @@ class AuthServiceProvider extends ServiceProvider
         AttendanceCorrection::class => AttendanceCorrectionPolicy::class,
         Appraisal::class => AppraisalPolicy::class,
         CashAdvance::class => CashAdvancePolicy::class,
+        CloudFile::class => CloudFilePolicy::class,
         EmployeeDocumentRequest::class => EmployeeDocumentRequestPolicy::class,
         Holiday::class => HolidayPolicy::class,
         HrChecklistCase::class => HrChecklistCasePolicy::class,
@@ -141,6 +144,8 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manageOperationsWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.operations.manage'));
         Gate::define('viewCommercialWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.commercial.view'));
         Gate::define('manageCommercialWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.commercial.manage'));
+        Gate::define('viewCollaborationWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.collaboration.view'));
+        Gate::define('manageCollaborationWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.collaboration.manage'));
         Gate::define('viewAccountingWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.accounting.view'));
         Gate::define('manageAccountingWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.accounting.manage'));
         Gate::define('viewCustomForms', fn (User $user): bool => $adminPermission($user, 'admin.custom_forms.view'));

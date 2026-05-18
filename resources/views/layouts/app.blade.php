@@ -76,24 +76,12 @@
     </script>
 
     @php
-        $pasPapanBroadcast = [
-            'connection' => config('broadcasting.default'),
-            'enabled' => \App\Support\AnnouncementRefresh::broadcastingEnabled(),
-            'reverb' => [
-                'key' => config('broadcasting.connections.reverb.key'),
-                'host' => config('broadcasting.connections.reverb.options.host') ?: request()->getHost(),
-                'port' => config('broadcasting.connections.reverb.options.port'),
-                'scheme' => config('broadcasting.connections.reverb.options.scheme'),
-                'path' => config('broadcasting.connections.reverb.options.path') ?: '',
-            ],
-            'pusher' => [
-                'key' => config('broadcasting.connections.pusher.key'),
-                'host' => config('broadcasting.connections.pusher.options.host'),
-                'port' => config('broadcasting.connections.pusher.options.port'),
-                'scheme' => config('broadcasting.connections.pusher.options.scheme'),
-                'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-            ],
-        ];
+        $pasPapanBroadcast = \App\Support\BroadcastRuntime::clientConfig(request());
+        $pasPapanBroadcast['enabled'] = $pasPapanBroadcast['enabled']
+            && (
+                \App\Support\AnnouncementRefresh::broadcastingEnabled()
+                || \App\Support\CollaborationRealtime::enabled()
+            );
     @endphp
 
     <script>

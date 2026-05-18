@@ -43,8 +43,13 @@ return [
     ],
 
     'attendance_integration' => [
+        'api_key' => env('ATTENDANCE_INTEGRATION_API_KEY', ''),
         'secret' => env('ATTENDANCE_INTEGRATION_SECRET', ''),
         'signature_tolerance_seconds' => env('ATTENDANCE_INTEGRATION_SIGNATURE_TOLERANCE_SECONDS', 300),
+        'allowed_sources' => array_values(array_filter(array_map(
+            static fn (string $source): string => trim($source),
+            explode(',', (string) env('ATTENDANCE_INTEGRATION_ALLOWED_SOURCES', '')),
+        ))),
     ],
 
     'slack' => [

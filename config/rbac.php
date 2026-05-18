@@ -494,6 +494,20 @@ return [
                 'manage' => ['permission' => 'admin.commercial.manage', 'label' => 'Manage'],
             ],
         ],
+        'collaboration_workspace' => [
+            'section' => 'operations',
+            'label' => 'Collaboration Workspace',
+            'description' => 'Manage company-scoped chat threads, shared file registry, and meeting links.',
+            'route_names' => ['admin.collaboration', 'admin.collaboration.files.download'],
+            'existing_authorization' => 'Gate:viewCollaborationWorkspace/manageCollaborationWorkspace + CollaborationWorkspaceService',
+            'menu_location' => 'Admin navigation > Operations > Collaboration',
+            'surface' => 'admin',
+            'enterprise' => false,
+            'actions' => [
+                'view' => ['permission' => 'admin.collaboration.view', 'label' => 'View'],
+                'manage' => ['permission' => 'admin.collaboration.manage', 'label' => 'Manage'],
+            ],
+        ],
         'accounting_workspace' => [
             'section' => 'operations',
             'label' => 'Accounting Workspace',
@@ -682,6 +696,7 @@ return [
                 'hr_checklists' => ['view', 'manage'],
                 'operations_workspace' => ['view', 'manage'],
                 'commercial_workspace' => ['view', 'manage'],
+                'collaboration_workspace' => ['view', 'manage'],
                 'accounting_workspace' => ['view', 'manage'],
                 'document_requests' => ['view', 'request', 'generate', 'templates', 'fulfill'],
                 'appraisals' => ['view', 'manage'],

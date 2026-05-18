@@ -31,6 +31,11 @@ class RateLimitServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('wilayah', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
-        RateLimiter::for('attendance-integrations', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
+        RateLimiter::for('attendance-integrations', function (Request $request) {
+            $apiKey = (string) $request->header('X-PasPapan-Api-Key', '');
+            $fingerprint = $apiKey !== '' ? hash('sha256', $apiKey) : $request->ip();
+
+            return Limit::perMinute(120)->by($fingerprint);
+        });
     }
 }

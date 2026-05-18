@@ -180,11 +180,12 @@
             'type' => 'group',
             'id' => 'operations',
             'label' => __('Operations'),
-            'active' => $isRouteActive(['admin.operations', 'admin.commercial', 'admin.accounting', 'admin.custom-forms']),
+            'active' => $isRouteActive(['admin.operations', 'admin.commercial', 'admin.collaboration', 'admin.accounting', 'admin.custom-forms']),
             'items' => [
                 ['type' => 'heading', 'label' => __('CRM & Field Work')],
                 ['type' => 'link', 'label' => __('Workspace'), 'href' => route('admin.operations'), 'active' => $isRouteActive('admin.operations'), 'visible' => $can('viewOperationsWorkspace')],
                 ['type' => 'link', 'label' => __('Commercial'), 'href' => route('admin.commercial'), 'active' => $isRouteActive('admin.commercial'), 'visible' => $can('viewCommercialWorkspace')],
+                ['type' => 'link', 'label' => __('Collaboration'), 'href' => route('admin.collaboration'), 'active' => $isRouteActive('admin.collaboration'), 'visible' => $can('viewCollaborationWorkspace')],
                 ['type' => 'link', 'label' => __('Accounting'), 'href' => route('admin.accounting'), 'active' => $isRouteActive('admin.accounting'), 'visible' => $can('viewAccountingWorkspace')],
                 ['type' => 'link', 'label' => __('Forms'), 'href' => route('admin.custom-forms'), 'active' => $isRouteActive('admin.custom-forms'), 'visible' => $can('viewCustomForms')],
             ],
