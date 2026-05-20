@@ -4,6 +4,18 @@ Dokumen ini mencatat area yang sudah punya implementasi/foundation dan area yang
 
 Fase berikutnya adalah feature maturity, bukan ekspansi modul. Perubahan baru harus memperkuat logic, security, data integrity, UX, test coverage, atau operational readiness dari fitur yang sudah ada. Prinsip kerja lengkap ada di `guides/feature-maturity.md`.
 
+## Current Maturity Snapshot
+
+Jujur: status keseluruhan belum 10/10. Baseline saat ini sekitar **86/100** untuk visi besar “1 platform HR, Accounting, CRM, dan Operasional”. Core HR/attendance/security sudah paling matang, accounting naik karena tax filing draft/filed/paid sudah punya flow dan test, commercial naik karena AR collection dan win-rate summary sudah ada, collaboration naik karena scoped message search sudah ada, sementara CRM penuh, collaboration enterprise-grade, dan iOS delivery masih perlu pematangan bertahap.
+
+Gunakan command berikut untuk melihat skor yang bisa diaudit:
+
+```bash
+php artisan feature:maturity
+```
+
+Target 10/10 internal adalah skor minimal `95/100`, semua evidence tersedia, dan tidak ada domain kritikal berstatus `not_release_ready`.
+
 ## Covered
 
 - Manager Inbox v2 foundation: pending summary, overdue summary, workflow badges, pending/overdue filter, quick approve/reject existing workflow, and managed-user/RBAC scope.
@@ -12,6 +24,11 @@ Fase berikutnya adalah feature maturity, bukan ekspansi modul. Perubahan baru ha
 - Operational Health v2: database latency, queue heartbeat, queue backlog, scheduler heartbeat, backup checksum, disk usage, import/export workload, runtime version, PHP/database version, table size summary, and license/feature locks.
 - Attachment storage: production defaults to private local attachment lookup; public is documented as an explicit legacy fallback only.
 - RBAC audit: `php artisan rbac:audit` reports route/menu/role/policy coverage.
+- Feature maturity audit: `php artisan feature:maturity` reports domain score, evidence, and release gaps.
+- Accounting tax filing: draft/filed/paid workflow backed by `tests/Feature/AccountingWorkspaceTest.php`.
+- Commercial collection: AR overdue/due-soon and win-rate summaries backed by `tests/Feature/CommercialWorkspaceTest.php`.
+- Collaboration scoped search: message-body search remains company-scoped in `tests/Feature/CollaborationWorkspaceTest.php`.
+- iOS preflight: `bun run ios:preflight` and `.github/workflows/ios-preflight.yml` make the future iOS release gate explicit without claiming TestFlight readiness yet.
 - Role preview: Roles & Permissions shows a human-readable module/action preview for each role.
 - Release hygiene: public release checklist, coverage baseline workflow, and release preflight workflow.
 - Security scans: CodeQL PHP/JS, Semgrep, gitleaks, and TruffleHog are present in CI.
@@ -28,6 +45,8 @@ Fase berikutnya adalah feature maturity, bukan ekspansi modul. Perubahan baru ha
 - Offline attendance API scope: `tests/Feature/OfflineAttendanceSyncTest.php`
 - Public release checklist: `RELEASE_CHECKLIST.md`
 - Attendance integration guide: `guides/attendance-integration.md`
+- Feature maturity matrix: `config/feature_maturity.php`
+- Feature maturity command: `app/Console/Commands/FeatureMaturityAudit.php`
 
 ## Deferred For Explicit Product Pass
 

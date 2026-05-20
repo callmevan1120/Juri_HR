@@ -23,6 +23,7 @@ class AttendanceRiskScoringService
             ...$context,
             'device_changed' => (bool) ($context['device_changed'] ?? false),
             'offline_submitted' => (bool) ($context['offline_submitted'] ?? $context['cached_location'] ?? false),
+            'cached_location' => (bool) ($context['cached_location'] ?? false),
         ];
 
         if (($context['barcode_source'] ?? null) === 'static') {

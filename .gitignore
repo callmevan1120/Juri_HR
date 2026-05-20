@@ -27,6 +27,9 @@ yarn-error.log
 !update.sh
 !scripts/apk-attendance-e2e.sh
 !scripts/collect-review-evidence.sh
+!scripts/ios-polish-splash.sh
+!scripts/ios-release-preflight.sh
+!scripts/ios-simulator-screenshot.sh
 *.zip
 *.Source.php
 server.php

@@ -7,13 +7,22 @@ use App\Models\Attendance;
 use App\Models\CashAdvance;
 use App\Models\CompanyAsset;
 use App\Models\EmployeeDocumentRequest;
+use App\Models\HrChecklistCase;
 use App\Models\HrChecklistTemplate;
 use App\Models\HrChecklistTemplateItem;
 use App\Models\ImportExportRun;
+use App\Models\Invoice;
 use App\Models\Payroll;
+use App\Models\Project;
+use App\Models\ProjectTask;
 use App\Models\Reimbursement;
 use App\Models\Role;
+use App\Models\SalesOpportunity;
 use App\Models\User;
+use App\Models\Vendor;
+use App\Models\VendorBill;
+use App\Models\WorkFromHomeRequest;
+use App\Support\AdminDashboardQueryService;
 use App\Support\HrChecklistService;
 use App\Support\MultiCompanyService;
 use Illuminate\Support\Facades\Gate;
@@ -248,4 +257,142 @@ test('company scoped report exports exclude other tenant rows', function () {
     expect((new PayrollSummaryExport($adminA))->query()->pluck('id')->all())
         ->toContain($payrollA->id)
         ->not->toContain($payrollB->id);
+});
+
+test('admin dashboard platform signals stay scoped to the current company', function () {
+    ['adminA' => $adminA, 'adminB' => $adminB, 'companyA' => $companyA, 'companyB' => $companyB, 'employeeA' => $employeeA, 'employeeB' => $employeeB] = tenantFixture();
+
+    $role = Role::create([
+        'name' => 'Tenant Dashboard Operator',
+        'slug' => 'tenant-dashboard-operator',
+        'description' => 'Can view tenant dashboard signals.',
+        'permissions' => [
+            'admin.dashboard.view',
+            'admin.wfh_requests.manage',
+            'admin.hr_checklists.view',
+            'admin.payroll.view',
+            'admin.commercial.view',
+            'admin.operations.view',
+        ],
+    ]);
+    $adminA->roles()->syncWithoutDetaching([$role->id]);
+    $adminA = $adminA->fresh('roles');
+
+    foreach ([[$employeeA, $companyA], [$employeeB, $companyB]] as [$employee, $company]) {
+        WorkFromHomeRequest::create([
+            'user_id' => $employee->id,
+            'company_id' => $company->id,
+            'date' => now()->toDateString(),
+            'start_time' => '09:00',
+            'end_time' => '17:00',
+            'location_address' => 'Home',
+            'reason' => 'Tenant scoped WFH',
+            'status' => WorkFromHomeRequest::STATUS_PENDING,
+        ]);
+
+        Payroll::create([
+            'user_id' => $employee->id,
+            'month' => now()->month,
+            'year' => now()->year,
+            'basic_salary' => 1000000,
+            'allowances' => [],
+            'deductions' => [],
+            'overtime_pay' => 0,
+            'net_salary' => 1000000,
+            'status' => 'pending',
+        ]);
+
+        Attendance::create([
+            'user_id' => $employee->id,
+            'date' => now()->toDateString(),
+            'status' => 'present',
+            'approval_status' => Attendance::STATUS_APPROVED,
+            'risk_level' => 'high',
+            'risk_score' => 80,
+        ]);
+
+        Invoice::create([
+            'company_id' => $company->id,
+            'number' => 'INV-'.$company->id,
+            'status' => Invoice::STATUS_SENT,
+            'grand_total' => 1000000,
+        ]);
+
+        $vendor = Vendor::create([
+            'company_id' => $company->id,
+            'name' => 'Vendor '.$company->id,
+        ]);
+
+        VendorBill::create([
+            'company_id' => $company->id,
+            'vendor_id' => $vendor->id,
+            'number' => 'BILL-'.$company->id,
+            'status' => VendorBill::STATUS_POSTED,
+            'grand_total' => 500000,
+        ]);
+
+        SalesOpportunity::create([
+            'company_id' => $company->id,
+            'owner_id' => $employee->id,
+            'title' => 'Opportunity '.$company->id,
+            'stage' => SalesOpportunity::STAGE_PROPOSAL,
+            'expected_value' => 2000000,
+        ]);
+
+        $project = Project::create([
+            'company_id' => $company->id,
+            'manager_id' => $employee->id,
+            'name' => 'Project '.$company->id,
+            'status' => Project::STATUS_ACTIVE,
+        ]);
+
+        ProjectTask::create([
+            'project_id' => $project->id,
+            'company_id' => $company->id,
+            'assigned_to' => $employee->id,
+            'title' => 'Overdue task '.$company->id,
+            'status' => ProjectTask::STATUS_TODO,
+            'priority' => ProjectTask::PRIORITY_NORMAL,
+            'due_date' => now()->subDay()->toDateString(),
+        ]);
+    }
+
+    foreach ([[$adminA, $employeeA], [$adminB, $employeeB]] as [$starter, $employee]) {
+        $template = HrChecklistTemplate::create([
+            'type' => HrChecklistTemplate::TYPE_ONBOARDING,
+            'name' => 'Dashboard Checklist '.$employee->id,
+            'is_active' => true,
+            'created_by' => $starter->id,
+        ]);
+
+        $case = HrChecklistCase::create([
+            'template_id' => $template->id,
+            'user_id' => $employee->id,
+            'type' => HrChecklistTemplate::TYPE_ONBOARDING,
+            'status' => HrChecklistCase::STATUS_ACTIVE,
+            'effective_date' => now()->toDateString(),
+            'started_by' => $starter->id,
+        ]);
+
+        $case->tasks()->create([
+            'title' => 'Overdue tenant task',
+            'category' => 'onboarding',
+            'assigned_to' => $starter->id,
+            'due_date' => now()->subDay()->toDateString(),
+            'status' => \App\Models\HrChecklistTask::STATUS_PENDING,
+        ]);
+    }
+
+    $dashboard = app(AdminDashboardQueryService::class)->build($adminA, now());
+
+    expect($dashboard['platformSignals'])->toMatchArray([
+        'pending_wfh' => 1,
+        'overdue_hr_tasks' => 1,
+        'high_risk_attendance' => 1,
+        'pending_payroll' => 1,
+        'open_invoices' => 1,
+        'open_vendor_bills' => 1,
+        'active_sales_opportunities' => 1,
+        'overdue_project_tasks' => 1,
+    ]);
 });

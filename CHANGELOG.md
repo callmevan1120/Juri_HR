@@ -6,6 +6,7 @@ Semua perubahan penting PasPapan dicatat di file ini.
 
 ### Dokumentasi & Runtime
 
+- Merapikan README menjadi landing page produk + teknis yang lebih mudah dicari, menambahkan pusat dokumentasi di `guides/README.md`, dan menghapus snapshot TODO/review branch yang sudah tidak relevan sebagai sumber utama.
 - Menyelaraskan dokumentasi stack resmi ke Laravel 13, Livewire 4, PHP 8.3+ minimum, dan PHP 8.4 rekomendasi.
 - Menaikkan Tailwind CSS ke versi 4 lewat plugin resmi `@tailwindcss/vite`.
 - Menghapus workaround entrypoint `E_DEPRECATED` PHP 8.5 yang sudah tidak diperlukan setelah Laravel 13 memakai constant `Pdo\Mysql::ATTR_SSL_CA`.
@@ -31,7 +32,7 @@ Semua perubahan penting PasPapan dicatat di file ini.
 ### Dokumentasi
 
 - Memperbarui README, changelog, operations, features, deployment/security references, dan enterprise packaging untuk rilis `v4.3.0`.
-- Menambahkan dokumentasi security model, attendance threat/risk scoring, RBAC matrix, dependency policy, file upload security, backup restore threat model, multi-company isolation, runbooks, compliance retention, dan enterprise readiness TODO.
+- Menambahkan dokumentasi security model, attendance threat/risk scoring, RBAC matrix, dependency policy, file upload security, backup restore threat model, multi-company isolation, runbooks, compliance retention, dan enterprise readiness notes.
 
 ### APK Android
 

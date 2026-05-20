@@ -93,6 +93,7 @@ test('attendance photo route rejects unsafe attachment paths', function () {
 });
 
 test('attendance photo public disk fallback is logged for legacy files', function () {
+    config(['filesystems.attachment_disks' => ['local', 'public']]);
     Storage::fake('local');
     Storage::fake('public');
     Log::spy();

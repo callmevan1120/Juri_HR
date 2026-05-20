@@ -91,6 +91,7 @@ class AttendanceScanService
         int $gracePeriod,
         ?float $gpsAccuracy,
         ?float $gpsVariance,
+        array $riskContext = [],
     ): array {
         $validation = $this->validateScan($user, $shiftId, $coords, $barcodePayload);
 
@@ -129,6 +130,7 @@ class AttendanceScanService
                 gpsVariance: $gpsVariance,
                 distance: $distance,
                 scanSource: $scanSource,
+                riskContext: $riskContext,
             );
             $message = __('Attendance In Successful');
             ActivityLog::record(
@@ -146,6 +148,7 @@ class AttendanceScanService
                 gpsVariance: $gpsVariance,
                 distance: $distance,
                 scanSource: $scanSource,
+                riskContext: $riskContext,
             );
             $message = __('Attendance Out Successful');
             ActivityLog::record(
@@ -225,6 +228,7 @@ class AttendanceScanService
         ?float $gpsVariance,
         int $distance,
         string $scanSource,
+        array $riskContext,
     ): Attendance {
         $now = Carbon::now();
         $shift = Shift::query()->findOrFail($shiftId);
@@ -245,6 +249,7 @@ class AttendanceScanService
             gpsVariance: $gpsVariance,
             distance: $distance,
             scanSource: $scanSource,
+            riskContext: $riskContext,
         );
     }
 
@@ -261,6 +266,7 @@ class AttendanceScanService
         ?float $gpsVariance,
         int $distance,
         string $scanSource,
+        array $riskContext,
     ): Attendance {
         $existingAttachment = $attendance->attachment;
         $attachments = [];
@@ -295,6 +301,7 @@ class AttendanceScanService
             shift: $attendance->shift,
             event: 'check_out',
             context: [
+                ...$riskContext,
                 'distance' => $distance,
                 'gps_accuracy' => $gpsAccuracy,
                 'gps_variance' => $gpsVariance,
@@ -343,6 +350,7 @@ class AttendanceScanService
         ?float $gpsVariance,
         int $distance,
         string $scanSource,
+        array $riskContext,
     ): Attendance {
         $isSuspicious = false;
         $suspiciousReasons = [];
@@ -396,6 +404,7 @@ class AttendanceScanService
             shift: $shift,
             event: 'check_in',
             context: [
+                ...$riskContext,
                 'distance' => $distance,
                 'gps_accuracy' => $gpsAccuracy,
                 'gps_variance' => $gpsVariance,

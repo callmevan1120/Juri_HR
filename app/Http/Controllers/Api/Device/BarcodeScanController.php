@@ -31,6 +31,15 @@ class BarcodeScanController extends Controller
                 gpsVariance: isset($validated['gps_variance']) ? (float) $validated['gps_variance'] : null,
                 mockLocationDetected: (bool) ($validated['mock_location_detected'] ?? false),
                 offlineSubmitted: (bool) ($validated['offline_submitted'] ?? false),
+                cachedLocation: (bool) ($validated['cached_location'] ?? false),
+                deviceChanged: (bool) ($validated['device_changed'] ?? false),
+                deviceInfoMissing: (bool) ($validated['device_info_missing'] ?? false),
+                deviceId: isset($validated['device_id']) ? (string) $validated['device_id'] : null,
+                deviceInfo: $validated['device_info'] ?? null,
+                platform: isset($validated['platform']) ? (string) $validated['platform'] : null,
+                faceConfidence: isset($validated['face_confidence']) ? (float) $validated['face_confidence'] : null,
+                faceVerificationFailed: (bool) ($validated['face_verification_failed'] ?? false),
+                faceVerificationSkipped: (bool) ($validated['face_verification_skipped'] ?? false),
                 qrTokenRetries: (int) ($validated['qr_token_retries'] ?? 0),
             );
 

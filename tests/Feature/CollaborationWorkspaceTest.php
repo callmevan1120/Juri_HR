@@ -119,6 +119,50 @@ test('collaboration route requires explicit permission', function () {
         ->assertOk();
 });
 
+test('collaboration search finds message body without leaking another company', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Collaboration Search A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Collaboration Search B');
+    $threadA = ChatThread::query()->create([
+        'company_id' => $companyA->id,
+        'created_by' => $superadmin->id,
+        'type' => ChatThread::TYPE_GROUP,
+        'title' => 'Ops sync',
+    ]);
+    $threadB = ChatThread::query()->create([
+        'company_id' => $companyB->id,
+        'created_by' => $superadmin->id,
+        'type' => ChatThread::TYPE_GROUP,
+        'title' => 'Other tenant sync',
+    ]);
+    ChatMessage::query()->create([
+        'chat_thread_id' => $threadA->id,
+        'user_id' => $superadmin->id,
+        'body' => 'Need field audit evidence today.',
+    ]);
+    ChatMessage::query()->create([
+        'chat_thread_id' => $threadB->id,
+        'user_id' => $superadmin->id,
+        'body' => 'Need field audit evidence today.',
+    ]);
+
+    $admin = User::factory()->admin()->create(['company_id' => $companyA->id]);
+    $role = Role::query()->create([
+        'name' => 'Scoped Collaboration Search',
+        'slug' => 'scoped_collaboration_search',
+        'permissions' => ['admin.collaboration.view'],
+    ]);
+    $admin->roles()->sync([$role->id]);
+
+    $this->actingAs($admin->fresh());
+
+    Livewire::test(CollaborationWorkspace::class)
+        ->set('search', 'field audit evidence')
+        ->assertViewHas('threads', fn ($threads): bool => $threads->count() === 1 && $threads->first()->is($threadA))
+        ->assertSee('Ops sync')
+        ->assertDontSee('Other tenant sync');
+});
+
 test('collaboration file download is private and company scoped', function () {
     Storage::fake('local');
 

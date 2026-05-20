@@ -32,7 +32,7 @@
 
                             <div class="auth-field">
                                 <label for="code" class="auth-label">{{ __('Verification Code') }}</label>
-                                <input id="code" name="code" type="text" value="{{ old('code') }}" required autofocus
+                                <input id="code" name="code" type="text" value="{{ old('code') }}" required
                                     inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"
                                     aria-describedby="@error('code') code-error @enderror"
                                     aria-invalid="@error('code') true @else false @enderror"

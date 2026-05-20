@@ -10,11 +10,12 @@
                 <x-forms.input id="accounting-search" type="search" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search account code or name...') }}" />
             </div>
             <div class="lg:col-span-5">
-                <div class="grid grid-cols-3 gap-2 rounded-xl bg-slate-100 p-1 text-xs font-semibold dark:bg-slate-800 sm:text-sm">
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1 text-xs font-semibold dark:bg-slate-800 sm:grid-cols-4 sm:text-sm">
                     @foreach ([
                         'journals' => __('Journals'),
                         'accounts' => __('Accounts'),
                         'reports' => __('Reports'),
+                        'tax' => __('Tax'),
                     ] as $tab => $label)
                         <button
                             type="button"
@@ -180,7 +181,7 @@
                         @endforelse
                     </div>
                 </x-admin.panel>
-            @else
+            @elseif ($activeTab === 'reports')
                 <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <x-admin.panel>
                         <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
@@ -521,6 +522,107 @@
                         </table>
                     </div>
                 </x-admin.panel>
+            @else
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <x-admin.panel>
+                        <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                            <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Tax Filing Readiness') }}</h2>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Prepare monthly output tax drafts from invoice tax summaries before filing or payment.') }}</p>
+                        </div>
+                        <dl class="divide-y divide-slate-100 p-4 text-sm dark:divide-slate-800">
+                            <div class="flex items-center justify-between py-3">
+                                <dt class="font-medium text-slate-600 dark:text-slate-300">{{ __('Issued Tax') }}</dt>
+                                <dd class="font-bold text-slate-950 dark:text-white">Rp{{ number_format($taxSummary['issued_tax'], 0, ',', '.') }}</dd>
+                            </div>
+                            <div class="flex items-center justify-between py-3">
+                                <dt class="font-medium text-slate-600 dark:text-slate-300">{{ __('Posted Tax Payable') }}</dt>
+                                <dd class="font-bold text-slate-950 dark:text-white">Rp{{ number_format($taxSummary['posted_tax_payable'], 0, ',', '.') }}</dd>
+                            </div>
+                            <div class="flex items-center justify-between py-3">
+                                <dt class="font-semibold text-slate-950 dark:text-white">{{ __('Needs Posting') }}</dt>
+                                <dd class="font-black {{ $taxSummary['unposted_tax'] > 0 ? 'text-amber-600 dark:text-amber-300' : 'text-emerald-600 dark:text-emerald-300' }}">
+                                    Rp{{ number_format($taxSummary['unposted_tax'], 0, ',', '.') }}
+                                </dd>
+                            </div>
+                        </dl>
+                    </x-admin.panel>
+
+                    <x-admin.panel>
+                        <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                            <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Tax Rate Breakdown') }}</h2>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Taxable base grouped by invoice line tax rate.') }}</p>
+                        </div>
+                        <div class="space-y-3 p-4">
+                            @forelse ($taxSummary['tax_rates'] as $taxRate)
+                                <div class="rounded-xl border border-slate-200 bg-white p-3 text-sm dark:border-slate-800 dark:bg-slate-950/40">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="font-semibold text-slate-950 dark:text-white">{{ number_format($taxRate['rate'], 2, ',', '.') }}%</p>
+                                        <p class="font-bold text-slate-950 dark:text-white">Rp{{ number_format($taxRate['tax_amount'], 0, ',', '.') }}</p>
+                                    </div>
+                                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Taxable amount Rp:amount', ['amount' => number_format($taxRate['taxable_amount'], 0, ',', '.')]) }}</p>
+                                </div>
+                            @empty
+                                <p class="text-sm text-slate-500 dark:text-slate-400">{{ __('No taxable invoice items found for this period.') }}</p>
+                            @endforelse
+                        </div>
+                    </x-admin.panel>
+                </div>
+
+                <x-admin.panel>
+                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Tax Filing Workflow') }}</h2>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Track draft, filed, and paid tax filings without mixing records across companies.') }}</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 p-4 md:grid-cols-2">
+                        @forelse ($taxFilings as $filing)
+                            <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <h3 class="font-semibold text-slate-950 dark:text-white">{{ $filing->company?->name }}</h3>
+                                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                            {{ $filing->period_start?->format('d M Y') }} - {{ $filing->period_end?->format('d M Y') }}
+                                        </p>
+                                    </div>
+                                    <x-admin.status-badge :tone="match ($filing->status) {
+                                        \App\Models\AccountingTaxFiling::STATUS_PAID => 'success',
+                                        \App\Models\AccountingTaxFiling::STATUS_FILED => 'primary',
+                                        default => 'warning',
+                                    }">
+                                        {{ __(str($filing->status)->headline()->toString()) }}
+                                    </x-admin.status-badge>
+                                </div>
+                                <dl class="mt-4 grid grid-cols-2 gap-2 text-sm">
+                                    <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
+                                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Output Tax') }}</dt>
+                                        <dd class="mt-1 font-bold text-slate-950 dark:text-white">Rp{{ number_format($filing->output_tax, 0, ',', '.') }}</dd>
+                                    </div>
+                                    <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
+                                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Net Payable') }}</dt>
+                                        <dd class="mt-1 font-bold text-slate-950 dark:text-white">Rp{{ number_format($filing->net_tax_payable, 0, ',', '.') }}</dd>
+                                    </div>
+                                </dl>
+                                @if ($filing->filing_reference || $filing->payment_reference)
+                                    <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                                        {{ $filing->filing_reference ? __('Filing: :ref', ['ref' => $filing->filing_reference]) : '' }}
+                                        {{ $filing->payment_reference ? ' · '.__('Payment: :ref', ['ref' => $filing->payment_reference]) : '' }}
+                                    </p>
+                                @endif
+                                @if ($canManage && $filing->status !== \App\Models\AccountingTaxFiling::STATUS_PAID)
+                                    <div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                        <x-actions.button type="button" wire:click="markTaxFilingFiled({{ $filing->id }})" variant="soft-secondary" class="justify-center">
+                                            {{ __('Mark Filed') }}
+                                        </x-actions.button>
+                                        <x-actions.button type="button" wire:click="markTaxFilingPaid({{ $filing->id }})" variant="soft-primary" class="justify-center">
+                                            {{ __('Mark Paid') }}
+                                        </x-actions.button>
+                                    </div>
+                                @endif
+                            </article>
+                        @empty
+                            <x-admin.empty-state :title="__('No tax filings yet')" :description="__('Prepare a filing draft from the action panel once invoice tax summaries are ready.')" class="border-0 bg-transparent shadow-none md:col-span-2" />
+                        @endforelse
+                    </div>
+                </x-admin.panel>
             @endif
         </div>
 
@@ -684,6 +786,63 @@
                             <x-forms.input-error for="closingNotes" />
                         </div>
                         <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Close Period') }}</x-actions.button>
+                    </form>
+                </x-admin.panel>
+                @elseif ($activeTab === 'tax')
+                <x-admin.panel>
+                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Prepare Tax Filing') }}</h2>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Generate a controlled tax filing draft from the selected company and period.') }}</p>
+                    </div>
+                    <form wire:submit.prevent="prepareTaxFiling" class="space-y-4 p-4">
+                        <div class="space-y-1.5">
+                            <x-forms.label for="tax-company" value="{{ __('Company') }}" />
+                            <x-forms.select id="tax-company" wire:model.live="taxCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                                <option value="">{{ __('Choose company') }}</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-forms.select>
+                            <x-forms.input-error for="taxCompanyId" />
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <x-forms.label for="tax-start-date" value="{{ __('Period start') }}" />
+                                <x-forms.input id="tax-start-date" type="date" wire:model.live="taxStartDate" />
+                                <x-forms.input-error for="taxStartDate" />
+                            </div>
+                            <div class="space-y-1.5">
+                                <x-forms.label for="tax-end-date" value="{{ __('Period end') }}" />
+                                <x-forms.input id="tax-end-date" type="date" wire:model.live="taxEndDate" />
+                                <x-forms.input-error for="taxEndDate" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="tax-input-tax" value="{{ __('Input tax credit') }}" />
+                            <x-forms.input id="tax-input-tax" type="number" min="0" step="0.01" wire:model.live="taxInputTax" placeholder="0" />
+                            <x-forms.input-error for="taxInputTax" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="tax-filing-reference" value="{{ __('Filing reference') }}" />
+                            <x-forms.input id="tax-filing-reference" wire:model.live="taxFilingReference" placeholder="{{ __('Optional e-Faktur/Coretax reference') }}" />
+                            <x-forms.input-error for="taxFilingReference" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="tax-payment-reference" value="{{ __('Payment reference') }}" />
+                            <x-forms.input id="tax-payment-reference" wire:model.live="taxPaymentReference" placeholder="{{ __('Optional payment reference') }}" />
+                            <x-forms.input-error for="taxPaymentReference" />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <x-forms.label for="tax-notes" value="{{ __('Tax note') }}" />
+                            <x-forms.textarea id="tax-notes" wire:model.live="taxNotes" rows="3" placeholder="{{ __('Filing note, approval number, or reconciliation remark.') }}" />
+                            <x-forms.input-error for="taxNotes" />
+                        </div>
+                        <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Prepare Draft') }}</x-actions.button>
                     </form>
                 </x-admin.panel>
                 @endif

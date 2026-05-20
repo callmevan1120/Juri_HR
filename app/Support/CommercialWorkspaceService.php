@@ -453,7 +453,7 @@ class CommercialWorkspaceService
     }
 
     /**
-     * @return array{open_value: float, weighted_value: float, won_value: float, lost_value: float, overdue_follow_ups: int}
+     * @return array{open_value: float, weighted_value: float, won_value: float, lost_value: float, overdue_follow_ups: int, win_rate: float}
      */
     public function salesSummaryForCompanies(array $companyIds): array
     {
@@ -467,6 +467,11 @@ class CommercialWorkspaceService
             SalesOpportunity::STAGE_PROPOSAL,
         ];
 
+        $closedCount = $opportunities
+            ->whereIn('stage', [SalesOpportunity::STAGE_WON, SalesOpportunity::STAGE_LOST])
+            ->count();
+        $wonCount = $opportunities->where('stage', SalesOpportunity::STAGE_WON)->count();
+
         return [
             'open_value' => round((float) $opportunities->whereIn('stage', $openStages)->sum('expected_value'), 2),
             'weighted_value' => round((float) $opportunities->whereIn('stage', $openStages)->sum(fn (SalesOpportunity $opportunity): float => (float) $opportunity->expected_value * ($opportunity->probability / 100)), 2),
@@ -475,6 +480,32 @@ class CommercialWorkspaceService
             'overdue_follow_ups' => $opportunities
                 ->filter(fn (SalesOpportunity $opportunity): bool => $opportunity->next_follow_up_at !== null && $opportunity->next_follow_up_at->isPast() && in_array($opportunity->stage, $openStages, true))
                 ->count(),
+            'win_rate' => $closedCount === 0 ? 0.0 : round(($wonCount / $closedCount) * 100, 2),
+        ];
+    }
+
+    /**
+     * @return array{open_total: float, overdue_total: float, overdue_count: int, due_soon_total: float, due_soon_count: int, paid_total: float}
+     */
+    public function collectionSummaryForCompanies(array $companyIds): array
+    {
+        $today = now()->startOfDay();
+        $dueSoon = now()->addDays(7)->endOfDay();
+        $invoices = Invoice::query()
+            ->whereIn('company_id', $companyIds)
+            ->get(['id', 'status', 'due_at', 'grand_total']);
+
+        $openInvoices = $invoices->where('status', Invoice::STATUS_SENT);
+        $overdueInvoices = $openInvoices->filter(fn (Invoice $invoice): bool => $invoice->due_at !== null && $invoice->due_at->lt($today));
+        $dueSoonInvoices = $openInvoices->filter(fn (Invoice $invoice): bool => $invoice->due_at !== null && $invoice->due_at->betweenIncluded($today, $dueSoon));
+
+        return [
+            'open_total' => round((float) $openInvoices->sum('grand_total'), 2),
+            'overdue_total' => round((float) $overdueInvoices->sum('grand_total'), 2),
+            'overdue_count' => $overdueInvoices->count(),
+            'due_soon_total' => round((float) $dueSoonInvoices->sum('grand_total'), 2),
+            'due_soon_count' => $dueSoonInvoices->count(),
+            'paid_total' => round((float) $invoices->where('status', Invoice::STATUS_PAID)->sum('grand_total'), 2),
         ];
     }
 

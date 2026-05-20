@@ -4,6 +4,7 @@ use App\Exports\AccountingStatementsExport;
 use App\Livewire\Admin\AccountingWorkspace;
 use App\Models\AccountingAccount;
 use App\Models\AccountingPeriodClosing;
+use App\Models\AccountingTaxFiling;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -405,6 +406,111 @@ test('accounting workspace can close and reopen periods from UI state', function
         ->call('reopenAccountingPeriod', AccountingPeriodClosing::query()->firstOrFail()->id)
         ->assertHasNoErrors()
         ->assertViewHas('periodClosings', fn ($closings): bool => $closings->contains('status', AccountingPeriodClosing::STATUS_REOPENED));
+});
+
+test('accounting tax filing workflow prepares files and pays company scoped output tax', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $company = app(MultiCompanyService::class)->createCompany('PT Tax Filing Workflow');
+    $client = Client::query()->create([
+        'company_id' => $company->id,
+        'name' => 'PT Filing Buyer',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+
+    $invoice = Invoice::query()->create([
+        'company_id' => $company->id,
+        'client_id' => $client->id,
+        'number' => 'INV-FILING-001',
+        'status' => Invoice::STATUS_SENT,
+        'issued_at' => '2026-05-10',
+        'subtotal' => 2000000,
+        'tax_total' => 220000,
+        'grand_total' => 2220000,
+    ]);
+    InvoiceItem::query()->create([
+        'invoice_id' => $invoice->id,
+        'description' => 'Taxable implementation',
+        'quantity' => 1,
+        'unit_price' => 2000000,
+        'tax_rate' => 11,
+        'line_total' => 2000000,
+    ]);
+
+    $service = app(AccountingWorkspaceService::class);
+    $filing = $service->prepareTaxFiling($superadmin, [
+        'company_id' => $company->id,
+        'period_start' => '2026-05-01',
+        'period_end' => '2026-05-31',
+        'input_tax' => 50000,
+        'notes' => 'Initial reconciliation',
+    ]);
+
+    expect($filing->status)->toBe(AccountingTaxFiling::STATUS_DRAFT)
+        ->and($filing->taxable_turnover)->toBe(2000000.0)
+        ->and($filing->output_tax)->toBe(220000.0)
+        ->and($filing->input_tax)->toBe(50000.0)
+        ->and($filing->net_tax_payable)->toBe(170000.0)
+        ->and($filing->metadata['taxable_invoice_count'])->toBe(1);
+
+    $service->markTaxFilingFiled($superadmin, $filing, [
+        'filing_reference' => 'CORETAX-FILE-001',
+    ]);
+
+    $paid = $service->markTaxFilingPaid($superadmin, $filing->refresh(), [
+        'payment_reference' => 'NTPN-001',
+    ]);
+
+    expect($paid->status)->toBe(AccountingTaxFiling::STATUS_PAID)
+        ->and($paid->filing_reference)->toBe('CORETAX-FILE-001')
+        ->and($paid->payment_reference)->toBe('NTPN-001')
+        ->and($paid->paid_by)->toBe($superadmin->id);
+});
+
+test('accounting tax filing workflow is available from UI state', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $company = app(MultiCompanyService::class)->createCompany('PT UI Tax Filing');
+    $client = Client::query()->create([
+        'company_id' => $company->id,
+        'name' => 'PT UI Tax Buyer',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $invoice = Invoice::query()->create([
+        'company_id' => $company->id,
+        'client_id' => $client->id,
+        'number' => 'INV-UI-TAX-001',
+        'status' => Invoice::STATUS_SENT,
+        'issued_at' => '2026-05-10',
+        'subtotal' => 1000000,
+        'tax_total' => 110000,
+        'grand_total' => 1110000,
+    ]);
+    InvoiceItem::query()->create([
+        'invoice_id' => $invoice->id,
+        'description' => 'UI taxable service',
+        'quantity' => 1,
+        'unit_price' => 1000000,
+        'tax_rate' => 11,
+        'line_total' => 1000000,
+    ]);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(AccountingWorkspace::class)
+        ->set('activeTab', 'tax')
+        ->set('taxCompanyId', (string) $company->id)
+        ->set('taxStartDate', '2026-05-01')
+        ->set('taxEndDate', '2026-05-31')
+        ->set('taxInputTax', '10000')
+        ->call('prepareTaxFiling')
+        ->assertHasNoErrors()
+        ->assertViewHas('taxFilings', fn ($filings): bool => $filings->contains('net_tax_payable', 100000.0))
+        ->set('taxFilingReference', 'CORETAX-UI-001')
+        ->call('markTaxFilingFiled', AccountingTaxFiling::query()->firstOrFail()->id)
+        ->assertHasNoErrors()
+        ->set('taxPaymentReference', 'NTPN-UI-001')
+        ->call('markTaxFilingPaid', AccountingTaxFiling::query()->firstOrFail()->id)
+        ->assertHasNoErrors()
+        ->assertViewHas('taxFilings', fn ($filings): bool => $filings->contains('status', AccountingTaxFiling::STATUS_PAID));
 });
 
 test('accounting journal form scopes accounts to selected company', function () {

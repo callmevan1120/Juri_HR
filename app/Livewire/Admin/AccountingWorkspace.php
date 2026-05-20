@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\AccountingAccount;
+use App\Models\AccountingTaxFiling;
 use App\Models\Company;
 use App\Models\JournalEntry;
 use App\Support\AccountingWorkspaceService;
@@ -19,7 +20,7 @@ class AccountingWorkspace extends Component
 {
     use InteractsWithBanner;
 
-    private const TABS = ['journals', 'accounts', 'reports'];
+    private const TABS = ['journals', 'accounts', 'reports', 'tax'];
 
     protected AccountingWorkspaceService $accounting;
 
@@ -62,6 +63,20 @@ class AccountingWorkspace extends Component
 
     public string $closingNotes = '';
 
+    public string $taxCompanyId = '';
+
+    public string $taxStartDate = '';
+
+    public string $taxEndDate = '';
+
+    public string $taxInputTax = '0';
+
+    public string $taxFilingReference = '';
+
+    public string $taxPaymentReference = '';
+
+    public string $taxNotes = '';
+
     public function boot(AccountingWorkspaceService $accounting): void
     {
         Gate::authorize('viewAccountingWorkspace');
@@ -78,6 +93,8 @@ class AccountingWorkspace extends Component
         $this->reportEndDate = now()->endOfMonth()->toDateString();
         $this->closingStartDate = now()->startOfMonth()->toDateString();
         $this->closingEndDate = now()->endOfMonth()->toDateString();
+        $this->taxStartDate = now()->startOfMonth()->toDateString();
+        $this->taxEndDate = now()->endOfMonth()->toDateString();
 
         $companyId = $this->defaultCompanyId();
 
@@ -88,6 +105,7 @@ class AccountingWorkspace extends Component
         $this->accountCompanyId = $companyId;
         $this->journalCompanyId = $companyId;
         $this->closingCompanyId = $companyId;
+        $this->taxCompanyId = $companyId;
     }
 
     public function updatedJournalCompanyId(): void
@@ -190,6 +208,69 @@ class AccountingWorkspace extends Component
         $this->banner(__('Accounting period reopened.'));
     }
 
+    public function prepareTaxFiling(): void
+    {
+        Gate::authorize('manageAccountingWorkspace');
+
+        $validated = $this->validate([
+            'taxCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
+            'taxStartDate' => ['required', 'date'],
+            'taxEndDate' => ['required', 'date', 'after_or_equal:taxStartDate'],
+            'taxInputTax' => ['required', 'numeric', 'min:0', 'max:999999999999'],
+            'taxNotes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $this->accounting->prepareTaxFiling(auth()->user(), [
+            'company_id' => (int) $validated['taxCompanyId'],
+            'period_start' => $validated['taxStartDate'],
+            'period_end' => $validated['taxEndDate'],
+            'input_tax' => $validated['taxInputTax'],
+            'notes' => $validated['taxNotes'] ?: null,
+        ]);
+
+        $this->reset(['taxNotes']);
+        $this->taxInputTax = '0';
+        $this->banner(__('Tax filing draft prepared.'));
+    }
+
+    public function markTaxFilingFiled(int $filingId): void
+    {
+        Gate::authorize('manageAccountingWorkspace');
+
+        $validated = $this->validate([
+            'taxFilingReference' => ['nullable', 'string', 'max:120'],
+            'taxNotes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $this->accounting->markTaxFilingFiled(auth()->user(), $filingId, [
+            'filing_reference' => $validated['taxFilingReference'] ?: null,
+            'notes' => $validated['taxNotes'] ?: null,
+        ]);
+
+        $this->reset(['taxFilingReference', 'taxNotes']);
+        $this->banner(__('Tax filing marked as filed.'));
+    }
+
+    public function markTaxFilingPaid(int $filingId): void
+    {
+        Gate::authorize('manageAccountingWorkspace');
+
+        $validated = $this->validate([
+            'taxFilingReference' => ['nullable', 'string', 'max:120'],
+            'taxPaymentReference' => ['nullable', 'string', 'max:120'],
+            'taxNotes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $this->accounting->markTaxFilingPaid(auth()->user(), $filingId, [
+            'filing_reference' => $validated['taxFilingReference'] ?: null,
+            'payment_reference' => $validated['taxPaymentReference'] ?: null,
+            'notes' => $validated['taxNotes'] ?: null,
+        ]);
+
+        $this->reset(['taxFilingReference', 'taxPaymentReference', 'taxNotes']);
+        $this->banner(__('Tax filing marked as paid.'));
+    }
+
     public function resetReportPeriod(): void
     {
         $this->reportStartDate = now()->startOfMonth()->toDateString();
@@ -247,6 +328,7 @@ class AccountingWorkspace extends Component
             'cashflowSummary' => $this->accounting->cashflowSummaryForCompanies($companyIds, $this->reportStartDate, $this->reportEndDate),
             'ledgerLines' => $this->accounting->ledgerLinesForCompanies($companyIds, $this->reportStartDate, $this->reportEndDate),
             'periodClosings' => $this->accounting->periodClosingsForCompanies($companyIds),
+            'taxFilings' => $this->accounting->taxFilingsForCompanies($companyIds),
             'accountTypes' => $this->accountTypes(),
             'canManage' => $user->can('manageAccountingWorkspace'),
         ]);

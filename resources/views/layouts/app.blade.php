@@ -147,7 +147,7 @@
                     <div class="absolute right-0 top-0 h-56 w-56 rounded-full bg-emerald-200/25 blur-3xl dark:bg-emerald-500/10"></div>
                 </div>
             @elseif ($isUserShell)
-                <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 overflow-hidden bg-[linear-gradient(180deg,rgba(226,240,223,0.42),rgba(248,250,252,0))] dark:bg-[linear-gradient(180deg,rgba(21,35,18,0.32),rgba(2,6,23,0))]"></div>
+                <div class="user-app-backdrop" aria-hidden="true"></div>
             @endif
             {{ $slot }}
         </main>

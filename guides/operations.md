@@ -21,6 +21,8 @@ Optional local portability smoke:
 ```bash
 composer check:database-portability:sqlite
 PASPAPAN_PG_USER=lutuk PASPAPAN_PG_ADMIN_DB=absensi composer check:database-portability:pgsql
+# Local socket-based MariaDB/MySQL compatibility path:
+PASPAPAN_MYSQL_HOST=localhost PASPAPAN_MYSQL_USER=<local-user> PASPAPAN_MYSQL_PASSWORD= composer check:database-portability:mysql
 ```
 
 ## Queue
@@ -284,6 +286,25 @@ Konfigurasi Android saat ini:
 - `minSdkVersion 24`
 - `compileSdkVersion 35`
 - `targetSdkVersion 35`
+
+## iOS Preflight
+
+PasPapan sudah menyertakan project Capacitor `ios/` dan preflight iOS. Preflight menjalankan `cap sync ios` lalu build simulator dengan `CODE_SIGNING_ALLOWED=NO`, sehingga cocok untuk CI macOS atau mesin release lokal.
+
+```bash
+bun run ios:assets
+bun run ios:preflight
+bun run ios:screenshot
+```
+
+iOS belum diklaim TestFlight/App Store release-ready sampai signing, provisioning profile, upload TestFlight, dan smoke test iPhone fisik selesai. Jika Xcode baru dipasang dari App Store, jalankan:
+
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+bun run ios:preflight
+```
+
+Detail gate iOS ada di [`guides/ios-release.md`](./ios-release.md).
 
 ### 5. Install APK dengan ADB
 

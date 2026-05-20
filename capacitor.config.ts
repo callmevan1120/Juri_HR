@@ -8,7 +8,7 @@ const usesCleartext = serverOrigin.protocol === 'http:';
 const config: CapacitorConfig = {
   appId: 'com.pandanteknik.paspapan',
   appName: 'PasPapan',
-  webDir: 'public',
+  webDir: 'capacitor-www',
   server: {
     url: serverUrl,
     androidScheme: usesCleartext ? 'http' : 'https',
@@ -17,7 +17,25 @@ const config: CapacitorConfig = {
   },
   android: {
     backgroundColor: '#00000000',
-    captureInput: true
+    captureInput: true,
+    includePlugins: [
+      '@capacitor-community/barcode-scanner',
+      '@capacitor/app',
+      '@capacitor/browser',
+      '@capacitor/camera',
+      '@capacitor/geolocation',
+      '@capacitor/splash-screen',
+      '@dewakoding/capacitor-mock-location'
+    ]
+  },
+  ios: {
+    includePlugins: [
+      '@capacitor/app',
+      '@capacitor/browser',
+      '@capacitor/camera',
+      '@capacitor/geolocation',
+      '@capacitor/splash-screen'
+    ]
   },
   plugins: {
     Camera: {

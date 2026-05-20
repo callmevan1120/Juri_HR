@@ -33,7 +33,7 @@
                                             </svg>
                                         </div>
                                         <input id="email" name="email" type="text" autocomplete="username"
-                                            required autofocus aria-describedby="@error('email') email-error @enderror"
+                                            required aria-describedby="@error('email') email-error @enderror"
                                             aria-invalid="@error('email') true @else false @enderror"
                                             class="auth-input auth-input--icon @error('email') auth-input--error @enderror"
                                             value="{{ old('email') }}" placeholder="{{ __('Enter your ID') }}">

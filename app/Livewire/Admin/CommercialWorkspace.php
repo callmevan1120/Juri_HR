@@ -530,6 +530,7 @@ class CommercialWorkspace extends Component
             'opportunities' => $opportunities,
             'opportunityStages' => $this->commerce->opportunityStages(),
             'salesSummary' => $this->commerce->salesSummaryForCompanies($companyIds),
+            'collectionSummary' => $this->commerce->collectionSummaryForCompanies($companyIds),
             'canManage' => $user->can('manageCommercialWorkspace'),
         ]);
     }

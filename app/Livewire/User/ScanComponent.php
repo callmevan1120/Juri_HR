@@ -42,6 +42,24 @@ class ScanComponent extends Component
 
     public ?float $gpsVariance = null;
 
+    public bool $cachedLocation = false;
+
+    public bool $mockLocationDetected = false;
+
+    public bool $deviceChanged = false;
+
+    public bool $deviceInfoMissing = false;
+
+    public ?string $deviceId = null;
+
+    public ?string $platform = null;
+
+    public ?float $faceConfidence = null;
+
+    public bool $faceVerificationFailed = false;
+
+    public bool $faceVerificationSkipped = false;
+
     public function boot(AttendanceScanService $attendanceScan): void
     {
         $this->attendanceScan = $attendanceScan;
@@ -79,6 +97,18 @@ class ScanComponent extends Component
             gracePeriod: (int) $this->gracePeriod,
             gpsAccuracy: $this->gpsAccuracy,
             gpsVariance: $this->gpsVariance,
+            riskContext: [
+                'cached_location' => $this->cachedLocation,
+                'mock_location_detected' => $this->mockLocationDetected,
+                'device_changed' => $this->deviceChanged,
+                'device_info_missing' => $this->deviceInfoMissing,
+                'device_id' => $this->deviceId,
+                'platform' => $this->platform,
+                'face_confidence' => $this->faceConfidence,
+                'face_verification_failed' => $this->faceVerificationFailed,
+                'face_verification_skipped' => $this->faceVerificationSkipped,
+                'received_at' => now(),
+            ],
         );
 
         if (! ($result['ok'] ?? false)) {

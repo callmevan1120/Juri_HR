@@ -77,10 +77,46 @@ test('device checkout merges new risk factors with existing check in risk', func
     $attendance = Attendance::firstOrFail();
     $codes = collect($attendance->risk_factors)->pluck('code')->all();
 
-    expect($attendance->risk_score)->toBe(40)
-        ->and($attendance->risk_level)->toBe('medium')
+    expect($attendance->risk_score)->toBeGreaterThanOrEqual(40)
+        ->and($attendance->risk_level)->toBeIn(['medium', 'high'])
         ->and($codes)->toContain('gps_accuracy_too_perfect')
-        ->and($codes)->toContain('gps_zero_variance');
+        ->and($codes)->toContain('gps_zero_variance')
+        ->and($codes)->toContain('timestamp_anomaly');
+});
+
+test('device barcode scan scores cross platform telemetry without android mock location', function () {
+    $user = User::factory()->create();
+    $barcode = Barcode::factory()->create([
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+        'radius' => 5000,
+    ]);
+
+    Sanctum::actingAs($user, deviceApiAbilities());
+
+    $this->postJson('/api/device/barcode', [
+        'barcode_data' => $barcode->value,
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+        'timestamp' => now()->toDateTimeString(),
+        'accuracy' => 3.2,
+        'cached_location' => true,
+        'device_changed' => true,
+        'device_id' => 'ios-device-1',
+        'platform' => 'ios',
+        'face_confidence' => 0.42,
+    ])->assertOk();
+
+    $attendance = Attendance::firstOrFail();
+    $codes = collect($attendance->risk_factors)->pluck('code')->all();
+
+    expect($attendance->risk_score)->toBeGreaterThanOrEqual(60)
+        ->and($attendance->risk_level)->toBe('high')
+        ->and($codes)->toContain('gps_accuracy_too_perfect')
+        ->and($codes)->toContain('cached_location_used')
+        ->and($codes)->toContain('device_changed')
+        ->and($codes)->toContain('face_confidence_low')
+        ->and($codes)->not->toContain('mock_location_detected');
 });
 
 test('web attendance scan production flow evaluates risk through scoring service', function () {

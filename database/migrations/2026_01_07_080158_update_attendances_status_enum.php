@@ -18,6 +18,7 @@ return new class extends Migration
             $this->replacePostgresCheckConstraint([
                 'present',
                 'late',
+                'leave',
                 'excused',
                 'sick',
                 'absent',
@@ -27,7 +28,7 @@ return new class extends Migration
             return;
         }
 
-        DB::statement("ALTER TABLE attendances MODIFY COLUMN status ENUM('present', 'late', 'excused', 'sick', 'absent', 'rejected') DEFAULT 'absent'");
+        DB::statement("ALTER TABLE attendances MODIFY COLUMN status ENUM('present', 'late', 'leave', 'excused', 'sick', 'absent', 'rejected') DEFAULT 'absent'");
     }
 
     /**
@@ -43,6 +44,7 @@ return new class extends Migration
             $this->replacePostgresCheckConstraint([
                 'present',
                 'late',
+                'leave',
                 'excused',
                 'sick',
                 'absent',
@@ -57,7 +59,7 @@ return new class extends Migration
 
         // Safer to just leave it or handle specific revert logic if needed.
         // For now we will allow reverting to the original enum list.
-        DB::statement("ALTER TABLE attendances MODIFY COLUMN status ENUM('present', 'late', 'excused', 'sick', 'absent') DEFAULT 'absent'");
+        DB::statement("ALTER TABLE attendances MODIFY COLUMN status ENUM('present', 'late', 'leave', 'excused', 'sick', 'absent') DEFAULT 'absent'");
     }
 
     /**

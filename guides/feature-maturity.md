@@ -2,6 +2,26 @@
 
 PasPapan sudah memasuki fase pematangan produk. Prioritas kerja berikutnya bukan menambah modul baru, melainkan memperkuat logic, keamanan, data integrity, UX, testing, dan operasional dari fitur yang sudah ada.
 
+## Skor Jujur Saat Ini
+
+Baseline setelah hardening database, dashboard, mobile, dan dokumentasi terbaru: **sekitar 85/100 untuk keseluruhan visi 1 platform**.
+
+Artinya:
+
+- core HR, attendance, approval, RBAC/security, dan payroll dasar sudah layak dipakai dengan guard produksi yang cukup kuat;
+- operasi, commercial/CRM, accounting, collaboration, dan APK sudah punya fondasi yang bisa diuji, tetapi sebagian masih berada di level release candidate/foundation;
+- iOS delivery belum full release-ready;
+- target “10/10” internal PasPapan dipatok sebagai skor audit minimal `95/100` plus tidak ada evidence yang hilang.
+
+Jalankan audit lokal:
+
+```bash
+php artisan feature:maturity
+php artisan feature:maturity --json
+```
+
+Definisi dan bobotnya ada di `config/feature_maturity.php`. Angka ini sengaja konservatif supaya dokumentasi tidak mengklaim sesuatu yang belum dibuktikan di test, staging, atau device. Follow-up terbaru menambahkan workflow tax filing draft/filed/paid untuk accounting, scoped message search untuk collaboration, AR collection summary untuk commercial, dan iOS preflight gate. Gap berkurang tanpa menutupi bahwa iOS delivery dan full finance sign-off masih perlu evidence nyata.
+
 ## Prinsip Kerja
 
 - Jangan menambah menu/modul baru kecuali langsung menutup gap pada fitur yang sudah ada.
@@ -32,11 +52,11 @@ PasPapan sudah memasuki fase pematangan produk. Prioritas kerja berikutnya bukan
 ### Payroll dan Accounting
 
 - Payroll Indonesia yang sudah ada harus diperdalam melalui validasi komponen, prorata, THR, BPJS, PPh21/Coretax metadata, payment instruction, variance, dan payslip access control.
-- Accounting foundation difokuskan pada posting yang benar, AR/AP aging, ledger export, closing period, dan report yang bisa direkonsiliasi.
+- Accounting foundation difokuskan pada posting yang benar, AR/AP aging, ledger export, closing period, tax filing draft/filed/paid, dan report yang bisa direkonsiliasi.
 
 ### Operations, Commercial, CRM, dan Collaboration
 
-- Client, project, task, checklist, quotation, invoice, vendor bill, stock movement, sales opportunity, chat, cloud file, dan meeting link difokuskan pada flow input yang jelas, company scope, secure file delivery, dan PDF/export yang konsisten.
+- Client, project, task, checklist, quotation, invoice, vendor bill, stock movement, sales opportunity, chat, cloud file, dan meeting link difokuskan pada flow input yang jelas, company scope, secure file delivery, scoped search, realtime hook, dan PDF/export yang konsisten.
 - Hindari menambah submodul baru sebelum create/edit/detail/export/download pada modul existing stabil.
 
 ### UX dan Mobile

@@ -6,10 +6,18 @@ use App\Models\ActivityLog;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
+use App\Models\Company;
 use App\Models\Holiday;
+use App\Models\HrChecklistTask;
+use App\Models\Invoice;
 use App\Models\Overtime;
+use App\Models\Payroll;
+use App\Models\ProjectTask;
 use App\Models\Reimbursement;
+use App\Models\SalesOpportunity;
 use App\Models\User;
+use App\Models\VendorBill;
+use App\Models\WorkFromHomeRequest;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +33,7 @@ class AdminDashboardQueryService
         $selectedDateString = $selectedDate->toDateString();
         $today = now()->startOfDay();
         $managedUserIds = $this->managedUserIds($admin);
+        $managedCompanyIds = $this->managedCompanyIds($admin, $managedUserIds);
 
         $pendingCounts = $this->pendingCounts($admin, $managedUserIds);
 
@@ -151,6 +160,7 @@ class AdminDashboardQueryService
             'unreadNotificationsPreview' => $admin->unreadNotifications()->latest()->take(5)->get(),
             'overdueUsers' => $overdueUsers,
             'calendarLeaves' => $this->calendarLeaves($admin, $selectedDate),
+            'platformSignals' => $this->platformSignals($admin, $managedUserIds, $managedCompanyIds, $selectedDateString),
         ];
     }
 
@@ -320,6 +330,100 @@ class AdminDashboardQueryService
         }
 
         return User::query()->managedBy($admin)->pluck('id');
+    }
+
+    /**
+     * @param  Collection<int, int>  $managedUserIds
+     * @return Collection<int, int>
+     */
+    private function managedCompanyIds(User $admin, Collection $managedUserIds): Collection
+    {
+        if ($admin->hasGlobalAdminScope()) {
+            return Company::query()->pluck('id')->map(fn ($id): int => (int) $id);
+        }
+
+        return User::query()
+            ->whereIn('id', $managedUserIds->concat([$admin->id])->unique()->values())
+            ->whereNotNull('company_id')
+            ->distinct()
+            ->pluck('company_id')
+            ->map(fn ($id): int => (int) $id);
+    }
+
+    /**
+     * @param  Collection<int, int>  $managedUserIds
+     * @param  Collection<int, int>  $managedCompanyIds
+     * @return array<string, int>
+     */
+    private function platformSignals(User $admin, Collection $managedUserIds, Collection $managedCompanyIds, string $selectedDateString): array
+    {
+        $scopedUserQuery = function (Builder $query) use ($admin, $managedUserIds): Builder {
+            if ($admin->hasGlobalAdminScope()) {
+                return $query;
+            }
+
+            return $query->whereIn('user_id', $managedUserIds);
+        };
+
+        $scopedCompanyQuery = function (Builder $query) use ($managedCompanyIds): Builder {
+            return $query->whereIn('company_id', $managedCompanyIds);
+        };
+
+        return [
+            'pending_wfh' => $admin->allowsAdminPermission('admin.wfh_requests.manage')
+                ? WorkFromHomeRequest::query()
+                    ->where('status', WorkFromHomeRequest::STATUS_PENDING)
+                    ->tap($scopedUserQuery)
+                    ->count()
+                : 0,
+            'overdue_hr_tasks' => $admin->can('viewAny', \App\Models\HrChecklistCase::class)
+                ? HrChecklistTask::query()
+                    ->reminderReady()
+                    ->whereHas('case.user', fn (Builder $query) => $query->managedBy($admin))
+                    ->count()
+                : 0,
+            'high_risk_attendance' => Attendance::query()
+                ->managedBy($admin)
+                ->where('date', $selectedDateString)
+                ->whereIn('risk_level', ['medium', 'high'])
+                ->count(),
+            'pending_payroll' => $admin->allowsAdminPermission('admin.payroll.view')
+                ? Payroll::query()
+                    ->where('status', 'pending')
+                    ->whereHas('user', fn (Builder $query) => $query->managedBy($admin))
+                    ->count()
+                : 0,
+            'open_invoices' => $admin->allowsAdminPermission('admin.commercial.view')
+                ? Invoice::query()
+                    ->where('status', '!=', Invoice::STATUS_PAID)
+                    ->tap($scopedCompanyQuery)
+                    ->count()
+                : 0,
+            'open_vendor_bills' => $admin->allowsAdminPermission('admin.commercial.view')
+                ? VendorBill::query()
+                    ->whereNotIn('status', [VendorBill::STATUS_PAID, VendorBill::STATUS_CANCELLED])
+                    ->tap($scopedCompanyQuery)
+                    ->count()
+                : 0,
+            'active_sales_opportunities' => $admin->allowsAdminPermission('admin.commercial.view')
+                ? SalesOpportunity::query()
+                    ->whereIn('stage', [
+                        SalesOpportunity::STAGE_LEAD,
+                        SalesOpportunity::STAGE_QUALIFIED,
+                        SalesOpportunity::STAGE_PROPOSAL,
+                    ])
+                    ->tap($scopedCompanyQuery)
+                    ->count()
+                : 0,
+            'overdue_project_tasks' => $admin->allowsAdminPermission('admin.operations.view')
+                ? ProjectTask::query()
+                    ->whereIn('status', [ProjectTask::STATUS_TODO, ProjectTask::STATUS_IN_PROGRESS])
+                    ->whereNotNull('due_date')
+                    ->whereDate('due_date', '<', now()->toDateString())
+                    ->tap($scopedCompanyQuery)
+                    ->count()
+                : 0,
+        ];
     }
 
     /**

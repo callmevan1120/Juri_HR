@@ -33,7 +33,7 @@
         </x-admin.page-tools>
     </x-slot>
 
-    <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-4">
+    <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-6">
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Open Pipeline') }}</p>
             <p class="mt-2 text-xl font-bold text-slate-950 dark:text-white">Rp{{ number_format($salesSummary['open_value'], 0, ',', '.') }}</p>
@@ -45,12 +45,25 @@
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Won') }}</p>
             <p class="mt-2 text-xl font-bold text-emerald-600 dark:text-emerald-300">Rp{{ number_format($salesSummary['won_value'], 0, ',', '.') }}</p>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Win rate :rate%', ['rate' => number_format($salesSummary['win_rate'], 2, ',', '.')]) }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Overdue Follow-up') }}</p>
             <p class="mt-2 text-xl font-bold {{ $salesSummary['overdue_follow_ups'] > 0 ? 'text-amber-600 dark:text-amber-300' : 'text-slate-950 dark:text-white' }}">
                 {{ number_format($salesSummary['overdue_follow_ups'], 0, ',', '.') }}
             </p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Overdue AR') }}</p>
+            <p class="mt-2 text-xl font-bold {{ $collectionSummary['overdue_total'] > 0 ? 'text-amber-600 dark:text-amber-300' : 'text-slate-950 dark:text-white' }}">
+                Rp{{ number_format($collectionSummary['overdue_total'], 0, ',', '.') }}
+            </p>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __(':count invoices', ['count' => number_format($collectionSummary['overdue_count'], 0, ',', '.')]) }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Due Soon') }}</p>
+            <p class="mt-2 text-xl font-bold text-primary-700 dark:text-primary-300">Rp{{ number_format($collectionSummary['due_soon_total'], 0, ',', '.') }}</p>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('next 7 days') }}</p>
         </div>
     </div>
 

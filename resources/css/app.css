@@ -1171,11 +1171,13 @@
 
     .user-page-shell {
         @apply pb-4 lg:pb-6;
-        padding-top: max(1rem, calc(env(safe-area-inset-top) + 1rem));
+        min-height: 100dvh;
+        padding-top: max(0.85rem, calc(env(safe-area-inset-top) + 0.85rem));
     }
 
     .user-page-container {
         @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
+        container-type: inline-size;
     }
 
     .user-page-container--wide {
@@ -1203,7 +1205,7 @@
     }
 
     .user-page-header {
-        @apply mb-4 flex flex-col gap-3 border-b-0 bg-transparent px-0 py-0 dark:bg-transparent;
+        @apply mb-5 flex flex-col gap-3 border-b-0 bg-transparent px-0 py-0 dark:bg-transparent;
     }
 
     .user-page-header--plain {
@@ -1211,19 +1213,22 @@
     }
 
     .user-page-header__row {
-        @apply relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+        @apply relative flex flex-row items-center justify-between gap-3;
     }
 
     .user-page-header__main {
-        @apply flex min-w-0 items-center gap-3;
+        @apply flex min-w-0 flex-1 items-center gap-3;
     }
 
     .user-page-header__back {
-        @apply shrink-0;
+        min-height: 2.75rem;
+        min-width: 2.75rem;
+
+        @apply inline-flex shrink-0 items-center justify-center rounded-full border border-slate-200/80 bg-white/76 text-slate-700 shadow-none backdrop-blur-md transition hover:bg-white hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-800/80 dark:bg-slate-900/68 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white dark:focus-visible:ring-primary-300 dark:focus-visible:ring-offset-slate-950;
     }
 
     .user-page-header__icon {
-        @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary-100 bg-white/80 text-primary-700 shadow-sm dark:border-primary-900/50 dark:bg-slate-900/70 dark:text-primary-200;
+        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary-100/80 bg-primary-50/80 text-primary-700 shadow-none ring-1 ring-white/60 backdrop-blur-sm dark:border-primary-900/55 dark:bg-primary-950/38 dark:text-primary-200 dark:ring-slate-800/70;
     }
 
     .user-page-header__copy {
@@ -1235,7 +1240,7 @@
     }
 
     .user-page-header__title {
-        @apply text-left text-xl font-semibold tracking-tight text-gray-950 dark:text-white sm:text-2xl;
+        @apply text-left text-xl font-semibold leading-tight tracking-tight text-gray-950 dark:text-white sm:text-2xl;
     }
 
     .user-page-header__meta {
@@ -1247,7 +1252,7 @@
     }
 
     .user-page-header__actions {
-        @apply flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end;
+        @apply flex w-auto shrink-0 flex-wrap items-center justify-end gap-2;
     }
 
     .user-page-body {
@@ -1599,44 +1604,30 @@
     }
 
     .auth-shell {
-        @apply relative grid overflow-hidden bg-gray-50 px-4 dark:bg-gray-950 sm:px-6 lg:px-8;
+        @apply relative grid overflow-hidden bg-slate-50 px-4 dark:bg-slate-950 sm:px-6 lg:px-8;
         align-items: center;
         min-height: 100svh;
         min-height: 100dvh;
-        padding-top: max(5.25rem, calc(env(safe-area-inset-top) + 5.25rem));
-        padding-bottom: max(1rem, calc(env(safe-area-inset-bottom) + 1rem));
+        padding-top: max(5rem, calc(env(safe-area-inset-top) + 5rem));
+        padding-bottom: max(0.9rem, calc(env(safe-area-inset-bottom) + 0.9rem));
     }
 
     .auth-shell--dense {
-        padding-top: max(4.5rem, calc(env(safe-area-inset-top) + 4.5rem));
+        padding-top: max(4.75rem, calc(env(safe-area-inset-top) + 4.75rem));
         padding-bottom: max(0.75rem, calc(env(safe-area-inset-bottom) + 0.75rem));
     }
 
     .auth-shell__backdrop {
         @apply absolute inset-0;
-        background-image: radial-gradient(
-                circle at top left,
-                rgba(87, 148, 74, 0.18),
-                transparent 32%
-            ),
-            radial-gradient(
-                circle at bottom right,
-                rgba(214, 232, 208, 0.7),
-                transparent 30%
-            );
+        background:
+            radial-gradient(circle at 50% -14rem, rgba(132, 193, 120, 0.22), transparent 30rem),
+            linear-gradient(180deg, rgba(247, 250, 248, 0.98), rgba(241, 245, 249, 0.98));
     }
 
     .dark .auth-shell__backdrop {
-        background-image: radial-gradient(
-                circle at top left,
-                rgba(87, 148, 74, 0.16),
-                transparent 32%
-            ),
-            radial-gradient(
-                circle at bottom right,
-                rgba(31, 41, 55, 0.42),
-                transparent 30%
-            );
+        background:
+            radial-gradient(circle at 50% -14rem, rgba(106, 180, 91, 0.18), transparent 30rem),
+            linear-gradient(180deg, rgba(2, 6, 23, 1), rgba(15, 23, 42, 0.98));
     }
 
     .auth-shell__container {
@@ -1649,15 +1640,18 @@
 
     .guest-topbar {
         @apply absolute inset-x-4 z-20 flex items-center justify-between gap-3 sm:inset-x-6 lg:inset-x-8;
-        top: calc(env(safe-area-inset-top) + 0.75rem);
+        top: max(0.75rem, calc(env(safe-area-inset-top) + 0.75rem));
     }
 
     .guest-ui {
-        background-color: #f8fafc;
+        background-color: #f7faf8;
+        color-scheme: light;
+        overscroll-behavior-y: none;
     }
 
     .dark .guest-ui {
-        background-color: #030712;
+        background-color: #020617;
+        color-scheme: dark;
     }
 
     .guest-ui.is-native-platform .guest-topbar {
@@ -1665,15 +1659,15 @@
     }
 
     .guest-ui.is-native-platform .auth-shell {
-        padding-top: max(6rem, calc(env(safe-area-inset-top) + 6rem));
+        padding-top: max(5.75rem, calc(env(safe-area-inset-top) + 5.75rem));
     }
 
     .guest-brand {
-        @apply inline-flex items-center gap-3 rounded-2xl border border-gray-200/80 bg-white/90 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 dark:text-white;
+        @apply inline-flex min-h-[2.75rem] items-center gap-2.5 rounded-full border border-slate-200/80 bg-white/76 px-2.5 py-1.5 text-sm font-semibold text-slate-900 shadow-none backdrop-blur-md transition hover:bg-white dark:border-slate-800/80 dark:bg-slate-900/68 dark:text-white dark:hover:bg-slate-900;
     }
 
     .guest-brand__logo {
-        @apply h-10 w-10 rounded-2xl object-cover shadow-sm;
+        @apply h-9 w-9 rounded-full object-cover shadow-none ring-1 ring-white/80 dark:ring-slate-800;
     }
 
     .guest-brand__name {
@@ -1730,18 +1724,18 @@
     }
 
     .auth-card {
-        @apply w-full overflow-y-auto overscroll-contain rounded-[1.5rem] border border-white/80 bg-white/95 p-5 shadow-[0_32px_80px_-46px_rgba(15,23,42,0.45)] backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 sm:p-6 lg:p-7;
-        max-height: calc(100dvh - max(6.25rem, calc(env(safe-area-inset-top) + 6.25rem)) - max(1rem, calc(env(safe-area-inset-bottom) + 1rem)));
+        @apply w-full overflow-y-auto overscroll-contain rounded-[1.35rem] border border-white/80 bg-white/88 p-4 shadow-[0_28px_72px_-50px_rgba(15,23,42,0.55)] backdrop-blur-xl dark:border-slate-800/85 dark:bg-slate-900/82 sm:p-5 lg:p-6;
+        max-height: calc(100dvh - max(6rem, calc(env(safe-area-inset-top) + 6rem)) - max(0.9rem, calc(env(safe-area-inset-bottom) + 0.9rem)));
         scrollbar-gutter: stable;
     }
 
     .auth-card--compact {
-        @apply p-4 sm:p-5 lg:p-6;
+        @apply p-4 sm:p-5;
         max-height: calc(100dvh - max(5.25rem, calc(env(safe-area-inset-top) + 5.25rem)) - max(0.75rem, calc(env(safe-area-inset-bottom) + 0.75rem)));
     }
 
     .auth-card__header {
-        @apply border-b border-gray-200 pb-4 dark:border-gray-800;
+        @apply border-b border-slate-200/72 pb-4 dark:border-slate-800/82;
     }
 
     .auth-card__eyebrow {
@@ -1749,7 +1743,7 @@
     }
 
     .auth-card__title {
-        @apply mt-2 text-xl font-semibold tracking-tight text-gray-950 dark:text-white;
+        @apply mt-1.5 text-xl font-semibold leading-tight tracking-tight text-gray-950 dark:text-white;
     }
 
     .auth-card__copy {
@@ -1757,7 +1751,7 @@
     }
 
     .auth-status {
-        @apply rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 dark:border-green-900/60 dark:bg-green-950/40 dark:text-green-100;
+        @apply rounded-[1rem] border border-green-200/80 bg-green-50/86 px-4 py-3 text-sm font-medium text-green-900 dark:border-green-900/60 dark:bg-green-950/40 dark:text-green-100;
     }
 
     .auth-form {
@@ -1765,7 +1759,7 @@
     }
 
     .auth-section {
-        @apply space-y-4 rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-950/30;
+        @apply space-y-4 rounded-[1.15rem] border border-slate-200/70 bg-slate-50/76 p-4 shadow-none dark:border-slate-800/80 dark:bg-slate-950/34;
     }
 
     .auth-section__header {
@@ -1801,7 +1795,7 @@
     }
 
     .auth-label {
-        @apply block text-sm font-semibold text-gray-900 dark:text-gray-100;
+        @apply block text-sm font-semibold leading-5 text-gray-900 dark:text-gray-100;
     }
 
     .auth-help {
@@ -1817,13 +1811,14 @@
     }
 
     .auth-input-icon {
-        @apply pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500 dark:text-gray-400;
+        @apply pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 dark:text-slate-400;
     }
 
     .auth-input,
     .auth-select,
     .auth-textarea {
-        @apply block min-h-[2.75rem] w-full rounded-2xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-950 shadow-sm transition duration-150 ease-in-out placeholder:text-gray-500 focus:border-primary-600 focus:ring-4 focus:ring-primary-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-400 dark:focus:ring-primary-950/40;
+        @apply block min-h-[3.25rem] w-full rounded-[1rem] border border-slate-200/85 bg-white/88 px-4 py-3 text-base font-medium text-slate-950 shadow-none transition duration-150 ease-in-out placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100/85 dark:border-slate-800 dark:bg-slate-950/48 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-primary-400 dark:focus:bg-slate-950 dark:focus:ring-primary-950/65;
+        color-scheme: light dark;
     }
 
     .auth-input--icon {
@@ -1831,7 +1826,7 @@
     }
 
     .auth-textarea {
-        @apply min-h-[5rem] resize-y;
+        @apply min-h-[6.5rem] resize-y leading-6;
     }
 
     .auth-input--error {
@@ -1843,11 +1838,11 @@
     }
 
     .auth-check {
-        @apply flex items-start gap-3;
+        @apply flex items-start gap-3 rounded-[1rem] px-0 py-1;
     }
 
     .auth-check__box {
-        @apply mt-0.5 h-5 w-5 rounded border-gray-300 text-primary-700 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-primary-300 dark:focus:ring-primary-400;
+        @apply mt-0.5 h-5 w-5 rounded-md border-slate-300 text-primary-700 focus:ring-primary-600 dark:border-slate-700 dark:bg-slate-900 dark:text-primary-300 dark:focus:ring-primary-400;
     }
 
     .auth-check__label {
@@ -1867,7 +1862,7 @@
     }
 
     .auth-button {
-        @apply inline-flex min-h-[2.75rem] min-w-[2.75rem] w-full items-center justify-center rounded-2xl border border-primary-700 bg-primary-700 px-5 py-3 text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-primary-800 focus:outline-none dark:border-primary-500 dark:bg-primary-500 dark:text-gray-950 dark:hover:bg-primary-400 sm:w-auto;
+        @apply inline-flex min-h-[3.25rem] min-w-[3.25rem] w-full items-center justify-center rounded-full border border-primary-700 bg-primary-700 px-5 py-3 text-base font-semibold text-white shadow-none transition duration-150 ease-in-out hover:bg-primary-800 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-primary-400 dark:bg-primary-400 dark:text-slate-950 dark:hover:bg-primary-300 dark:focus-visible:ring-primary-300 dark:focus-visible:ring-offset-slate-950 sm:w-auto;
     }
 
     .auth-button--full {
@@ -1875,11 +1870,11 @@
     }
 
     .auth-button--secondary {
-        @apply border-gray-300 bg-white text-gray-800 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700;
+        @apply border-slate-200/85 bg-white/72 text-slate-800 hover:bg-white dark:border-slate-800 dark:bg-slate-900/64 dark:text-white dark:hover:bg-slate-900;
     }
 
     .auth-footer {
-        @apply border-t border-gray-200 pt-4 text-center text-sm leading-6 text-gray-700 dark:border-gray-800 dark:text-gray-300;
+        @apply border-t border-slate-200/72 pt-4 text-center text-sm leading-6 text-gray-700 dark:border-slate-800/82 dark:text-gray-300;
     }
 
     .auth-card .ts-wrapper {
@@ -1891,7 +1886,7 @@
     }
 
     .auth-card .ts-wrapper.auth-tom-select .ts-control {
-        @apply relative min-h-[2.75rem] rounded-2xl border border-gray-300 bg-white px-4 py-2 pr-10 text-sm text-gray-950 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white;
+        @apply relative min-h-[3.25rem] rounded-[1rem] border border-slate-200/85 bg-white/88 px-4 py-3 pr-10 text-base font-medium text-slate-950 shadow-none dark:border-slate-800 dark:bg-slate-950/48 dark:text-white;
         display: flex !important;
         align-items: center !important;
         flex-wrap: nowrap !important;
@@ -1900,7 +1895,7 @@
 
     .auth-card .ts-wrapper.auth-tom-select .ts-control > input,
     .auth-card .ts-wrapper.auth-tom-select .ts-control .item {
-        @apply text-sm text-gray-950 dark:text-white;
+        @apply text-base text-gray-950 dark:text-white;
         min-height: 1.25rem !important;
         line-height: 1.25rem !important;
     }
@@ -1935,7 +1930,7 @@
     }
 
     .auth-card .ts-wrapper.auth-tom-select.focus .ts-control {
-        @apply border-primary-600 ring-4 ring-primary-100 dark:border-primary-400 dark:ring-primary-950/40;
+        @apply border-primary-500 bg-white ring-4 ring-primary-100/85 dark:border-primary-400 dark:bg-slate-950 dark:ring-primary-950/65;
     }
 
     .auth-card .ts-wrapper.auth-tom-select.error .ts-control,
@@ -1975,6 +1970,31 @@
         .ts-wrapper.auth-tom-select.single.dropdown-active
         .ts-control::after {
         @apply -translate-y-[35%] rotate-[225deg];
+    }
+
+    .auth-card > form,
+    .auth-card form:not(.inline) {
+        @apply space-y-4;
+    }
+
+    .auth-card > form label:not(.auth-check):not(.auth-label),
+    .auth-card form:not(.inline) label:not(.auth-check):not(.auth-label) {
+        @apply mb-1.5 block text-sm font-semibold leading-5 text-slate-700 dark:text-slate-200;
+    }
+
+    .auth-card > form input:not([type="checkbox"]):not([type="radio"]):not(.auth-input),
+    .auth-card form:not(.inline) input:not([type="checkbox"]):not([type="radio"]):not(.auth-input),
+    .auth-card > form textarea:not(.auth-textarea),
+    .auth-card form:not(.inline) textarea:not(.auth-textarea),
+    .auth-card > form select:not(.auth-select),
+    .auth-card form:not(.inline) select:not(.auth-select) {
+        @apply min-h-[3.25rem] w-full rounded-[1rem] border border-slate-200/85 bg-white/88 px-4 py-3 text-base font-medium text-slate-950 shadow-none transition placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100/85 dark:border-slate-800 dark:bg-slate-950/48 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-primary-400 dark:focus:bg-slate-950 dark:focus:ring-primary-950/65;
+        color-scheme: light dark;
+    }
+
+    .auth-card > form button,
+    .auth-card form:not(.inline) button {
+        min-height: 3rem;
     }
 
     .topbar-tool {
@@ -2037,13 +2057,37 @@
     .user-ui {
         --user-menu-card-radius: 1.1rem;
         --user-menu-icon-radius: 0.95rem;
+        --user-native-surface: rgb(255 255 255 / 0.72);
+        --user-native-surface-strong: rgb(255 255 255 / 0.86);
+        --user-native-border: rgb(203 213 225 / 0.72);
+        --user-native-page: #f7faf8;
         background:
-            linear-gradient(180deg, rgb(247 250 248) 0%, rgb(248 250 252) 44%, rgb(241 245 249) 100%);
+            radial-gradient(circle at 50% -12rem, rgba(132, 193, 120, 0.2), transparent 28rem),
+            linear-gradient(180deg, rgb(247 250 248) 0%, rgb(248 250 252) 46%, rgb(241 245 249) 100%);
+        color-scheme: light;
+        overscroll-behavior-y: none;
     }
 
     .dark .user-ui {
+        --user-native-surface: rgb(15 23 42 / 0.64);
+        --user-native-surface-strong: rgb(15 23 42 / 0.82);
+        --user-native-border: rgb(51 65 85 / 0.8);
+        --user-native-page: #020617;
         background:
+            radial-gradient(circle at 50% -12rem, rgba(106, 180, 91, 0.16), transparent 28rem),
             linear-gradient(180deg, rgb(2 6 23) 0%, rgb(15 23 42) 58%, rgb(2 6 23) 100%);
+        color-scheme: dark;
+    }
+
+    .user-app-backdrop {
+        @apply pointer-events-none absolute inset-x-0 top-0 -z-10 h-[18rem] overflow-hidden;
+        background:
+            linear-gradient(180deg, rgba(213, 234, 209, 0.46), rgba(248, 250, 252, 0));
+    }
+
+    .dark .user-app-backdrop {
+        background:
+            linear-gradient(180deg, rgba(30, 51, 26, 0.38), rgba(2, 6, 23, 0));
     }
 
     .user-home-hero {
@@ -2091,7 +2135,7 @@
     }
 
     .user-content-panel {
-        @apply relative overflow-hidden rounded-[1.15rem] border border-slate-200/70 bg-white/70 shadow-none backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-900/60;
+        @apply relative overflow-hidden rounded-[1.2rem] border border-slate-200/70 bg-white/70 shadow-none backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-900/60;
     }
 
     .user-content-panel__header {
@@ -2107,7 +2151,7 @@
     }
 
     .asset-mobile-card {
-        @apply overflow-hidden rounded-[1.15rem] border border-slate-200/70 bg-white/72 p-3 shadow-none backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-900/60;
+        @apply overflow-hidden rounded-[1.2rem] border border-slate-200/70 bg-white/72 p-3.5 shadow-none backdrop-blur-sm dark:border-slate-800/80 dark:bg-slate-900/60;
     }
 
     .asset-mobile-card__top {
@@ -2214,7 +2258,7 @@
 
     .user-native-field__label,
     .wfh-native-field__label {
-        @apply mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200;
+        @apply mb-1.5 block text-sm font-semibold leading-5 text-slate-700 dark:text-slate-200;
     }
 
     .user-native-field__control,
@@ -2224,7 +2268,7 @@
 
     .user-native-field__icon,
     .wfh-native-field__icon {
-        @apply pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 dark:text-slate-500;
+        @apply pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500 dark:text-slate-400;
     }
 
     .user-native-field__icon--top,
@@ -2234,7 +2278,7 @@
 
     .user-native-field__input,
     .wfh-native-field__input {
-        @apply min-h-[3.35rem] w-full rounded-[1.05rem] border border-slate-200/80 bg-slate-50/80 pl-12 pr-4 text-base font-medium text-slate-950 shadow-none outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:bg-white focus:ring-4 focus:ring-primary-100/80 dark:border-slate-800 dark:bg-slate-950/45 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-primary-500 dark:focus:bg-slate-950 dark:focus:ring-primary-950/60;
+        @apply min-h-[3.35rem] w-full rounded-[1rem] border border-slate-200/80 bg-slate-50/82 pl-12 pr-4 text-base font-medium text-slate-950 shadow-none outline-none transition placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100/85 dark:border-slate-800 dark:bg-slate-950/45 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-primary-400 dark:focus:bg-slate-950 dark:focus:ring-primary-950/65;
         color-scheme: light dark;
     }
 
@@ -2244,7 +2288,7 @@
     }
 
     .wfh-submit-button {
-        @apply inline-flex min-h-[3.35rem] w-full items-center justify-center gap-2 rounded-[1.05rem] bg-primary-700 px-4 py-3 text-base font-semibold text-white shadow-none transition hover:bg-primary-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:bg-primary-400 dark:text-slate-950 dark:hover:bg-primary-300 dark:focus-visible:ring-primary-300 dark:focus-visible:ring-offset-slate-950;
+        @apply inline-flex min-h-[3.35rem] w-full items-center justify-center gap-2 rounded-full bg-primary-700 px-4 py-3 text-base font-semibold text-white shadow-none transition hover:bg-primary-800 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:bg-primary-400 dark:text-slate-950 dark:hover:bg-primary-300 dark:focus-visible:ring-primary-300 dark:focus-visible:ring-offset-slate-950;
     }
 
     .wfh-request-list {
@@ -2313,53 +2357,36 @@
 
     .user-bottom-navigation {
         @apply fixed inset-x-0 bottom-0 z-40 px-3 sm:px-6;
-        padding-bottom: max(0.65rem, calc(env(safe-area-inset-bottom) + 0.65rem));
+        padding-bottom: max(0.55rem, calc(env(safe-area-inset-bottom) + 0.55rem));
     }
 
     .user-bottom-navigation__dock {
-        @apply relative mx-auto flex h-[4.45rem] max-w-md items-center gap-1 overflow-visible rounded-[1.55rem] border border-slate-200/80 bg-white/90 px-2 py-2 shadow-[0_16px_42px_-32px_rgba(15,23,42,0.72)] backdrop-blur-xl dark:border-slate-700/75 dark:bg-slate-900/90 dark:shadow-[0_18px_46px_-34px_rgba(0,0,0,0.95)];
+        @apply relative mx-auto grid h-[4.15rem] max-w-md grid-cols-5 items-center gap-1 overflow-visible rounded-[1.45rem] border border-slate-200/80 bg-white/88 px-1.5 py-1.5 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.72)] backdrop-blur-xl dark:border-slate-700/75 dark:bg-slate-900/88 dark:shadow-[0_18px_46px_-34px_rgba(0,0,0,0.95)];
         --user-nav-surface: rgb(255 255 255 / 0.95);
     }
 
     .user-bottom-navigation__item {
-        @apply relative flex min-h-[3.55rem] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-[1.15rem] px-1.5 text-center text-slate-500 transition duration-200 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:ring-primary-300 dark:focus-visible:ring-offset-slate-900;
+        @apply relative flex min-h-[3.2rem] min-w-0 flex-col items-center justify-center gap-0.5 rounded-[1.05rem] px-1 text-center text-slate-500 transition duration-200 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:ring-primary-300 dark:focus-visible:ring-offset-slate-900;
     }
 
-    .user-bottom-navigation__item.is-active:not(.is-primary) {
+    .user-bottom-navigation__item.is-active {
         @apply bg-primary-50 text-primary-800 dark:bg-primary-950/55 dark:text-primary-100;
     }
 
-    .user-bottom-navigation__item.is-primary {
-        @apply -mt-6 text-primary-800 hover:bg-transparent dark:text-primary-100 dark:hover:bg-transparent;
-    }
-
     .user-bottom-navigation__icon {
-        @apply relative grid h-8 w-8 place-items-center rounded-full text-current transition duration-200;
+        @apply relative grid h-7 w-7 place-items-center rounded-full text-current transition duration-200;
     }
 
     .user-bottom-navigation__badge {
         @apply absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[0.56rem] font-bold leading-none text-white ring-2 ring-white dark:ring-slate-900;
     }
 
-    .user-bottom-navigation__item.is-active:not(.is-primary) .user-bottom-navigation__icon {
-        @apply bg-primary-700 text-white dark:bg-primary-300 dark:text-slate-950;
-    }
-
-    .user-bottom-navigation__item.is-primary .user-bottom-navigation__icon {
-        @apply h-[3.25rem] w-[3.25rem] border-[4px] bg-primary-600 text-white shadow-[0_16px_28px_-18px_rgba(87,148,74,0.85)] group-hover:bg-primary-700 dark:bg-primary-400 dark:text-slate-950 dark:group-hover:bg-primary-300;
-        border-color: var(--user-nav-surface);
-    }
-
-    .user-bottom-navigation__item.is-primary .user-bottom-navigation__icon svg {
-        @apply h-6 w-6;
+    .user-bottom-navigation__item.is-active .user-bottom-navigation__icon {
+        @apply bg-primary-100 text-primary-800 dark:bg-primary-950/70 dark:text-primary-100;
     }
 
     .user-bottom-navigation__label {
-        @apply relative block w-full truncate text-[0.72rem] font-semibold leading-tight tracking-normal;
-    }
-
-    .user-bottom-navigation__item.is-primary .user-bottom-navigation__label {
-        @apply -mt-0.5;
+        @apply relative block w-full truncate text-[0.68rem] font-semibold leading-tight tracking-normal;
     }
 
     .dark .user-bottom-navigation__dock {
@@ -2368,20 +2395,34 @@
 
     @media (min-width: 768px) {
         .user-bottom-navigation__dock {
-            @apply h-[4.55rem] max-w-lg px-3;
+            @apply h-[4.25rem] max-w-lg px-2;
         }
 
-        .user-bottom-navigation__item.is-primary {
-            @apply -mt-5;
-        }
-
-        .user-bottom-navigation__item.is-primary .user-bottom-navigation__icon {
-            @apply h-12 w-12;
-        }
     }
 
     body.is-native-scanning .user-bottom-navigation {
         display: none;
+    }
+
+    body.is-native-platform:not(.is-native-scanning) .user-bottom-navigation {
+        display: none;
+    }
+
+    body.is-native-platform:not(.is-native-scanning) .app-shell {
+        padding-bottom: max(1rem, calc(env(safe-area-inset-bottom) + 1rem)) !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .user-ui *,
+        .user-bottom-navigation__item,
+        .attendance-panel__cta,
+        .user-native-field__input,
+        .wfh-native-field__input {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+        }
     }
 
     .user-ui .shortcut-tile,
@@ -2441,7 +2482,7 @@
 
     .user-ui .quick-wallet-title,
     .user-ui .attendance-panel__title {
-        @apply mt-2 text-lg font-semibold tracking-tight text-slate-950 dark:text-white;
+        @apply mt-1.5 text-lg font-semibold leading-tight tracking-tight text-slate-950 dark:text-white;
     }
 
     .user-ui .quick-wallet-grid {
@@ -2451,7 +2492,7 @@
     .user-ui .quick-wallet-action,
     .user-ui .quick-wallet-more-item,
     .user-ui .quick-menu-item {
-        @apply min-h-[5rem] border-0 bg-white/60 p-3 shadow-none ring-1 ring-slate-200/70 hover:bg-white dark:bg-slate-900/50 dark:ring-slate-800/80 dark:hover:bg-slate-900/75;
+        @apply min-h-[4.75rem] border-0 bg-white/60 p-3 shadow-none ring-1 ring-slate-200/70 hover:bg-white dark:bg-slate-900/50 dark:ring-slate-800/80 dark:hover:bg-slate-900/75;
     }
 
     .user-ui .quick-wallet-action__icon,
@@ -2496,7 +2537,7 @@
     }
 
     .user-ui .attendance-panel {
-        @apply p-4;
+        @apply rounded-[1.2rem] p-4;
     }
 
     .user-ui .attendance-panel__stat,
@@ -2505,16 +2546,48 @@
         @apply border-0 bg-slate-50/80 shadow-none ring-1 ring-slate-200/70 dark:bg-slate-950/40 dark:ring-slate-800/80;
     }
 
+    .user-ui .attendance-panel__timeline {
+        @apply gap-2;
+    }
+
+    .user-ui .attendance-panel__step {
+        @apply min-h-[5.25rem] rounded-[1rem] p-3;
+    }
+
+    .user-ui .attendance-panel__step-icon {
+        @apply h-7 w-7;
+    }
+
+    .user-ui .attendance-panel__step-label {
+        @apply mt-1.5 text-[0.82rem];
+    }
+
+    .user-ui .attendance-panel__step-time {
+        @apply text-lg;
+    }
+
+    .user-ui .attendance-panel__worktime {
+        @apply rounded-[1rem] px-3 py-2;
+    }
+
+    .user-ui .attendance-panel__cta {
+        @apply min-h-[3.15rem] rounded-[1rem];
+    }
+
+    .user-ui .attendance-panel__cta-icon {
+        @apply h-8 w-8;
+    }
+
     .user-ui .user-page-header__icon {
-        @apply h-9 w-9 rounded-full border-0 bg-primary-50 text-primary-700 shadow-none ring-1 ring-primary-100 dark:bg-primary-950/40 dark:text-primary-200 dark:ring-primary-900/60;
+        @apply h-10 w-10 rounded-full border-0 bg-primary-50 text-primary-700 shadow-none ring-1 ring-primary-100 dark:bg-primary-950/40 dark:text-primary-200 dark:ring-primary-900/60;
     }
 
     .user-ui .user-page-header__title {
-        @apply text-xl font-semibold tracking-tight;
+        @apply text-xl font-semibold leading-tight tracking-tight;
     }
 
     .user-ui .user-page-header__back {
-        @apply !rounded-full !border-slate-200 !bg-white/70 !shadow-none dark:!border-slate-800 dark:!bg-slate-900/60;
+        @apply !rounded-full !border-slate-200/80 !bg-white/70 !shadow-none dark:!border-slate-800/80 dark:!bg-slate-900/60;
     }
 
     .user-ui .user-empty-state {
@@ -2599,7 +2672,7 @@
     .user-ui .user-page-body input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.ts-input),
     .user-ui .user-page-body textarea,
     .user-ui .user-page-body select {
-        @apply min-h-[3.25rem] rounded-[1.05rem] border-slate-200/80 bg-slate-50/80 text-base font-medium text-slate-950 shadow-none transition placeholder:text-slate-400 focus:border-primary-400 focus:bg-white focus:ring-4 focus:ring-primary-100/80 dark:border-slate-800 dark:bg-slate-950/45 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-primary-500 dark:focus:bg-slate-950 dark:focus:ring-primary-950/60;
+        @apply min-h-[3.25rem] rounded-[1rem] border-slate-200/80 bg-slate-50/82 text-base font-medium text-slate-950 shadow-none transition placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100/85 dark:border-slate-800 dark:bg-slate-950/45 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-primary-400 dark:focus:bg-slate-950 dark:focus:ring-primary-950/65;
         color-scheme: light dark;
     }
 
@@ -3119,6 +3192,16 @@
         padding-bottom: 1rem;
     }
 
+    body.is-native-platform.scan-attendance-route #main-content {
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        padding-top: max(4.35rem, calc(env(safe-area-inset-top) + 1.35rem));
+    }
+
+    body.is-native-platform.scan-attendance-route .scan-attendance-page {
+        padding-top: 0 !important;
+    }
+
     .scan-attendance-page .user-page-container--wide {
         max-width: 42rem;
     }
@@ -3447,18 +3530,18 @@
 
     .scan-attendance-page .scanner-header {
         border: 1px solid rgba(226, 232, 240, 0.78);
-        border-radius: 1.45rem;
+        border-radius: 1.2rem;
         background: rgba(255, 255, 255, 0.76);
-        margin-bottom: 0.85rem !important;
-        padding: 0.85rem !important;
+        margin-bottom: 0.75rem !important;
+        padding: 0.75rem !important;
         box-shadow: none;
         backdrop-filter: blur(16px);
     }
 
     .scan-attendance-page .scanner-title-icon {
         display: inline-flex;
-        width: 1.95rem;
-        height: 1.95rem;
+        width: 1.8rem;
+        height: 1.8rem;
         align-items: center;
         justify-content: center;
         border-radius: 999px;
@@ -3466,26 +3549,32 @@
         color: #2f6f32;
     }
 
+    .scan-attendance-page .scanner-title-icon svg,
+    .scan-attendance-page .location-card-icon svg {
+        width: 1rem;
+        height: 1rem;
+    }
+
     .scan-attendance-page .scanner-helper-text {
-        margin-top: 0.3rem;
-        font-size: 0.75rem;
-        line-height: 1.15rem;
+        margin-top: 0.2rem;
+        font-size: 0.72rem;
+        line-height: 1.05rem;
         color: #64748b;
     }
 
     .scan-attendance-page .scanner-camera-toggle,
     .scan-attendance-page #switch-camera-btn.scanner-camera-toggle {
         display: inline-flex;
-        min-height: 2.35rem;
+        min-height: 2.2rem;
         align-items: center;
         justify-content: center;
         gap: 0.45rem;
         border-radius: 999px;
         border: 1px solid rgba(203, 213, 225, 0.76) !important;
         background: rgba(248, 250, 252, 0.82) !important;
-        padding: 0 0.8rem;
+        padding: 0 0.7rem;
         color: #475569 !important;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 700;
         box-shadow: none !important;
         transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -3500,9 +3589,9 @@
 
     .scan-attendance-page #scanner-card .scanner-container,
     .scan-attendance-page #scanner {
-        min-height: min(calc(100vw - 2rem), 24rem);
+        min-height: min(calc(100vw - 2rem), 18.75rem);
         border: 1px solid rgba(148, 163, 184, 0.22) !important;
-        border-radius: 2rem !important;
+        border-radius: 1.35rem !important;
         background:
             radial-gradient(circle at 50% 0%, rgba(132, 204, 22, 0.12), transparent 36%),
             linear-gradient(180deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.015)) !important;
@@ -3524,8 +3613,8 @@
 
     .scan-attendance-page .scanner-placeholder__icon {
         display: inline-flex;
-        width: 3.4rem;
-        height: 3.4rem;
+        width: 2.8rem;
+        height: 2.8rem;
         align-items: center;
         justify-content: center;
         border-radius: 999px;
@@ -3534,9 +3623,9 @@
     }
 
     .scan-attendance-page .scanner-placeholder__title {
-        margin-top: 0.75rem;
+        margin-top: 0.65rem;
         display: block;
-        font-size: 0.9375rem;
+        font-size: 0.875rem;
         font-weight: 700;
         letter-spacing: -0.01em;
         color: #0f172a;
@@ -3545,8 +3634,8 @@
     .scan-attendance-page .scanner-placeholder__copy {
         margin-top: 0.25rem;
         display: block;
-        font-size: 0.75rem;
-        line-height: 1.2rem;
+        font-size: 0.72rem;
+        line-height: 1.1rem;
         color: #64748b;
     }
 
@@ -3559,17 +3648,17 @@
     .scan-attendance-page #scanner-card .scan-attendance-location-card,
     .scan-attendance-page .scan-attendance-location-card {
         border: 1px solid rgba(226, 232, 240, 0.78) !important;
-        border-radius: 1.45rem !important;
+        border-radius: 1.2rem !important;
         background: rgba(255, 255, 255, 0.76) !important;
-        padding: 0.9rem !important;
+        padding: 0.8rem !important;
         box-shadow: none !important;
         backdrop-filter: blur(16px);
     }
 
     .scan-attendance-page .location-card-icon {
         display: inline-flex;
-        width: 2.15rem;
-        height: 2.15rem;
+        width: 2rem;
+        height: 2rem;
         align-items: center;
         justify-content: center;
         border-radius: 999px;
@@ -3578,8 +3667,8 @@
     .scan-attendance-page .location-icon-button,
     .scan-attendance-page #refresh-location-btn.location-icon-button {
         display: inline-flex;
-        width: 2.15rem;
-        height: 2.15rem;
+        width: 2rem;
+        height: 2rem;
         align-items: center;
         justify-content: center;
         border: 1px solid rgba(203, 213, 225, 0.7) !important;
@@ -3592,7 +3681,7 @@
     .scan-attendance-page .location-map-toggle,
     .scan-attendance-page #toggle-currentLocationMap-btn.location-map-toggle {
         display: inline-flex;
-        min-height: 2.15rem;
+        min-height: 2rem;
         align-items: center;
         gap: 0.35rem;
         border: 1px solid rgba(132, 204, 22, 0.26) !important;
@@ -3600,7 +3689,7 @@
         background: rgba(236, 253, 245, 0.78) !important;
         padding: 0 0.75rem;
         color: #31542a !important;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 700;
     }
 
@@ -3624,9 +3713,9 @@
     .scan-attendance-page .scan-selfie-panel,
     .scan-attendance-page .scan-processing-panel {
         border: 1px solid rgba(226, 232, 240, 0.78);
-        border-radius: 1.45rem;
+        border-radius: 1.2rem;
         background: rgba(255, 255, 255, 0.76);
-        padding: 0.95rem;
+        padding: 0.8rem;
         box-shadow: none;
         backdrop-filter: blur(16px);
     }

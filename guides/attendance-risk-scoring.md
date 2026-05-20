@@ -10,14 +10,24 @@ The production check-in/check-out flows call `AttendanceRiskScoringService`, whi
 | --- | ---: | --- |
 | `mock_location_detected` | 40 | Strong signal from native/mock-location detection. |
 | `offline_submitted` | 25 | Covers offline queue and cached location submissions. |
+| `cached_location_used` | 15 | Browser/PWA fallback used a recent cached GPS point because fresh GPS failed. |
 | `gps_accuracy_too_perfect` | 20 | Accuracy below 5 meters can indicate emulator/spoof patterns. |
 | `gps_zero_variance` | 20 | Repeated identical GPS variance is suspicious. |
 | `near_attendance_radius` | 15 | Triggered when distance is 85%-100% of checkpoint radius. |
 | `device_changed` | 15 | Includes missing device info. |
+| `device_info_missing` | 10 | Device/API client explicitly reports missing device metadata. |
 | `face_confidence_low` | 20 | Triggered below 0.65 or when face verification is failed/skipped. |
 | `qr_token_retry` | 10-25 | Retry weight is capped at 25; static QR source counts as at least one retry. |
+| `timestamp_invalid` / `timestamp_in_future` / `timestamp_anomaly` | 15-20 | Online submissions should be close to server time; offline submissions get a wider stale threshold. |
 | `check_in_too_early` | 10 | More than 120 minutes before shift start. |
 | `check_in_late` | 10 | Uses the attendance `late` status. |
+
+## Platform Coverage
+
+- Web/PWA uses browser geolocation and can mark cached location fallback when a recent known point is reused.
+- Android can additionally submit the native mock-location signal from the dedicated plugin.
+- iOS does not rely on mock-location APIs; it uses the shared backend risk context: GPS accuracy, cached/offline submission, timestamp drift, device-change metadata, face confidence, QR source, and shift timing.
+- Device API and offline sync accept the same telemetry keys so native clients can converge on one backend scoring policy.
 
 ## Thresholds
 

@@ -25,7 +25,6 @@
             'href' => route('scan'),
             'active' => request()->routeIs('scan'),
             'icon' => 'heroicon-o-qr-code',
-            'primary' => true,
         ],
         [
             'label' => __('Tasks'),
@@ -51,14 +50,14 @@
         @foreach ($items as $item)
             @php
                 $active = (bool) $item['active'];
-                $isPrimary = (bool) ($item['primary'] ?? false);
                 $badgeCount = (int) ($item['badge'] ?? 0);
             @endphp
 
             <a
                 href="{{ $item['href'] }}"
                 @if ($active) aria-current="page" @endif
-                class="group user-bottom-navigation__item {{ $active ? 'is-active' : '' }} {{ $isPrimary ? 'is-primary' : '' }}"
+                aria-label="{{ $badgeCount > 0 ? __(':label, :count unread', ['label' => $item['label'], 'count' => $badgeCount]) : $item['label'] }}"
+                class="group user-bottom-navigation__item {{ $active ? 'is-active' : '' }}"
             >
                 <span class="user-bottom-navigation__icon">
                     <x-dynamic-component :component="$item['icon']" class="h-5 w-5" />

@@ -50,7 +50,7 @@
                                             <div class="auth-input-icon" aria-hidden="true">
                                                 <x-heroicon-o-user class="h-5 w-5" />
                                             </div>
-                                            <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name"
+                                            <input id="name" name="name" type="text" value="{{ old('name') }}" required autocomplete="name"
                                                 aria-describedby="@error('name') name-error @enderror"
                                                 aria-invalid="@error('name') true @else false @enderror"
                                                 class="auth-input auth-input--icon @error('name') auth-input--error @enderror"

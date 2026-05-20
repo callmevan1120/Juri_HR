@@ -807,6 +807,12 @@ window.profilePhotoEditor = (config = {}) => ({
 let nativeBarcodeModulePromise;
 let mockLocationModulePromise;
 
+const isAndroidNativeRuntime = () =>
+    Boolean(
+        window.Capacitor?.isNativePlatform?.() &&
+        window.Capacitor?.getPlatform?.() === "android",
+    );
+
 const loadNativeBarcodeModule = () => {
     nativeBarcodeModulePromise ??= import("./services/native/barcode");
     return nativeBarcodeModulePromise;
@@ -1080,16 +1086,22 @@ window.setMapLocation = ({ location }) => {
 };
 
 window.startNativeBarcodeScanner = async (...args) => {
+    if (!isAndroidNativeRuntime()) return false;
+
     const module = await loadNativeBarcodeModule();
     return module.startNativeBarcodeScanner(...args);
 };
 
 window.stopNativeBarcodeScanner = async (...args) => {
+    if (!isAndroidNativeRuntime()) return false;
+
     const module = await loadNativeBarcodeModule();
     return module.stopNativeBarcodeScanner(...args);
 };
 
 window.switchNativeCamera = async (...args) => {
+    if (!isAndroidNativeRuntime()) return false;
+
     const module = await loadNativeBarcodeModule();
     return module.switchNativeCamera(...args);
 };

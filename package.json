@@ -42,7 +42,11 @@
         "screenshots:apk": "bash scripts/apk-page-screenshots.sh",
         "apk:smoke": "bash scripts/apk-device-smoke.sh",
         "apk:e2e:attendance": "bash scripts/apk-attendance-e2e.sh",
-        "apk:e2e:document-upload": "bash scripts/apk-document-upload-e2e.sh"
+        "apk:e2e:document-upload": "bash scripts/apk-document-upload-e2e.sh",
+        "ios:assets": "bunx capacitor-assets generate --ios --assetPath resources && bash scripts/ios-polish-splash.sh",
+        "ios:preflight": "bash scripts/ios-release-preflight.sh",
+        "ios:pages": "node scripts/ios-page-screenshots.mjs",
+        "ios:screenshot": "bash scripts/ios-simulator-screenshot.sh"
     },
     "devDependencies": {
         "@capacitor/assets": "^3.0.5",
@@ -68,6 +72,7 @@
         "@capacitor/cli": "^8.3.1",
         "@capacitor/core": "^8.3.1",
         "@capacitor/geolocation": "^8.2.0",
+        "@capacitor/ios": "^8.3.1",
         "@capacitor/splash-screen": "^8.0.1",
         "@dewakoding/capacitor-mock-location": "^1.1.1",
         "baseline-browser-mapping": "^2.10.19",

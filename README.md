@@ -4,136 +4,78 @@
 
 # PasPapan
 
-Platform kerja terpadu berbasis Laravel untuk HR, absensi aman, approval, payroll preparation, accounting foundation, CRM/operasional, kolaborasi internal, reporting, aset, dan mobile workforce.
+Satu platform kerja untuk HR, absensi, payroll preparation, operasional, CRM, accounting foundation, kolaborasi tim, approval, reporting, dan mobile workforce.
 
 [![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
 [![Livewire 4](https://img.shields.io/badge/Livewire-4-4E56A6?style=flat-square&logo=livewire&logoColor=white)](https://livewire.laravel.com)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 
 </div>
 
-> Dokumentasi utama project ini memakai Bahasa Indonesia.
+> Dokumentasi utama PasPapan memakai Bahasa Indonesia supaya gampang dipakai tim lokal, vendor implementasi, HR, finance, dan engineer.
 
-## Ringkasan
+## Kenapa PasPapan?
 
-PasPapan adalah aplikasi workforce untuk organisasi yang membutuhkan absensi mobile, HR checklist onboarding/offboarding, workflow approval, persiapan payroll, import/export, reporting, accounting foundation, CRM/operasional, kolaborasi internal, dan maintenance system dalam satu aplikasi Laravel deployable.
+PasPapan dibuat untuk perusahaan yang ingin aktivitas harian karyawan, HR, finance, dan operasional tidak tercecer di spreadsheet, chat, dan file manual.
 
-Fokus utama aplikasi:
+Yang dikejar bukan sekadar "aplikasi absensi", tapi sistem kerja yang bisa dipakai setiap hari:
 
-- absensi aman dengan GPS, foto, Face ID, static barcode, dan Dynamic QR
-- HR Checklist v2 untuk onboarding/offboarding, task dependency ringan, overdue indicator, attachment task, summary clearance, dan self-service HR Tasks
-- attendance risk scoring untuk mock location, radius boundary, device context, barcode source, face verification, offline/cached location, dan jam di luar shift
-- panel admin untuk karyawan, absensi, cuti, lembur, reimbursement, kasbon, aset, payroll, reports, settings, dan maintenance
-- self-service karyawan untuk check-in/out, koreksi absensi, cuti, lembur, reimbursement, slip gaji, dokumen, jadwal, HR tasks, dan approval tim
-- approval matrix reusable untuk reimbursement, kasbon, koreksi absensi, cuti, lembur, asset/document/payroll-sensitive workflow foundation
-- multi-company dan company branch foundation untuk isolasi data perusahaan/cabang
-- operations workspace untuk client, project, task, checklist, bukti kunjungan, dan bukti foto
-- commercial workspace untuk client, product, stock movement, quotation, invoice, sales opportunity, follow-up, dan vendor bill foundation
-- accounting workspace untuk chart of accounts, journal, AR/AP aging, cashflow, ledger detail, export Excel, dan closing period
-- collaboration workspace untuk admin dan user: thread chat personal/grup/proyek, upload file kerja private dengan secure download policy, link online meeting, dan optional realtime update di VPS
-- command center untuk pending approval, overdue HR task, attendance risk, payroll readiness, profile completeness, dan contract expiry
-- custom form builder untuk request/form operasional yang bisa berubah tanpa migration baru
-- WFH request dan leave entitlement untuk alokasi/expiry cuti
-- payroll Indonesia foundation untuk period bulanan/mingguan/harian, BPJS, PPh21 TER/Coretax metadata, payment instruction, dan workbook export
-- generic attendance integration API untuk mesin absensi/gateway seperti Solution atau SBG
-- import/export background dengan progress run, ringkasan sukses/error, download hasil, dan cleanup otomatis
-- operational health dashboard untuk queue, scheduler, backup, disk, database, cache/session/queue driver, app version, Reverb/polling, dan license status
-- wrapper Android berbasis Capacitor untuk kebutuhan APK
-- modul enterprise-gated untuk fitur lanjutan tertentu
+- HR bisa mengurus karyawan, kontrak, checklist onboarding/offboarding, dokumen, cuti, lembur, dan approval.
+- Karyawan bisa clock in/out dari web/APK, mengajukan cuti, reimbursement, kasbon, WFH, koreksi absensi, dan melihat slip/dokumen.
+- Manager bisa memantau approval, risiko absensi, pekerjaan tim, checklist, dan tugas operasional.
+- Finance bisa menyiapkan payroll, payment instruction, reimbursement/kasbon, invoice, aging, dan laporan dasar.
+- Operasional bisa mengelola client, project, tugas, checklist, bukti kunjungan, stock, quotation, invoice, dan follow-up sales.
 
-Detail fitur lengkap ada di [guides/features.md](./guides/features.md). Panduan integrasi mesin absensi ada di [guides/attendance-integration.md](./guides/attendance-integration.md). Baseline stack modern ada di [guides/modern-stack.md](./guides/modern-stack.md). Coverage roadmap menuju 10/10 ada di [guides/roadmap-10-coverage.md](./guides/roadmap-10-coverage.md). Checklist rilis publik tersedia di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
-Evidence bundle untuk reviewer tersedia di [guides/reviewer-evidence.md](./guides/reviewer-evidence.md).
+## Cakupan Fitur
 
-Fokus pengembangan saat ini adalah pematangan fitur yang sudah ada: logic correctness, security, data integrity, UX polish, test coverage, dan operational readiness. Modul baru tidak menjadi prioritas kecuali langsung memperkuat flow existing. Detail prinsip kerja ada di [guides/feature-maturity.md](./guides/feature-maturity.md).
+| Area | Yang Tersedia |
+| --- | --- |
+| HR & Employee | data karyawan, divisi/jabatan/level, direct manager, employee lifecycle, dokumen, HR checklist, clearance summary |
+| Absensi Pintar | GPS, foto, Face ID, static barcode, Dynamic QR, offline/cached location, risk scoring, koreksi absensi |
+| Approval | cuti, lembur, reimbursement, kasbon, attendance correction, shift swap, HR task, approval matrix foundation |
+| Payroll | payroll period bulanan/mingguan/harian, komponen payroll, BPJS/PPh21/Coretax metadata, THR/prorata foundation, payment instruction, payslip PDF |
+| Finance | reimbursement, expense, kasbon/simpan pinjam foundation, AR/AP aging, cashflow, journal, ledger, closing period, tax filing workflow |
+| Operasional & CRM | branch, client, project, task, checklist, bukti kunjungan/foto, product, stock, quotation, invoice, vendor bill, sales tracking |
+| Collaboration | thread personal/grup/proyek, private cloud file, secure download policy, meeting link, optional realtime via Reverb |
+| Reporting | dashboard admin, KPI/analytics, Excel/PDF export, import/export background, operational health |
+| Mobile | PWA, Android Capacitor APK, iOS Capacitor project dengan simulator preflight |
+| Security | RBAC, policy/gate, private attachment, audit trail, multi-company isolation, enterprise feature lock |
 
-## Stack
+Detail lengkap ada di [guides/features.md](./guides/features.md).
 
+## Untuk Siapa?
+
+- UMKM yang butuh absensi + HR + payroll preparation dalam satu sistem.
+- Perusahaan lapangan yang butuh bukti lokasi, foto, QR, dan risk scoring.
+- Konsultan/vendor yang mengelola banyak perusahaan/cabang.
+- Tim operasional yang ingin client, project, task, checklist, invoice, dan laporan berada dalam sistem yang sama.
+- Engineer Laravel yang butuh baseline aplikasi produksi dengan test, RBAC, queue, scheduler, dan deployment docs.
+
+## Stack Resmi
+
+- PHP `8.3+`; PHP `8.4` direkomendasikan
 - Laravel `13`
-- PHP `8.3+` minimum; PHP `8.4` direkomendasikan
 - Livewire `4`
-- Tailwind CSS `4`
+- Tailwind CSS `4` dengan CSS-first config di `resources/css/app.css`
 - Vite `7`
 - Node.js `20+`
 - Bun `1.3.6+`
 - PostgreSQL `15+` sebagai default local/VPS
-- Pest untuk test suite
-- Capacitor `8`
-- Android SDK `35` dengan minimum Android API `24`
+- Queue/cache/session database-backed
+- Capacitor `8` untuk Android dan iOS wrapper
 
-Runtime default aplikasi database-centric:
+Panduan stack ada di [guides/modern-stack.md](./guides/modern-stack.md).
 
-- `DB_CONNECTION=pgsql`
-- `QUEUE_CONNECTION=database`
-- `CACHE_STORE=database`
-- `SESSION_DRIVER=database`
-- `FILESYSTEM_DISK=local`
-- `FILESYSTEM_ATTACHMENT_DISKS=local`
-- realtime: Reverb WebSocket di VPS, polling fallback hanya untuk degraded mode
-- timezone `Asia/Jakarta`
-- locale `id`
+## Target Deployment
 
-Baseline runtime resmi PasPapan adalah PHP 8.3+. PHP 8.4 direkomendasikan untuk production baru karena dukungan platform lebih panjang dan performa runtime lebih segar. Stack framework resmi saat ini adalah Laravel 13 + Livewire 4.
+| Target | Status | Keterangan |
+| --- | --- | --- |
+| VPS | Production penuh | Target utama: PostgreSQL, queue worker, scheduler, storage privat, backup, Reverb, import/export panjang |
+| Vercel | Demo/staging ringan | Serverless, queue sync, storage `/tmp` sementara, tanpa worker/scheduler long-running |
+| Shared hosting | Legacy/best-effort | Bisa untuk instalasi kecil tertentu, tetapi bukan baseline fitur penuh |
 
-Target production resmi sekarang adalah VPS dengan PostgreSQL 15+ sebagai default. Deployment MySQL/MariaDB tetap tersedia sebagai compatibility path untuk provider managed database tertentu, tetapi bukan baseline utama; lihat [Database Portability](./guides/database-portability.md).
-
-Vercel memakai runtime serverless, jadi default production-nya berbeda dari VPS penuh:
-
-- `SESSION_DRIVER=cookie`
-- `CACHE_STORE=array`
-- `QUEUE_CONNECTION=sync`
-- `LOG_CHANNEL=stderr`
-- `APP_STORAGE_PATH=/tmp/storage`
-- `BROADCAST_CONNECTION=log`
-
-Gunakan [`.env.vercel.example`](./.env.vercel.example) sebagai template environment Vercel. Jangan memakai `SESSION_DRIVER=database`, `CACHE_STORE=database`, atau `QUEUE_CONNECTION=database` di Vercel kecuali ada worker/cache eksternal yang memang sudah disiapkan.
-
-## Rilis Terbaru
-
-Rilis terbaru: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0)
-
-- APK Android: [`PasPapan-v4.3.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk)
-- Checksum APK: [`PasPapan-v4.3.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk.sha256)
-- Changelog: [`CHANGELOG.md`](./CHANGELOG.md)
-- ID aplikasi Android: `com.pandanteknik.paspapan`
-- Versi Android: `4.3.0` (`versionCode 43`)
-
-Sorotan `v4.3.0`:
-
-- security matrix, multi-company isolation guard, private attachment policy, dan CI security scanning diperluas
-- Playwright smoke workflow dan Android smoke/E2E tersedia untuk regresi utama
-- screenshot katalog menu diperbarui menjadi 62 halaman untuk desktop dan APK
-- source review enterprise dipisahkan dari artifact runtime obfuscated melalui `.gitattributes` dan panduan packaging
-
-Sorotan branch `chore/major-upgrade-audit`:
-
-- Laravel 13, Livewire 4, Tailwind CSS 4, Vite 7, PHP 8.3+, Node 20+, Bun 1.3.6+, dan Capacitor 8 sudah menjadi baseline modern stack.
-- Foundation produk diperluas ke multi-company/branch, operations workspace, commercial/CRM workspace, accounting workspace, collaboration workspace, custom form builder, leave entitlement, WFH request, command center, dan payroll period/Coretax export.
-- Evidence terakhir: `php artisan test` pass `505` tests / `10246` assertions setelah enterprise obfuscator salted dijalankan ulang, `composer check:enterprise-boundary`, `composer phpstan`, Pint, composer/bun audit, `bun run build`, `php artisan rbac:audit`, browser smoke, APK smoke, APK attendance E2E, dan APK document upload E2E pass.
-- Commit evidence terbaru: `99cde52` untuk screenshot APK smoke, `0ed8b9f` untuk refresh dokumen release evidence, `c4d69fe` untuk sinkronisasi README, `e5063be` untuk refresh salted enterprise artifacts, dan `df23827` untuk enterprise boundary gate docs.
-
-## Enterprise Offline
-
-Rilis ini memperkuat mode enterprise offline tanpa server lisensi:
-
-- lisensi bertanda tangan mendukung allow-all atau daftar fitur spesifik
-- gate enterprise mengecek fitur per modul, bukan hanya status lisensi global
-- validasi lisensi memakai cache request dan cache aplikasi agar menu/gate tidak mem-parse lisensi berulang
-- runtime enterprise sudah dioptimalkan agar proteksi offline tidak membuat halaman admin lambat
-- komponen internal penerbitan lisensi tidak disertakan pada deployment klien
-
-## HR Checklist
-
-Modul `HR Checklists` membantu HR UMKM memastikan onboarding dan offboarding tidak bergantung pada ingatan manual.
-
-- Admin/HR membuka `Master Data > HR Checklists` untuk membuat case onboarding atau offboarding.
-- Template default dibuat otomatis untuk onboarding dan offboarding.
-- Task dapat ditugaskan ke HR, karyawan, atau atasan langsung karyawan.
-- Task menampilkan overdue indicator, dependency sederhana, dan attachment privat bila task membutuhkan bukti dokumen.
-- Karyawan dan manager membuka `HR Tasks` dari quick action untuk menyelesaikan task mereka.
-- Summary completion/clearance membantu HR melihat kesiapan onboarding/offboarding.
-- RBAC memakai permission `admin.hr_checklists.view` dan `admin.hr_checklists.manage`.
-- Semua label UI tersedia di `lang/id.json` dan `lang/en.json`.
+Panduan lengkap ada di [guides/deployment.md](./guides/deployment.md). Operasi harian ada di [guides/operations.md](./guides/operations.md).
 
 ## Quick Start
 
@@ -145,6 +87,7 @@ php -v
 node -v
 bun --version
 composer check-platform-reqs
+
 composer install
 bun install
 cp .env.example .env
@@ -153,17 +96,6 @@ php artisan migrate --seed
 php artisan storage:link
 ```
 
-Seeder default mengisi master data aman secara idempotent, termasuk dataset wilayah Indonesia dari `database/data/wilayah.sql.gz`. Operasional harian dan automation tidak boleh melakukan refresh/truncate lewat seeder; jika dataset perlu diganti total, jalankan runbook migration/restore terpisah dengan backup, staging rehearsal, dan approval.
-
-Untuk setup yang lebih eksplisit:
-
-```bash
-php artisan paspapan:seed-real
-php artisan paspapan:seed-fake
-```
-
-`paspapan:seed-real` hanya mengisi master data production-safe. `paspapan:seed-fake` mengisi data demo/fake untuk menu HR, attendance, finance, operations, commercial, accounting, dan custom forms; jangan jalankan di production kecuali environment demo/staging terkontrol.
-
 Jalankan aplikasi:
 
 ```bash
@@ -171,10 +103,10 @@ php artisan serve
 bun run dev
 ```
 
-Opsional untuk tes background job lokal:
+Worker lokal jika ingin menguji background job:
 
 ```bash
-php artisan queue:work database --queue=maintenance,default
+php artisan queue:work database --queue=maintenance,default --tries=3 --timeout=1800
 ```
 
 ## Environment Minimal
@@ -198,119 +130,45 @@ QUEUE_CONNECTION=database
 SESSION_DRIVER=database
 CACHE_STORE=database
 BROADCAST_CONNECTION=log
+FILESYSTEM_ATTACHMENT_DISKS=local
+```
+
+## Seeder
+
+Seeder default bersifat idempotent dan production-safe untuk master data.
+
+```bash
+php artisan paspapan:seed-real
+php artisan paspapan:seed-fake
+```
+
+- `paspapan:seed-real` untuk master data nyata.
+- `paspapan:seed-fake` untuk demo/staging.
+- Jangan melakukan refresh/truncate database production kecuali operator sengaja menjalankan runbook restore/migration dengan backup.
+
+## Realtime
+
+Local/default bisa memakai log/polling:
+
+```dotenv
+BROADCAST_CONNECTION=log
 ANNOUNCEMENT_REFRESH_MODE=auto
-ANNOUNCEMENT_POLL_INTERVAL=60s
 COLLABORATION_REALTIME_ENABLED=false
 ```
 
-## Realtime Hybrid
-
-PasPapan mendukung dua mode announcement/notification refresh dan collaboration update:
-
-- VPS: gunakan `BROADCAST_CONNECTION=reverb`. Aplikasi memakai Laravel Reverb + Echo sehingga announcement baru dan update collaboration workspace dikirim lewat WebSocket. Aktifkan `COLLABORATION_REALTIME_ENABLED=true` di deployment WebSocket-ready. Mode `auto` tetap fallback ke polling kalau driver/key Reverb belum lengkap, jadi local install tidak akan kehilangan refresh.
-- Degraded mode: gunakan `BROADCAST_CONNECTION=log` dengan `ANNOUNCEMENT_REFRESH_MODE=auto` hanya untuk staging ringan atau troubleshooting tanpa WebSocket.
-
-Contoh local Reverb smoke:
-
-Generate key lokal:
+VPS production bisa memakai Reverb:
 
 ```bash
-php -r 'echo "REVERB_APP_ID=local-".bin2hex(random_bytes(6)).PHP_EOL; echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
-```
-
-```dotenv
-BROADCAST_CONNECTION=reverb
-ANNOUNCEMENT_REFRESH_MODE=auto
-COLLABORATION_REALTIME_ENABLED=true
-REVERB_APP_ID=local-<random>
-REVERB_APP_KEY=<random-hex>
-REVERB_APP_SECRET=<random-hex>
-REVERB_HOST=127.0.0.1
-REVERB_PORT=8080
-REVERB_SCHEME=http
-REVERB_SERVER_HOST=0.0.0.0
-REVERB_SERVER_PORT=8080
-```
-
-Contoh production VPS Reverb:
-
-Generate key production di server/CI secret manager, lalu simpan hanya di `.env` production:
-
-```bash
-php -r 'echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
-```
-
-```dotenv
-BROADCAST_CONNECTION=reverb
-ANNOUNCEMENT_REFRESH_MODE=auto
-COLLABORATION_REALTIME_ENABLED=true
-REVERB_APP_ID=paspapan-production
-REVERB_APP_KEY=<random-hex>
-REVERB_APP_SECRET=<random-hex>
-REVERB_HOST=your-domain.com
-REVERB_PORT=443
-REVERB_SCHEME=https
-REVERB_SERVER_HOST=0.0.0.0
-REVERB_SERVER_PORT=8080
-```
-
-Di VPS jalankan proses long-running:
-
-```bash
-php artisan queue:work database --queue=maintenance,default --tries=3 --timeout=1800
+php -r 'echo "REVERB_APP_ID=paspapan-".bin2hex(random_bytes(6)).PHP_EOL; echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
 php artisan reverb:start
-```
-
-## Deployment
-
-Target produksi paling lengkap adalah VPS karena PasPapan memakai queue worker, scheduler, storage lokal, dan background job.
-
-Panduan deployment dipisahkan di [guides/deployment.md](./guides/deployment.md):
-
-- VPS dengan Nginx/Apache, Supervisor/systemd, cron, PostgreSQL, dan Reverb
-- Vercel memakai [`vercel-community/php`](https://github.com/vercel-community/php)
-
-Ringkasan target deploy:
-
-| Target | Status | Catatan |
-| --- | --- | --- |
-| VPS | Production penuh | Target utama dan baseline resmi: PostgreSQL 15+, queue worker, scheduler, storage lokal/private, backup, Reverb, dan job background panjang. |
-| Vercel | Demo/staging/ringan | Aman untuk demo serverless; queue `sync`, storage `/tmp` ephemeral, tanpa scheduler/worker permanen, dan tidak cocok untuk backup/file-heavy production. |
-| Shared hosting | Legacy/best-effort | Tidak lagi menjadi target utama karena fitur penuh membutuhkan worker, scheduler, storage privat stabil, backup, dan WebSocket. |
-
-File pendukung Vercel yang sudah tersedia:
-
-- [`vercel.json`](./vercel.json)
-- [`api/index.php`](./api/index.php)
-- [`api/php.ini`](./api/php.ini)
-- [`.env.vercel.example`](./.env.vercel.example)
-- [`.vercelignore`](./.vercelignore)
-
-Catatan Vercel: set semua environment variable lewat Vercel Dashboard atau CLI, lalu redeploy. Gunakan managed PostgreSQL untuk default baru.
-
-## Operasi
-
-Panduan operasional ada di [guides/operations.md](./guides/operations.md):
-
-- queue dan scheduler
-- backup dan maintenance
-- import/export run retention
-- workflow update
-- testing dan quality check
-- Android build
-- catatan produksi
-
-Command yang paling sering dipakai:
-
-```bash
 php artisan queue:work database --queue=maintenance,default --tries=3 --timeout=1800
-php artisan schedule:run
-php artisan queue:failed
-php artisan queue:retry all
-php artisan queue:restart
 ```
 
-## Testing
+Detail ada di [guides/operations.md](./guides/operations.md).
+
+## Quality Gate
+
+Command yang paling sering dipakai sebelum merge/rilis:
 
 ```bash
 php artisan test
@@ -326,53 +184,69 @@ bun run build
 php artisan rbac:audit
 ```
 
-Smoke database lintas engine:
-
-```bash
-composer check:database-portability:sqlite
-PASPAPAN_PG_USER=lutuk PASPAPAN_PG_ADMIN_DB=absensi composer check:database-portability:pgsql
-# optional managed MySQL compatibility path:
-# PASPAPAN_MYSQL_USER=root PASPAPAN_MYSQL_PASSWORD=<password> composer check:database-portability:mysql
-```
-
-Smoke dan screenshot tambahan:
+Smoke tambahan:
 
 ```bash
 bun run e2e:smoke
-bun run screenshots:desktop
-bun run screenshots:apk
 bun run apk:smoke
 bun run apk:e2e:attendance
-bun run apk:e2e:document-upload
+bun run ios:preflight
 ```
 
-Screenshot katalog saat ini berisi 62 halaman menu/page untuk desktop dan APK. Manifest berada di:
+Checklist rilis ada di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
 
-- [`screenshots/desktop-pages/manifest.json`](./screenshots/desktop-pages/manifest.json)
-- [`screenshots/apk-pages/manifest.json`](./screenshots/apk-pages/manifest.json)
+## Mobile
 
-Evidence APK terakhir:
+- Android APK memakai Capacitor.
+- iOS project sudah tersedia untuk simulator preflight.
+- Icon dan splash diambil dari `resources/icon.png` dan `resources/splash.png`.
+- iOS belum diklaim App Store/TestFlight-ready sampai signing, provisioning, TestFlight upload, dan smoke test iPhone fisik selesai.
 
-- `screenshots/apk-device-smoke.png`
-- `screenshots/apk-attendance-e2e.png`
-- `screenshots/apk-document-upload-e2e.png`
+Panduan iOS ada di [guides/ios-release.md](./guides/ios-release.md).
+
+## Dokumentasi
+
+Mulai dari [guides/README.md](./guides/README.md) untuk mencari dokumen yang tepat.
+
+Jalur cepat:
+
+- [Fitur produk](./guides/features.md)
+- [Deployment](./guides/deployment.md)
+- [Operasi harian](./guides/operations.md)
+- [Security model](./guides/security-model.md)
+- [Database portability](./guides/database-portability.md)
+- [Attendance integration API](./guides/attendance-integration.md)
+- [Feature maturity](./guides/feature-maturity.md)
+- [Reviewer evidence](./guides/reviewer-evidence.md)
+
+## Rilis
+
+Rilis terbaru stabil: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0)
+
+- APK: [`PasPapan-v4.3.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk)
+- Checksum: [`PasPapan-v4.3.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk.sha256)
+- Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
 ## Demo
 
-Gunakan platform di sandbox simulasi terbatas.
+Demo publik, jika aktif:
 
-Link akses:
+- [paspapan.vercel.app](https://paspapan.vercel.app)
+- [paspapan.pandanteknik.com](https://paspapan.pandanteknik.com)
 
-- Demo Vercel: [paspapan.vercel.app](https://paspapan.vercel.app)
-- Demo produksi: [paspapan.pandanteknik.com](https://paspapan.pandanteknik.com)
+Kredensial demo tidak dipublikasikan di README. Operator dapat membuat akun demo khusus di local/staging. Jangan memakai akun demo atau password contoh untuk production.
 
-Akun demo:
-| Role | Email Login | Password |
-| --- | --- | --- |
-| Admin | `admin123@paspapan.com` | `12345678` |
-| User | `user123@paspapan.com` | `12345678` |
+## Enterprise
 
-Akun demo hanya boleh dipakai untuk environment lokal/staging atau demo publik yang sengaja disiapkan oleh operator. Kredensial di atas adalah kredensial demo dan tidak boleh digunakan ulang sebagai kredensial produksi. Demo Vercel berjalan di runtime serverless, sehingga fitur yang bergantung pada worker/background job panjang, storage lokal permanen, atau proses realtime long-running harus diuji di deployment VPS.
+Repository open source harus bisa `composer install` dan boot tanpa `ENTERPRISE_OBFUSCATOR_KEY`.
+
+Fitur enterprise yang dibuild sebagai artifact obfuscated salted dapat membutuhkan `ENTERPRISE_OBFUSCATOR_KEY` di runtime customer. `ENTERPRISE_LICENSE_KEY` hanya untuk validasi lisensi fitur, bukan secret obfuscator.
+
+Panduan packaging ada di [guides/enterprise-packaging.md](./guides/enterprise-packaging.md).
+
+## Kontribusi
+
+Baca [CONTRIBUTING.md](./CONTRIBUTING.md), [SECURITY.md](./SECURITY.md), dan [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
 ## Dukung Pengembangan
 

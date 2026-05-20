@@ -54,6 +54,7 @@ class AdminDashboardPresenter
             'chartData' => $chartData,
             'overdueUsers' => $dashboard['overdueUsers'],
             'calendarLeaves' => $dashboard['calendarLeaves'],
+            'platformSignals' => $dashboard['platformSignals'] ?? [],
             'pendingLeavesCount' => $dashboard['pendingLeavesCount'],
             'pendingReimbursementsCount' => $dashboard['pendingReimbursementsCount'],
             'pendingOvertimesCount' => $dashboard['pendingOvertimesCount'],

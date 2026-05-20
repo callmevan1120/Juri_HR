@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\AccountingAccount;
 use App\Models\AccountingPeriodClosing;
+use App\Models\AccountingTaxFiling;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -223,6 +224,116 @@ class AccountingWorkspaceService
     {
         return AccountingPeriodClosing::query()
             ->with(['company:id,name', 'closedBy:id,name', 'reopenedBy:id,name'])
+            ->whereIn('company_id', $companyIds)
+            ->latest('period_end')
+            ->latest()
+            ->limit(20)
+            ->get();
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function prepareTaxFiling(User $actor, array $data): AccountingTaxFiling
+    {
+        $companyId = (int) $data['company_id'];
+        $this->assertCompanyAccess($actor, $companyId);
+
+        $periodStart = Carbon::parse($data['period_start'])->toDateString();
+        $periodEnd = Carbon::parse($data['period_end'])->toDateString();
+
+        abort_if($periodEnd < $periodStart, 422, 'Tax filing period end must be after period start.');
+
+        $taxSummary = $this->taxSummaryForCompanies([$companyId], $periodStart, $periodEnd);
+        $inputTax = round((float) ($data['input_tax'] ?? 0), 2);
+        abort_if($inputTax < 0, 422, 'Input tax cannot be negative.');
+
+        $outputTax = round((float) $taxSummary['issued_tax'], 2);
+
+        return AccountingTaxFiling::query()->updateOrCreate([
+            'company_id' => $companyId,
+            'period_start' => $periodStart,
+            'period_end' => $periodEnd,
+            'tax_type' => $data['tax_type'] ?? AccountingTaxFiling::TYPE_PPN_OUTPUT,
+        ], [
+            'taxable_turnover' => $taxSummary['issued_subtotal'],
+            'output_tax' => $outputTax,
+            'input_tax' => $inputTax,
+            'net_tax_payable' => round(max(0, $outputTax - $inputTax), 2),
+            'status' => AccountingTaxFiling::STATUS_DRAFT,
+            'prepared_by' => $actor->id,
+            'prepared_at' => now(),
+            'filing_reference' => null,
+            'payment_reference' => null,
+            'notes' => $data['notes'] ?? null,
+            'metadata' => [
+                'invoice_count' => $taxSummary['invoice_count'],
+                'taxable_invoice_count' => $taxSummary['taxable_invoice_count'],
+                'posted_tax_payable' => $taxSummary['posted_tax_payable'],
+                'unposted_tax' => $taxSummary['unposted_tax'],
+                'tax_rates' => $taxSummary['tax_rates']->all(),
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function markTaxFilingFiled(User $actor, AccountingTaxFiling|int $filing, array $data = []): AccountingTaxFiling
+    {
+        $filing = $filing instanceof AccountingTaxFiling
+            ? $filing
+            : AccountingTaxFiling::query()->findOrFail($filing);
+
+        $this->assertCompanyAccess($actor, $filing->company_id);
+
+        abort_if($filing->status === AccountingTaxFiling::STATUS_PAID, 422, 'Paid tax filings cannot be re-filed.');
+
+        $filing->forceFill([
+            'status' => AccountingTaxFiling::STATUS_FILED,
+            'filed_by' => $actor->id,
+            'filed_at' => now(),
+            'filing_reference' => $data['filing_reference'] ?? $filing->filing_reference,
+            'notes' => $data['notes'] ?? $filing->notes,
+        ])->save();
+
+        return $filing->fresh(['company:id,name', 'preparedBy:id,name', 'filedBy:id,name', 'paidBy:id,name']);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function markTaxFilingPaid(User $actor, AccountingTaxFiling|int $filing, array $data = []): AccountingTaxFiling
+    {
+        $filing = $filing instanceof AccountingTaxFiling
+            ? $filing
+            : AccountingTaxFiling::query()->findOrFail($filing);
+
+        $this->assertCompanyAccess($actor, $filing->company_id);
+
+        abort_unless(in_array($filing->status, [AccountingTaxFiling::STATUS_DRAFT, AccountingTaxFiling::STATUS_FILED], true), 422, 'Only draft or filed tax filings can be marked paid.');
+
+        $filing->forceFill([
+            'status' => AccountingTaxFiling::STATUS_PAID,
+            'filed_by' => $filing->filed_by ?: $actor->id,
+            'filed_at' => $filing->filed_at ?: now(),
+            'paid_by' => $actor->id,
+            'paid_at' => now(),
+            'filing_reference' => $data['filing_reference'] ?? $filing->filing_reference,
+            'payment_reference' => $data['payment_reference'] ?? $filing->payment_reference,
+            'notes' => $data['notes'] ?? $filing->notes,
+        ])->save();
+
+        return $filing->fresh(['company:id,name', 'preparedBy:id,name', 'filedBy:id,name', 'paidBy:id,name']);
+    }
+
+    /**
+     * @return Collection<int, AccountingTaxFiling>
+     */
+    public function taxFilingsForCompanies(array $companyIds): Collection
+    {
+        return AccountingTaxFiling::query()
+            ->with(['company:id,name', 'preparedBy:id,name', 'filedBy:id,name', 'paidBy:id,name'])
             ->whereIn('company_id', $companyIds)
             ->latest('period_end')
             ->latest()

@@ -77,7 +77,7 @@ php artisan key:generate
 
 ### 2. Configure local environment
 
-Update `.env` with a working MySQL or MariaDB connection.
+Update `.env` with a working PostgreSQL connection. PostgreSQL is the default local/VPS database; MySQL/MariaDB remains a compatibility path for specific providers and should be validated with the portability checks before production use.
 
 At minimum:
 
@@ -86,12 +86,14 @@ APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://127.0.0.1:8000
 
-DB_CONNECTION=mysql
+DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=5432
 DB_DATABASE=absensi
 DB_USERNAME=your_user
 DB_PASSWORD=your_password
+DB_SCHEMA=public
+DB_SSLMODE=prefer
 ```
 
 ### 3. Run setup commands
@@ -140,8 +142,8 @@ When opening a pull request:
 
 ## Repository Guardrails
 
-- Do not commit `docs/*.md`, `*.Source.php`, or `secure_tools/`.
-- Keep deployment paths compatible with shared hosting unless a task explicitly targets VPS-only behavior.
+- Do not commit secrets, `secure_tools/`, enterprise `*.Source.php`, or generated enterprise build artifacts.
+- Keep the default production path VPS/PostgreSQL-friendly. Shared hosting guidance is legacy/best-effort only.
 - Add or update both `lang/id.json` and `lang/en.json` for user-facing text.
 - Treat UI changes as mobile-first and verify narrow viewports.
 - Run the relevant quality checks before opening a PR:

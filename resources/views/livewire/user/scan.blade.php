@@ -507,6 +507,8 @@
             userLng: null,
             userAccuracy: null,
             gpsVariance: null,
+            cachedLocation: false,
+            platform: window.Capacitor?.getPlatform?.() || (window.Capacitor?.isNativePlatform?.() ? 'native' : 'web'),
             isRefreshing: false,
             facingMode: new URLSearchParams(window.location.search).get('camera') || 'environment',
             lastPhoto: null,
@@ -618,18 +620,32 @@
             }
         }
 
-        function syncLivewireLocation(lat, lng, accuracy = null, variance = null) {
+        function syncLivewireRiskTelemetry(partial = {}) {
+            const component = window.Livewire?.find('{{ $_instance->getId() }}');
+
+            if (!component) {
+                return;
+            }
+
+            Object.entries(partial).forEach(([key, value]) => {
+                component.set(key, value);
+            });
+        }
+
+        function syncLivewireLocation(lat, lng, accuracy = null, variance = null, cached = false) {
             state.userLat = Number(lat);
             state.userLng = Number(lng);
             state.userAccuracy = accuracy;
             state.gpsVariance = variance;
+            state.cachedLocation = cached;
 
-            if (window.Livewire) {
-                const component = window.Livewire.find('{{ $_instance->getId() }}');
-                component.set('currentLiveCoords', [state.userLat, state.userLng]);
-                component.set('gpsAccuracy', accuracy);
-                component.set('gpsVariance', variance);
-            }
+            syncLivewireRiskTelemetry({
+                currentLiveCoords: [state.userLat, state.userLng],
+                gpsAccuracy: accuracy,
+                gpsVariance: variance,
+                cachedLocation: cached,
+                platform: state.platform
+            });
         }
 
         function setSelfieLivenessStatus(message, tone = 'warning') {
@@ -1138,7 +1154,8 @@
                 cachedLocation.lat,
                 cachedLocation.lng,
                 cachedLocation.accuracy ?? null,
-                cachedLocation.variance ?? null
+                cachedLocation.variance ?? null,
+                true
             );
             updateLocationDisplay(
                 Number(cachedLocation.lat).toFixed(6),
@@ -1615,12 +1632,13 @@
                 state.gpsVariance = variance;
 
                 if (window.Livewire) {
-                    window.Livewire.find('{{ $_instance->getId() }}')
-                        .set('currentLiveCoords', [state.userLat, state.userLng]);
-                    window.Livewire.find('{{ $_instance->getId() }}')
-                        .set('gpsAccuracy', accuracy);
-                    window.Livewire.find('{{ $_instance->getId() }}')
-                        .set('gpsVariance', variance);
+                    syncLivewireRiskTelemetry({
+                        currentLiveCoords: [state.userLat, state.userLng],
+                        gpsAccuracy: accuracy,
+                        gpsVariance: variance,
+                        cachedLocation: false,
+                        platform: state.platform
+                    });
                 }
 
                 updateLocationDisplay(lat, lng);
@@ -1885,6 +1903,7 @@
                 return Boolean(
                     !new URLSearchParams(window.location.search).has('apk_screenshot') &&
                     window.Capacitor?.isNativePlatform?.() &&
+                    window.Capacitor?.getPlatform?.() === 'android' &&
                     typeof window.startNativeBarcodeScanner === 'function' &&
                     typeof window.stopNativeBarcodeScanner === 'function'
                 );

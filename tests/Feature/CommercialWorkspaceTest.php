@@ -369,13 +369,101 @@ test('commercial pipeline tracks opportunities follow ups and stage summary', fu
 
     $summary = app(CommercialWorkspaceService::class)->salesSummaryForCompanies([$company->id]);
 
-    expect($opportunity->refresh()->stage)->toBe(SalesOpportunity::STAGE_WON)
+    $lostOpportunity = app(CommercialWorkspaceService::class)->createOpportunity($superadmin, [
+        'company_id' => $company->id,
+        'title' => 'Lost comparison deal',
+        'stage' => SalesOpportunity::STAGE_LOST,
+        'expected_value' => 2500000,
+    ]);
+
+    expect($lostOpportunity->stage)->toBe(SalesOpportunity::STAGE_LOST)
+        ->and($opportunity->refresh()->stage)->toBe(SalesOpportunity::STAGE_WON)
         ->and($opportunity->probability)->toBe(100)
         ->and($opportunity->project_id)->toBe($project->id)
         ->and(SalesFollowUp::query()->where('sales_opportunity_id', $opportunity->id)->count())->toBe(1)
         ->and($summary['won_value'])->toBe(12500000.0)
         ->and($summary['open_value'])->toBe(0.0)
-        ->and($summary['overdue_follow_ups'])->toBe(0);
+        ->and($summary['overdue_follow_ups'])->toBe(0)
+        ->and(app(CommercialWorkspaceService::class)->salesSummaryForCompanies([$company->id])['win_rate'])->toBe(50.0);
+});
+
+test('commercial collection summary tracks overdue and due soon receivables by company', function () {
+    $this->travelTo(now()->setDate(2026, 5, 19)->startOfDay());
+
+    $superadmin = User::factory()->admin(true)->create();
+    $companyA = app(MultiCompanyService::class)->createCompany('PT Collection A');
+    $companyB = app(MultiCompanyService::class)->createCompany('PT Collection B');
+    $clientA = Client::query()->create([
+        'company_id' => $companyA->id,
+        'name' => 'Collection Buyer A',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $clientB = Client::query()->create([
+        'company_id' => $companyB->id,
+        'name' => 'Collection Buyer B',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+
+    Invoice::query()->create([
+        'company_id' => $companyA->id,
+        'client_id' => $clientA->id,
+        'number' => 'INV-COL-A-1',
+        'status' => Invoice::STATUS_SENT,
+        'issued_at' => now()->subDays(20)->toDateString(),
+        'due_at' => now()->subDay()->toDateString(),
+        'subtotal' => 1000000,
+        'tax_total' => 0,
+        'grand_total' => 1000000,
+    ]);
+    Invoice::query()->create([
+        'company_id' => $companyA->id,
+        'client_id' => $clientA->id,
+        'number' => 'INV-COL-A-2',
+        'status' => Invoice::STATUS_SENT,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->addDays(3)->toDateString(),
+        'subtotal' => 2000000,
+        'tax_total' => 0,
+        'grand_total' => 2000000,
+    ]);
+    Invoice::query()->create([
+        'company_id' => $companyA->id,
+        'client_id' => $clientA->id,
+        'number' => 'INV-COL-A-3',
+        'status' => Invoice::STATUS_PAID,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->toDateString(),
+        'subtotal' => 3000000,
+        'tax_total' => 0,
+        'grand_total' => 3000000,
+    ]);
+    Invoice::query()->create([
+        'company_id' => $companyB->id,
+        'client_id' => $clientB->id,
+        'number' => 'INV-COL-B-1',
+        'status' => Invoice::STATUS_SENT,
+        'issued_at' => now()->subDays(20)->toDateString(),
+        'due_at' => now()->subDay()->toDateString(),
+        'subtotal' => 9000000,
+        'tax_total' => 0,
+        'grand_total' => 9000000,
+    ]);
+
+    $summary = app(CommercialWorkspaceService::class)->collectionSummaryForCompanies([$companyA->id]);
+
+    expect($summary['open_total'])->toBe(3000000.0)
+        ->and($summary['overdue_total'])->toBe(1000000.0)
+        ->and($summary['overdue_count'])->toBe(1)
+        ->and($summary['due_soon_total'])->toBe(2000000.0)
+        ->and($summary['due_soon_count'])->toBe(1)
+        ->and($summary['paid_total'])->toBe(3000000.0);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(CommercialWorkspace::class)
+        ->assertViewHas('collectionSummary', fn (array $summary): bool => $summary['overdue_total'] === 10000000.0)
+        ->set('documentCompanyId', (string) $companyA->id)
+        ->assertViewHas('collectionSummary', fn (array $summary): bool => $summary['due_soon_total'] === 2000000.0);
 });
 
 test('sales opportunities can create quotations once', function () {

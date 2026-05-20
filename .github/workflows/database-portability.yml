@@ -75,7 +75,15 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run focused PostgreSQL smoke tests
-        run: php artisan test tests/Feature/HealthEndpointTest.php tests/Feature/WilayahApiHardeningTest.php tests/Feature/AuthenticationTest.php
+        run: |
+          php artisan test \
+            tests/Feature/HealthEndpointTest.php \
+            tests/Feature/WilayahApiHardeningTest.php \
+            tests/Feature/AuthenticationTest.php \
+            tests/Feature/AdminLeaveApprovalTest.php \
+            tests/Feature/DynamicBarcodeTest.php \
+            tests/Feature/WorkFromHomeRequestFlowTest.php \
+            tests/Feature/IndonesiaPayrollCalculatorTest.php
 
   sqlite:
     name: SQLite migration smoke
@@ -123,7 +131,15 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run focused SQLite smoke tests
-        run: php artisan test tests/Feature/HealthEndpointTest.php
+        run: |
+          php artisan test \
+            tests/Feature/HealthEndpointTest.php \
+            tests/Feature/WilayahApiHardeningTest.php \
+            tests/Feature/AuthenticationTest.php \
+            tests/Feature/AdminLeaveApprovalTest.php \
+            tests/Feature/DynamicBarcodeTest.php \
+            tests/Feature/WorkFromHomeRequestFlowTest.php \
+            tests/Feature/IndonesiaPayrollCalculatorTest.php
 
   mysql:
     name: MySQL compatibility smoke
@@ -189,4 +205,12 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run focused MySQL compatibility smoke tests
-        run: php artisan test tests/Feature/HealthEndpointTest.php tests/Feature/WilayahApiHardeningTest.php tests/Feature/AuthenticationTest.php
+        run: |
+          php artisan test \
+            tests/Feature/HealthEndpointTest.php \
+            tests/Feature/WilayahApiHardeningTest.php \
+            tests/Feature/AuthenticationTest.php \
+            tests/Feature/AdminLeaveApprovalTest.php \
+            tests/Feature/DynamicBarcodeTest.php \
+            tests/Feature/WorkFromHomeRequestFlowTest.php \
+            tests/Feature/IndonesiaPayrollCalculatorTest.php

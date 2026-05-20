@@ -12,6 +12,7 @@
         "@capacitor/cli": "^8.3.1",
         "@capacitor/core": "^8.3.1",
         "@capacitor/geolocation": "^8.2.0",
+        "@capacitor/ios": "^8.3.1",
         "@capacitor/splash-screen": "^8.0.1",
         "@dewakoding/capacitor-mock-location": "^1.1.1",
         "baseline-browser-mapping": "^2.10.19",
@@ -83,6 +84,8 @@
     "@capacitor/core": ["@capacitor/core@8.3.1", "", { "dependencies": { "tslib": "^2.1.0" } }, "sha512-UF8ItlHguU1Z6GXfPTeT2gakf+ctNI8pAS1kwSBQlsJMlfD4OPoto/SmKnOxKCQvnF4WRcdWeg6C0zREUNaAQg=="],
 
     "@capacitor/geolocation": ["@capacitor/geolocation@8.2.0", "", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-N29QcoIPmme0xSxRkm7+3hjoHp6mBAOarxecvtCCZKyOBeKiJsFUq981cezg2XWBa6fhCXJMCCjQPngKK/dIag=="],
+
+    "@capacitor/ios": ["@capacitor/ios@8.3.4", "", { "peerDependencies": { "@capacitor/core": "^8.3.0" } }, "sha512-XvvnPFWWP/gwwO811ue7nEBKSZqDCIB8hxGgWV6iXA7DSVLqMOEmQdfHj94kkVxof2wL9XWHypu3ayDULo7U5w=="],
 
     "@capacitor/splash-screen": ["@capacitor/splash-screen@8.0.1", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-c/ew/Z3eA7z8l06WoRAtzVF16VwYYrExmHmfGq1Cg675pVzaC/yuucB8/1xG1vhEfnW4fZ1KhSf/kzR1RiVYgg=="],
 

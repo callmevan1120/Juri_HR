@@ -11,9 +11,9 @@
     <div class="user-page-header__row">
         <div class="user-page-header__main">
             @if ($backHref)
-                <x-actions.secondary-button href="{{ $backHref }}" class="user-page-header__back !rounded-2xl !px-3 !py-2 border-gray-200 dark:border-gray-600 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600" aria-label="{{ $backLabel ?? __('Go back') }}">
-                    <x-heroicon-o-arrow-left class="h-5 w-5 text-gray-500 dark:text-gray-300" />
-                </x-actions.secondary-button>
+                <a href="{{ $backHref }}" class="user-page-header__back" aria-label="{{ $backLabel ?? __('Go back') }}">
+                    <x-heroicon-o-arrow-left class="h-5 w-5" />
+                </a>
             @endif
 
             @isset($icon)

@@ -314,7 +314,11 @@ class CollaborationWorkspace extends Component
             ->with(['company:id,name', 'project:id,name', 'members:id,name', 'messages' => fn ($query) => $query->latest()->limit(3)])
             ->withCount('messages')
             ->whereIn('company_id', $companyIds)
-            ->when($this->search !== '', fn (Builder $query) => $query->where('title', 'like', '%'.$this->search.'%'))
+            ->when($this->search !== '', fn (Builder $query) => $query->where(function (Builder $nested): void {
+                $nested
+                    ->where('title', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('messages', fn (Builder $messageQuery) => $messageQuery->where('body', 'like', '%'.$this->search.'%'));
+            }))
             ->latest()
             ->get();
 
