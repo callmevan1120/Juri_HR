@@ -11,7 +11,8 @@
         "esbuild": "^0.27.0",
         "@xmldom/xmldom": "^0.8.13",
         "postcss": "^8.5.10",
-        "uuid": "^14.0.0"
+        "uuid": "^14.0.0",
+        "ws": "^8.20.1"
     },
     "overrides": {
         "esbuild": "^0.27.0",
@@ -31,10 +32,12 @@
         "glob": "^10.5.0",
         "handlebars": "^4.7.9",
         "micromatch": "^4.0.8",
-        "picomatch": "^2.3.2"
+        "picomatch": "^2.3.2",
+        "ws": "^8.20.1"
     },
     "scripts": {
         "dev": "vite",
+        "dev:local": "bun scripts/dev-local.mjs",
         "build": "rm -f public/hot && BROWSERSLIST_IGNORE_OLD_DATA=true vite build",
         "evidence:review": "bash scripts/collect-review-evidence.sh",
         "e2e:smoke": "bunx playwright test tests/e2e/main-smoke.spec.ts",

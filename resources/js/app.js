@@ -1,5 +1,6 @@
 import "./bootstrap";
 import TomSelect from "tom-select";
+import "tom-select/dist/css/tom-select.css";
 import flatpickr from "flatpickr";
 import Swal from "sweetalert2";
 import Chart from "chart.js/auto";

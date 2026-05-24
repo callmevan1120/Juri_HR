@@ -143,9 +143,10 @@ return [
             'status' => 'release_candidate',
             'evidence' => [
                 'tests/e2e/main-smoke.spec.ts',
-                'screenshots/apk-device-smoke.png',
-                'screenshots/apk-attendance-e2e.png',
-                'screenshots/apk-document-upload-e2e.png',
+                'scripts/apk-device-smoke.sh',
+                'scripts/apk-attendance-e2e.sh',
+                'scripts/apk-document-upload-e2e.sh',
+                'screenshots/apk-pages/06-user-scan.png',
             ],
             'gaps' => [
                 'Android is usable, but release-candidate device matrix must still run before every production release.',

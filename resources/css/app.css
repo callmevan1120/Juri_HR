@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tom-select/dist/css/tom-select.css" layer(base);
 @import "flatpickr/dist/flatpickr.css";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
