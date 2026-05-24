@@ -281,8 +281,12 @@ async function capturePage(cdp, page, index) {
   await waitForPageReady(cdp);
 
   if (page.readyExpression) {
-    await cdp.waitFor(page.readyExpression, `${page.label} ready state`);
-    await delay(settleMs);
+    try {
+      await cdp.waitFor(page.readyExpression, `${page.label} ready state`);
+      await delay(settleMs);
+    } catch (error) {
+      console.warn(`Readiness check timed out for ${page.slug}; capturing current rendered state. ${error.message}`);
+    }
   }
 
   if (page.afterNavigate) {
