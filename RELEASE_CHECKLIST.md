@@ -2,7 +2,7 @@
 
 Checklist publik ini dipakai sebelum membuat tag atau GitHub Release. Jangan menaruh secret, credential demo, atau detail private enterprise build di dokumen ini.
 
-Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
+Status terakhir diverifikasi lokal pada 2026-05-24 Asia/Jakarta untuk target `v5.0.0`.
 
 - `[x]` berarti sudah terbukti lewat local/dev gate, device smoke, release asset check, atau server probe.
 
@@ -14,6 +14,7 @@ Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
 - [x] Update `android/app/build.gradle` `versionName` dan `versionCode`.
 - [x] Pastikan nama APK mengikuti versi rilis.
 - [x] Pastikan link GitHub Release, nama APK, dan checksum APK sinkron di README.
+  Evidence: README menandai target `v5.0.0`, target APK `PasPapan-v5.0.0.apk`, target checksum `PasPapan-v5.0.0.apk.sha256`, Android `versionName 5.0.0`, Android `versionCode 50`, iOS `MARKETING_VERSION 5.0.0`, dan iOS `CURRENT_PROJECT_VERSION 50`.
 - [x] Pastikan baseline runtime konsisten di `composer.json`, `composer.lock`, `README.md`, `guides/deployment.md`, `guides/operations.md`, dan `guides/features.md`.
   Evidence: baseline runtime resmi adalah PHP 8.3+; PHP 8.4 direkomendasikan; stack framework resmi adalah Laravel 13 + Livewire 4.
 - [x] Pastikan baseline frontend/mobile konsisten di `package.json`, `README.md`, dan `guides/features.md`.
@@ -93,8 +94,8 @@ Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
   Evidence: release/server probe completed against the public deployment endpoint; full deploy still follows `.github/workflows/deploy.yml`.
 - [x] Jalankan smoke test staging.
   Evidence: login endpoint responded `200` over HTTPS with production security headers.
-- [x] Jalankan Release Preflight workflow dengan versi target, `versionCode`, dan artifact/checksum bila APK sudah dibuild.
-  Evidence: local release-preflight simulation passed for `4.3.0`, `versionCode 43`, `PasPapan-v4.3.0.apk`, and SHA-256 checksum.
+- [ ] Jalankan Release Preflight workflow dengan versi target, `versionCode`, dan artifact/checksum bila APK sudah dibuild.
+  Target: `5.0.0`, `versionCode 50`, `PasPapan-v5.0.0.apk`, dan SHA-256 checksum.
 - [x] Verifikasi `/public` adalah document root.
   Evidence: sensitive root probes are blocked or unavailable (`/.env` 403, `/composer.json` 404, `/storage/` 403); deployment docs still require document root to `public/`.
 - [x] Verifikasi `APP_ENV=production`, `APP_DEBUG=false`, dan secure session cookie.
@@ -108,11 +109,11 @@ Status terakhir diverifikasi lokal pada 2026-05-17 Asia/Jakarta.
 
 - [x] Untuk rilis enterprise internal saja: jalankan enterprise obfuscator salted sesuai SOP private sebelum commit artifact enterprise.
   Evidence: rilis OSS tidak boleh membutuhkan obfuscator/key saat `composer install`; artifact enterprise customer wajib dibuild salted dengan `ENTERPRISE_OBFUSCATOR_KEY`, dan runtime harus memiliki key yang sama. Obfuscator internal `php secure_tools/build_enterprise.php` sudah dijalankan ulang dalam mode salted key, `composer check:enterprise-boundary` pass, dan full `php artisan test` pass setelahnya.
-- [x] Buat tag dan GitHub Release.
-  Evidence: Git tag/release `v4.3.0` exists and is published.
-- [x] Attach APK dan checksum.
-  Evidence: release contains `PasPapan-v4.3.0.apk` and uploaded `PasPapan-v4.3.0.apk.sha256`.
+- [ ] Buat tag dan GitHub Release.
+  Target: `v5.0.0`.
+- [ ] Attach APK dan checksum.
+  Target: `PasPapan-v5.0.0.apk` dan `PasPapan-v5.0.0.apk.sha256`.
 - [x] Update release notes.
-  Evidence: GitHub Release `PasPapan v4.3.0` and `CHANGELOG.md` `4.3.0` are present.
-- [x] Post announcement.
-  Evidence: release announcement is represented by published release notes and README release section.
+  Evidence: `CHANGELOG.md` memiliki section `5.0.0` untuk major release `main-vps`.
+- [ ] Post announcement.
+  Target: umumkan `main-vps` sebagai jalur fitur lengkap dan `main` sebagai legacy/shared-hosting ringan.

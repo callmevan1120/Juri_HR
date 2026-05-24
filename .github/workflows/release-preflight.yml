@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Expected release version, for example 4.3.0"
+        description: "Expected release version, for example 5.0.0"
         required: true
       android_version_code:
-        description: "Expected Android versionCode, for example 43"
+        description: "Expected Android versionCode, for example 50"
         required: true
       apk_path:
         description: "Optional built APK path to verify filename/checksum"

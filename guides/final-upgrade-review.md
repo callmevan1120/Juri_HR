@@ -4,6 +4,7 @@ Tanggal review: 24 Mei 2026
 
 Branch sumber: `chore/major-upgrade-audit`
 Target release branch: `main-vps`
+Target release version: `v5.0.0`
 Baseline sebelum pass ini: `a2a3559`
 Release-prep commit awal: `3a6bd56`
 
@@ -14,6 +15,7 @@ Pass ini menyiapkan PasPapan sebagai track produksi VPS penuh. `main-vps` menjad
 ## Perubahan Final
 
 - Menambahkan dokumentasi branch `main-vps` di README, pusat dokumen, deployment, operations, dan changelog.
+- Menetapkan metadata rilis mayor `v5.0.0` untuk package, Android, iOS, README, changelog, dan release checklist.
 - Membuat `update.sh` branch-aware: default `main-vps`, tetap bisa `main` jika eksplisit untuk legacy.
 - Menambahkan `PASPAPAN_RELEASE_BRANCH=main-vps` ke `.env.example`.
 - Memastikan script smoke yang direferensikan fresh clone/CI ikut tracked, bukan lagi tertahan `.gitignore`.
@@ -26,6 +28,9 @@ Pass ini menyiapkan PasPapan sebagai track produksi VPS penuh. `main-vps` menjad
 | Command | Result |
 | --- | --- |
 | `composer validate` | PASS |
+| `bun install` | PASS, no changes |
+| `bun run build` | PASS |
+| Release metadata sync (`package.json`, README, changelog, Android, iOS) | PASS, `5.0.0` / `versionCode 50` / `CURRENT_PROJECT_VERSION 50` |
 | `composer check-platform-reqs` | PASS, PHP 8.3.31 dan extension required terpenuhi |
 | `composer check:modern-stack` | PASS |
 | `composer check:ui` | PASS, 0 active warning, 31 baseline legacy |
@@ -41,9 +46,7 @@ Pass ini menyiapkan PasPapan sebagai track produksi VPS penuh. `main-vps` menjad
 | `vendor/bin/pest` | PASS, 568 tests / 11094 assertions |
 | `composer phpstan` | PASS |
 | `composer audit` | PASS, no advisories |
-| `bun install` | PASS, no changes |
 | `bun audit` | PASS, no vulnerabilities |
-| `bun run build` | PASS |
 | `bun run e2e:smoke` | PASS, 3 Playwright tests |
 | `php artisan rbac:audit` | PASS, all sections OK |
 | `./vendor/bin/pint --test --dirty` | PASS |

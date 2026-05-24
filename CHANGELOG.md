@@ -4,15 +4,35 @@ Semua perubahan penting PasPapan dicatat di file ini.
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-05-24
+
+### Sorotan
+
+- Meresmikan `main-vps` sebagai jalur rilis fitur lengkap untuk production VPS, PostgreSQL-first, queue worker, scheduler, private storage, Reverb, import/export background, Android/iOS wrapper, dan modul HR/finance/ops/commercial/collaboration.
+- Menaikkan stack resmi ke PHP 8.3+, Laravel 13, Livewire 4, Tailwind CSS 4, Vite 7, Bun 1.3.6+, dan Capacitor 8.
+- Memperkuat positioning produk sebagai platform HRIS Indonesia untuk absensi online, payroll preparation, reimbursement, kasbon, approval, operasional lapangan, CRM ringan, accounting foundation, reporting, dan mobile workforce.
+- Menambahkan database portability smoke untuk SQLite, PostgreSQL, dan MySQL compatibility path, dengan fokus approval workflow, attendance media/API, WFH, Dynamic QR, payroll, auth, health, dan wilayah API.
+- Memperkuat multi-company isolation agar data karyawan, attendance, dokumen, HR checklist, import/export, report, dan dashboard tetap scoped antar perusahaan/cabang.
+- Menjalankan ulang enterprise obfuscator salted untuk artifact enterprise runtime; open-source/community install tetap bisa boot tanpa `ENTERPRISE_OBFUSCATOR_KEY`.
+
 ### Dokumentasi & Runtime
 
 - Menetapkan `main-vps` sebagai jalur fitur lengkap untuk instalasi VPS/PostgreSQL, sementara `main` tetap menjadi jalur legacy/shared-hosting ringan.
+- Menambahkan nilai jual dan kata kunci Indonesia di README agar PasPapan mudah ditemukan oleh pengguna yang mencari aplikasi absensi karyawan, HRIS Indonesia, payroll Laravel, reimbursement, kasbon, cuti/lembur/WFH, absensi GPS/foto/QR, dan aplikasi HR multi cabang.
+- Membuat `update.sh` branch-aware dengan default `main-vps` dan jalur eksplisit untuk `main` legacy.
 - Memperbaiki referensi script release/smoke yang sebelumnya masih mengarah ke file lokal ignored agar fresh clone dan CI tidak kehilangan command.
 - Memperluas database portability smoke untuk approval workflow dan attendance media/API selain WFH dan payroll.
 - Merapikan README menjadi landing page produk + teknis yang lebih mudah dicari, menambahkan pusat dokumentasi di `guides/README.md`, dan menghapus snapshot TODO/review branch yang sudah tidak relevan sebagai sumber utama.
 - Menyelaraskan dokumentasi stack resmi ke Laravel 13, Livewire 4, PHP 8.3+ minimum, dan PHP 8.4 rekomendasi.
 - Menaikkan Tailwind CSS ke versi 4 lewat plugin resmi `@tailwindcss/vite`.
 - Menghapus workaround entrypoint `E_DEPRECATED` PHP 8.5 yang sudah tidak diperlukan setelah Laravel 13 memakai constant `Pdo\Mysql::ATTR_SSL_CA`.
+
+### Mobile Release Metadata
+
+- Android `versionName`: `5.0.0`
+- Android `versionCode`: `50`
+- iOS `MARKETING_VERSION`: `5.0.0`
+- iOS `CURRENT_PROJECT_VERSION`: `50`
 
 ## [4.3.0] - 2026-05-12
 
@@ -154,6 +174,7 @@ Semua perubahan penting PasPapan dicatat di file ini.
 - Backup Center ditingkatkan dengan backup berbasis queue, riwayat backup, dan dukungan worker terjadwal.
 - Dokumentasi deployment, operasi, Android build, dan kredensial sandbox demo publik diperluas.
 
+[5.0.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0
 [4.3.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0
 [4.2.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v4.2.0
 [4.1.0]: https://github.com/RiprLutuk/PasPapan/releases/tag/v4.1.0

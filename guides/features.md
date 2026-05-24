@@ -223,7 +223,7 @@ Status implementasi fondasi:
 - Fase 4: kalkulator payroll Indonesia dan payment instruction sudah tersedia sebagai service teruji.
 - Fase 5: lifecycle, shift planning, notification preference, webhook/API integration, dan KPI service sudah tersedia sebagai foundation backend.
 - Fase 6: multi-company ringan, marketplace template HR, dan issue labels komunitas sudah tersedia sebagai foundation produk.
-- Rilis 4.3.0: screenshot katalog menu desktop/APK sudah diperluas menjadi 62 halaman, Playwright smoke masuk CI, Android attendance smoke berjalan di device ADB, dan security scan CI mencakup CodeQL PHP/JS, Semgrep, Gitleaks, serta TruffleHog.
+- Rilis 5.0.0: `main-vps` menjadi jalur fitur lengkap untuk VPS/PostgreSQL, screenshot katalog menu desktop/APK tetap menjadi evidence visual, Playwright smoke masuk CI, Android attendance smoke berjalan di device ADB, database portability smoke mencakup PostgreSQL/SQLite/MySQL compatibility, dan security scan CI mencakup CodeQL PHP/JS, Semgrep, Gitleaks, serta TruffleHog.
 - Foundation modern sudah mencakup multi-company, company branch, operations workspace, commercial/CRM workspace, accounting workspace, collaboration workspace, custom form builder, leave entitlement, WFH request, payroll period/Coretax export, command center, dan physical APK smoke evidence dengan test coverage.
 
 ### Fase 1 - Trust, Audit, dan Risiko Absensi

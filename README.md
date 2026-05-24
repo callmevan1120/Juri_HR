@@ -248,13 +248,19 @@ Jalur cepat:
 
 ## Rilis
 
-Rilis APK publik terbaru tetap: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0)
+Rilis mayor terbaru untuk branch fitur lengkap: [`v5.0.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0)
 
 Branch fitur terbaru dan paling lengkap: [`main-vps`](https://github.com/RiprLutuk/PasPapan/tree/main-vps)
 
-- APK: [`PasPapan-v4.3.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk)
-- Checksum: [`PasPapan-v4.3.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk.sha256)
+- Target APK: `PasPapan-v5.0.0.apk`
+- Target checksum: `PasPapan-v5.0.0.apk.sha256`
+- Android `versionName`: `5.0.0`
+- Android `versionCode`: `50`
+- iOS `MARKETING_VERSION`: `5.0.0`
+- iOS `CURRENT_PROJECT_VERSION`: `50`
 - Changelog: [CHANGELOG.md](./CHANGELOG.md)
+
+Catatan: artifact APK/checksum `v5.0.0` dibuat pada tahap release build. Rilis APK publik lama [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0) tetap tersedia sebagai arsip stable sebelumnya.
 
 ## Demo
 

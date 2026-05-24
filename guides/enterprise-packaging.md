@@ -34,12 +34,13 @@ Do not move `secure_tools/build_enterprise.php` or private source mirrors into `
 6. Commit only intended obfuscated enterprise runtime files, readable source changes, tests, docs, and public screenshots.
 7. Never publish the obfuscator implementation.
 
-For `v4.3.0`, the public evidence set includes:
+For `v5.0.0`, the public evidence set includes:
 
 - 62 desktop screenshots in `screenshots/desktop-pages/`
 - 62 APK screenshots in `screenshots/apk-pages/`
 - Playwright smoke workflow in `.github/workflows/e2e.yml`
 - security scan workflow in `.github/workflows/security.yml`
+- database portability workflow in `.github/workflows/database-portability.yml`
 
 The private build tool remains `secure_tools/build_enterprise.php`. It must be run before commit/release when enterprise-owned files are touched, but it must not be copied to `scripts/` or exposed in release artifacts. The tool fails closed when `ENTERPRISE_OBFUSCATOR_KEY` is missing or shorter than 32 characters, unless `ENTERPRISE_ALLOW_UNSALTED_OBFUSCATION=true` is set for a local debug-only build.
 
