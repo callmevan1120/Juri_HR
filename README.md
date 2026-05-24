@@ -24,6 +24,22 @@ Satu platform kerja untuk HR, absensi, payroll preparation, operasional, CRM, ac
 
 Untuk free/community build yang paling aman, gunakan `main-vps` di VPS kecil atau local server dengan `BROADCAST_CONNECTION=log` dulu. Fitur enterprise tetap terkunci tanpa license, tetapi fitur open-source harus bisa install dan boot tanpa `ENTERPRISE_OBFUSCATOR_KEY`.
 
+## Kenapa Pilih `main-vps`?
+
+Kalau kebutuhanmu bukan cuma absensi sederhana, `main-vps` adalah versi yang paling masuk akal untuk dipakai serius. Branch ini dibuat untuk perusahaan Indonesia yang ingin punya sistem HRIS, absensi online, payroll preparation, reimbursement, kasbon, approval, operasional, CRM ringan, accounting foundation, dan laporan dalam satu aplikasi Laravel yang bisa dikontrol sendiri di VPS.
+
+Kelebihan utama `main-vps`:
+
+- **Lebih lengkap untuk operasional harian**: tidak hanya clock in/out, tapi juga cuti, izin, lembur, WFH, reimbursement, kasbon, dokumen karyawan, HR checklist, asset, KPI, project, task, client, quotation, invoice, dan laporan.
+- **Lebih siap untuk multi cabang/multi perusahaan**: data company, branch, user, dokumen, attendance, finance, report, dan dashboard dijaga dengan company scope supaya tidak bocor antar perusahaan.
+- **Lebih cocok untuk perusahaan lapangan**: absensi bisa memakai GPS, foto, barcode, Dynamic QR, Face ID, offline submission, dan risk scoring untuk bantu deteksi lokasi mencurigakan.
+- **Lebih siap untuk HR dan finance Indonesia**: ada payroll period bulanan/mingguan/harian, metadata BPJS/PPh21/Coretax, THR/prorata foundation, payment instruction, payslip PDF, reimbursement, kasbon, dan aging/cashflow/journal foundation.
+- **Lebih kuat untuk produksi**: default VPS memakai PostgreSQL, queue worker, scheduler, private storage, backup, Reverb/WebSocket optional, import/export background, audit log, RBAC, policy/gate, dan security checklist.
+- **Lebih enak untuk vendor/implementor**: dokumentasi deploy, operations, database portability, security, release evidence, Android/iOS wrapper, dan command seed real/fake sudah dipisah.
+- **Tetap bisa dipakai free/community**: fitur open-source bisa install dan boot tanpa enterprise key; fitur enterprise tetap terkunci rapi untuk deployment berlisensi.
+
+Kata kunci yang cocok untuk menemukan PasPapan: aplikasi absensi karyawan, HRIS Indonesia, aplikasi payroll Laravel, sistem reimbursement karyawan, aplikasi kasbon karyawan, aplikasi cuti lembur WFH, absensi GPS dan foto, absensi QR code, aplikasi HR multi cabang, aplikasi operasional lapangan, aplikasi approval karyawan, aplikasi slip gaji PDF, aplikasi manajemen aset kantor, aplikasi CRM sederhana, aplikasi invoice dan quotation, aplikasi laporan Excel PDF, dan aplikasi workforce management Indonesia.
+
 ## Kenapa PasPapan?
 
 PasPapan dibuat untuk perusahaan yang ingin aktivitas harian karyawan, HR, finance, dan operasional tidak tercecer di spreadsheet, chat, dan file manual.

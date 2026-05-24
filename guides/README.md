@@ -11,6 +11,20 @@ Mulai dari halaman ini kalau bingung harus membaca file yang mana. README utama 
 
 Untuk instalasi baru, mulai dari `main-vps`. Gunakan `main` hanya jika benar-benar membutuhkan compatibility shared-hosting lama.
 
+## Nilai Jual `main-vps`
+
+`main-vps` adalah jalur yang paling cocok kalau calon pengguna mencari aplikasi HRIS Indonesia yang bisa jalan di server sendiri, bukan hanya aplikasi absensi basic. Fokusnya adalah membantu perusahaan menggabungkan HR, absensi, approval, payroll preparation, finance workflow, operasional lapangan, CRM ringan, accounting foundation, dan laporan dalam satu sistem.
+
+Yang membuat `main-vps` lebih menarik dibanding branch `main`:
+
+- fitur lebih lengkap untuk HR, finance, operasional, commercial, collaboration, reporting, Android, dan iOS
+- PostgreSQL-first untuk VPS, tetapi tetap ada portability guard untuk SQLite/MySQL compatibility
+- queue worker, scheduler, backup, private file storage, Reverb, import/export background, dan operational health dashboard
+- multi-company isolation untuk mencegah data bocor antar perusahaan/cabang
+- workflow karyawan dan manager lebih kaya: approval center, team attendance, team kasbon, WFH, reimbursement, document request, HR checklist, dan task
+- security production lebih matang: RBAC, policy/gate, private attachment, audit trail, signed backup, release checklist, dan enterprise boundary
+- lebih mudah dicari oleh pasar lokal karena fiturnya relevan dengan kebutuhan Indonesia: absensi GPS/foto/QR, cuti/lembur/WFH, reimbursement, kasbon, payroll/PPh21/Coretax foundation, slip gaji PDF, laporan Excel/PDF, dan multi cabang
+
 ## Jalur Cepat
 
 | Kebutuhan | Baca |
