@@ -369,7 +369,7 @@
 
                 <div class="w-full">
                     <div id="scanner-card-container" wire:ignore>
-                        @component('components.user.scanner-card', ['title' => __('Scan to Check Out')])
+                        @component('components.user.scanner-card', ['title' => __('Clock Out QR')])
                             @slot('headerActions')
                                 @include('components.user.shift-selector', ['disabled' => true])
                             @endslot
@@ -413,7 +413,7 @@
                 @if (!$isAbsence)
                     <div class="w-full">
                         <div id="scanner-card-container" wire:ignore>
-                            @component('components.user.scanner-card', ['title' => __('Scan QR Code')])
+                            @component('components.user.scanner-card', ['title' => __('Clock In QR')])
                                 @slot('headerActions')
                                     @include('components.user.shift-selector', ['disabled' => false])
                                 @endslot

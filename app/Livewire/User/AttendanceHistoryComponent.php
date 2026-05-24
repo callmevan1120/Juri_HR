@@ -75,7 +75,7 @@ class AttendanceHistoryComponent extends Component
                 return Attendance::filter(
                     month: $this->month,
                     userId: $user->id,
-                )->get(['id', 'status', 'date', 'latitude_in', 'longitude_in', 'latitude_out', 'longitude_out', 'attachment', 'note', 'approval_status'])->toArray();
+                )->get(['id', 'status', 'date', 'time_in', 'time_out', 'latitude_in', 'longitude_in', 'latitude_out', 'longitude_out', 'attachment', 'note', 'approval_status'])->toArray();
             }
         ) ?? [];
 

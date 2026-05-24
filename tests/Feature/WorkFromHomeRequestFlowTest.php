@@ -53,6 +53,26 @@ test('employee can submit work from home request and manager can approve it', fu
         ->and($request->reviewed_at)->not->toBeNull();
 });
 
+test('wfh request requires complete time range when hours are provided', function () {
+    $employee = User::factory()->create();
+
+    Livewire::actingAs($employee)
+        ->test(WorkFromHomeRequestPage::class)
+        ->set('date', now()->addDay()->toDateString())
+        ->set('startTime', '09:00')
+        ->set('reason', 'Need remote work for a focused documentation session.')
+        ->call('submit')
+        ->assertHasErrors(['endTime' => 'required_with']);
+
+    Livewire::actingAs($employee)
+        ->test(WorkFromHomeRequestPage::class)
+        ->set('date', now()->addDay()->toDateString())
+        ->set('endTime', '17:00')
+        ->set('reason', 'Need remote work for a focused documentation session.')
+        ->call('submit')
+        ->assertHasErrors(['startTime' => 'required_with']);
+});
+
 test('unrelated user cannot approve another employee wfh request', function () {
     $manager = User::factory()->create();
     $employee = User::factory()->create(['manager_id' => $manager->id]);

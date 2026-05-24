@@ -61,6 +61,11 @@ class TeamApprovalsHistory extends Component
         $this->resetPage();
     }
 
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $leaves = collect();

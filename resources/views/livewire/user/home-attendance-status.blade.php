@@ -1,76 +1,91 @@
 <div>
     @if ($approvedAbsence)
-        <section aria-labelledby="attendance-status-date" class="wcag-card rounded-2xl p-4">
-            <div class="mb-4 flex items-start justify-between gap-3">
-                <div>
-                    <p class="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {{ __('Your Status') }}
-                    </p>
-                    <h2 id="attendance-status-date" class="text-lg font-semibold leading-tight text-gray-950 dark:text-white">
+        <section aria-labelledby="attendance-status-date" class="attendance-panel">
+            <div class="attendance-panel__header">
+                <div class="min-w-0">
+                    <p class="attendance-panel__eyebrow">{{ __('Your Status') }}</p>
+                    <h2 id="attendance-status-date" class="attendance-panel__title">
                         {{ $approvedAbsence->date->translatedFormat('l, d F Y') }}
                     </h2>
+                    <p class="attendance-panel__copy">{{ __('Today\'s attendance has been recorded completely.') }}</p>
                 </div>
 
-                <div class="flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 dark:border-green-800 dark:bg-green-900/30"
-                    role="status" aria-live="polite">
-                    <div
-                        class="relative flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-700 dark:bg-green-400">
-                        <span
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    </div>
-                    <span class="text-sm font-semibold leading-none text-green-800 dark:text-green-200">
-                        {{ __(ucfirst($approvedAbsence->status)) }}
+                <div class="attendance-panel__badge attendance-panel__badge--done" role="status" aria-live="polite">
+                    <span class="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-brand-500 text-white">
+                        <x-heroicon-o-check class="h-3 w-3" />
                     </span>
+                    <span>{{ __(ucfirst($approvedAbsence->status)) }}</span>
                 </div>
             </div>
 
-            <div
-                class="flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700/50 dark:bg-gray-700/30">
-                <div
-                    class="shrink-0 rounded-xl bg-white p-2.5 text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-200">
-                    <x-heroicon-m-document-text class="w-6 h-6" />
+            <div class="attendance-panel__summary">
+                <div class="attendance-panel__summary-icon">
+                    <x-heroicon-o-document-text class="h-5 w-5" />
                 </div>
                 <div>
-                    <h3 class="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-100">{{ __('Note') }}</h3>
-                    <p class="text-sm font-medium italic leading-relaxed text-gray-900 dark:text-white">
-                        "{{ $approvedAbsence->note }}"
+                    <h3 class="attendance-panel__summary-title">{{ __('Note') }}</h3>
+                    <p class="attendance-panel__summary-copy">
+                        {{ $approvedAbsence->note ?: __('Approved') }}
                     </p>
                 </div>
             </div>
         </section>
     @elseif($requiresFaceEnrollment)
         <section aria-labelledby="face-enrollment-heading"
-            class="wcag-card group relative overflow-hidden rounded-2xl p-4 text-center transition-all">
-            <div class="relative z-10">
-                <div
-                    class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 shadow-sm dark:bg-primary-900/40 dark:text-primary-300">
-                    <x-heroicon-m-face-smile class="h-6 w-6" />
+            class="attendance-panel">
+            <div class="attendance-panel__header">
+                <div class="min-w-0">
+                    <p class="attendance-panel__eyebrow">{{ __('Attendance') }}</p>
+                    <h2 id="face-enrollment-heading" class="attendance-panel__title">
+                        {{ __('Face ID Registration Required') }}
+                    </h2>
+                    <p class="attendance-panel__copy">
+                        {{ __('To ensure security, you must register your face data before you can clock in/out.') }}
+                    </p>
                 </div>
 
-                <h2 id="face-enrollment-heading" class="mb-2 text-base font-semibold text-gray-950 dark:text-white">
-                    {{ __('Face ID Registration Required') }}</h2>
-                <p class="sr-only">
-                    {{ __('To ensure security, you must register your face data before you can clock in/out.') }}
-                </p>
-
-                @if (\App\Helpers\Editions::attendanceLocked())
-                    <button type="button"
-                        aria-label="{{ __('Register Face ID Now') }}"
-                        @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
-                        class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition-all sm:w-auto">
-                        <x-heroicon-m-camera class="w-5 h-5" />
-                        {{ __('Register Face ID Now') }}
-                        <x-heroicon-o-lock-closed class="h-4 w-4" />
-                    </button>
-                @else
-                    <a href="{{ route('face.enrollment') }}"
-                        aria-label="{{ __('Register Face ID Now') }}"
-                        class="inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-800 sm:w-auto">
-                        <x-heroicon-m-camera class="w-5 h-5" />
-                        {{ __('Register Face ID Now') }}
-                    </a>
-                @endif
+                <div class="attendance-panel__badge attendance-panel__badge--live" aria-hidden="true">
+                    <x-heroicon-o-face-smile class="h-4 w-4" />
+                    <span>{{ __('Face ID') }}</span>
+                </div>
             </div>
+
+            <div class="attendance-panel__worktime" aria-hidden="true">
+                <div class="attendance-panel__worktime-icon">
+                    <x-heroicon-o-shield-check class="h-4 w-4" />
+                </div>
+                <div class="min-w-0">
+                    <p class="attendance-panel__worktime-label">{{ __('Secure attendance') }}</p>
+                    <p class="attendance-panel__worktime-copy">{{ __('Register Face ID Now') }}</p>
+                </div>
+            </div>
+
+            @if (\App\Helpers\Editions::attendanceLocked())
+                <button type="button"
+                    aria-label="{{ __('Register Face ID Now') }}"
+                    @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
+                    class="attendance-panel__cta attendance-panel__cta--primary">
+                    <span class="attendance-panel__cta-icon">
+                        <x-heroicon-o-lock-closed class="h-5 w-5" />
+                    </span>
+                    <span class="min-w-0">
+                        <span class="attendance-panel__cta-label">{{ __('Register Face ID Now') }}</span>
+                        <span class="attendance-panel__cta-copy">{{ __('Face ID Locked') }}</span>
+                    </span>
+                </button>
+            @else
+                <a href="{{ route('face.enrollment') }}"
+                    aria-label="{{ __('Register Face ID Now') }}"
+                    class="attendance-panel__cta attendance-panel__cta--primary">
+                    <span class="attendance-panel__cta-icon">
+                        <x-heroicon-o-camera class="h-5 w-5" />
+                    </span>
+                    <span class="min-w-0">
+                        <span class="attendance-panel__cta-label">{{ __('Register Face ID Now') }}</span>
+                        <span class="attendance-panel__cta-copy">{{ __('Secure attendance') }}</span>
+                    </span>
+                </a>
+            @endif
         </section>
     @elseif($hasCheckedIn && $hasCheckedOut)
         <x-user.attendance-hero-card :attendance="$attendance" />

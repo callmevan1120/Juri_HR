@@ -15,8 +15,9 @@
         <div class="min-w-0">
             <p class="attendance-panel__eyebrow">{{ __('Attendance') }}</p>
             <h2 id="attendance-card-title" class="attendance-panel__title">
-                {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
+                {{ __('Today') }}
             </h2>
+            <p class="attendance-panel__copy">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</p>
         </div>
 
         <div class="attendance-panel__badge attendance-panel__badge--live" role="status" aria-live="polite">
@@ -35,8 +36,7 @@
         <div class="min-w-0">
             <p class="attendance-panel__worktime-label">{{ $shiftName }}</p>
             <p class="attendance-panel__worktime-copy">
-                {{ __('Working hours') }}:
-                <span class="font-semibold text-slate-950 dark:text-white">{{ $workHours }}</span>
+                {{ __('Working hours') }}: <span class="font-semibold text-slate-950 dark:text-white">{{ $workHours }}</span>
                 @if ($shiftDuration)
                     <span class="text-slate-400">•</span>
                     {{ $shiftDuration }}

@@ -66,6 +66,7 @@ class MyCustomForms extends Component
             ->get();
 
         return view('livewire.user.my-custom-forms', [
+            'pollingEnabled' => $this->selectedTemplateId === '',
             'templates' => $templates,
             'selectedTemplate' => $selectedTemplate,
             'submissions' => $submissions,

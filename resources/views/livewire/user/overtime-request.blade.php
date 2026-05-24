@@ -1,6 +1,6 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="overtime-request-title" class="user-page-surface relative">
+        <section aria-labelledby="overtime-request-title" class="user-page-surface relative" @unless($showModal) wire:poll.visible.20s @endunless>
             <x-user.page-header
                 :back-href="!$showModal ? route('home') : null"
                 :title="$showModal ? __('New Request') : __('Overtime Request')"
@@ -95,9 +95,9 @@
                             <p class="user-empty-state__copy">{{ __('You haven\'t submitted any overtime requests yet.') }}</p>
                         </div>
                     @else
-                        <div class="divide-y divide-gray-100 dark:divide-gray-700">
-                                     @foreach($overtimes as $overtime)
-                                <div class="p-3 transition hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:p-4">
+                        <div class="space-y-3">
+                            @foreach($overtimes as $overtime)
+                                <article class="user-list-card">
                                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
@@ -124,10 +124,10 @@
                                         </span>
                                     </div>
                                     </div>
-                                </div>
-                             @endforeach
+                                </article>
+                            @endforeach
                         </div>
-                        <div class="rounded-b-2xl border-t border-gray-100 p-3 dark:border-gray-700">
+                        <div class="mt-4">
                             {{ $overtimes->links() }}
                         </div>
                     @endif

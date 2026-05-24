@@ -1,113 +1,97 @@
-<div class="user-list-card hidden overflow-hidden p-0 md:block">
-    <div class="user-desktop-table-scroll">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Employee') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Request') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Status') }}</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Processed By') }}</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-                @forelse ($attendanceCorrections as $correction)
-                    <tr>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full object-cover"
-                                        src="{{ $correction->user->profile_photo_url }}"
-                                        alt="{{ $correction->user->name }}">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $correction->user->name }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $correction->user->jobTitle->name ?? __('N/A') }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
-                            <div class="font-semibold">{{ $correction->requestTypeLabel() }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ $correction->attendance_date->translatedFormat('d M Y') }}</div>
-                            <div class="mt-1 max-w-xs truncate text-xs text-gray-500 dark:text-gray-400">{{ $correction->reason }}</div>
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm">
-                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold
-                                {{ $correction->status === 'approved'
-                                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                    : ($correction->status === 'rejected'
-                                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                                        : 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200') }}">
-                                {{ $correction->statusLabel() }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-right text-sm text-gray-500 dark:text-gray-400">
-                            @if ($correction->status === 'pending_admin')
-                                <span>{{ $correction->headApprover?->name ?? __('Supervisor') }}</span>
-                            @else
-                                <span>{{ $correction->reviewer?->name ?? __('System') }}</span>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                            {{ __('No attendance correction history found') }}
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
+@php
+    $correctionStatusClass = fn (?string $status): string => match ($status) {
+        'approved' => 'team-approval-status team-approval-status--success',
+        'rejected' => 'team-approval-status team-approval-status--danger',
+        default => 'team-approval-status team-approval-status--info',
+    };
+@endphp
 
-<div class="space-y-4 md:hidden">
+<section class="team-approval-list" aria-live="polite">
     @forelse ($attendanceCorrections as $correction)
-        <div class="user-list-card">
-            <div class="flex items-start justify-between">
-                <div class="flex items-center">
-                    <img class="h-10 w-10 rounded-full object-cover"
-                        src="{{ $correction->user->profile_photo_url }}"
-                        alt="{{ $correction->user->name }}">
-                    <div class="ml-3">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $correction->user->name }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $correction->user->jobTitle->name ?? __('N/A') }}</div>
+        <article class="team-approval-card">
+            <div class="team-approval-card__main">
+                <img
+                    class="team-approval-card__avatar"
+                    src="{{ $correction->user->profile_photo_url }}"
+                    alt="{{ $correction->user->name }}">
+
+                <div class="team-approval-card__body">
+                    <div class="team-approval-card__topline">
+                        <div class="min-w-0">
+                            <h3>{{ $correction->user->name }}</h3>
+                            <p>{{ $correction->user->jobTitle->name ?? __('N/A') }}</p>
+                        </div>
+
+                        <span class="{{ $correctionStatusClass($correction->status) }}">
+                            {{ $correction->statusLabel() }}
+                        </span>
                     </div>
-                </div>
-                <span class="px-2 py-1 text-xs font-semibold rounded-full
-                    {{ $correction->status === 'approved'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                        : ($correction->status === 'rejected'
-                            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                            : 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200') }}">
-                    {{ $correction->statusLabel() }}
-                </span>
-            </div>
 
-            <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
-                <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Attendance Date') }}</p>
-                    <p class="font-medium text-gray-900 dark:text-white">{{ $correction->attendance_date->translatedFormat('d M Y') }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Processed By') }}</p>
-                    <p class="font-medium text-gray-900 dark:text-white">
-                        {{ $correction->status === 'pending_admin' ? ($correction->headApprover?->name ?? __('Supervisor')) : ($correction->reviewer?->name ?? __('System')) }}
-                    </p>
-                </div>
-            </div>
+                    <div class="team-approval-facts">
+                        <div>
+                            <span>{{ __('Request') }}</span>
+                            <strong>{{ $correction->requestTypeLabel() }}</strong>
+                        </div>
+                        <div>
+                            <span>{{ __('Attendance Date') }}</span>
+                            <strong>{{ $correction->attendance_date->translatedFormat('d M Y') }}</strong>
+                        </div>
+                        <div>
+                            <span>{{ __('Processed By') }}</span>
+                            <strong>
+                                {{ $correction->status === 'pending_admin'
+                                    ? ($correction->headApprover?->name ?? __('Supervisor'))
+                                    : ($correction->reviewer?->name ?? __('System')) }}
+                            </strong>
+                        </div>
+                        <div>
+                            <span>{{ __('Submitted') }}</span>
+                            <strong>{{ $correction->created_at->diffForHumans() }}</strong>
+                        </div>
+                    </div>
 
-            <div class="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-700/50 dark:text-gray-300">
-                <div class="font-semibold">{{ $correction->requestTypeLabel() }}</div>
-                <div class="mt-1">{{ $correction->reason }}</div>
+                    @if ($correction->requested_time_in || $correction->requested_time_out || $correction->requestedShift)
+                        <div class="team-approval-facts">
+                            @if ($correction->requested_time_in)
+                                <div>
+                                    <span>{{ __('Check in') }}</span>
+                                    <strong>{{ $correction->requested_time_in->translatedFormat('d M Y H:i') }}</strong>
+                                </div>
+                            @endif
+
+                            @if ($correction->requested_time_out)
+                                <div>
+                                    <span>{{ __('Check out') }}</span>
+                                    <strong>{{ $correction->requested_time_out->translatedFormat('d M Y H:i') }}</strong>
+                                </div>
+                            @endif
+
+                            @if ($correction->requestedShift)
+                                <div>
+                                    <span>{{ __('Shift') }}</span>
+                                    <strong>{{ $correction->requestedShift->name }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if ($correction->reason)
+                        <p class="team-approval-note">{{ $correction->reason }}</p>
+                    @endif
+                </div>
             </div>
-        </div>
+        </article>
     @empty
-        <div class="user-empty-state">
-            {{ __('No attendance correction history found') }}
+        <div class="team-approval-empty">
+            <x-heroicon-o-clipboard-document-check class="h-10 w-10" />
+            <h3>{{ __('No attendance correction history found') }}</h3>
+            <p>{{ __('Attendance corrections waiting for review.') }}</p>
         </div>
     @endforelse
-</div>
 
-<div class="px-4 py-3">
-    {{ $attendanceCorrections->links() }}
-</div>
+    @if ($attendanceCorrections->hasPages())
+        <div>
+            {{ $attendanceCorrections->links() }}
+        </div>
+    @endif
+</section>

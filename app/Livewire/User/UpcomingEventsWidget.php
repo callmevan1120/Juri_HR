@@ -11,6 +11,69 @@ use Livewire\Component;
 
 class UpcomingEventsWidget extends Component
 {
+    /**
+     * @var array{type:string, title:string, subtitle:string|null, body:string|null, tone:string}|null
+     */
+    public ?array $selectedEvent = null;
+
+    public function showAnnouncement(int $announcementId): void
+    {
+        $announcement = Announcement::visibleForUser(Auth::id())
+            ->whereKey($announcementId)
+            ->first();
+
+        if (! $announcement) {
+            return;
+        }
+
+        $this->selectedEvent = [
+            'type' => __('Announcement'),
+            'title' => $announcement->title,
+            'subtitle' => $announcement->priority === 'high' ? __('Important Policy') : __('Announcement'),
+            'body' => trim(strip_tags((string) $announcement->content)),
+            'tone' => $announcement->priority === 'high' ? 'warning' : 'info',
+        ];
+    }
+
+    public function showHoliday(int $holidayId): void
+    {
+        $holiday = Holiday::query()->find($holidayId);
+
+        if (! $holiday) {
+            return;
+        }
+
+        $this->selectedEvent = [
+            'type' => __('Holiday'),
+            'title' => $holiday->name,
+            'subtitle' => $holiday->date?->translatedFormat('l, d F Y'),
+            'body' => __('National holiday or company calendar reminder.'),
+            'tone' => 'danger',
+        ];
+    }
+
+    public function showBirthday(string $userId): void
+    {
+        $user = User::query()->find($userId);
+
+        if (! $user || ! $user->birth_date) {
+            return;
+        }
+
+        $this->selectedEvent = [
+            'type' => __('Birthday'),
+            'title' => $user->name,
+            'subtitle' => Carbon::parse($user->birth_date)->translatedFormat('d F'),
+            'body' => __('Team birthday reminder.'),
+            'tone' => 'warning',
+        ];
+    }
+
+    public function closeEvent(): void
+    {
+        $this->selectedEvent = null;
+    }
+
     public function render()
     {
         // 1. Active Announcements (Priority > Normal)

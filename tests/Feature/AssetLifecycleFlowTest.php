@@ -123,6 +123,24 @@ test('admin selecting ready automatically releases the assigned user', function 
         ->and($asset->return_date)->toBeNull();
 });
 
+test('asset admin page auto refreshes pending return otp notifications', function () {
+    $admin = assetAdmin();
+
+    $this->actingAs($admin);
+
+    Livewire::test(AssetManager::class)
+        ->assertSeeHtml('wire:poll.visible.10s');
+});
+
+test('employee asset page auto refreshes assigned assets and return history', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(MyAssets::class)
+        ->assertSeeHtml('wire:poll.visible.15s');
+});
+
 function assetAdmin(): User
 {
     $admin = User::factory()->admin()->create();

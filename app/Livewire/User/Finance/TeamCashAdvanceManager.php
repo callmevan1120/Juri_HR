@@ -46,9 +46,29 @@ class TeamCashAdvanceManager extends Component
         $this->resetPage();
     }
 
+    public function setStatusFilter(string $status): void
+    {
+        if (! in_array($status, ['all', 'pending', 'pending_finance', 'approved', 'paid', 'rejected'], true)) {
+            return;
+        }
+
+        $this->statusFilter = $status;
+        $this->resetPage();
+    }
+
     public function updatedActiveTab(): void
     {
         $this->normalizeActiveTab();
+        $this->resetPage();
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStatusFilter(): void
+    {
         $this->resetPage();
     }
 

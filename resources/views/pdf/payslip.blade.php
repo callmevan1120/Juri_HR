@@ -1,269 +1,411 @@
 @php
     $logoSrc = \App\Support\MailBranding::logoPdfSource();
+    $companyName = \App\Models\Setting::getValue('app.company_name', config('app.name'));
+    $companyAddress = \App\Models\Setting::getValue('app.company_address', '');
+    $periodLabel = \Carbon\Carbon::createFromDate((int) $payroll->year, (int) $payroll->month, 1)->translatedFormat('F Y');
+    $formatMoney = fn ($value) => 'Rp '.number_format((float) $value, 0, ',', '.');
+    $totalEarnings = $payroll->gross_salary ?? ((float) $payroll->basic_salary + (float) $payroll->total_allowance);
+    $totalDeductions = $payroll->total_deductions ?? $payroll->total_deduction;
 @endphp
-<!DOCTYPE html>
-<html>
+
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <title>Payslip - {{ $payroll->month }}/{{ $payroll->year }}</title>
+    <title>{{ __('Payslip') }} - {{ $periodLabel }}</title>
     <style>
-        /* Security Background Pattern */
-        body { 
-            font-family: 'Helvetica', 'Arial', sans-serif; 
-            font-size: 12px; 
-            color: #333; 
-            line-height: 1.5;
-            background-color: #fff;
-            /* Subtle diagonal security lines */
-            background-image: repeating-linear-gradient(
-                135deg,
-                #fff,
-                #fff 10px,
-                #f3f4f6 10px,
-                #f3f4f6 11px
-            );
+        @page {
+            margin: 34px 54px 68px 54px;
         }
-        
-        /* Modern Header */
-        .header-table { width: 100%; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; margin-top: -30px; }
-        .header-left { text-align: left; vertical-align: middle; width: 70%; }
-        .header-right { text-align: right; vertical-align: middle; width: 30%; }
 
-        /* Logo & Company Side-by-Side */
-        .company-info-table { width: 100%; }
-        .logo-cell { width: 60px; vertical-align: middle; padding-right: 15px; }
-        .text-cell { vertical-align: middle; }
-        
-        .company-name { font-size: 16px; font-weight: bold; color: #111; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
-        .company-address { font-size: 10px; color: #666; margin: 2px 0 0 0; line-height: 1.2; }
-
-        /* Stamp Style */
-        .stamp-box { 
-            border: 3px solid #15803d; /* Green border */
-            padding: 8px 15px; 
-            display: inline-block; 
-            text-align: center;
-            border-radius: 6px;
-            transform: rotate(-8deg); /* More tilt */
-            color: #15803d; /* Green text */
-            opacity: 0.9;
+        body {
+            color: #111827;
+            font-family: DejaVu Sans, Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.55;
+            margin: 0;
         }
-        .stamp-title { font-size: 20px; font-weight: 900; color: #15803d; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        .stamp-subtitle { font-size: 9px; color: #166534; margin: 2px 0 0 0; text-transform: uppercase; font-weight: bold; }
 
-        /* Crisp Info Table */
-        .info-table { width: 100%; margin-bottom: 25px; border-collapse: collapse; }
-        .info-table td { padding: 3px 0; vertical-align: top; }
-        .label-col { width: 15%; font-weight: bold; color: #555; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
-        .colon-col { width: 2%; text-align: center; color: #555; font-weight: bold; font-size: 10px; }
-        .value-col { width: 33%; color: #111; font-weight: 600; font-size: 11px; }
-        
-        /* Modern Data Table */
-        .salary-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .salary-table th { color: #888; text-transform: uppercase; font-size: 9px; letter-spacing: 1px; padding: 8px 0; border-bottom: 1px solid #eee; }
-        .salary-table td { padding: 5px 0; color: #333; font-size: 11px; border-bottom: 1px solid #f9f9f9; }
-        
-        .section-header { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 1.5px; padding-top: 10px; padding-bottom: 2px; }
-        
-        .total-row td { font-weight: bold; color: #111; padding-top: 8px; padding-bottom: 8px; border-top: 1px solid #eee; }
-        
-        .net-salary-box { 
-            background-color: #f0fdf4; /* Green-50 */
-            border: 1px solid #dcfce7; /* Green-100 */
-            color: #166534; /* Green-800 */
-            padding: 12px 15px; 
-            margin-top: 15px; 
-            border-radius: 8px;
-        }
-        .net-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .net-value { font-size: 18px; font-weight: 900; float: right; }
-
-        .text-right { text-align: right; }
-        .text-red { color: #dc2626; }
-        .text-green { color: #166534; }
-
-        /* Footer & Signatures */
-        .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 8px; color: #ccc; padding-top: 10px; }
-        
-        .signature-section { margin-top: 50px; page-break-inside: avoid; }
-        .signature-table { width: 100%; table-layout: fixed; }
-        .signature-cell-left { text-align: center; vertical-align: top; width: 50%; padding-right: 20px; }
-        .signature-cell-right { text-align: center; vertical-align: top; width: 50%; padding-left: 20px; }
-        .signature-line { border-top: 1px solid #ddd; width: 60%; margin: 60px auto 10px auto; }
-        .signature-name { font-weight: bold; font-size: 12px; color: #111; }
-        .signature-role { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Confidential Watermark */
         .watermark {
+            color: #e5e7eb;
+            font-size: 68px;
+            font-weight: 700;
+            left: 0;
+            letter-spacing: 8px;
+            opacity: .26;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 80px;
-            color: #d1d5db; /* Gray-300 */
-            opacity: 0.3;
-            z-index: -1000;
-            pointer-events: none;
-            font-weight: 900;
-            letter-spacing: 10px;
-            width: 100%;
+            right: 0;
             text-align: center;
-            white-space: nowrap;
+            top: 42%;
+            transform: rotate(-34deg);
+            z-index: -10;
         }
 
-        .confidential-note {
-            margin-top: 40px;
-            font-size: 7px;
-            color: #9ca3af; /* Gray-400 */
+        .top-corner-navy {
+            border-left: 82px solid transparent;
+            border-top: 82px solid #083344;
+            height: 0;
+            position: fixed;
+            right: -54px;
+            top: -34px;
+            width: 0;
+        }
+
+        .top-corner-primary {
+            border-left: 46px solid transparent;
+            border-top: 46px solid #6ab45b;
+            height: 0;
+            position: fixed;
+            right: -54px;
+            top: -34px;
+            width: 0;
+        }
+
+        .letterhead {
+            border-bottom: 1.4px solid #31542a;
+            margin: 0 0 20px;
+            padding-bottom: 12px;
+            width: 100%;
+        }
+
+        .letterhead,
+        .letterhead td,
+        .meta-table,
+        .meta-table td,
+        .salary-table,
+        .summary-table,
+        .signature-table {
+            border: 0;
+        }
+
+        .logo-cell {
+            padding: 0 14px 0 0;
+            vertical-align: middle;
+            width: 64px;
+        }
+
+        .company-cell {
+            padding: 0 14px 0 0;
+            vertical-align: middle;
+        }
+
+        .doc-cell {
+            text-align: right;
+            vertical-align: middle;
+            width: 190px;
+        }
+
+        .company-name {
+            color: #111827;
+            font-size: 15.5px;
+            font-weight: 700;
+            letter-spacing: .01em;
+            margin: 0 0 2px;
+            text-transform: uppercase;
+        }
+
+        .company-address {
+            color: #4b5563;
+            font-size: 9.2px;
+            line-height: 1.35;
+            margin: 0;
+        }
+
+        .company-mark {
+            color: #57944a;
+            font-size: 8.2px;
+            font-weight: 700;
+            letter-spacing: .18em;
+            margin: 3px 0 0;
+            text-transform: uppercase;
+        }
+
+        .document-title {
+            color: #083344;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .document-period {
+            color: #31542a;
+            font-size: 10px;
+            font-weight: 700;
+            margin: 3px 0 0;
+            text-transform: uppercase;
+        }
+
+        .meta-table {
+            margin: 0 0 18px;
+            width: 100%;
+        }
+
+        .meta-table td {
+            padding: 3px 0;
+            vertical-align: top;
+        }
+
+        .meta-label {
+            color: #31542a;
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            width: 115px;
+        }
+
+        .meta-value {
+            color: #111827;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            color: #083344;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            margin: 16px 0 7px;
+            text-transform: uppercase;
+        }
+
+        .salary-table {
+            border-collapse: collapse;
+            margin: 0 0 10px;
+            width: 100%;
+        }
+
+        .salary-table th {
+            background: #083344;
+            border: 1px solid #083344;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 7px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .salary-table td {
+            border: 1px solid #d1d5db;
+            padding: 7px;
+            vertical-align: top;
+        }
+
+        .salary-table .subtotal td {
+            background: #f5faf4;
+            color: #31542a;
+            font-weight: 700;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-red {
+            color: #b91c1c;
+        }
+
+        .summary-card {
+            background: #f0f9ee;
+            border: 1.5px solid #6ab45b;
+            border-radius: 8px;
+            margin: 16px 0 0;
+            padding: 12px 14px;
+        }
+
+        .summary-table {
+            width: 100%;
+        }
+
+        .summary-label {
+            color: #31542a;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            color: #083344;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .signature-section {
+            margin-top: 42px;
+            page-break-inside: avoid;
+        }
+
+        .signature-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .signature-table td {
             text-align: center;
-            font-style: italic;
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .signature-line {
+            border-top: 1px solid #9ca3af;
+            margin: 54px auto 8px;
+            width: 62%;
+        }
+
+        .signature-name {
+            color: #111827;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .signature-role {
+            color: #6b7280;
+            font-size: 9px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .footer {
+            border-top: 1px solid #badcb3;
+            bottom: -54px;
+            color: #6b7280;
+            font-size: 8.4px;
+            left: 0;
             line-height: 1.4;
-            max-width: 90%;
-            margin-left: auto;
-            margin-right: auto;
+            padding-top: 8px;
+            position: fixed;
+            right: 0;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-
     <div class="watermark">{{ __('Confidential') }}</div>
+    <div class="top-corner-navy"></div>
+    <div class="top-corner-primary"></div>
 
-    <table class="header-table">
+    <table class="letterhead">
         <tr>
-            <td class="header-left">
-                <table class="company-info-table">
-                    <tr>
-                        @if ($logoSrc)
-                            <td class="logo-cell">
-                                <img src="{{ $logoSrc }}" style="height: 50px; width: auto;">
-                            </td>
-                        @endif
-                        <td class="text-cell">
-                            <h1 class="company-name">{{ \App\Models\Setting::getValue('app.company_name', config('app.name')) }}</h1>
-                            <p class="company-address">{{ \App\Models\Setting::getValue('app.company_address', '123 Business Rd, Jakarta, Indonesia') }}</p>
-                        </td>
-                    </tr>
-                </table>
+            @if ($logoSrc)
+                <td class="logo-cell">
+                    <img src="{{ $logoSrc }}" style="height: 56px; width: auto;" alt="{{ $companyName }}">
+                </td>
+            @endif
+            <td class="company-cell">
+                <h1 class="company-name">{{ $companyName }}</h1>
+                @if ($companyAddress)
+                    <p class="company-address">{{ $companyAddress }}</p>
+                @endif
+                <p class="company-mark">{{ __('Enterprise Workforce System') }}</p>
             </td>
-            <td class="header-right">
-                <div class="stamp-box">
-                    <div class="stamp-title">{{ __('Payslip') }}</div>
-                    <div class="stamp-subtitle">{{ DateTime::createFromFormat('!m', $payroll->month)->format('F') }} {{ $payroll->year }}</div>
-                </div>
+            <td class="doc-cell">
+                <h2 class="document-title">{{ __('Payslip') }}</h2>
+                <p class="document-period">{{ $periodLabel }}</p>
             </td>
         </tr>
     </table>
 
-    <table class="info-table">
+    <table class="meta-table">
         <tr>
-            <!-- Left Column Data -->
-            <td width="55%" style="vertical-align: top;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td class="label-col" style="width: 25%;">{{ __('NIP') }}</td>
-                        <td class="colon-col">:</td>
-                        <td class="value-col">{{ $payroll->user->nip ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td class="label-col">{{ __('Name') }}</td>
-                        <td class="colon-col">:</td>
-                        <td class="value-col">{{ $payroll->user->name }}</td>
-                    </tr>
-                    <tr>
-                        <td class="label-col">{{ __('Department') }}</td>
-                        <td class="colon-col">:</td>
-                        <td class="value-col">{{ $payroll->user->division->name ?? '-' }}</td>
-                    </tr>
-                </table>
-            </td>
-            
-            <!-- Right Column Data (Aligned Right) -->
-            <td width="45%" style="vertical-align: top;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td class="label-col" style="width: 30%; padding-left: 20px;">{{ __('Generated On') }}</td>
-                        <td class="colon-col">:</td>
-                        <td class="value-col">{{ $payroll->created_at->format('d M Y H:i') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="label-col" style="padding-left: 20px;">{{ __('Status') }}</td>
-                        <td class="colon-col">:</td>
-                        <td class="value-col">{{ ucfirst($payroll->status) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="label-col" style="padding-left: 20px;">{{ __('Job Title') }}</td>
-                        <td class="colon-col">:</td>
-                        <td class="value-col">{{ $payroll->user->jobTitle->name ?? '-' }}</td>
-                    </tr>
-                </table>
-            </td>
+            <td class="meta-label">{{ __('NIP') }}</td>
+            <td class="meta-value">{{ $payroll->user->nip ?? '-' }}</td>
+            <td class="meta-label">{{ __('Generated On') }}</td>
+            <td class="meta-value">{{ $payroll->created_at->translatedFormat('d M Y H:i') }}</td>
+        </tr>
+        <tr>
+            <td class="meta-label">{{ __('Name') }}</td>
+            <td class="meta-value">{{ $payroll->user->name }}</td>
+            <td class="meta-label">{{ __('Status') }}</td>
+            <td class="meta-value">{{ __(ucfirst((string) $payroll->status)) }}</td>
+        </tr>
+        <tr>
+            <td class="meta-label">{{ __('Department') }}</td>
+            <td class="meta-value">{{ $payroll->user->division->name ?? '-' }}</td>
+            <td class="meta-label">{{ __('Job Title') }}</td>
+            <td class="meta-value">{{ $payroll->user->jobTitle->name ?? '-' }}</td>
         </tr>
     </table>
 
+    <div class="section-title">{{ __('Earnings') }}</div>
     <table class="salary-table">
         <thead>
             <tr>
-                <th width="70%" style="text-align: left;">{{ __('Description') }}</th>
-                <th width="30%" class="text-right">{{ __('Amount') }} (IDR)</th>
+                <th>{{ __('Description') }}</th>
+                <th style="width: 30%;" class="text-right">{{ __('Amount') }} (IDR)</th>
             </tr>
         </thead>
         <tbody>
-            <!-- EARNINGS SECTION -->
-            <tr><td colspan="2" class="section-header">{{ __('Earnings') }}</td></tr>
-            
             <tr>
                 <td>{{ __('Basic Salary') }}</td>
-                <td class="text-right">{{ number_format($payroll->basic_salary, 0, ',', '.') }}</td>
+                <td class="text-right">{{ $formatMoney($payroll->basic_salary) }}</td>
             </tr>
-            
-            @if(is_array($payroll->allowances))
-                @foreach($payroll->allowances as $name => $amount)
+            @if (is_array($payroll->allowances))
+                @foreach ($payroll->allowances as $name => $amount)
                     <tr>
                         <td>{{ $name }}</td>
-                        <td class="text-right">{{ number_format($amount, 0, ',', '.') }}</td>
+                        <td class="text-right">{{ $formatMoney($amount) }}</td>
                     </tr>
                 @endforeach
             @endif
-
-            <tr class="total-row">
-                <td style="padding-left: 10px;">{{ __('Total Earnings') }}</td>
-                <td class="text-right text-green">{{ number_format($payroll->gross_salary ?? ($payroll->basic_salary + $payroll->total_allowance), 0, ',', '.') }}</td>
-            </tr>
-
-            <!-- DEDUCTIONS SECTION -->
-            <tr><td colspan="2" class="section-header" style="color: #ef4444;">{{ __('Deductions') }}</td></tr> <!-- Red-500 -->
-
-            @if(is_array($payroll->deductions))
-                @foreach($payroll->deductions as $name => $amount)
-                    <tr>
-                        <td>{{ $name }}</td>
-                        <td class="text-right text-red">-{{ number_format($amount, 0, ',', '.') }}</td>
-                    </tr>
-                @endforeach
-            @endif
-
-            <tr class="total-row">
-                <td style="padding-left: 10px;">{{ __('Total Deductions') }}</td>
-                <td class="text-right text-red">-{{ number_format($payroll->total_deductions ?? $payroll->total_deduction, 0, ',', '.') }}</td>
+            <tr class="subtotal">
+                <td>{{ __('Total Earnings') }}</td>
+                <td class="text-right">{{ $formatMoney($totalEarnings) }}</td>
             </tr>
         </tbody>
     </table>
 
-    <!-- NET PAY CARD -->
-    <div class="net-salary-box">
-        <span class="net-label">{{ __('Net Salary (Take Home Pay)') }}</span>
-        <span class="net-value">Rp {{ number_format($payroll->net_salary, 0, ',', '.') }}</span>
+    <div class="section-title">{{ __('Deductions') }}</div>
+    <table class="salary-table">
+        <thead>
+            <tr>
+                <th>{{ __('Description') }}</th>
+                <th style="width: 30%;" class="text-right">{{ __('Amount') }} (IDR)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (is_array($payroll->deductions) && count($payroll->deductions) > 0)
+                @foreach ($payroll->deductions as $name => $amount)
+                    <tr>
+                        <td>{{ $name }}</td>
+                        <td class="text-right text-red">-{{ $formatMoney($amount) }}</td>
+                    </tr>
+                @endforeach
+            @else
+                <tr>
+                    <td>{{ __('No deductions') }}</td>
+                    <td class="text-right">Rp 0</td>
+                </tr>
+            @endif
+            <tr class="subtotal">
+                <td>{{ __('Total Deductions') }}</td>
+                <td class="text-right text-red">-{{ $formatMoney($totalDeductions) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary-card">
+        <table class="summary-table">
+            <tr>
+                <td class="summary-label">{{ __('Net Salary (Take Home Pay)') }}</td>
+                <td class="summary-value">{{ $formatMoney($payroll->net_salary) }}</td>
+            </tr>
+        </table>
     </div>
 
     <div class="signature-section">
         <table class="signature-table">
             <tr>
-                <td class="signature-cell-left">
+                <td>
                     <div class="signature-role">{{ __('Approved By') }}</div>
                     <div class="signature-line"></div>
                     <div class="signature-name">{{ __('Manager / HR') }}</div>
                 </td>
-                <td class="signature-cell-right">
+                <td>
                     <div class="signature-role">{{ __('Received By') }}</div>
                     <div class="signature-line"></div>
                     <div class="signature-name">{{ $payroll->user->name }}</div>
@@ -273,12 +415,8 @@
     </div>
 
     <div class="footer">
-        <div style="margin-bottom: 5px;">{{ __('Generated by :app. This is a computer-generated document and may not require a physical signature.', ['app' => config('app.name')]) }}</div>
-        
-        <div class="confidential-note" style="margin-top: 5px;">
-            {{ __('Please note that the contents of this statement should be treated with absolute confidentiality except where disclosure is required for tax, legal, or regulatory purposes. Any breach of this confidentiality obligation may result in disciplinary action.') }}
-        </div>
+        <div>{{ __('Generated by :app. This is a computer-generated document and may not require a physical signature.', ['app' => config('app.name')]) }}</div>
+        <div>{{ __('Please note that the contents of this statement should be treated with absolute confidentiality except where disclosure is required for tax, legal, or regulatory purposes. Any breach of this confidentiality obligation may result in disciplinary action.') }}</div>
     </div>
-
 </body>
 </html>

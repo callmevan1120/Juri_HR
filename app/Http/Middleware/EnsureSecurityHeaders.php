@@ -121,18 +121,21 @@ class EnsureSecurityHeaders
      */
     private function localRealtimeConnectHosts(string $requestHost): array
     {
-        if (config('broadcasting.default') !== 'reverb') {
-            return [];
-        }
-
         $host = (string) config('broadcasting.connections.reverb.options.host', '');
-        $port = (int) config('broadcasting.connections.reverb.options.port', 0);
+        $configuredPort = (int) config('broadcasting.connections.reverb.options.port', 0);
+        $serverPort = (int) config('reverb.servers.reverb.port', 0);
 
-        if ($host === '' || $port <= 0) {
+        if ($host === '') {
             return [];
         }
 
         $hosts = [$host];
+        $ports = array_filter(array_unique([
+            $configuredPort,
+            $serverPort,
+            8080,
+            8081,
+        ]), fn (int $port): bool => $port > 0);
 
         if ($requestHost !== '' && $requestHost !== '[::1]') {
             $hosts[] = $requestHost;
@@ -149,8 +152,10 @@ class EnsureSecurityHeaders
         $origins = [];
 
         foreach (array_unique($hosts) as $candidateHost) {
-            $origins[] = "ws://{$candidateHost}:{$port}";
-            $origins[] = "wss://{$candidateHost}:{$port}";
+            foreach ($ports as $port) {
+                $origins[] = "ws://{$candidateHost}:{$port}";
+                $origins[] = "wss://{$candidateHost}:{$port}";
+            }
         }
 
         return array_values(array_unique($origins));

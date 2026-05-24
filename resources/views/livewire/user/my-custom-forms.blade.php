@@ -1,18 +1,22 @@
 <div class="user-page-shell">
-    <div class="user-page-container user-page-container--wide space-y-4">
-    <div class="user-list-card">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <h1 class="text-lg font-bold text-slate-950 dark:text-white">{{ __('Forms') }}</h1>
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Submit company forms for HR, operations, visits, and internal requests.') }}</p>
-            </div>
-            <span class="rounded-full bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
-                {{ __('Available: :count', ['count' => $templates->count()]) }}
-            </span>
-        </div>
-    </div>
+    <div class="user-page-container user-page-container--wide">
+        <section aria-labelledby="my-custom-forms-title" class="user-page-surface" @if($pollingEnabled) wire:poll.visible.20s @endif>
+            <x-user.page-header
+                :back-href="route('home')"
+                :title="__('Forms')"
+                :description="__('Submit company forms for HR, operations, visits, and internal requests.')"
+                title-id="my-custom-forms-title">
+                <x-slot name="icon">
+                    <x-heroicon-o-clipboard-document-list class="h-5 w-5" />
+                </x-slot>
+                <x-slot name="actions">
+                    <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
+                        {{ __('Available: :count', ['count' => $templates->count()]) }}
+                    </span>
+                </x-slot>
+            </x-user.page-header>
 
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <div class="user-page-body grid grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
         <div class="space-y-3">
             @forelse ($templates as $template)
                 <button
@@ -90,5 +94,7 @@
                 </div>
             </div>
         </div>
+            </div>
+        </section>
     </div>
 </div>

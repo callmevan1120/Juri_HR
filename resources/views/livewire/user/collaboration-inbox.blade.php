@@ -3,7 +3,7 @@
         <section
             aria-labelledby="collaboration-inbox-title"
             class="user-page-surface"
-            @if (! $realtimeEnabled) wire:poll.{{ $pollInterval }} @endif
+            @if (! $realtimeEnabled && $pollingEnabled) wire:poll.{{ $pollInterval }} @endif
         >
             <x-user.page-header
                 :back-href="route('home')"

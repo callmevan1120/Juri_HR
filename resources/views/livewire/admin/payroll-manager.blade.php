@@ -2,10 +2,7 @@
     <x-admin.page-shell :title="__('Payroll Management')" :description="__('Generate and manage employee payments.')">
         <x-slot name="actions">
             <x-actions.button type="button" wire:click="openGenerateModal">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
-                    </path>
-                </svg>
+                <x-heroicon-o-plus class="h-5 w-5" />
                 {{ __('Generate Payroll') }}
             </x-actions.button>
         </x-slot>

@@ -4,6 +4,7 @@
 /public/storage
 /storage/*.key
 /storage/review-evidence/
+/storage/ui-backups/
 /vendor
 .env
 .env.backup

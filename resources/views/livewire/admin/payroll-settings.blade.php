@@ -2,9 +2,7 @@
     <x-admin.page-shell :title="__('Payroll Configurations')" :description="__('Manage allowances, deductions, and tax rules.')">
         <x-slot name="actions">
             <x-actions.button wire:click="create" type="button" size="icon" label="{{ __('Add Component') }}">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
-                </svg>
+                <x-heroicon-o-plus class="h-5 w-5" />
             </x-actions.button>
         </x-slot>
 
@@ -57,7 +55,77 @@
         </x-slot>
 
         <x-admin.panel>
-            <div class="overflow-x-auto">
+            <div class="grid gap-3 p-3 lg:hidden">
+                @forelse ($components as $payrollComponent)
+                    <article class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <h3 class="truncate text-sm font-bold text-slate-950 dark:text-white">{{ $payrollComponent->name }}</h3>
+                                <p class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                    {{ str_replace('_', ' ', ucfirst($payrollComponent->calculation_type)) }}
+                                </p>
+                            </div>
+
+                            <x-admin.status-badge :tone="$payrollComponent->type === 'allowance' ? 'success' : 'danger'">
+                                {{ __(ucfirst($payrollComponent->type)) }}
+                            </x-admin.status-badge>
+                        </div>
+
+                        <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <dt class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">{{ __('Value') }}</dt>
+                                <dd class="mt-1 font-mono font-bold text-slate-950 dark:text-white">
+                                    @if ($payrollComponent->calculation_type == 'percentage_basic')
+                                        {{ $payrollComponent->percentage }}%
+                                    @else
+                                        {{ __('Rp') }} {{ number_format($payrollComponent->amount, 0, ',', '.') }}
+                                        @if ($payrollComponent->calculation_type == 'daily_presence')
+                                            <span class="text-xs text-slate-500">/{{ __('day') }}</span>
+                                        @endif
+                                    @endif
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">{{ __('Status') }}</dt>
+                                <dd class="mt-1 flex items-center gap-2">
+                                    <x-forms.switch wire:click="toggleActive({{ $payrollComponent->id }})"
+                                        :checked="$payrollComponent->is_active" :label="__('Toggle payroll component') . ': ' . $payrollComponent->name" />
+                                    <span class="text-xs font-bold text-slate-600 dark:text-slate-300">
+                                        {{ $payrollComponent->is_active ? __('Active') : __('Inactive') }}
+                                    </span>
+                                </dd>
+                            </div>
+                        </dl>
+
+                        @if ($payrollComponent->is_taxable)
+                            <x-admin.status-badge tone="warning" class="mt-4">
+                                {{ __('Taxable') }}
+                            </x-admin.status-badge>
+                        @endif
+
+                        <div class="mt-4 flex justify-end gap-2">
+                            <x-actions.icon-button wire:click="edit({{ $payrollComponent->id }})"
+                                variant="primary"
+                                label="{{ __('Edit payroll component') }}: {{ $payrollComponent->name }}">
+                                <x-heroicon-m-pencil-square class="h-5 w-5" />
+                            </x-actions.icon-button>
+                            <x-actions.icon-button wire:click="confirmDelete({{ $payrollComponent->id }})"
+                                variant="danger"
+                                label="{{ __('Delete payroll component') }}: {{ $payrollComponent->name }}">
+                                <x-heroicon-m-trash class="h-5 w-5" />
+                            </x-actions.icon-button>
+                        </div>
+                    </article>
+                @empty
+                    <x-admin.empty-state :title="filled($search) || $typeFilter !== 'all' || $activeFilter !== 'all' ? __('No matching components found.') : __('No components found.')">
+                        <x-slot name="icon">
+                            <x-heroicon-o-calculator class="h-12 w-12 text-gray-400" />
+                        </x-slot>
+                    </x-admin.empty-state>
+                @endforelse
+            </div>
+
+            <div class="hidden lg:block">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50/50 dark:bg-gray-700/50">
                         <tr>
@@ -106,7 +174,7 @@
                                     @if ($payrollComponent->calculation_type == 'percentage_basic')
                                         {{ $payrollComponent->percentage }}%
                                     @else
-                                        Rp {{ number_format($payrollComponent->amount, 0, ',', '.') }}
+                                        {{ __('Rp') }} {{ number_format($payrollComponent->amount, 0, ',', '.') }}
                                         @if ($payrollComponent->calculation_type == 'daily_presence')
                                             <span class="text-xs text-gray-500">/{{ __('day') }}</span>
                                         @endif
@@ -138,13 +206,7 @@
                                     <div class="flex justify-center">
                                         <x-admin.empty-state :title="filled($search) || $typeFilter !== 'all' || $activeFilter !== 'all' ? __('No matching components found.') : __('No components found.')">
                                             <x-slot name="icon">
-                                                <svg class="h-12 w-12 text-gray-400" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="1.5"
-                                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                                    </path>
-                                                </svg>
+                                                <x-heroicon-o-calculator class="h-12 w-12 text-gray-400" />
                                             </x-slot>
                                         </x-admin.empty-state>
                                     </div>
@@ -216,7 +278,7 @@
                         <x-forms.label for="amount" value="{{ __('Amount (Rp)') }}" />
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <span class="text-gray-500 sm:text-sm">Rp</span>
+                                <span class="text-gray-500 sm:text-sm">{{ __('Rp') }}</span>
                             </div>
                             <x-forms.input id="amount" type="number" class="block w-full pl-12"
                                 wire:model="amount" placeholder="0" />

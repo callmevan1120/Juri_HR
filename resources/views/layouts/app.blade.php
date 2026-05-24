@@ -92,6 +92,18 @@
             'confirmTitle' => __('Are you sure?'),
             'noticeTitle' => __('Notice'),
         ]) }};
+        window.PasPapanValidationLabels = {{ Illuminate\Support\Js::from([
+            'required' => __('Please complete this field.'),
+            'email' => __('Please enter a valid email address.'),
+            'url' => __('Please enter a valid URL.'),
+            'pattern' => __('Please match the requested format.'),
+            'minLength' => __('Please enter at least :min characters.'),
+            'maxLength' => __('Please enter no more than :max characters.'),
+            'rangeUnderflow' => __('Please enter a value greater than or equal to :min.'),
+            'rangeOverflow' => __('Please enter a value less than or equal to :max.'),
+            'invalid' => __('Please review this field.'),
+            'summary' => __('Please review the highlighted fields before continuing.'),
+        ]) }};
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -251,6 +263,11 @@
 
                 const config = {
                     create: false,
+                    openOnFocus: true,
+                    closeAfterSelect: true,
+                    preload: true,
+                    maxOptions: 1000,
+                    shouldLoad: () => true,
                     dropdownParent: this.dropdownParent === 'self' ? this.$root : this.dropdownParent,
                     sortField: {
                         field: '$order'
@@ -270,6 +287,14 @@
                     onDropdownOpen: () => {
                         if (this.tomSelectInstance) this.tomSelectInstance.positionDropdown();
                     },
+                    onFocus: () => {
+                        if (!this.tomSelectInstance || this.disabled) {
+                            return;
+                        }
+
+                        this.tomSelectInstance.refreshOptions(false);
+                        requestAnimationFrame(() => this.tomSelectInstance?.open());
+                    },
                     onDropdownClose: () => {
                         this.commitPendingValue();
                     },
@@ -283,6 +308,27 @@
                 }
 
                 this.tomSelectInstance = new window.TomSelect(this.$refs.select, config);
+
+                if (this.$root?.classList.contains('ts-wrapper-user') || this.$root?.closest('.user-ui')) {
+                    this.tomSelectInstance.dropdown?.classList.add('ts-dropdown-user');
+                }
+
+                if (this.$root?.classList.contains('ts-wrapper-admin') || this.$root?.closest('.admin-ui')) {
+                    this.tomSelectInstance.dropdown?.classList.add('ts-dropdown-admin');
+                }
+
+                const openOptions = () => {
+                    if (this.disabled || !this.tomSelectInstance) {
+                        return;
+                    }
+
+                    this.tomSelectInstance.refreshOptions(false);
+                    requestAnimationFrame(() => this.tomSelectInstance?.open());
+                };
+
+                this.tomSelectInstance.control.addEventListener('mousedown', openOptions);
+                this.tomSelectInstance.control.addEventListener('pointerdown', openOptions);
+                this.tomSelectInstance.control_input?.addEventListener('focus', openOptions);
                 this.configureDropdownPosition();
 
                 this.$watch('value', (newValue) => {

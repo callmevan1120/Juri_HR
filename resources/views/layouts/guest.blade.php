@@ -70,6 +70,21 @@
         }
     </script>
 
+    <script>
+        window.PasPapanValidationLabels = {{ Illuminate\Support\Js::from([
+            'required' => __('Please complete this field.'),
+            'email' => __('Please enter a valid email address.'),
+            'url' => __('Please enter a valid URL.'),
+            'pattern' => __('Please match the requested format.'),
+            'minLength' => __('Please enter at least :min characters.'),
+            'maxLength' => __('Please enter no more than :max characters.'),
+            'rangeUnderflow' => __('Please enter a value greater than or equal to :min.'),
+            'rangeOverflow' => __('Please enter a value less than or equal to :max.'),
+            'invalid' => __('Please review this field.'),
+            'summary' => __('Please review the highlighted fields before continuing.'),
+        ]) }};
+    </script>
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -107,8 +122,8 @@
                             aria-label="{{ __('Switch language to :language', ['language' => app()->getLocale() == 'id' ? 'English' : 'Bahasa Indonesia']) }}">
                             <span class="sr-only">{{ __('Switch Language') }}</span>
                             <span class="language-toggle__labels" aria-hidden="true">
-                                <span class="language-toggle__label">ID</span>
-                                <span class="language-toggle__label">EN</span>
+                                <span class="language-toggle__label">{{ __('ID') }}</span>
+                                <span class="language-toggle__label">{{ __('EN') }}</span>
                             </span>
                             <span
                                 class="language-toggle__thumb {{ app()->getLocale() == 'en' ? 'language-toggle__thumb--end' : 'translate-x-0' }}">
@@ -177,6 +192,11 @@
 
                     const config = {
                         create: false,
+                        openOnFocus: true,
+                        closeAfterSelect: true,
+                        preload: true,
+                        maxOptions: 1000,
+                        shouldLoad: () => true,
                         dropdownParent: 'body',
                         sortField: {
                             field: '$order'
@@ -196,6 +216,14 @@
                         onDropdownOpen: () => {
                             if (this.tomSelectInstance) this.tomSelectInstance.positionDropdown();
                         },
+                        onFocus: () => {
+                            if (!this.tomSelectInstance || this.disabled) {
+                                return;
+                            }
+
+                            this.tomSelectInstance.refreshOptions(false);
+                            requestAnimationFrame(() => this.tomSelectInstance?.open());
+                        },
                         onDropdownClose: () => {
                             this.commitPendingValue();
                         },
@@ -209,6 +237,18 @@
                     }
 
                     this.tomSelectInstance = new TomSelect(this.$refs.select, config);
+                    const openOptions = () => {
+                        if (this.disabled || !this.tomSelectInstance) {
+                            return;
+                        }
+
+                        this.tomSelectInstance.refreshOptions(false);
+                        requestAnimationFrame(() => this.tomSelectInstance?.open());
+                    };
+
+                    this.tomSelectInstance.control.addEventListener('mousedown', openOptions);
+                    this.tomSelectInstance.control.addEventListener('pointerdown', openOptions);
+                    this.tomSelectInstance.control_input?.addEventListener('focus', openOptions);
 
                     this.$watch('value', (newValue) => {
                         if (!this.tomSelectInstance) return;

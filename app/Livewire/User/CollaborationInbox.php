@@ -163,6 +163,7 @@ class CollaborationInbox extends Component
             'messages' => $messages,
             'files' => $files,
             'realtimeEnabled' => CollaborationRealtime::enabled(),
+            'pollingEnabled' => ! $this->hasDraftMessage(),
             'pollInterval' => CollaborationRealtime::pollInterval(),
         ]);
     }
@@ -190,5 +191,10 @@ class CollaborationInbox extends Component
         $thread->members()->updateExistingPivot(Auth::id(), [
             'last_read_at' => now(),
         ]);
+    }
+
+    private function hasDraftMessage(): bool
+    {
+        return trim($this->messageBody) !== '' || $this->uploadedFile instanceof TemporaryUploadedFile;
     }
 }

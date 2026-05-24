@@ -8,7 +8,7 @@
                     </span>
                     <span class="truncate">{{ $title }}</span>
                 </h3>
-                <p class="scanner-helper-text">{{ __('Align the QR code inside the frame.') }}</p>
+                <p class="scanner-helper-text">{{ __('Tap the frame, then align the attendance QR.') }}</p>
             </div>
             <button type="button" id="switch-camera-btn" onclick="window.switchCamera?.()"
                 aria-label="{{ __('Switch camera') }}" class="scanner-camera-toggle">

@@ -81,7 +81,6 @@
                                         name="leave_type_id"
                                         placeholder="{{ __('Select Leave Type') }}"
                                         :selected="old('leave_type_id')"
-                                        dropdown-parent="self"
                                         required
                                     >
                                         <option value="" disabled>{{ __('Select Leave Type') }}</option>
@@ -106,24 +105,44 @@
                             <x-forms.input-error for="status" class="mt-2" />
                         </fieldset>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <x-forms.label for="from" value="{{ __('From Date') }}" class="mb-2 font-bold text-gray-700 dark:text-gray-300" />
-                                <x-forms.input type="date" name="from" id="from" class="block w-full rounded-xl border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900/50"
-                                    value="{{ old('from', date('Y-m-d')) }}" required />
-                                <x-forms.input-error for="from" class="mt-2" />
+                        @php
+                            $fromValue = old('from', date('Y-m-d'));
+                            $toValue = old('to', $fromValue);
+                            $rangeValue = $toValue && $toValue !== $fromValue
+                                ? $fromValue.' - '.$toValue
+                                : $fromValue;
+                        @endphp
+
+                        <div class="user-native-field">
+                            <x-forms.label for="leave-date-range" :value="__('Leave Date')" class="user-native-field__label" />
+
+                            <input type="hidden" name="from" id="from" value="{{ $fromValue }}" />
+                            <input type="hidden" name="to" id="to" value="{{ $toValue }}" />
+
+                            <div class="user-native-field__control">
+                                <x-heroicon-o-calendar-days class="user-native-field__icon" />
+                                <input
+                                    id="leave-date-range"
+                                    type="text"
+                                    value="{{ $rangeValue }}"
+                                    aria-label="{{ __('Leave Date') }}"
+                                    data-ui-picker="date-range"
+                                    data-ui-range-from="#from"
+                                    data-ui-range-to="#to"
+                                    autocomplete="off"
+                                    inputmode="none"
+                                    readonly
+                                    required
+                                    class="user-native-field__input"
+                                >
                             </div>
-                            <div>
-                                <x-forms.label for="to" value="{{ __('To Date') }}" class="mb-2 font-bold text-gray-700 dark:text-gray-300" />
-                                <div class="relative">
-                                    <x-forms.input type="date" name="to" id="to" class="block w-full rounded-xl border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900/50"
-                                        value="{{ old('to') }}" />
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-12 pointer-events-none">
-                                        <span class="rounded border border-gray-200 bg-white px-2 py-0.5 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">{{ __('Optional') }}</span>
-                                    </div>
-                                </div>
-                                <x-forms.input-error for="to" class="mt-2" />
-                            </div>
+
+                            <p class="mt-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                {{ __('Tap one date for a single-day leave, or choose another date for a range.') }}
+                            </p>
+
+                            <x-forms.input-error for="from" class="mt-2" />
+                            <x-forms.input-error for="to" class="mt-2" />
                         </div>
 
                         <div>

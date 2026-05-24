@@ -11,7 +11,7 @@
         {{ $slot }}
     </x-forms.tom-select>
 @else
-    <x-user.tom-select-user :disabled="$disabled" dropdown-parent="self" {{ $attributes }}>
+    <x-user.tom-select-user :disabled="$disabled" {{ $attributes }}>
         {{ $slot }}
     </x-user.tom-select-user>
 @endif

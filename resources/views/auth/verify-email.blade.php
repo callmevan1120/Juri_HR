@@ -4,12 +4,17 @@
 
         <div class="auth-shell__container">
             <section class="auth-card lg:col-span-2" aria-labelledby="verify-email-title">
-                <div class="auth-card__header">
-                    <p class="auth-card__eyebrow">{{ __('Verify Email') }}</p>
-                    <h2 id="verify-email-title" class="auth-card__title">{{ __('Check your inbox') }}</h2>
-                    <p class="auth-card__copy sr-only">
-                        {{ __('Enter the verification code we sent to your email address. If you did not receive it, you can request a new code.') }}
-                    </p>
+                <div class="auth-card__header auth-native-header">
+                    <div class="auth-native-mark" aria-hidden="true">
+                        <x-heroicon-o-envelope-open class="h-8 w-8" />
+                    </div>
+                    <div>
+                        <p class="auth-card__eyebrow">{{ __('Verify Email') }}</p>
+                        <h2 id="verify-email-title" class="auth-card__title">{{ __('Check your inbox') }}</h2>
+                        <p class="auth-card__copy">
+                            {{ __('Enter the verification code we sent to your email address.') }}
+                        </p>
+                    </div>
                 </div>
 
                 <div class="auth-form">
@@ -36,14 +41,15 @@
                                     inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"
                                     aria-describedby="@error('code') code-error @enderror"
                                     aria-invalid="@error('code') true @else false @enderror"
-                                    class="auth-input @error('code') auth-input--error @enderror"
+                                    class="auth-input auth-code-input @error('code') auth-input--error @enderror"
                                     placeholder="{{ __('6 digit code') }}">
                                 @error('code')
                                     <p id="code-error" class="auth-error" role="alert">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <button type="submit" class="auth-button auth-button--full">
+                            <button type="submit" class="auth-button auth-button--full" aria-label="{{ __('Verify and Continue') }}">
+                                <x-heroicon-o-check-badge class="mr-2 h-5 w-5" />
                                 {{ __('Verify and Continue') }}
                             </button>
                         </form>

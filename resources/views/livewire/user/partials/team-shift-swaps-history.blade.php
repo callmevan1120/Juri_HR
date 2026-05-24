@@ -1,112 +1,72 @@
-<div class="user-list-card hidden overflow-hidden p-0 md:block">
-    <div class="user-desktop-table-scroll">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Employee') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Schedule') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Requested Shift') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Status') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Reason') }}</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-                @forelse ($shiftSwapRequests as $request)
-                    <tr>
-                        <td class="px-4 py-3">
-                            <div class="flex items-center">
-                                <img class="h-10 w-10 rounded-full object-cover" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
-                                <div class="ml-4 min-w-0">
-                                    <div class="truncate text-sm font-medium text-gray-900 dark:text-white">{{ $request->user->name }}</div>
-                                    <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ $request->user->jobTitle->name ?? __('N/A') }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                            <div class="font-semibold text-gray-900 dark:text-white">{{ $request->effectiveScheduleDate()?->translatedFormat('d M Y') ?? '-' }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Current') }}: {{ $request->currentShift->name ?? __('No current schedule') }}</div>
-                        </td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ $request->requestedShift->name ?? '-' }}</td>
-                        <td class="px-4 py-3">
-                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $request->status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
-                                {{ $request->statusLabel() }}
-                            </span>
-                            @if ($request->reviewer)
-                                <div class="mt-1 text-[10px] text-gray-400">{{ __('by') }} {{ $request->reviewer->name }}</div>
-                            @endif
-                            @if ($request->rejection_note)
-                                <div class="mt-1 text-xs text-red-600 dark:text-red-300">{{ $request->rejection_note }}</div>
-                            @endif
-                        </td>
-                        <td class="max-w-sm px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                            <div class="line-clamp-2">{{ $request->reason }}</div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                            {{ __('No shift swap requests found') }}
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+@php
+    $shiftSwapStatusClass = fn (?string $status): string => match ($status) {
+        'approved' => 'team-approval-status team-approval-status--success',
+        'rejected' => 'team-approval-status team-approval-status--danger',
+        default => 'team-approval-status team-approval-status--info',
+    };
+@endphp
 
-    @if ($shiftSwapRequests->hasPages())
-        <div class="px-4 py-3">{{ $shiftSwapRequests->links() }}</div>
-    @endif
-</div>
-
-<div class="space-y-4 md:hidden">
+<section class="team-approval-list" aria-live="polite">
     @forelse ($shiftSwapRequests as $request)
-        <article class="user-list-card">
-            <div class="flex items-start gap-3">
-                <div class="flex min-w-0 flex-1 items-center">
-                    <img class="h-10 w-10 rounded-full object-cover" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
-                    <div class="ml-3 min-w-0">
-                        <div class="truncate text-sm font-medium text-gray-900 dark:text-white">{{ $request->user->name }}</div>
-                        <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ $request->user->jobTitle->name ?? __('N/A') }}</div>
+        <article class="team-approval-card">
+            <div class="team-approval-card__main">
+                <img
+                    class="team-approval-card__avatar"
+                    src="{{ $request->user->profile_photo_url }}"
+                    alt="{{ $request->user->name }}">
+
+                <div class="team-approval-card__body">
+                    <div class="team-approval-card__topline">
+                        <div class="min-w-0">
+                            <h3>{{ $request->user->name }}</h3>
+                            <p>{{ $request->user->jobTitle->name ?? __('N/A') }}</p>
+                        </div>
+
+                        <span class="{{ $shiftSwapStatusClass($request->status) }}">
+                            {{ $request->statusLabel() }}
+                        </span>
                     </div>
-                </div>
-                <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold {{ $request->status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
-                    {{ $request->statusLabel() }}
-                </span>
-            </div>
 
-            <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Schedule') }}</p>
-                    <p class="font-medium text-gray-900 dark:text-white">{{ $request->effectiveScheduleDate()?->translatedFormat('d M Y') ?? '-' }}</p>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Current') }}: {{ $request->currentShift->name ?? __('No current schedule') }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Requested Shift') }}</p>
-                    <p class="font-medium text-gray-900 dark:text-white">{{ $request->requestedShift->name ?? '-' }}</p>
-                </div>
-            </div>
+                    <div class="team-approval-facts">
+                        <div>
+                            <span>{{ __('Schedule') }}</span>
+                            <strong>{{ $request->effectiveScheduleDate()?->translatedFormat('d M Y') ?? '-' }}</strong>
+                        </div>
+                        <div>
+                            <span>{{ __('Current') }}</span>
+                            <strong>{{ $request->currentShift->name ?? __('No current schedule') }}</strong>
+                        </div>
+                        <div>
+                            <span>{{ __('Requested Shift') }}</span>
+                            <strong>{{ $request->requestedShift->name ?? '-' }}</strong>
+                        </div>
+                        <div>
+                            <span>{{ __('Processed By') }}</span>
+                            <strong>{{ $request->reviewer?->name ?? __('System') }}</strong>
+                        </div>
+                    </div>
 
-            <div class="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-900/40 dark:text-gray-200">
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Reason') }}</p>
-                <div class="mt-1">{{ $request->reason }}</div>
-            </div>
+                    @if ($request->reason)
+                        <p class="team-approval-note">{{ $request->reason }}</p>
+                    @endif
 
-            <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                @if ($request->reviewer)
-                    <div>{{ __('by') }} {{ $request->reviewer->name }}</div>
-                @endif
-                @if ($request->rejection_note)
-                    <div class="mt-2 rounded-xl bg-red-50 p-3 text-red-600 dark:bg-red-900/20 dark:text-red-300">{{ $request->rejection_note }}</div>
-                @endif
+                    @if ($request->rejection_note)
+                        <p class="team-approval-note team-approval-note--danger">{{ $request->rejection_note }}</p>
+                    @endif
+                </div>
             </div>
         </article>
     @empty
-        <div class="user-empty-state">
-            {{ __('No shift swap requests found') }}
+        <div class="team-approval-empty">
+            <x-heroicon-o-arrows-right-left class="h-10 w-10" />
+            <h3>{{ __('No shift swap requests found') }}</h3>
+            <p>{{ __('Your shift swap requests are waiting for review.') }}</p>
         </div>
     @endforelse
 
     @if ($shiftSwapRequests->hasPages())
-        <div class="px-4 py-3">{{ $shiftSwapRequests->links() }}</div>
+        <div>
+            {{ $shiftSwapRequests->links() }}
+        </div>
     @endif
-</div>
+</section>

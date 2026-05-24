@@ -131,6 +131,7 @@ class MyOperationalTasks extends Component
 
         return view('livewire.user.my-operational-tasks', [
             'tasks' => $tasks,
+            'pollingEnabled' => ! $this->hasDraftVisitEvidence(),
             'statuses' => [
                 'open' => __('Open'),
                 ProjectTask::STATUS_DONE => __('Done'),
@@ -144,5 +145,26 @@ class MyOperationalTasks extends Component
         return ProjectTask::query()
             ->where('assigned_to', auth()->id())
             ->findOrFail($taskId);
+    }
+
+    private function hasDraftVisitEvidence(): bool
+    {
+        foreach ([$this->visitNotes, $this->visitLatitude, $this->visitLongitude, $this->visitAccuracy, $this->visitPhotos] as $values) {
+            foreach ($values as $value) {
+                if ($value instanceof TemporaryUploadedFile) {
+                    return true;
+                }
+
+                if (is_string($value) && trim($value) !== '') {
+                    return true;
+                }
+
+                if ($value !== null && ! is_string($value)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

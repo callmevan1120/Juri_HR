@@ -1,50 +1,50 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <div class="user-page-surface relative overflow-hidden">
+        <section class="user-page-surface face-enrollment-page" aria-labelledby="face-enrollment-title">
             <x-user.page-header
                 :back-href="route('home')"
                 :title="__('Face ID Setup')"
-                title-id="face-enrollment-title">
-                <x-slot name="icon">
-                    <x-heroicon-o-face-smile class="h-5 w-5" />
-                </x-slot>
-            </x-user.page-header>
+                title-id="face-enrollment-title"
+                class="border-b-0" />
 
-            <div class="p-3 sm:p-4">
+            <div class="user-page-body pt-0">
                 @if ($isEnrolled && !$isCapturing)
-                    <div class="max-w-md mx-auto text-center">
-                        <div
-                            class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sky-50 ring-1 ring-sky-100 dark:bg-sky-950/30 dark:ring-sky-900/50">
-                            <x-heroicon-o-check-circle class="h-8 w-8 text-sky-600 dark:text-sky-300" />
+                    <div class="face-enrollment-ready">
+                        <div class="face-enrollment-ready__mark">
+                            <x-heroicon-o-check-circle class="h-9 w-9" />
                         </div>
-                        <h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">{{ __('Face ID Active') }}</h3>
-                        <p class="sr-only">
-                            {{ __('Your face is registered for attendance verification.') }}</p>
 
-                        <div class="mt-5 flex flex-col gap-2">
+                        <div class="min-w-0">
+                            <p class="face-enrollment-eyebrow">{{ __('Face ID') }}</p>
+                            <h2 class="face-enrollment-ready__title">{{ __('Face ID Active') }}</h2>
+                            <p class="face-enrollment-ready__copy">{{ __('Your face is registered for attendance verification.') }}</p>
+                        </div>
+
+                        <div class="face-enrollment-ready__actions">
                             @if (\App\Helpers\Editions::attendanceLocked())
                                 <button type="button"
                                     @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
-                                    class="w-full px-4 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 font-semibold transition flex items-center justify-center gap-2">
+                                    class="face-enrollment-primary-action"
+                                    aria-label="{{ __('Update Face ID') }}">
                                     <x-heroicon-o-arrow-path class="h-5 w-5" />
-                                    {{ __('Update Face ID') }}
+                                    <span>{{ __('Update Face ID') }}</span>
                                     <x-heroicon-o-lock-closed class="h-4 w-4" />
                                 </button>
                                 <button type="button"
                                     @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
-                                    class="w-full px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 font-semibold transition">
-                                    {{ __('Remove Face ID') }}
-                                    <x-heroicon-o-lock-closed class="ml-2 inline h-4 w-4" />
+                                    class="face-enrollment-danger-action"
+                                    aria-label="{{ __('Remove Face ID') }}">
+                                    <span>{{ __('Remove Face ID') }}</span>
+                                    <x-heroicon-o-lock-closed class="h-4 w-4" />
                                 </button>
                             @else
-                                <button wire:click="startCapture" data-apk-face-update
-                                    class="w-full px-4 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 font-semibold transition flex items-center justify-center gap-2">
+                                <button wire:click="startCapture" data-apk-face-update class="face-enrollment-primary-action" aria-label="{{ __('Update Face ID') }}">
                                     <x-heroicon-o-arrow-path class="h-5 w-5" />
-                                    {{ __('Update Face ID') }}
+                                    <span>{{ __('Update Face ID') }}</span>
                                 </button>
                                 <button wire:click="removeFace"
                                     wire:confirm="{{ __('Are you sure you want to remove Face ID?') }}"
-                                    class="w-full px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 font-semibold transition">
+                                    class="face-enrollment-danger-action">
                                     {{ __('Remove Face ID') }}
                                 </button>
                             @endif
@@ -53,30 +53,38 @@
                 @else
                     <div data-face-enrollment-root
                         wire:key="face-enrollment-{{ $isEnrolled ? 'enrolled' : 'capture' }}-{{ $isCapturing ? 'capturing' : 'idle' }}"
-                        x-data="faceEnrollment()" x-init="init()" class="max-w-lg mx-auto">
-                        <div class="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl bg-slate-950 ring-1 ring-white/10">
-                            <video x-ref="video" autoplay playsinline muted class="h-full w-full object-cover contrast-105 saturate-105"></video>
-                            <canvas x-ref="overlay" class="absolute inset-0 w-full h-full"></canvas>
+                        x-data="faceEnrollment()" x-init="init()" class="face-enrollment-capture">
+                        <div class="face-enrollment-guide">
+                            <div class="face-enrollment-guide__copy">
+                                <p class="face-enrollment-eyebrow">{{ __('Face ID') }}</p>
+                                <h2 x-text="guideTitle()"></h2>
+                                <p x-text="guideInstruction()"></p>
+                            </div>
+                            <div class="face-enrollment-guide__steps" aria-hidden="true">
+                                <span>1</span>
+                                <span>2</span>
+                                <span>3</span>
+                            </div>
                         </div>
 
-                        <div class="mb-4 flex min-h-[44px] items-center justify-center">
-                            <div class="px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 text-center"
-                                role="status" aria-live="polite" aria-atomic="true"
-                                :class="statusToneClass()">
+                        <div class="face-enrollment-camera" aria-label="{{ __('Face ID Setup') }}">
+                            <video x-ref="video" autoplay playsinline muted class="face-enrollment-camera__video"></video>
+                            <canvas x-ref="overlay" class="face-enrollment-camera__overlay"></canvas>
+                        </div>
+
+                        <div class="face-enrollment-status">
+                            <div class="face-enrollment-status__pill" role="status" aria-live="polite" aria-atomic="true" :class="statusToneClass()">
                                 <template x-if="showSpinner()">
                                     <x-heroicon-o-arrow-path class="h-4 w-4 shrink-0 animate-spin" />
                                 </template>
                                 <span x-text="statusMessage"></span>
                             </div>
+                            <p class="face-enrollment-status__hint" x-text="hintMessage"></p>
                         </div>
 
-                        <div class="mb-4 min-h-[20px] text-center text-xs text-gray-700 dark:text-gray-300"
-                            x-text="hintMessage"></div>
-
-                        <div class="flex gap-3">
+                        <div class="face-enrollment-actions">
                             @if ($isEnrolled)
-                                <button wire:click="cancelCapture"
-                                    class="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-semibold transition">
+                                <button wire:click="cancelCapture" class="face-enrollment-secondary-action">
                                     {{ __('Cancel') }}
                                 </button>
                             @endif
@@ -84,16 +92,17 @@
                             @if (\App\Helpers\Editions::attendanceLocked())
                                 <button
                                     @click.prevent="$dispatch('feature-lock', { title: @js(__('Face ID Locked')), message: @js(__('Face ID Biometrics is an Enterprise Feature. Please Upgrade.')) })"
-                                    class="flex-1 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition flex items-center justify-center gap-2">
+                                    class="face-enrollment-primary-action @if (! $isEnrolled) w-full @endif"
+                                    aria-label="{{ __('Capture Face') }}">
                                     <x-heroicon-o-camera class="h-5 w-5" />
-                                    {{ __('Capture Face') }}
+                                    <span>{{ __('Capture Face') }}</span>
                                     <x-heroicon-o-lock-closed class="h-4 w-4" />
                                 </button>
                             @else
-                                <button @click="capture()" :disabled="!canCapture()"
-                                    :class="canCapture() ? 'bg-primary-600 hover:bg-primary-700 text-white' :
-                                        'bg-gray-300 dark:bg-gray-600 text-white cursor-not-allowed'"
-                                    class="@if ($isEnrolled) flex-1 @else w-full @endif px-4 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                                <button @click="capture({ manual: true })" :disabled="!canCapture()"
+                                    :class="canCapture() ? 'face-enrollment-primary-action' : 'face-enrollment-primary-action face-enrollment-primary-action--disabled'"
+                                    class="@if (! $isEnrolled) w-full @else flex-1 @endif"
+                                    aria-label="{{ __('Capture Face') }}">
                                     <x-heroicon-o-camera class="h-5 w-5" />
                                     <span x-text="buttonLabel()"></span>
                                 </button>
@@ -102,7 +111,7 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </section>
     </div>
 </div>
 
@@ -183,9 +192,9 @@
             const messages = {
                 loadingModels: @js(__('Loading Face ID models...')),
                 openingCamera: @js(__('Opening camera...')),
-                centerFace: @js(__('Center your face inside the guide')),
-                holdStill: @js(__('Hold still for a moment')),
-                passChallenge: @js(__('Complete the face movement check')),
+                centerFace: @js(__('Face forward inside the guide')),
+                holdStill: @js(__('Hold face forward briefly')),
+                passChallenge: @js(__('Turn your head slowly')),
                 liveConfirmed: @js(__('Live face confirmed. Ready to capture.')),
                 savingFace: @js(__('Saving Face ID...')),
                 capturingFrames: @js(__('Capturing face frames...')),
@@ -197,14 +206,26 @@
                 cameraError: @js(__('Could not access camera for Face ID setup.')),
                 faceError: @js(__('We could not verify a live face right now. Please try again.')),
                 captureFace: @js(__('Capture Face')),
+                captureNow: @js(__('Capture now')),
                 permissionHint: @js(__('Allow camera access to continue')),
-                livenessHint: @js(__('Turn your head to both sides naturally before capture')),
-                readyHint: @js(__('You can capture now')),
+                livenessHint: @js(__('Start facing forward, then follow the turn prompt.')),
+                readyHint: @js(__('Ready. Capturing automatically...')),
                 loadingHint: @js(__('Preparing browser face detection')),
-                turnBothSidesHint: @js(__('Look to one side, face forward, then look to the other side')),
-                turnOppositeHint: @js(__('Now turn your head to the other side')),
-                recenterHint: @js(__('Face forward briefly before the next turn')),
-                finalCenterHint: @js(__('Face forward briefly to finish verification')),
+                turnBothSidesHint: @js(__('Turn your head to one side first.')),
+                turnOppositeHint: @js(__('Now turn your head to the other side.')),
+                recenterHint: @js(__('Face forward again before the next turn.')),
+                finalCenterHint: @js(__('Face forward to finish verification.')),
+                guideCenterTitle: @js(__('Face forward first')),
+                guideCenterCopy: @js(__('Keep your face inside the guide until the next prompt appears.')),
+                guideTurnTitle: @js(__('Turn your head')),
+                guideTurnFirstCopy: @js(__('Turn slowly to one side. No button press is needed.')),
+                guideTurnOppositeCopy: @js(__('Now turn slowly to the other side.')),
+                guideRecenterTitle: @js(__('Back to center')),
+                guideRecenterCopy: @js(__('Face forward briefly so we can confirm the movement.')),
+                guideReadyTitle: @js(__('Face verified')),
+                guideReadyCopy: @js(__('Hold still. We are capturing automatically.')),
+                guideErrorTitle: @js(__('Try once more')),
+                guideErrorCopy: @js(__('Keep one face visible and follow the movement prompt.')),
             };
             const modelUrls = [
                 window.resolveRuntimeAssetUrl ? window.resolveRuntimeAssetUrl('/models') :
@@ -238,6 +259,8 @@
                 baselineYaw: null,
                 livenessPassed: false,
                 captureBusy: false,
+                autoCaptureTimer: null,
+                autoCaptureQueued: false,
                 challengeStep: 'turn-first-side',
                 firstTurnDirection: null,
                 leftTurnDetected: false,
@@ -293,6 +316,50 @@
                     return ['loading-models', 'opening-camera', 'saving'].includes(this.status);
                 },
 
+                guideTitle() {
+                    if (this.status === 'ready-to-capture' || this.status === 'saving') {
+                        return messages.guideReadyTitle;
+                    }
+
+                    if (this.status === 'error') {
+                        return messages.guideErrorTitle;
+                    }
+
+                    if (this.status === 'turn-face' || this.status === 'turn-opposite-face') {
+                        return messages.guideTurnTitle;
+                    }
+
+                    if (this.status === 'recenter-face') {
+                        return messages.guideRecenterTitle;
+                    }
+
+                    return messages.guideCenterTitle;
+                },
+
+                guideInstruction() {
+                    if (this.status === 'ready-to-capture' || this.status === 'saving') {
+                        return messages.guideReadyCopy;
+                    }
+
+                    if (this.status === 'error') {
+                        return messages.guideErrorCopy;
+                    }
+
+                    if (this.status === 'turn-opposite-face') {
+                        return messages.guideTurnOppositeCopy;
+                    }
+
+                    if (this.status === 'turn-face') {
+                        return messages.guideTurnFirstCopy;
+                    }
+
+                    if (this.status === 'recenter-face') {
+                        return messages.guideRecenterCopy;
+                    }
+
+                    return messages.guideCenterCopy;
+                },
+
                 statusToneClass() {
                     if (this.status === 'ready-to-capture') {
                         return 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-100';
@@ -310,7 +377,11 @@
                 },
 
                 buttonLabel() {
-                    return this.status === 'saving' ? messages.savingFace : messages.captureFace;
+                    if (this.status === 'saving') {
+                        return messages.savingFace;
+                    }
+
+                    return this.status === 'ready-to-capture' ? messages.captureNow : messages.captureFace;
                 },
 
                 canCapture() {
@@ -436,6 +507,27 @@
                     this.isDetecting = false;
                 },
 
+                clearAutoCapture() {
+                    if (this.autoCaptureTimer) {
+                        window.clearTimeout(this.autoCaptureTimer);
+                        this.autoCaptureTimer = null;
+                    }
+
+                    this.autoCaptureQueued = false;
+                },
+
+                scheduleAutoCapture() {
+                    if (this.autoCaptureQueued || this.captureBusy || !this.canCapture()) {
+                        return;
+                    }
+
+                    this.autoCaptureQueued = true;
+                    this.autoCaptureTimer = window.setTimeout(() => {
+                        this.autoCaptureTimer = null;
+                        void this.capture({ manual: false });
+                    }, 620);
+                },
+
                 queueDetection(delay = 420) {
                     this.stopDetection();
                     this.detectionTimer = setTimeout(() => {
@@ -444,6 +536,7 @@
                 },
 
                 resetLiveness(message, stage = 'align-face') {
+                    this.clearAutoCapture();
                     this.stableFrames = 0;
                     this.baselineYaw = null;
                     this.livenessPassed = false;
@@ -654,6 +747,7 @@
 
                         if (this.livenessPassed) {
                             this.setStage('ready-to-capture', messages.liveConfirmed, messages.readyHint);
+                            this.scheduleAutoCapture();
                             return;
                         }
 
@@ -729,6 +823,7 @@
                                 this.livenessPassed = true;
                                 this.stopDetection();
                                 this.setStage('ready-to-capture', messages.liveConfirmed, messages.readyHint);
+                                this.scheduleAutoCapture();
                                 return;
                             }
 
@@ -811,12 +906,15 @@
                     throw new Error(messages.descriptorFailed);
                 },
 
-                async capture() {
+                async capture({ manual = true } = {}) {
                     if (!this.canCapture()) {
-                        this.setStage('turn-face', messages.passChallenge, messages.turnBothSidesHint);
+                        if (manual) {
+                            this.setStage('turn-face', messages.passChallenge, messages.turnBothSidesHint);
+                        }
                         return;
                     }
 
+                    this.clearAutoCapture();
                     this.captureBusy = true;
                     this.stopDetection();
                     this.setStage('saving', messages.capturingFrames, messages.readyHint);
@@ -869,6 +967,7 @@
                 },
 
                 cleanup() {
+                    this.clearAutoCapture();
                     this.stopDetection();
                     this.stopStream();
                     this.clearOverlay();

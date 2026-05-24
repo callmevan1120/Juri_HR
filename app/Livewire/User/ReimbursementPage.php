@@ -95,9 +95,31 @@ class ReimbursementPage extends Component
         $this->limit = 5;
     }
 
+    public function setStatusFilter(string $status): void
+    {
+        if (! in_array($status, ['all', 'pending', 'approved', 'rejected'], true)) {
+            return;
+        }
+
+        $this->statusFilter = $status;
+        $this->limit = 5;
+    }
+
+    public function setTypeFilter(string $type): void
+    {
+        if (! in_array($type, ['all', 'medical', 'transport', 'project', 'optical', 'dental', 'other'], true)) {
+            return;
+        }
+
+        $this->typeFilter = $type;
+        $this->limit = 5;
+    }
+
     public function save()
     {
         $this->authorize('create', Reimbursement::class);
+
+        $this->amount = $this->normalizeCurrencyAmount($this->amount);
 
         $this->validate();
         $this->reimbursementService->createClaim(Auth::user(), [
@@ -132,5 +154,16 @@ class ReimbursementPage extends Component
         return view('livewire.user.reimbursement-page', [
             'totalClaims' => $listing['total'],
         ])->layout('layouts.app');
+    }
+
+    private function normalizeCurrencyAmount(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', (string) $value);
+
+        return $digits === '' ? null : $digits;
     }
 }

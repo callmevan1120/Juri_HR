@@ -1,914 +1,473 @@
-<div class="user-page-shell">
+<div class="user-page-shell team-approvals-page" wire:poll.visible.20s>
+    @php
+        $tabs = [
+            'leaves' => ['label' => __('Leave'), 'icon' => 'calendar', 'hint' => __('Leave Requests')],
+            'reimbursements' => ['label' => __('Claim'), 'icon' => 'cash', 'hint' => __('Reimbursements')],
+            'attendance-corrections' => ['label' => __('Correction'), 'icon' => 'correction', 'hint' => __('Attendance Corrections')],
+            'shift-swaps' => ['label' => __('Shift Swap'), 'icon' => 'swap', 'hint' => __('Shift Swaps')],
+            'overtimes' => ['label' => __('Overtime'), 'icon' => 'clock', 'hint' => __('Overtime Requests')],
+            'wfh' => ['label' => __('WFH'), 'icon' => 'home', 'hint' => __('WFH')],
+            'kasbons' => ['label' => __('Kasbon'), 'icon' => 'wallet', 'hint' => __('Kasbons')],
+        ];
+
+        $activePaginator = match ($activeTab) {
+            'attendance-corrections' => $attendanceCorrections,
+            'shift-swaps' => $shiftSwapRequests,
+            'reimbursements' => $reimbursements,
+            'overtimes' => $overtimes,
+            'wfh' => $wfhRequests,
+            'kasbons' => $kasbons,
+            default => $leaves,
+        };
+        $activeTotal = method_exists($activePaginator, 'total') ? $activePaginator->total() : $activePaginator->count();
+        $activeMeta = $tabs[$activeTab] ?? $tabs['leaves'];
+
+        $statusClass = fn (?string $status): string => match ($status) {
+            'approved', 'paid' => 'team-approval-status team-approval-status--success',
+            'rejected' => 'team-approval-status team-approval-status--danger',
+            'pending_finance' => 'team-approval-status team-approval-status--info',
+            default => 'team-approval-status team-approval-status--warning',
+        };
+    @endphp
+
     <div class="user-page-container user-page-container--wide">
-        <div class="user-page-surface">
+        <div class="user-page-surface team-approval-surface">
             <x-user.page-header
                 :back-href="route('home')"
                 :title="__('Team Approvals')"
                 title-id="team-approvals-title"
                 class="border-b-0">
                 <x-slot name="icon">
-                    <x-heroicon-o-users class="h-5 w-5" />
+                    <x-heroicon-o-check-badge class="h-5 w-5" />
                 </x-slot>
                 <x-slot name="actions">
                     <a href="{{ route('approvals.history') }}"
-                        class="wcag-touch-target inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white sm:w-auto"
-                        title="{{ __('History') }}">
+                        class="user-header-icon-button"
+                        title="{{ __('History') }}"
+                        aria-label="{{ __('Approval History') }}">
                         <x-heroicon-o-clock class="h-5 w-5" />
-                        <span>{{ __('History') }}</span>
                     </a>
                 </x-slot>
             </x-user.page-header>
 
-        <div class="user-page-body pt-0">
-        <div class="mb-6">
-            <nav class="user-segmented-tabs" aria-label="{{ __('Tabs') }}">
-                <button wire:click="switchTab('leaves')"
-                    aria-selected="{{ $activeTab === 'leaves' ? 'true' : 'false' }}"
-                    class="user-segmented-tab">
-                    {{ __('Leave Requests') }}
-                </button>
-                <button wire:click="switchTab('reimbursements')"
-                    aria-selected="{{ $activeTab === 'reimbursements' ? 'true' : 'false' }}"
-                    class="user-segmented-tab">
-                    {{ __('Reimbursements') }}
-                </button>
-                <button wire:click="switchTab('attendance-corrections')"
-                    aria-selected="{{ $activeTab === 'attendance-corrections' ? 'true' : 'false' }}"
-                    class="user-segmented-tab">
-                    {{ __('Attendance Corrections') }}
-                </button>
-                <button wire:click="switchTab('shift-swaps')"
-                    aria-selected="{{ $activeTab === 'shift-swaps' ? 'true' : 'false' }}"
-                    class="user-segmented-tab">
-                    {{ __('Shift Swaps') }}
-                </button>
-                <button wire:click="switchTab('overtimes')"
-                    aria-selected="{{ $activeTab === 'overtimes' ? 'true' : 'false' }}"
-                    class="user-segmented-tab">
-                    {{ __('Overtime Requests') }}
-                </button>
-                <button wire:click="switchTab('wfh')"
-                    aria-selected="{{ $activeTab === 'wfh' ? 'true' : 'false' }}"
-                    class="user-segmented-tab">
-                    {{ __('WFH') }}
-                </button>
-                <button wire:click="switchTab('kasbons')"
-                    aria-selected="{{ $activeTab === 'kasbons' ? 'true' : 'false' }}"
-                    class="user-segmented-tab">
-                    {{ __('Kasbons') }}
-                </button>
-            </nav>
-        </div>
-
-        <div class="space-y-4">
-            @if ($activeTab === 'leaves')
-                <!-- Desktop Table -->
-                <div
-                    class="user-list-card hidden overflow-hidden p-0 md:block">
-                    <div class="user-desktop-table-scroll">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-900">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Employee') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Type') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Date') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Status') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Actions') }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse ($leaves as $leave)
-                                    <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full object-cover"
-                                                        src="{{ $leave->user->profile_photo_url }}"
-                                                        alt="{{ $leave->user->name }}">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $leave->user->name }}
-                                                    </div>
-                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $leave->user->jobTitle->name ?? __('N/A') }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $leave->status === 'sick' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
-                                                {{ ucfirst($leave->status) }}
-                                            </span>
-                                        </td>
-                                        <td
-                                            class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ \Carbon\Carbon::parse($leave->date)->format('d M Y') }}
-                                            @if ($leave->note)
-                                                <div class="text-xs text-gray-400 mt-0.5 truncate max-w-xs">
-                                                    {{ $leave->note }}
-                                                </div>
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            @if ($leave->approval_status === 'pending')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                                    {{ __('Pending') }}
-                                                </span>
-                                            @elseif($leave->approval_status === 'approved')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                                    {{ __('Approved') }}
-                                                </span>
-                                                @if ($leave->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $leave->approvedBy->name }}</div>
-                                                @endif
-                                            @else
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                                    {{ __('Rejected') }}
-                                                </span>
-                                                @if ($leave->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $leave->approvedBy->name }}</div>
-                                                @endif
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                                            @if ($leave->approval_status === 'pending')
-                                                <div class="flex justify-end gap-2">
-                                                    <button wire:click="approveLeave('{{ $leave->id }}')"
-                                                        class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Approve') }}">
-                                                        <x-heroicon-o-check class="h-5 w-5" />
-                                                    </button>
-                                                    <button wire:click="rejectLeave('{{ $leave->id }}')"
-                                                        class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Reject') }}">
-                                                        <x-heroicon-o-x-mark class="h-5 w-5" />
-                                                    </button>
-                                                </div>
-                                            @else
-                                                <span class="text-gray-400 text-xs italic">{{ __('Processed') }}</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5"
-                                            class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                                            {{ __('No leave requests found') }}
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+            <div class="user-page-body pt-0">
+                <section class="team-approval-overview" aria-labelledby="team-approval-overview-title">
+                    <div class="team-approval-overview__copy">
+                        <p class="team-approval-overview__eyebrow">{{ __('Manager Inbox') }}</p>
+                        <h2 id="team-approval-overview-title">{{ $activeMeta['hint'] }}</h2>
+                        <p>{{ __('Review pending team requests without jumping between menus.') }}</p>
                     </div>
-                </div>
+                    <div class="team-approval-overview__count" aria-label="{{ __('Pending approvals') }}">
+                        <strong>{{ $activeTotal }}</strong>
+                        <span>{{ __('Pending') }}</span>
+                    </div>
+                </section>
 
-                <!-- Mobile Cards -->
-                <div class="space-y-4 md:hidden">
-                    @forelse ($leaves as $leave)
-                        <div
-                            class="user-list-card">
-                            <div class="flex items-start gap-3">
-                                <div class="flex min-w-0 flex-1 items-center">
-                                    <img class="h-10 w-10 rounded-full object-cover"
-                                        src="{{ $leave->user->profile_photo_url }}" alt="{{ $leave->user->name }}">
-                                    <div class="ml-3 min-w-0">
-                                        <div class="truncate text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $leave->user->name }}
-                                        </div>
-                                        <div class="truncate text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $leave->user->jobTitle->name ?? __('N/A') }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <span
-                                    class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold {{ $leave->status === 'sick' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
-                                    {{ ucfirst($leave->status) }}
+                <section class="team-approval-toolbar" aria-label="{{ __('Filter approvals') }}">
+                    <label class="team-approval-search" for="team-approval-search">
+                        <x-heroicon-o-magnifying-glass class="h-5 w-5" />
+                        <input
+                            id="team-approval-search"
+                            wire:model.live.debounce.300ms="search"
+                            type="search"
+                            placeholder="{{ __('Search employee...') }}"
+                            autocomplete="off" />
+                    </label>
+
+                    <nav class="team-approval-tabs" aria-label="{{ __('Approval type') }}">
+                        @foreach($tabs as $tab => $meta)
+                            <button
+                                type="button"
+                                wire:click="switchTab('{{ $tab }}')"
+                                class="team-approval-tab"
+                                aria-label="{{ $meta['hint'] }}"
+                                aria-selected="{{ $activeTab === $tab ? 'true' : 'false' }}">
+                                <span class="team-approval-tab__icon" aria-hidden="true">
+                                    @switch($meta['icon'])
+                                        @case('cash')
+                                            <x-heroicon-o-banknotes class="h-4 w-4" />
+                                            @break
+                                        @case('correction')
+                                            <x-heroicon-o-clipboard-document-check class="h-4 w-4" />
+                                            @break
+                                        @case('swap')
+                                            <x-heroicon-o-arrows-right-left class="h-4 w-4" />
+                                            @break
+                                        @case('clock')
+                                            <x-heroicon-o-clock class="h-4 w-4" />
+                                            @break
+                                        @case('home')
+                                            <x-heroicon-o-home-modern class="h-4 w-4" />
+                                            @break
+                                        @case('wallet')
+                                            <x-heroicon-o-wallet class="h-4 w-4" />
+                                            @break
+                                        @default
+                                            <x-heroicon-o-calendar-days class="h-4 w-4" />
+                                    @endswitch
                                 </span>
-                            </div>
+                                <span>{{ $meta['label'] }}</span>
+                            </button>
+                        @endforeach
+                    </nav>
+                </section>
 
-                            <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date') }}</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">
-                                        {{ \Carbon\Carbon::parse($leave->date)->format('d M Y') }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Status') }}</p>
-                                    <div class="flex flex-col">
-                                        @if ($leave->approval_status === 'pending')
-                                            <span
-                                                class="text-yellow-600 dark:text-yellow-400 font-medium">{{ __('Pending') }}</span>
-                                        @elseif($leave->approval_status === 'approved')
-                                            <span
-                                                class="text-green-600 dark:text-green-400 font-medium">{{ __('Approved') }}</span>
-                                        @else
-                                            <span
-                                                class="text-red-600 dark:text-red-400 font-medium">{{ __('Rejected') }}</span>
-                                        @endif
-                                        @if ($leave->approvedBy)
-                                            <span class="text-[10px] text-gray-400">{{ __('by') }}
-                                                {{ $leave->approvedBy->name }}</span>
+                <section class="team-approval-list" aria-live="polite">
+                    @if ($activeTab === 'leaves')
+                        @forelse ($leaves as $leave)
+                            <article class="team-approval-card">
+                                <div class="team-approval-card__main">
+                                    <img class="team-approval-card__avatar" src="{{ $leave->user->profile_photo_url }}" alt="{{ $leave->user->name }}">
+                                    <div class="team-approval-card__body">
+                                        <div class="team-approval-card__topline">
+                                            <div>
+                                                <h3>{{ $leave->user->name }}</h3>
+                                                <p>{{ $leave->user->jobTitle->name ?? __('N/A') }}</p>
+                                            </div>
+                                            <span class="{{ $statusClass($leave->approval_status) }}">{{ __(str((string) $leave->approval_status)->headline()->toString()) }}</span>
+                                        </div>
+
+                                        <div class="team-approval-facts">
+                                            <div>
+                                                <span>{{ __('Type') }}</span>
+                                                <strong>{{ __(ucfirst((string) $leave->status)) }}</strong>
+                                            </div>
+                                            <div>
+                                                <span>{{ __('Date') }}</span>
+                                                <strong>{{ \Carbon\Carbon::parse($leave->date)->translatedFormat('d M Y') }}</strong>
+                                            </div>
+                                        </div>
+
+                                        @if($leave->note)
+                                            <p class="team-approval-note">{{ $leave->note }}</p>
                                         @endif
                                     </div>
                                 </div>
-                            </div>
 
-                            @if ($leave->note)
-                                <div
-                                    class="mt-3 p-2 bg-gray-50 dark:bg-gray-700/50 rounded text-xs text-gray-600 dark:text-gray-300">
-                                    {{ $leave->note }}
-                                </div>
-                            @endif
-
-                            @if ($leave->approval_status === 'pending')
-                                <div
-                                    class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
-                                    <button wire:click="rejectLeave('{{ $leave->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30">
+                                <div class="team-approval-actions">
+                                    <button type="button" wire:click="rejectLeave('{{ $leave->id }}')" class="team-approval-action team-approval-action--reject">
                                         <x-heroicon-o-x-mark class="h-4 w-4" />
-                                        {{ __('Reject') }}
+                                        <span>{{ __('Reject') }}</span>
                                     </button>
-                                    <button wire:click="approveLeave('{{ $leave->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-sm font-medium text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30">
+                                    <button type="button" wire:click="approveLeave('{{ $leave->id }}')" class="team-approval-action team-approval-action--approve">
                                         <x-heroicon-o-check class="h-4 w-4" />
-                                        {{ __('Approve') }}
+                                        <span>{{ __('Approve') }}</span>
                                     </button>
                                 </div>
-                            @endif
-                        </div>
-                    @empty
-                        <div
-                            class="user-empty-state">
-                            {{ __('No leave requests found') }}
-                        </div>
-                    @endforelse
-                </div>
+                            </article>
+                        @empty
+                            <div class="team-approval-empty">
+                                <x-heroicon-o-calendar-days class="h-8 w-8" />
+                                <h3>{{ __('No leave requests found') }}</h3>
+                                <p>{{ __('New team leave requests will appear here.') }}</p>
+                            </div>
+                        @endforelse
 
-                <div class="px-2 py-3 sm:px-4">
-                    {{ $leaves->links() }}
-                </div>
-            @elseif ($activeTab === 'attendance-corrections')
-                @include('livewire.user.partials.team-attendance-corrections-pending')
-            @elseif ($activeTab === 'shift-swaps')
-                @include('livewire.user.partials.team-shift-swaps-pending')
-            @elseif ($activeTab === 'reimbursements')
-                <!-- Reimbursement Desktop/Mobile Table (Existing Code) -->
-                <!-- Desktop Table -->
-                <div
-                    class="user-list-card hidden overflow-hidden p-0 md:block">
-                    <div class="user-desktop-table-scroll">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-900">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Employee') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Type') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Amount') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Status') }}
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Actions') }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse ($reimbursements as $reimbursement)
-                                    <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full object-cover"
-                                                        src="{{ $reimbursement->user->profile_photo_url }}"
-                                                        alt="{{ $reimbursement->user->name }}">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $reimbursement->user->name }}
-                                                    </div>
-                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $reimbursement->user->jobTitle->name ?? __('N/A') }}
-                                                    </div>
-                                                </div>
+                        {{ $leaves->links() }}
+                    @elseif ($activeTab === 'attendance-corrections')
+                        @forelse ($attendanceCorrections as $correction)
+                            <article class="team-approval-card">
+                                <div class="team-approval-card__main">
+                                    <img class="team-approval-card__avatar" src="{{ $correction->user->profile_photo_url }}" alt="{{ $correction->user->name }}">
+                                    <div class="team-approval-card__body">
+                                        <div class="team-approval-card__topline">
+                                            <div>
+                                                <h3>{{ $correction->user->name }}</h3>
+                                                <p>{{ $correction->requestTypeLabel() }} · {{ $correction->attendance_date->translatedFormat('d M Y') }}</p>
                                             </div>
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <span
-                                                class="text-sm text-gray-900 dark:text-white">{{ ucfirst($reimbursement->type) }}</span>
-                                            <div class="text-xs text-gray-400">
-                                                {{ \Carbon\Carbon::parse($reimbursement->date)->format('d M Y') }}
-                                            </div>
-                                        </td>
-                                        <td
-                                            class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
-                                            Rp {{ number_format($reimbursement->amount, 0, ',', '.') }}
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            @if ($reimbursement->status === 'pending')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                                    {{ __('Pending') }}
-                                                </span>
-                                            @elseif($reimbursement->status === 'approved')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                                    {{ __('Approved') }}
-                                                </span>
-                                                @if ($reimbursement->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $reimbursement->approvedBy->name }}</div>
-                                                @endif
-                                            @else
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                                    {{ __('Rejected') }}
-                                                </span>
-                                                @if ($reimbursement->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $reimbursement->approvedBy->name }}</div>
-                                                @endif
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                                            @if ($reimbursement->status === 'pending')
-                                                <div class="flex justify-end gap-2">
-                                                    <button
-                                                        wire:click="approveReimbursement('{{ $reimbursement->id }}')"
-                                                        class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Approve') }}">
-                                                        <x-heroicon-o-check class="h-5 w-5" />
-                                                    </button>
-                                                    <button
-                                                        wire:click="rejectReimbursement('{{ $reimbursement->id }}')"
-                                                        class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Reject') }}">
-                                                        <x-heroicon-o-x-mark class="h-5 w-5" />
-                                                    </button>
-                                                </div>
-                                            @else
-                                                <span
-                                                    class="text-gray-400 text-xs italic">{{ __('Processed') }}</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5"
-                                            class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                                            {{ __('No reimbursement requests found') }}
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                            <span class="{{ $statusClass($correction->status) }}">{{ __('Pending') }}</span>
+                                        </div>
 
-                <!-- Mobile Cards -->
-                <div class="space-y-4 md:hidden">
-                    @forelse ($reimbursements as $reimbursement)
-                        <div
-                            class="user-list-card">
-                            <div class="flex items-start gap-3">
-                                <div class="flex min-w-0 flex-1 items-center">
-                                    <img class="h-10 w-10 rounded-full object-cover"
-                                        src="{{ $reimbursement->user->profile_photo_url }}"
-                                        alt="{{ $reimbursement->user->name }}">
-                                    <div class="ml-3 min-w-0">
-                                        <div class="truncate text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $reimbursement->user->name }}
+                                        <div class="team-approval-facts">
+                                            @if ($correction->requested_time_in)
+                                                <div>
+                                                    <span>{{ __('Check in') }}</span>
+                                                    <strong>{{ $correction->requested_time_in->translatedFormat('d M Y H:i') }}</strong>
+                                                </div>
+                                            @endif
+                                            @if ($correction->requested_time_out)
+                                                <div>
+                                                    <span>{{ __('Check out') }}</span>
+                                                    <strong>{{ $correction->requested_time_out->translatedFormat('d M Y H:i') }}</strong>
+                                                </div>
+                                            @endif
+                                            @if ($correction->requestedShift)
+                                                <div>
+                                                    <span>{{ __('Shift') }}</span>
+                                                    <strong>{{ $correction->requestedShift->name }}</strong>
+                                                </div>
+                                            @endif
                                         </div>
-                                        <div class="truncate text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $reimbursement->user->jobTitle->name ?? __('N/A') }}
-                                        </div>
+
+                                        <p class="team-approval-note">{{ $correction->reason }}</p>
                                     </div>
                                 </div>
-                                <span
-                                    class="shrink-0 rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-800 dark:bg-sky-900 dark:text-sky-200">
-                                    {{ ucfirst($reimbursement->type) }}
-                                </span>
-                            </div>
 
-                            <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Amount') }}</p>
-                                    <p class="font-mono font-medium text-gray-900 dark:text-white">
-                                        Rp {{ number_format($reimbursement->amount, 0, ',', '.') }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date') }}</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">
-                                        {{ \Carbon\Carbon::parse($reimbursement->date)->format('d M Y') }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            @if ($reimbursement->description)
-                                <div
-                                    class="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-700/50 dark:text-gray-300">
-                                    {{ $reimbursement->description }}
-                                </div>
-                            @endif
-
-                            <div class="mt-3 flex flex-col gap-1">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Status') }}</p>
-                                @if ($reimbursement->status === 'pending')
-                                    <span
-                                        class="font-medium text-yellow-600 dark:text-yellow-400">{{ __('Pending') }}</span>
-                                @elseif($reimbursement->status === 'approved')
-                                    <span
-                                        class="font-medium text-green-600 dark:text-green-400">{{ __('Approved') }}</span>
-                                @else
-                                    <span
-                                        class="font-medium text-red-600 dark:text-red-400">{{ __('Rejected') }}</span>
-                                @endif
-                                @if ($reimbursement->approvedBy)
-                                    <span class="text-[11px] text-gray-400">{{ __('by') }}
-                                        {{ $reimbursement->approvedBy->name }}</span>
-                                @endif
-                            </div>
-
-                            @if ($reimbursement->status === 'pending')
-                                <div
-                                    class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
-                                    <button wire:click="rejectReimbursement('{{ $reimbursement->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30">
+                                <div class="team-approval-actions">
+                                    <button type="button" wire:click="rejectAttendanceCorrection('{{ $correction->id }}')" class="team-approval-action team-approval-action--reject">
                                         <x-heroicon-o-x-mark class="h-4 w-4" />
-                                        {{ __('Reject') }}
+                                        <span>{{ __('Reject') }}</span>
                                     </button>
-                                    <button wire:click="approveReimbursement('{{ $reimbursement->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-sm font-medium text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30">
+                                    <button type="button" wire:click="approveAttendanceCorrection('{{ $correction->id }}')" class="team-approval-action team-approval-action--approve">
                                         <x-heroicon-o-check class="h-4 w-4" />
-                                        {{ __('Approve') }}
+                                        <span>{{ __('Approve') }}</span>
                                     </button>
                                 </div>
-                            @endif
-                        </div>
-                    @empty
-                        <div
-                            class="user-empty-state">
-                            {{ __('No reimbursement requests found') }}
-                        </div>
-                    @endforelse
-                </div>
-                <div class="px-2 py-3 sm:px-4">
-                    {{ $reimbursements->links() }}
-                </div>
-            @elseif ($activeTab === 'overtimes')
-                <!-- Overtime Table -->
-                <div
-                    class="user-list-card hidden overflow-hidden p-0 md:block">
-                    <div class="user-desktop-table-scroll">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-900">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Employee') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Date & Time') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Reason') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Status') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse ($overtimes as $overtime)
-                                    <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full object-cover"
-                                                        src="{{ $overtime->user->profile_photo_url }}"
-                                                        alt="{{ $overtime->user->name }}">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $overtime->user->name }}</div>
-                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $overtime->user->jobTitle->name ?? __('N/A') }}</div>
-                                                </div>
+                            </article>
+                        @empty
+                            <div class="team-approval-empty">
+                                <x-heroicon-o-clipboard-document-check class="h-8 w-8" />
+                                <h3>{{ __('No attendance correction requests found') }}</h3>
+                                <p>{{ __('Attendance corrections waiting for review will appear here.') }}</p>
+                            </div>
+                        @endforelse
+
+                        {{ $attendanceCorrections->links() }}
+                    @elseif ($activeTab === 'shift-swaps')
+                        @forelse ($shiftSwapRequests as $request)
+                            <article class="team-approval-card">
+                                <div class="team-approval-card__main">
+                                    <img class="team-approval-card__avatar" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
+                                    <div class="team-approval-card__body">
+                                        <div class="team-approval-card__topline">
+                                            <div>
+                                                <h3>{{ $request->user->name }}</h3>
+                                                <p>{{ $request->effectiveScheduleDate()?->translatedFormat('d M Y') ?? __('No schedule') }}</p>
                                             </div>
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900 dark:text-white font-medium">
-                                                {{ \Carbon\Carbon::parse($overtime->date)->format('d M Y') }}</div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ \Carbon\Carbon::parse($overtime->start_time)->format('H:i') }} -
-                                                {{ \Carbon\Carbon::parse($overtime->end_time)->format('H:i') }}
-                                                ({{ $overtime->duration_text }})
+                                            <span class="{{ $statusClass($request->status) }}">{{ __('Pending') }}</span>
+                                        </div>
+
+                                        <div class="team-approval-facts">
+                                            <div>
+                                                <span>{{ __('Current') }}</span>
+                                                <strong>{{ $request->currentShift->name ?? __('No current schedule') }}</strong>
                                             </div>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <div class="text-sm text-gray-900 dark:text-white truncate max-w-xs">
-                                                {{ $overtime->reason }}</div>
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            @if ($overtime->status === 'pending')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">{{ __('Pending') }}</span>
-                                            @elseif($overtime->status === 'approved')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">{{ __('Approved') }}</span>
-                                                @if ($overtime->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $overtime->approvedBy->name }}</div>
-                                                @endif
-                                            @else
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">{{ __('Rejected') }}</span>
-                                                @if ($overtime->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $overtime->approvedBy->name }}</div>
-                                                @endif
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                                            @if ($overtime->status === 'pending')
-                                                <div class="flex justify-end gap-2">
-                                                    <button wire:click="approveOvertime('{{ $overtime->id }}')"
-                                                        class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Approve') }}">
-                                                        <x-heroicon-o-check class="h-5 w-5" />
-                                                    </button>
-                                                    <button wire:click="rejectOvertime('{{ $overtime->id }}')"
-                                                        class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Reject') }}">
-                                                        <x-heroicon-o-x-mark class="h-5 w-5" />
-                                                    </button>
-                                                </div>
-                                            @else
-                                                <span
-                                                    class="text-gray-400 text-xs italic">{{ __('Processed') }}</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5"
-                                            class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                                            {{ __('No overtime requests found') }}</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <!-- Mobile List -->
-                <div class="space-y-4 md:hidden">
-                    @forelse ($overtimes as $overtime)
-                        <div
-                            class="user-list-card">
-                            <div class="flex items-start gap-3">
-                                <div class="flex min-w-0 flex-1 items-center">
-                                    <img class="h-10 w-10 rounded-full object-cover"
-                                        src="{{ $overtime->user->profile_photo_url }}"
-                                        alt="{{ $overtime->user->name }}">
-                                    <div class="ml-3 min-w-0">
-                                        <div class="truncate text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $overtime->user->name }}</div>
-                                        <div class="truncate text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $overtime->user->jobTitle->name ?? __('N/A') }}</div>
+                                            <div>
+                                                <span>{{ __('Requested Shift') }}</span>
+                                                <strong>{{ $request->requestedShift->name ?? '-' }}</strong>
+                                            </div>
+                                            <div>
+                                                <span>{{ __('Replacement') }}</span>
+                                                <strong>{{ $request->replacementUser->name ?? __('Not specified') }}</strong>
+                                            </div>
+                                        </div>
+
+                                        <p class="team-approval-note">{{ $request->reason }}</p>
                                     </div>
                                 </div>
-                                <span
-                                    class="shrink-0 rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">{{ __("SPL") }}</span>
-                            </div>
-                            <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date') }}</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">
-                                        {{ \Carbon\Carbon::parse($overtime->date)->format('d M Y') }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Time') }}</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">
-                                        {{ \Carbon\Carbon::parse($overtime->start_time)->format('H:i') }} -
-                                        {{ \Carbon\Carbon::parse($overtime->end_time)->format('H:i') }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div
-                                class="mt-3 rounded-xl bg-gray-50 p-3 text-sm italic text-gray-600 dark:bg-gray-700/50 dark:text-gray-300">
-                                "{{ $overtime->reason }}"</div>
 
-                            <div class="mt-3 flex flex-col gap-1">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Status') }}</p>
-                                <span
-                                    class="text-sm font-medium {{ $overtime->status === 'pending' ? 'text-yellow-600 dark:text-yellow-400' : ($overtime->status === 'approved' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') }}">
-                                    {{ ucfirst($overtime->status) }}
-                                </span>
-                                @if ($overtime->approvedBy)
-                                    <span class="text-[11px] text-gray-400">{{ __('by') }}
-                                        {{ $overtime->approvedBy->name }}</span>
-                                @endif
-                            </div>
-
-                            @if ($overtime->status === 'pending')
-                                <div
-                                    class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
-                                    <button wire:click="rejectOvertime('{{ $overtime->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30">
+                                <div class="team-approval-actions">
+                                    <button type="button" wire:click="rejectShiftSwap('{{ $request->id }}')" class="team-approval-action team-approval-action--reject">
                                         <x-heroicon-o-x-mark class="h-4 w-4" />
-                                        {{ __('Reject') }}
+                                        <span>{{ __('Reject') }}</span>
                                     </button>
-                                    <button wire:click="approveOvertime('{{ $overtime->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-sm font-medium text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30">
+                                    <button type="button" wire:click="approveShiftSwap('{{ $request->id }}')" class="team-approval-action team-approval-action--approve">
                                         <x-heroicon-o-check class="h-4 w-4" />
-                                        {{ __('Approve') }}
+                                        <span>{{ __('Approve') }}</span>
                                     </button>
                                 </div>
-                            @endif
-                        </div>
-                    @empty
-                        <div
-                            class="user-empty-state">
-                            {{ __('No overtime requests found') }}</div>
-                    @endforelse
-                </div>
-                <div class="px-2 py-3 sm:px-4">
-                    {{ $overtimes->links() }}
-                </div>
-            @elseif ($activeTab === 'wfh')
-                <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    @forelse ($wfhRequests as $request)
-                        <article class="user-list-card">
-                            <div class="flex items-start gap-3">
-                                <img class="h-10 w-10 rounded-full object-cover" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                                        <div>
-                                            <h3 class="truncate text-sm font-semibold text-gray-900 dark:text-white">{{ $request->user->name }}</h3>
-                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $request->user->jobTitle->name ?? __('N/A') }}</p>
-                                        </div>
-                                        <span class="inline-flex w-fit rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
-                                            {{ __('Pending') }}
-                                        </span>
-                                    </div>
-                                    <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                                        <div>
-                                            <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date') }}</dt>
-                                            <dd class="font-medium text-gray-900 dark:text-white">{{ $request->date?->translatedFormat('d M Y') }}</dd>
-                                        </div>
-                                        <div>
-                                            <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('Time') }}</dt>
-                                            <dd class="font-medium text-gray-900 dark:text-white">{{ $request->start_time ?: '--:--' }} - {{ $request->end_time ?: '--:--' }}</dd>
-                                        </div>
-                                    </dl>
-                                    @if ($request->location_address)
-                                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">{{ $request->location_address }}</p>
-                                    @endif
-                                    <p class="mt-3 rounded-xl bg-gray-50 p-3 text-sm italic text-gray-600 dark:bg-gray-700/50 dark:text-gray-300">"{{ $request->reason }}"</p>
-                                    <div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
-                                        <button wire:click="rejectWfh('{{ $request->id }}')"
-                                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30">
-                                            <x-heroicon-o-x-mark class="h-4 w-4" />
-                                            {{ __('Reject') }}
-                                        </button>
-                                        <button wire:click="approveWfh('{{ $request->id }}')"
-                                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-sm font-medium text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30">
-                                            <x-heroicon-o-check class="h-4 w-4" />
-                                            {{ __('Approve') }}
-                                        </button>
-                                    </div>
-                                </div>
+                            </article>
+                        @empty
+                            <div class="team-approval-empty">
+                                <x-heroicon-o-arrows-right-left class="h-8 w-8" />
+                                <h3>{{ __('No shift swap requests found') }}</h3>
+                                <p>{{ __('Shift swap requests waiting for review will appear here.') }}</p>
                             </div>
-                        </article>
-                    @empty
-                        <div class="user-empty-state lg:col-span-2">
-                            {{ __('No WFH requests found') }}
-                        </div>
-                    @endforelse
-                </div>
-                <div class="px-2 py-3 sm:px-4">
-                    {{ $wfhRequests->links() }}
-                </div>
-            @else
-                <!-- Kasbons Table -->
-                <div
-                    class="user-list-card hidden overflow-hidden p-0 md:block">
-                    <div class="user-desktop-table-scroll">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-900">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Employee') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Payment') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Amount') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Status') }}</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        {{ __('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse ($kasbons as $kasbon)
-                                    <tr>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full object-cover"
-                                                        src="{{ $kasbon->user->profile_photo_url }}"
-                                                        alt="{{ $kasbon->user->name }}">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $kasbon->user->name }}</div>
-                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $kasbon->user->jobTitle->name ?? __('N/A') }}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900 dark:text-white font-medium">
-                                                {{ \Carbon\Carbon::create()->month($kasbon->payment_month)->englishMonth }}
-                                            </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $kasbon->payment_year }}
-                                            </div>
-                                        </td>
-                                        <td
-                                            class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
-                                            Rp {{ number_format($kasbon->amount, 0, ',', '.') }}
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            @if ($kasbon->status === 'pending')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">{{ __('Pending') }}</span>
-                                            @elseif($kasbon->status === 'approved')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">{{ __('Approved') }}</span>
-                                                @if ($kasbon->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $kasbon->approvedBy->name }}</div>
-                                                @endif
-                                            @elseif($kasbon->status === 'paid')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">{{ __('Paid') }}</span>
-                                            @else
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">{{ __('Rejected') }}</span>
-                                                @if ($kasbon->approvedBy)
-                                                    <div class="text-[10px] text-gray-400 mt-1">{{ __('by') }}
-                                                        {{ $kasbon->approvedBy->name }}</div>
-                                                @endif
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                                            @if ($kasbon->status === 'pending')
-                                                <div class="flex justify-end gap-2">
-                                                    <button wire:click="approveKasbon('{{ $kasbon->id }}')"
-                                                        class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Approve') }}">
-                                                        <x-heroicon-o-check class="h-5 w-5" />
-                                                    </button>
-                                                    <button wire:click="rejectKasbon('{{ $kasbon->id }}')"
-                                                        class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-2 rounded-lg transition-colors"
-                                                        title="{{ __('Reject') }}">
-                                                        <x-heroicon-o-x-mark class="h-5 w-5" />
-                                                    </button>
-                                                </div>
-                                            @else
-                                                <span
-                                                    class="text-gray-400 text-xs italic">{{ __('Processed') }}</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5"
-                                            class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                                            {{ __('No kasbon requests found') }}</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <!-- Mobile List -->
-                <div class="space-y-4 md:hidden">
-                    @forelse ($kasbons as $kasbon)
-                        <div
-                            class="user-list-card">
-                            <div class="flex items-start gap-3">
-                                <div class="flex min-w-0 flex-1 items-center">
-                                    <img class="h-10 w-10 rounded-full object-cover"
-                                        src="{{ $kasbon->user->profile_photo_url }}"
-                                        alt="{{ $kasbon->user->name }}">
-                                    <div class="ml-3 min-w-0">
-                                        <div class="truncate text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $kasbon->user->name }}</div>
-                                        <div class="truncate text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $kasbon->user->jobTitle->name ?? __('N/A') }}</div>
-                                    </div>
-                                </div>
-                                <span
-                                    class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-900 dark:text-amber-200">{{ __("Rp") }}</span>
-                            </div>
-                            <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Payment Month') }}</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">
-                                        {{ \Carbon\Carbon::create()->month($kasbon->payment_month)->englishMonth }}
-                                        {{ $kasbon->payment_year }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Amount') }}</p>
-                                    <p class="font-medium text-gray-900 dark:text-white font-mono">
-                                        Rp {{ number_format($kasbon->amount, 0, ',', '.') }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div
-                                class="mt-3 rounded-xl bg-gray-50 p-3 text-sm italic text-gray-600 dark:bg-gray-700/50 dark:text-gray-300">
-                                "{{ $kasbon->purpose }}"</div>
+                        @endforelse
 
-                            <div class="mt-3 flex flex-col gap-1">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Status') }}</p>
-                                <span
-                                    class="text-sm font-medium {{ $kasbon->status === 'pending' ? 'text-yellow-600 dark:text-yellow-400' : ($kasbon->status === 'approved' ? 'text-green-600 dark:text-green-400' : ($kasbon->status === 'paid' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400')) }}">
-                                    {{ ucfirst($kasbon->status) }}
-                                </span>
-                                @if ($kasbon->approvedBy)
-                                    <span class="text-[11px] text-gray-400">{{ __('by') }}
-                                        {{ $kasbon->approvedBy->name }}</span>
-                                @endif
-                            </div>
+                        {{ $shiftSwapRequests->links() }}
+                    @elseif ($activeTab === 'reimbursements')
+                        @forelse ($reimbursements as $reimbursement)
+                            <article class="team-approval-card">
+                                <div class="team-approval-card__main">
+                                    <img class="team-approval-card__avatar" src="{{ $reimbursement->user->profile_photo_url }}" alt="{{ $reimbursement->user->name }}">
+                                    <div class="team-approval-card__body">
+                                        <div class="team-approval-card__topline">
+                                            <div>
+                                                <h3>{{ $reimbursement->user->name }}</h3>
+                                                <p>{{ __(ucfirst((string) $reimbursement->type)) }} · {{ $reimbursement->date?->translatedFormat('d M Y') }}</p>
+                                            </div>
+                                            <span class="{{ $statusClass($reimbursement->status) }}">{{ __('Pending') }}</span>
+                                        </div>
 
-                            @if ($kasbon->status === 'pending')
-                                <div
-                                    class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
-                                    <button wire:click="rejectKasbon('{{ $kasbon->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30">
+                                        <div class="team-approval-amount">Rp {{ number_format((float) $reimbursement->amount, 0, ',', '.') }}</div>
+
+                                        @if($reimbursement->description)
+                                            <p class="team-approval-note">{{ $reimbursement->description }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="team-approval-actions">
+                                    <button type="button" wire:click="rejectReimbursement('{{ $reimbursement->id }}')" class="team-approval-action team-approval-action--reject">
                                         <x-heroicon-o-x-mark class="h-4 w-4" />
-                                        {{ __('Reject') }}
+                                        <span>{{ __('Reject') }}</span>
                                     </button>
-                                    <button wire:click="approveKasbon('{{ $kasbon->id }}')"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-sm font-medium text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30">
+                                    <button type="button" wire:click="approveReimbursement('{{ $reimbursement->id }}')" class="team-approval-action team-approval-action--approve">
                                         <x-heroicon-o-check class="h-4 w-4" />
-                                        {{ __('Approve') }}
+                                        <span>{{ __('Approve') }}</span>
                                     </button>
                                 </div>
-                            @endif
-                        </div>
-                    @empty
-                        <div
-                            class="user-empty-state">
-                            {{ __('No kasbon requests found') }}</div>
-                    @endforelse
-                </div>
-                <div class="px-2 py-3 sm:px-4">
-                    {{ $kasbons->links() }}
-                </div>
-            @endif
+                            </article>
+                        @empty
+                            <div class="team-approval-empty">
+                                <x-heroicon-o-banknotes class="h-8 w-8" />
+                                <h3>{{ __('No reimbursement requests found') }}</h3>
+                                <p>{{ __('Team reimbursement requests waiting for review will appear here.') }}</p>
+                            </div>
+                        @endforelse
+
+                        {{ $reimbursements->links() }}
+                    @elseif ($activeTab === 'overtimes')
+                        @forelse ($overtimes as $overtime)
+                            <article class="team-approval-card">
+                                <div class="team-approval-card__main">
+                                    <img class="team-approval-card__avatar" src="{{ $overtime->user->profile_photo_url }}" alt="{{ $overtime->user->name }}">
+                                    <div class="team-approval-card__body">
+                                        <div class="team-approval-card__topline">
+                                            <div>
+                                                <h3>{{ $overtime->user->name }}</h3>
+                                                <p>{{ \Carbon\Carbon::parse($overtime->date)->translatedFormat('d M Y') }}</p>
+                                            </div>
+                                            <span class="{{ $statusClass($overtime->status) }}">{{ __('Pending') }}</span>
+                                        </div>
+
+                                        <div class="team-approval-facts">
+                                            <div>
+                                                <span>{{ __('Start Time') }}</span>
+                                                <strong>{{ \Carbon\Carbon::parse($overtime->start_time)->format('H:i') }}</strong>
+                                            </div>
+                                            <div>
+                                                <span>{{ __('End Time') }}</span>
+                                                <strong>{{ \Carbon\Carbon::parse($overtime->end_time)->format('H:i') }}</strong>
+                                            </div>
+                                            <div>
+                                                <span>{{ __('Duration') }}</span>
+                                                <strong>{{ $overtime->duration_text }}</strong>
+                                            </div>
+                                        </div>
+
+                                        <p class="team-approval-note">{{ $overtime->reason }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="team-approval-actions">
+                                    <button type="button" wire:click="rejectOvertime('{{ $overtime->id }}')" class="team-approval-action team-approval-action--reject">
+                                        <x-heroicon-o-x-mark class="h-4 w-4" />
+                                        <span>{{ __('Reject') }}</span>
+                                    </button>
+                                    <button type="button" wire:click="approveOvertime('{{ $overtime->id }}')" class="team-approval-action team-approval-action--approve">
+                                        <x-heroicon-o-check class="h-4 w-4" />
+                                        <span>{{ __('Approve') }}</span>
+                                    </button>
+                                </div>
+                            </article>
+                        @empty
+                            <div class="team-approval-empty">
+                                <x-heroicon-o-clock class="h-8 w-8" />
+                                <h3>{{ __('No overtime requests found') }}</h3>
+                                <p>{{ __('Team overtime requests waiting for review will appear here.') }}</p>
+                            </div>
+                        @endforelse
+
+                        {{ $overtimes->links() }}
+                    @elseif ($activeTab === 'wfh')
+                        @forelse ($wfhRequests as $request)
+                            <article class="team-approval-card">
+                                <div class="team-approval-card__main">
+                                    <img class="team-approval-card__avatar" src="{{ $request->user->profile_photo_url }}" alt="{{ $request->user->name }}">
+                                    <div class="team-approval-card__body">
+                                        <div class="team-approval-card__topline">
+                                            <div>
+                                                <h3>{{ $request->user->name }}</h3>
+                                                <p>{{ $request->date?->translatedFormat('d M Y') }}</p>
+                                            </div>
+                                            <span class="{{ $statusClass($request->status) }}">{{ __('Pending') }}</span>
+                                        </div>
+
+                                        <div class="team-approval-facts">
+                                            <div>
+                                                <span>{{ __('Start Time') }}</span>
+                                                <strong>{{ $request->start_time ?: '--:--' }}</strong>
+                                            </div>
+                                            <div>
+                                                <span>{{ __('End Time') }}</span>
+                                                <strong>{{ $request->end_time ?: '--:--' }}</strong>
+                                            </div>
+                                        </div>
+
+                                        @if($request->location_address)
+                                            <p class="team-approval-location">{{ $request->location_address }}</p>
+                                        @endif
+                                        <p class="team-approval-note">{{ $request->reason }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="team-approval-actions">
+                                    <button type="button" wire:click="rejectWfh('{{ $request->id }}')" class="team-approval-action team-approval-action--reject">
+                                        <x-heroicon-o-x-mark class="h-4 w-4" />
+                                        <span>{{ __('Reject') }}</span>
+                                    </button>
+                                    <button type="button" wire:click="approveWfh('{{ $request->id }}')" class="team-approval-action team-approval-action--approve">
+                                        <x-heroicon-o-check class="h-4 w-4" />
+                                        <span>{{ __('Approve') }}</span>
+                                    </button>
+                                </div>
+                            </article>
+                        @empty
+                            <div class="team-approval-empty">
+                                <x-heroicon-o-home-modern class="h-8 w-8" />
+                                <h3>{{ __('No WFH requests found') }}</h3>
+                                <p>{{ __('Team WFH requests waiting for review will appear here.') }}</p>
+                            </div>
+                        @endforelse
+
+                        {{ $wfhRequests->links() }}
+                    @else
+                        @forelse ($kasbons as $kasbon)
+                            <article class="team-approval-card">
+                                <div class="team-approval-card__main">
+                                    <img class="team-approval-card__avatar" src="{{ $kasbon->user->profile_photo_url }}" alt="{{ $kasbon->user->name }}">
+                                    <div class="team-approval-card__body">
+                                        <div class="team-approval-card__topline">
+                                            <div>
+                                                <h3>{{ $kasbon->user->name }}</h3>
+                                                <p>{{ __('Salary Deduction Period') }} · {{ \Carbon\Carbon::create()->month($kasbon->payment_month)->translatedFormat('F') }} {{ $kasbon->payment_year }}</p>
+                                            </div>
+                                            <span class="{{ $statusClass($kasbon->status) }}">{{ __('Pending') }}</span>
+                                        </div>
+
+                                        <div class="team-approval-amount">Rp {{ number_format((float) $kasbon->amount, 0, ',', '.') }}</div>
+
+                                        @if($kasbon->purpose)
+                                            <p class="team-approval-note">{{ $kasbon->purpose }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="team-approval-actions">
+                                    <button type="button" wire:click="rejectKasbon('{{ $kasbon->id }}')" class="team-approval-action team-approval-action--reject">
+                                        <x-heroicon-o-x-mark class="h-4 w-4" />
+                                        <span>{{ __('Reject') }}</span>
+                                    </button>
+                                    <button type="button" wire:click="approveKasbon('{{ $kasbon->id }}')" class="team-approval-action team-approval-action--approve">
+                                        <x-heroicon-o-check class="h-4 w-4" />
+                                        <span>{{ __('Approve') }}</span>
+                                    </button>
+                                </div>
+                            </article>
+                        @empty
+                            <div class="team-approval-empty">
+                                <x-heroicon-o-wallet class="h-8 w-8" />
+                                <h3>{{ __('No kasbon requests found') }}</h3>
+                                <p>{{ __('Team cash advance requests waiting for review will appear here.') }}</p>
+                            </div>
+                        @endforelse
+
+                        {{ $kasbons->links() }}
+                    @endif
+                </section>
+            </div>
         </div>
-    </div>
     </div>
 </div>

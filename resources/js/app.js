@@ -1,6 +1,5 @@
 import "./bootstrap";
 import TomSelect from "tom-select";
-import "tom-select/dist/css/tom-select.css";
 import flatpickr from "flatpickr";
 import Swal from "sweetalert2";
 import Chart from "chart.js/auto";
@@ -56,11 +55,13 @@ const normalizeSweetAlertIcon = (icon) => {
 };
 
 const sweetAlertBaseClasses = {
-    popup: "!rounded-2xl !border !border-slate-200 dark:!border-slate-700 !bg-white dark:!bg-slate-900 !text-slate-950 dark:!text-white !shadow-[0_24px_70px_-34px_rgba(15,23,42,0.55)]",
-    title: "!text-base !font-semibold !tracking-tight",
-    htmlContainer: "!text-sm !leading-6 !text-slate-600 dark:!text-slate-300",
-    confirmButton: "!rounded-xl !bg-primary-700 !px-4 !py-2.5 !text-sm !font-semibold !text-white hover:!bg-primary-800 focus:!shadow-none focus:!ring-2 focus:!ring-primary-500 focus:!ring-offset-2 dark:!bg-primary-400 dark:!text-slate-950 dark:hover:!bg-primary-300",
-    cancelButton: "!rounded-xl !border !border-slate-200 !bg-white !px-4 !py-2.5 !text-sm !font-semibold !text-slate-700 hover:!bg-slate-50 focus:!shadow-none focus:!ring-2 focus:!ring-slate-300 focus:!ring-offset-2 dark:!border-slate-700 dark:!bg-slate-800 dark:!text-slate-100 dark:hover:!bg-slate-700",
+    popup: "!w-[min(28rem,calc(100vw-2rem))] !rounded-[1.35rem] !border !border-slate-200 !bg-white !px-5 !py-6 !text-slate-950 !shadow-[0_28px_80px_-42px_rgba(15,23,42,0.62)] dark:!border-slate-700 dark:!bg-slate-900 dark:!text-white",
+    icon: "!my-2 !h-16 !w-16 !border-[0.28rem]",
+    title: "!mt-4 !text-lg !font-bold !tracking-tight",
+    htmlContainer: "!mx-0 !mt-3 !text-sm !leading-6 !text-slate-600 dark:!text-slate-300",
+    actions: "!mt-7 !grid !w-full !grid-cols-1 !gap-3 sm:!grid-cols-2",
+    confirmButton: "!m-0 !inline-flex !min-h-[3rem] !w-full !items-center !justify-center !rounded-2xl !bg-primary-700 !px-5 !py-3 !text-base !font-bold !text-white hover:!bg-primary-800 focus:!shadow-none focus:!ring-2 focus:!ring-primary-500 focus:!ring-offset-2 dark:!bg-primary-400 dark:!text-slate-950 dark:hover:!bg-primary-300",
+    cancelButton: "!m-0 !inline-flex !min-h-[3rem] !w-full !items-center !justify-center !rounded-2xl !border !border-slate-300 !bg-transparent !px-5 !py-3 !text-base !font-bold !text-slate-700 hover:!bg-slate-50 focus:!shadow-none focus:!ring-2 focus:!ring-slate-300 focus:!ring-offset-2 dark:!border-slate-700 dark:!text-slate-100 dark:hover:!bg-slate-800",
 };
 
 const createPasPapanToast = () => Swal.mixin({
@@ -217,6 +218,226 @@ document.addEventListener("livewire:navigated", () => {
     scheduleSweetAlertConfirmations();
 });
 
+const pasPapanValidationLabels = () => ({
+    required: window.PasPapanValidationLabels?.required || "Please complete this field.",
+    email: window.PasPapanValidationLabels?.email || "Please enter a valid email address.",
+    url: window.PasPapanValidationLabels?.url || "Please enter a valid URL.",
+    pattern: window.PasPapanValidationLabels?.pattern || "Please match the requested format.",
+    minLength: window.PasPapanValidationLabels?.minLength || "Please enter at least :min characters.",
+    maxLength: window.PasPapanValidationLabels?.maxLength || "Please enter no more than :max characters.",
+    rangeUnderflow: window.PasPapanValidationLabels?.rangeUnderflow || "Please enter a value greater than or equal to :min.",
+    rangeOverflow: window.PasPapanValidationLabels?.rangeOverflow || "Please enter a value less than or equal to :max.",
+    invalid: window.PasPapanValidationLabels?.invalid || "Please review this field.",
+    summary: window.PasPapanValidationLabels?.summary || "Please review the highlighted fields before continuing.",
+});
+
+const interpolateValidationMessage = (message, replacements = {}) => Object.entries(replacements)
+    .reduce((current, [key, value]) => current.replaceAll(`:${key}`, value), message);
+
+const validationMessageFor = (control) => {
+    const labels = pasPapanValidationLabels();
+    const validity = control.validity;
+
+    if (validity.valueMissing) {
+        return labels.required;
+    }
+
+    if (validity.typeMismatch && control.type === "email") {
+        return labels.email;
+    }
+
+    if (validity.typeMismatch && control.type === "url") {
+        return labels.url;
+    }
+
+    if (validity.patternMismatch) {
+        return labels.pattern;
+    }
+
+    if (validity.tooShort) {
+        return interpolateValidationMessage(labels.minLength, { min: control.minLength });
+    }
+
+    if (validity.tooLong) {
+        return interpolateValidationMessage(labels.maxLength, { max: control.maxLength });
+    }
+
+    if (validity.rangeUnderflow) {
+        return interpolateValidationMessage(labels.rangeUnderflow, { min: control.min });
+    }
+
+    if (validity.rangeOverflow) {
+        return interpolateValidationMessage(labels.rangeOverflow, { max: control.max });
+    }
+
+    return labels.invalid;
+};
+
+const validationTargetFor = (control) => {
+    if (control.tomselect?.wrapper) {
+        return control.tomselect.wrapper;
+    }
+
+    return control.closest(".flatpickr-wrapper")
+        || control.closest(".auth-input-wrap, .user-native-field__control, .wfh-native-field__control")
+        || control;
+};
+
+const validationContainerFor = (control) => control.closest(
+    ".auth-field, .auth-check, .user-native-field, .wfh-native-field, .user-form-field, .profile-field-group, .space-y-1, .space-y-1\\.5, .space-y-2, label",
+) || validationTargetFor(control).parentElement || control.parentElement;
+
+const validationErrorIdFor = (control) => {
+    if (!control.id) {
+        control.id = `ui-field-${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    return `${control.id}-client-error`;
+};
+
+const clearControlValidation = (control) => {
+    const errorId = validationErrorIdFor(control);
+    const target = validationTargetFor(control);
+
+    target.classList.remove("ui-invalid");
+    control.classList.remove("ui-invalid");
+    control.removeAttribute("aria-invalid");
+
+    const describedBy = (control.getAttribute("aria-describedby") || "")
+        .split(/\s+/)
+        .filter((item) => item && item !== errorId);
+
+    if (describedBy.length) {
+        control.setAttribute("aria-describedby", describedBy.join(" "));
+    } else {
+        control.removeAttribute("aria-describedby");
+    }
+
+    document.getElementById(errorId)?.remove();
+};
+
+const renderControlValidation = (control) => {
+    const errorId = validationErrorIdFor(control);
+    const target = validationTargetFor(control);
+    const container = validationContainerFor(control);
+    const message = validationMessageFor(control);
+
+    target.classList.add("ui-invalid");
+    control.classList.add("ui-invalid");
+    control.setAttribute("aria-invalid", "true");
+
+    const describedBy = new Set((control.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+    describedBy.add(errorId);
+    control.setAttribute("aria-describedby", Array.from(describedBy).join(" "));
+
+    let error = document.getElementById(errorId);
+    if (!error) {
+        error = document.createElement("p");
+        error.id = errorId;
+        error.className = "ui-validation-error";
+        error.setAttribute("role", "alert");
+        container.appendChild(error);
+    }
+
+    error.textContent = message;
+};
+
+const uiValidatableControls = (form) => Array.from(form.querySelectorAll("input, select, textarea"))
+    .filter((control) => (
+        !control.disabled
+        && control.type !== "hidden"
+        && !control.matches("[data-ui-validation-ignore]")
+    ));
+
+const validateUiForm = (form, event = null) => {
+    const invalidControls = uiValidatableControls(form).filter((control) => !control.validity.valid);
+
+    uiValidatableControls(form).forEach((control) => {
+        if (control.validity.valid) {
+            clearControlValidation(control);
+        }
+    });
+
+    invalidControls.forEach(renderControlValidation);
+
+    if (!invalidControls.length) {
+        return true;
+    }
+
+    event?.preventDefault();
+    event?.stopImmediatePropagation();
+
+    const firstInvalid = invalidControls[0];
+    const target = validationTargetFor(firstInvalid);
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    requestAnimationFrame(() => {
+        if (firstInvalid.tomselect) {
+            firstInvalid.tomselect.focus();
+            return;
+        }
+
+        firstInvalid.focus({ preventScroll: true });
+    });
+
+    window.PasPapanAlert?.toast({
+        icon: "warning",
+        title: pasPapanValidationLabels().summary,
+    });
+
+    return false;
+};
+
+const installUiValidationGuards = () => {
+    if (!document.body?.matches(".guest-ui, .user-ui")) {
+        return;
+    }
+
+    document.querySelectorAll("form:not([data-ui-validation-bound])").forEach((form) => {
+        if (form.matches("[data-native-validation='true']")) {
+            return;
+        }
+
+        form.dataset.uiValidationBound = "true";
+        form.noValidate = true;
+
+        form.addEventListener("submit", (event) => {
+            if (event.submitter?.formNoValidate || event.defaultPrevented) {
+                return;
+            }
+
+            validateUiForm(form, event);
+        }, true);
+
+        form.addEventListener("input", (event) => {
+            const control = event.target;
+
+            if (control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement) {
+                if (control.validity.valid) {
+                    clearControlValidation(control);
+                }
+            }
+        }, true);
+
+        form.addEventListener("change", (event) => {
+            const control = event.target;
+
+            if (control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement) {
+                if (control.validity.valid) {
+                    clearControlValidation(control);
+                } else if (control.getAttribute("aria-invalid") === "true") {
+                    renderControlValidation(control);
+                }
+            }
+        }, true);
+    });
+};
+
+document.addEventListener("DOMContentLoaded", installUiValidationGuards);
+document.addEventListener("livewire:init", installUiValidationGuards);
+document.addEventListener("livewire:navigated", installUiValidationGuards);
+document.addEventListener("livewire:updated", installUiValidationGuards);
+
 const resolveSystemBarAppearance = () => {
     const root = document.documentElement;
     const body = document.body;
@@ -331,6 +552,10 @@ const normalizeUiPickerCalendar = (instance) => {
         return;
     }
 
+    if (instance.input?.closest?.(".user-ui")) {
+        calendar.classList.add("flatpickr-calendar--user");
+    }
+
     const months = calendar.querySelector(".flatpickr-months");
     const month = calendar.querySelector(".flatpickr-month");
     const currentMonth = calendar.querySelector(".flatpickr-current-month");
@@ -414,8 +639,81 @@ const normalizeUiPickerCalendar = (instance) => {
 
 const uiPickerValue = (input) => input?.value || input?.getAttribute?.("value") || "";
 
+const uiPickerTargetValue = (selector) => {
+    if (!selector) {
+        return "";
+    }
+
+    const target = document.querySelector(selector);
+
+    return target?.value || target?.getAttribute?.("value") || "";
+};
+
+const uiPickerFormatDate = (date, format = "Y-m-d") => {
+    if (!date || !window.flatpickr) {
+        return "";
+    }
+
+    return window.flatpickr.formatDate(date, format);
+};
+
+const syncUiRangeTargets = (input, selectedDates = []) => {
+    const fromTarget = document.querySelector(input.dataset.uiRangeFrom || "");
+    const toTarget = document.querySelector(input.dataset.uiRangeTo || "");
+    const format = input.dataset.uiRangeFormat || "Y-m-d";
+    const from = selectedDates[0] ? uiPickerFormatDate(selectedDates[0], format) : "";
+    const to = selectedDates[1] ? uiPickerFormatDate(selectedDates[1], format) : from;
+    const display = from && to && from !== to ? `${from} - ${to}` : from;
+
+    if (fromTarget) {
+        dispatchUiPickerValue(fromTarget, from);
+    }
+
+    if (toTarget) {
+        dispatchUiPickerValue(toTarget, to);
+    }
+
+    dispatchUiPickerValue(input, display);
+};
+
+const shouldAutoCloseUiPicker = (input, mode, selectedDates = [], dateStr = "") => {
+    if (input.dataset.uiPickerAutoClose === "false") {
+        return false;
+    }
+
+    if (mode === "date-range") {
+        return selectedDates.length >= 2;
+    }
+
+    if (mode === "time" || mode === "datetime") {
+        return Boolean(dateStr);
+    }
+
+    return selectedDates.length > 0 || Boolean(dateStr);
+};
+
+const closeUiPickerAfterSelection = (input, mode, selectedDates = [], dateStr = "", instance = null) => {
+    if (!instance?.isOpen || !shouldAutoCloseUiPicker(input, mode, selectedDates, dateStr)) {
+        return;
+    }
+
+    window.setTimeout(() => {
+        if (!instance.isOpen) {
+            return;
+        }
+
+        instance.close();
+        (instance.altInput || instance.input || input)?.blur?.();
+        input.blur?.();
+    }, mode === "time" || mode === "datetime" ? 120 : 80);
+};
+
 const isUiPickerDetached = (instance) => {
     if (!instance) {
+        return true;
+    }
+
+    if (!instance.input || !instance._input || !instance.calendarContainer) {
         return true;
     }
 
@@ -430,14 +728,97 @@ const isUiPickerDetached = (instance) => {
     return false;
 };
 
+const destroyUiPicker = (input) => {
+    if (!input?._flatpickr) {
+        if (input && input._flatpickr === null) {
+            try {
+                delete input._flatpickr;
+            } catch (_error) {
+                input._flatpickr = undefined;
+            }
+        }
+
+        return;
+    }
+
+    try {
+        input._flatpickr.destroy();
+    } catch (_error) {
+        // Livewire can remove generated Flatpickr nodes before destroy runs.
+    }
+
+    try {
+        delete input._flatpickr;
+    } catch (_error) {
+        input._flatpickr = undefined;
+    }
+};
+
 const syncUiPickerValue = (instance, input) => {
+    if (input.dataset.uiPicker === "date-range") {
+        const from = uiPickerTargetValue(input.dataset.uiRangeFrom);
+        const to = uiPickerTargetValue(input.dataset.uiRangeTo);
+        const dates = [from, to].filter(Boolean);
+
+        if (instance?.input && dates.length > 0) {
+            instance.setDate(dates, false, instance.config?.dateFormat);
+        }
+
+        return;
+    }
+
     const value = uiPickerValue(input);
 
-    if (!instance || !value || instance.input.value === value) {
+    if (!instance?.input || !value || instance.input.value === value) {
         return;
     }
 
     instance.setDate(value, false, instance.config?.dateFormat);
+};
+
+const dispatchUiPickerValue = (input, value = null) => {
+    if (value !== null) {
+        input.value = value;
+        input.setAttribute("value", value);
+    }
+
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+
+    window.requestAnimationFrame(() => {
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+};
+
+const enforceUiPickerOnlyInput = (instance, input) => {
+    [input, instance?.input, instance?.altInput].forEach((field) => {
+        if (!field) {
+            return;
+        }
+
+        if (field === instance?.altInput) {
+            field.dataset.uiPickerGenerated = "true";
+            field.removeAttribute("data-ui-picker");
+        }
+
+        field.readOnly = true;
+        field.setAttribute("readonly", "readonly");
+        field.setAttribute("inputmode", "none");
+        field.setAttribute("autocomplete", "off");
+        field.setAttribute("aria-haspopup", "dialog");
+
+        if (!field.dataset.uiPickerKeyboardGuardReady) {
+            field.dataset.uiPickerKeyboardGuardReady = "true";
+            field.addEventListener("keydown", (event) => {
+                const allowedKeys = ["Tab", "Escape", "Enter", " ", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+
+                if (!allowedKeys.includes(event.key)) {
+                    event.preventDefault();
+                }
+            });
+        }
+    });
 };
 
 const initUiPickers = (root = document) => {
@@ -456,12 +837,23 @@ const initUiPickers = (root = document) => {
     });
 
     inputs.forEach((input) => {
+        if (input.dataset.uiPickerGenerated === "true" || input.classList.contains("flatpickr-mobile")) {
+            return;
+        }
+
+        if (input._flatpickr === null) {
+            destroyUiPicker(input);
+        }
+
         const mode = input.dataset.uiPicker;
-        const staticPicker = input.dataset.uiPickerStatic === "true";
+        const dialogPanel = input.closest?.("[role=\"dialog\"]");
+        const modalRoot = input.closest?.(".jetstream-modal, .profile-modal");
+        const staticPreference = input.dataset.uiPickerStatic;
+        const staticPicker = staticPreference === "true" || (staticPreference !== "false" && Boolean(dialogPanel));
 
         if (input._flatpickr) {
             if (isUiPickerDetached(input._flatpickr)) {
-                input._flatpickr.destroy();
+                destroyUiPicker(input);
             } else {
                 syncUiPickerValue(input._flatpickr, input);
                 syncUiPickerWidth(input._flatpickr, input);
@@ -478,22 +870,43 @@ const initUiPickers = (root = document) => {
         input.setAttribute("data-ui-picker-ready", "true");
 
         const config = {
-            allowInput: true,
+            allowInput: false,
+            clickOpens: true,
             disableMobile: true,
             static: staticPicker,
-            onChange: () => {
-                input.dispatchEvent(new Event("input", { bubbles: true }));
-                input.dispatchEvent(new Event("change", { bubbles: true }));
+            onChange: (selectedDates, dateStr, instance) => {
+                if (mode === "date-range") {
+                    syncUiRangeTargets(input, selectedDates);
+                    closeUiPickerAfterSelection(input, mode, selectedDates, dateStr, instance);
+
+                    return;
+                }
+
+                dispatchUiPickerValue(input, dateStr);
+                closeUiPickerAfterSelection(input, mode, selectedDates, dateStr, instance);
             },
-            onValueUpdate: () => {
-                input.dispatchEvent(new Event("input", { bubbles: true }));
+            onValueUpdate: (selectedDates, dateStr, instance) => {
+                if (mode === "date-range") {
+                    syncUiRangeTargets(input, selectedDates);
+                    closeUiPickerAfterSelection(input, mode, selectedDates, dateStr, instance);
+
+                    return;
+                }
+
+                dispatchUiPickerValue(input, dateStr);
+                closeUiPickerAfterSelection(input, mode, selectedDates, dateStr, instance);
             },
-            onReady: (_selectedDates, _dateStr, instance) => {
+            onReady: (selectedDates, _dateStr, instance) => {
+                enforceUiPickerOnlyInput(instance, input);
                 syncUiPickerValue(instance, input);
                 syncUiPickerWidth(instance, input);
+                if (mode === "date-range" && selectedDates.length > 0) {
+                    syncUiRangeTargets(input, selectedDates);
+                }
                 normalizeUiPickerCalendar(instance);
             },
             onOpen: (_selectedDates, _dateStr, instance) => {
+                enforceUiPickerOnlyInput(instance, input);
                 syncUiPickerValue(instance, input);
                 syncUiPickerWidth(instance, input);
                 normalizeUiPickerCalendar(instance);
@@ -506,14 +919,19 @@ const initUiPickers = (root = document) => {
             },
         };
 
-        const defaultDate = uiPickerValue(input);
+        const defaultDate = mode === "date-range"
+            ? [
+                uiPickerTargetValue(input.dataset.uiRangeFrom),
+                uiPickerTargetValue(input.dataset.uiRangeTo),
+            ].filter(Boolean)
+            : uiPickerValue(input);
 
-        if (defaultDate) {
+        if (Array.isArray(defaultDate) ? defaultDate.length > 0 : defaultDate) {
             config.defaultDate = defaultDate;
         }
 
         if (!staticPicker) {
-            config.appendTo = document.body;
+            config.appendTo = modalRoot || document.body;
         }
 
         if (input.min) {
@@ -535,19 +953,22 @@ const initUiPickers = (root = document) => {
             Object.assign(config, {
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
-                altInput: true,
-                altFormat: "d M Y H:i",
                 time_24hr: true,
+            });
+        } else if (mode === "date-range") {
+            Object.assign(config, {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                conjunction: " - ",
             });
         } else {
             Object.assign(config, {
                 dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "d M Y",
             });
         }
 
         const picker = window.flatpickr(input, config);
+        enforceUiPickerOnlyInput(picker, input);
         syncUiPickerWidth(picker, input);
         normalizeUiPickerCalendar(picker);
     });
@@ -555,6 +976,50 @@ const initUiPickers = (root = document) => {
 
 const scheduleUiPickerInit = (root = document) => {
     window.requestAnimationFrame(() => initUiPickers(root));
+};
+
+const openUiPicker = (input) => {
+    if (!input) {
+        return;
+    }
+
+    if (input._flatpickr && isUiPickerDetached(input._flatpickr)) {
+        destroyUiPicker(input);
+    }
+
+    if (!input._flatpickr) {
+        initUiPickers(input);
+    }
+
+    window.requestAnimationFrame(() => {
+        if (input._flatpickr && isUiPickerDetached(input._flatpickr)) {
+            destroyUiPicker(input);
+            initUiPickers(input);
+        }
+
+        const picker = input._flatpickr;
+
+        if (!picker || isUiPickerDetached(picker) || picker.input?.disabled || picker._input?.disabled) {
+            return;
+        }
+
+        enforceUiPickerOnlyInput(picker, input);
+        picker.open(undefined, picker.altInput || picker.input || input);
+    });
+};
+
+const uiPickerInputFromTarget = (target) => {
+    if (!target?.closest) {
+        return null;
+    }
+
+    if (target.closest(".flatpickr-calendar")) {
+        return null;
+    }
+
+    return target.closest("[data-ui-picker]")
+        || target.closest(".user-native-field__control")?.querySelector?.("[data-ui-picker]")
+        || null;
 };
 
 window.initUiPickers = initUiPickers;
@@ -585,12 +1050,34 @@ const watchUiPickerMounts = () => {
     });
 };
 
+document.addEventListener("pointerdown", (event) => {
+    const input = uiPickerInputFromTarget(event.target);
+
+    if (!input) {
+        return;
+    }
+
+    event.preventDefault();
+    openUiPicker(input);
+}, true);
+
+document.addEventListener("keydown", (event) => {
+    const input = uiPickerInputFromTarget(event.target);
+
+    if (!input || !["Enter", " "].includes(event.key)) {
+        return;
+    }
+
+    event.preventDefault();
+    openUiPicker(input);
+}, true);
+
 ["click", "focusin"].forEach((eventName) => {
     document.addEventListener(eventName, (event) => {
-        const input = event.target?.closest?.("[data-ui-picker]");
+        const input = uiPickerInputFromTarget(event.target);
 
-        if (input && !input._flatpickr) {
-            initUiPickers(input);
+        if (input) {
+            openUiPicker(input);
         }
     });
 });

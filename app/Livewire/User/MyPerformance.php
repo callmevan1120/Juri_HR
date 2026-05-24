@@ -125,10 +125,18 @@ class MyPerformance extends Component
         $this->authorize('viewAny', Appraisal::class);
 
         $appraisals = Appraisal::where('user_id', auth()->id())
+            ->with('evaluator:id,name')
             ->orderBy('period_year', 'desc')
             ->orderBy('period_month', 'desc')
             ->get();
 
-        return view('livewire.user.my-performance', compact('appraisals'));
+        $activeAppraisal = $this->activeAppraisalId
+            ? Appraisal::query()
+                ->with('evaluations.kpiTemplate.kpiGroup')
+                ->where('user_id', auth()->id())
+                ->find($this->activeAppraisalId)
+            : null;
+
+        return view('livewire.user.my-performance', compact('appraisals', 'activeAppraisal'));
     }
 }

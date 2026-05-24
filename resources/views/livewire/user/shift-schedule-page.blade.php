@@ -1,6 +1,6 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="my-schedule-title" class="user-page-surface">
+        <section aria-labelledby="my-schedule-title" class="user-page-surface" wire:poll.visible.20s>
             <x-user.page-header
                 :back-href="route('home')"
                 :title="__('My Schedule')"

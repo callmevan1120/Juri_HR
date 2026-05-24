@@ -1,210 +1,214 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="my-kasbon-title" class="user-page-surface relative">
+        <section
+            aria-labelledby="my-kasbon-title"
+            class="user-page-surface my-kasbon-page relative"
+            @unless($showCreateModal) wire:poll.visible.20s @endunless
+        >
             <x-user.page-header
-                :back-href="!$showCreateModal ? route('home') : null"
+                :back-href="! $showCreateModal ? route('home') : null"
                 :title="$showCreateModal ? __('Request Kasbon') : __('My Kasbon')"
                 title-id="my-kasbon-title"
                 class="border-b-0">
-                <x-slot name="icon">
-                    <x-heroicon-o-banknotes class="h-5 w-5" />
-                </x-slot>
                 <x-slot name="actions">
-                    @if($showCreateModal)
-                        <button wire:click="$set('showCreateModal', false)" aria-label="{{ __('Back') }}" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                    @if ($showCreateModal)
+                        <button wire:click="$set('showCreateModal', false)" aria-label="{{ __('Back') }}" title="{{ __('Back') }}"
+                            class="user-header-icon-action">
                             <x-heroicon-o-arrow-left class="h-5 w-5" />
-                            <span>{{ __('Back') }}</span>
                         </button>
-                    @elseif(!$canRequestCashAdvance)
+                    @elseif (! $canRequestCashAdvance)
                         <button type="button" disabled title="{{ __('Kasbon is available after your basic salary has been updated.') }}"
-                            class="user-disabled-action">
+                            class="user-header-icon-action opacity-45">
                             <x-heroicon-m-plus class="h-5 w-5" />
-                            <span>{{ __('Request Kasbon') }}</span>
                         </button>
                     @else
-                        <button wire:click="openCreateModal" aria-label="{{ __('Request Kasbon') }}" class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
+                        <button wire:click="openCreateModal" aria-label="{{ __('Request Kasbon') }}" title="{{ __('Request Kasbon') }}"
+                            class="user-header-icon-action bg-primary-600 text-white hover:bg-primary-700 hover:text-white dark:bg-primary-400 dark:text-slate-950 dark:hover:bg-primary-300">
                             <x-heroicon-m-plus class="h-5 w-5" />
-                            <span>{{ __('Request Kasbon') }}</span>
                         </button>
                     @endif
                 </x-slot>
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-                @unless($canRequestCashAdvance)
-                    <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-medium text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100">
-                        <span class="font-semibold">{{ __('Kasbon is available after your basic salary has been updated.') }}</span>
+                @unless ($canRequestCashAdvance)
+                    <div class="kasbon-alert">
+                        <x-heroicon-o-information-circle class="h-5 w-5 shrink-0" />
+                        <span>{{ __('Kasbon is available after your basic salary has been updated.') }}</span>
                     </div>
                 @endunless
 
-                @if($showCreateModal)
-                {{-- CREATE FORM --}}
-	                <div class="user-native-form mx-auto max-w-2xl p-4 sm:p-5">
-                <form wire:submit.prevent="submit" class="space-y-4">
+                @if ($showCreateModal)
+                    <form wire:submit.prevent="submit" class="kasbon-request-panel">
+                        <div>
+                            <p class="kasbon-eyebrow">{{ __('Cash advance request') }}</p>
+                            <h2 class="kasbon-request-panel__title">{{ __('Choose amount and payroll deduction') }}</h2>
+                            <p class="kasbon-request-panel__copy">
+                                {{ __('If approved, this amount will be deducted from the selected payroll period.') }}
+                            </p>
+                        </div>
 
-                    {{-- Amount --}}
-                    <div>
-	                        <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Kasbon Amount') }}</label>
-	                        <div class="relative">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                                <span class="text-gray-500 dark:text-gray-400 font-bold">Rp</span>
+                        <div class="user-native-field">
+                            <x-forms.label for="kasbon-amount" value="{{ __('Kasbon Amount') }}" class="user-native-field__label" />
+                            <div class="user-native-field__control">
+                                <span class="user-native-field__prefix">{{ __('Rp') }}</span>
+                                <input
+                                    id="kasbon-amount"
+                                    type="text"
+                                    inputmode="numeric"
+                                    x-data
+                                    x-mask:dynamic="$money($input, '.', ',')"
+                                    wire:model.defer="amount"
+                                    placeholder="0"
+                                    class="user-native-field__input user-native-field__input--with-prefix"
+                                    aria-label="{{ __('Kasbon Amount') }}">
                             </div>
-                            <x-forms.input
-                                type="text"
-	                                class="block w-full py-3 pl-12 text-lg font-semibold"
-                                x-data
-                                x-mask:dynamic="$money($input, '.', ',')"
-                                wire:model.defer="amount"
-                                placeholder="0" />
+                            <x-forms.input-error for="amount" class="mt-2" />
                         </div>
-                        <x-forms.input-error for="amount" class="mt-2" />
-                    </div>
 
-                    {{-- Purpose --}}
-                    <div>
-	                        <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Kasbon Purpose') }}</label>
-	                        <x-forms.textarea wire:model.defer="purpose" rows="3" class="block w-full py-3" placeholder="{{ __('Explain the purpose of this kasbon') }}" />
-                        <x-forms.input-error for="purpose" class="mt-2" />
-                    </div>
+                        <x-user.native-textarea-field
+                            id="kasbon-purpose"
+                            model="purpose"
+                            modifier="defer"
+                            icon="heroicon-o-chat-bubble-left-right"
+                            rows="3"
+                            label="{{ __('Kasbon Purpose') }}"
+                            placeholder="{{ __('Explain the purpose of this kasbon') }}"
+                            error="purpose" />
 
-                    {{-- Deduction Target --}}
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {{-- Payment Month --}}
-                        <div>
-	                            <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Salary Deduction Month') }}</label>
-	                            <x-forms.select wire:model.defer="payment_month" class="block w-full text-gray-900 transition-all dark:text-gray-100">
-                                @for($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}">{{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}</option>
-                                    @endfor
-                            </x-forms.select>
+                        @php
+                            $deductionPeriods = collect(range(0, 2))->map(fn (int $offset) => now()->startOfMonth()->addMonths($offset));
+                            $selectedPeriodKey = sprintf('%04d-%02d', (int) ($payment_year ?: now()->year), (int) ($payment_month ?: now()->month));
+                        @endphp
+
+                        <div class="user-native-field">
+                            <x-forms.label for="kasbon-payment-period" value="{{ __('Salary Deduction Period') }}" class="user-native-field__label" />
+                            <div class="user-native-field__control">
+                                <x-heroicon-o-calendar-days class="user-native-field__icon" />
+                                <select
+                                    id="kasbon-payment-period"
+                                    x-data
+                                    x-on:change="
+                                        const [year, month] = $event.target.value.split('-');
+                                        $wire.set('payment_year', Number(year));
+                                        $wire.set('payment_month', Number(month));
+                                    "
+                                    class="user-native-field__input kasbon-native-select">
+                                    @foreach ($deductionPeriods as $period)
+                                        @php
+                                            $periodKey = $period->format('Y-m');
+                                        @endphp
+                                        <option value="{{ $periodKey }}" @selected($selectedPeriodKey === $periodKey)>
+                                            {{ $period->translatedFormat('F Y') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <x-heroicon-o-chevron-down class="kasbon-native-select__chevron" />
+                            </div>
+                            <p class="kasbon-field-hint">{{ __('Only the current month through the next two months can be selected.') }}</p>
                             <x-forms.input-error for="payment_month" class="mt-2" />
-                        </div>
-
-                        {{-- Payment Year --}}
-                        <div>
-	                            <label class="mb-2 block font-semibold text-gray-700 dark:text-gray-300">{{ __('Salary Deduction Year') }}</label>
-	                            <x-forms.input type="number" wire:model.defer="payment_year" class="block w-full" />
                             <x-forms.input-error for="payment_year" class="mt-2" />
                         </div>
-                    </div>
 
-                    <div class="rounded-xl border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20">
-                        <p class="flex items-start gap-2 text-xs font-medium text-orange-800 dark:text-orange-300">
-                            <x-heroicon-o-information-circle class="h-4 w-4 shrink-0" />
-                            <span><strong class="font-bold">{{ __('IMPORTANT') }}</strong></span>
-                            <span class="sr-only">{{ __('If approved, this amount will be automatically deducted from your payroll for the month and year you selected above.') }}</span>
-                        </p>
-                    </div>
+                        <div class="kasbon-request-note">
+                            <x-heroicon-o-shield-check class="h-5 w-5 shrink-0" />
+                            <span>{{ __('Finance and your manager can review this request before payroll deduction.') }}</span>
+                        </div>
 
-                    <div class="flex flex-col-reverse items-stretch justify-end gap-2 pt-3 sm:flex-row">
-                        <button type="button" wire:click="$set('showCreateModal', false)" class="user-secondary-action">
-                            {{ __('Cancel') }}
-                        </button>
-                        <button type="submit" wire:loading.attr="disabled" class="user-primary-action flex-1 sm:flex-none">
-                            {{ __('Submit Kasbon Request') }}
-                        </button>
-                    </div>
-                </form>
-                </div>
-
+                        <div class="kasbon-request-panel__actions">
+                            <button type="button" wire:click="$set('showCreateModal', false)" class="user-secondary-action">
+                                {{ __('Cancel') }}
+                            </button>
+                            <button type="submit" wire:loading.attr="disabled" class="user-primary-action">
+                                {{ __('Submit Kasbon Request') }}
+                            </button>
+                        </div>
+                    </form>
                 @else
-                {{-- LIST VIEW --}}
-
-                {{-- Summary Cards (Compact Mode) --}}
-	                <div class="user-stat-strip mb-4 grid grid-cols-3 gap-1.5">
-                    {{-- Unpaid --}}
-	                    <div class="user-stat-pill flex flex-col items-center gap-1">
-	                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-                            <x-heroicon-m-clock class="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    <div class="kasbon-summary">
+                        <div class="kasbon-summary__item kasbon-summary__item--warning">
+                            <span>{{ __('Unpaid') }}</span>
+                            <strong>{{ __('Rp') }} {{ number_format($totalUnpaid, 0, ',', '.') }}</strong>
                         </div>
-	                        <div class="min-w-0 text-center">
-	                            <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">{{ __('Unpaid') }}</p>
-	                            <p class="mt-0.5 truncate text-xs font-black text-amber-900 dark:text-amber-200">Rp {{ number_format($totalUnpaid, 0, ',', '.') }}</p>
+                        <div class="kasbon-summary__item kasbon-summary__item--success">
+                            <span>{{ __('Paid') }}</span>
+                            <strong>{{ __('Rp') }} {{ number_format($totalPaid, 0, ',', '.') }}</strong>
                         </div>
-                    </div>
-
-                    {{-- Paid --}}
-	                    <div class="user-stat-pill flex flex-col items-center gap-1">
-	                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                            <x-heroicon-m-check-badge class="h-5 w-5 text-green-600 dark:text-green-400" />
-                        </div>
-	                        <div class="min-w-0 text-center">
-	                            <p class="text-[10px] font-bold uppercase tracking-wider text-green-700 dark:text-green-400">{{ __('Paid') }}</p>
-	                            <p class="mt-0.5 truncate text-xs font-black text-green-900 dark:text-green-200">Rp {{ number_format($totalPaid, 0, ',', '.') }}</p>
+                        <div class="kasbon-summary__item kasbon-summary__item--neutral">
+                            <span>{{ __('Limit') }}</span>
+                            <strong>{{ __('Rp') }} {{ number_format($basicSalary, 0, ',', '.') }}</strong>
                         </div>
                     </div>
 
-                    {{-- Limit --}}
-	                    <div class="user-stat-pill flex flex-col items-center gap-1">
-	                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                            <x-heroicon-m-shield-check class="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-	                        <div class="min-w-0 text-center">
-	                            <p class="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">{{ __('Limit') }}</p>
-	                            <p class="mt-0.5 truncate text-xs font-black text-blue-900 dark:text-blue-200">Rp {{ number_format($basicSalary, 0, ',', '.') }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                @if($advances->isEmpty())
-                <div class="user-empty-state">
-                    <div class="user-empty-state__icon">
-                        <x-heroicon-o-banknotes class="h-8 w-8 text-gray-300 dark:text-gray-600" />
-                    </div>
-                    <h3 class="user-empty-state__title">{{ __('No cash advance data found.') }}</h3>
-                    <p class="user-empty-state__copy">{{ __('No cash advance requests yet.') }}</p>
-                </div>
-                @else
-                <div class="space-y-3">
-                    @foreach($advances as $advance)
-	                    <div class="user-list-card group">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex items-center gap-3 overflow-hidden sm:gap-4">
-                                {{-- Icon --}}
-                                <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
-                                    <x-heroicon-o-banknotes class="h-5 w-5 sm:h-6 sm:w-6" />
-                                </div>
-
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-0.5">
-                                        <h4 class="font-bold text-gray-900 dark:text-white capitalize truncate text-sm sm:text-base">{{ __('Deduction Target') }}: {{ \Carbon\Carbon::create()->month((int)$advance->payment_month)->translatedFormat('F') }} {{ $advance->payment_year }}</h4>
-                                        <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wide
-                                                        @if($advance->status === 'approved') bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400
-                                                        @elseif($advance->status === 'rejected') bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
-                                                        @elseif($advance->status === 'paid') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400
-                                                        @else bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 @endif">
-                                            {{ __($advance->status === 'pending' ? 'Pending' : ($advance->status === 'approved' ? 'Approved' : ($advance->status === 'paid' ? 'Paid' : 'Rejected'))) }}
-                                        </span>
-                                    </div>
-                                    <p class="sr-only">{{ $advance->purpose }}</p>
-                                    <div class="text-[10px] text-gray-400 mt-0.5 sm:mt-1 flex items-center gap-1">
-                                        <x-heroicon-o-calendar-days class="h-3 w-3" />
-                                        {{ $advance->created_at->format('d M Y') }}
-                                    </div>
-                                </div>
+                    @if ($advances->isEmpty())
+                        <div class="user-empty-state">
+                            <div class="user-empty-state__icon">
+                                <x-heroicon-o-banknotes class="h-8 w-8" />
                             </div>
-
-                            <div class="shrink-0 flex flex-col items-start gap-1 pl-0 text-left sm:items-end sm:pl-4 sm:text-right">
-                                <p class="text-sm sm:text-lg font-black text-gray-900 dark:text-white tracking-tight">
-                                    <span class="text-[10px] sm:text-xs text-gray-400 font-normal mr-0.5">{{ __('Rp') }}</span>{{ number_format($advance->amount, 0, ',', '.') }}
-                                </p>
-                                @if($advance->status === 'pending')
-                                <button wire:click="delete({{ $advance->id }})" wire:confirm="{{ __('Are you sure you want to cancel this request?') }}" class="text-[10px] font-medium text-red-500 hover:text-red-700 transition">
-                                    {{ __('Cancel') }}
-                                </button>
-                                @endif
-                            </div>
+                            <h3 class="user-empty-state__title">{{ __('No cash advance data found.') }}</h3>
+                            <p class="user-empty-state__copy">{{ __('No cash advance requests yet.') }}</p>
                         </div>
-                    </div>
-                    @endforeach
-                </div>
+                    @else
+                        <div class="kasbon-list">
+                            @foreach ($advances as $advance)
+                                @php
+                                    $statusTone = match ($advance->status) {
+                                        'approved' => 'success',
+                                        'paid' => 'info',
+                                        'rejected' => 'danger',
+                                        default => 'warning',
+                                    };
+                                    $statusLabel = match ($advance->status) {
+                                        'approved' => __('Approved'),
+                                        'paid' => __('Paid'),
+                                        'rejected' => __('Rejected'),
+                                        default => __('Pending'),
+                                    };
+                                @endphp
 
-	                <div class="mt-4">
-                    {{ $advances->links() }}
-                </div>
-                @endif
-                @endif
+                                <article class="kasbon-card">
+                                    <div class="kasbon-card__icon" aria-hidden="true">
+                                        <x-heroicon-o-banknotes class="h-5 w-5" />
+                                    </div>
 
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex min-w-0 items-start justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <h3 class="kasbon-card__title">
+                                                    {{ \Carbon\Carbon::create()->month((int) $advance->payment_month)->translatedFormat('F') }} {{ $advance->payment_year }}
+                                                </h3>
+                                                <p class="kasbon-card__meta">
+                                                    {{ __('Deduction Target') }} · {{ $advance->created_at->format('d M Y') }}
+                                                </p>
+                                            </div>
+
+                                            <span class="kasbon-card__status kasbon-card__status--{{ $statusTone }}">
+                                                {{ $statusLabel }}
+                                            </span>
+                                        </div>
+
+                                        <div class="kasbon-card__amount">
+                                            <span>{{ __('Rp') }}</span>{{ number_format($advance->amount, 0, ',', '.') }}
+                                        </div>
+                                    </div>
+
+                                    @if ($advance->status === 'pending')
+                                        <button wire:click="delete({{ $advance->id }})"
+                                            wire:confirm="{{ __('Are you sure you want to cancel this request?') }}"
+                                            class="kasbon-card__cancel"
+                                            aria-label="{{ __('Cancel') }} {{ __('Request Kasbon') }}">
+                                            <x-heroicon-o-x-mark class="h-5 w-5" />
+                                        </button>
+                                    @endif
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-4">
+                            {{ $advances->links() }}
+                        </div>
+                    @endif
+                @endif
             </div>
         </section>
     </div>

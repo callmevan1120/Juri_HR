@@ -1,6 +1,6 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section class="user-page-surface" aria-labelledby="wfh-request-title">
+        <section class="user-page-surface" aria-labelledby="wfh-request-title" @unless($showCreateModal) wire:poll.visible.20s @endunless>
             <x-user.page-header
                 :back-href="route('home')"
                 :title="__('WFH Request')"
@@ -19,6 +19,16 @@
 
             <div class="user-page-body bg-gray-50/50 dark:bg-gray-900/20">
                 @include('components.feedback.alert-messages')
+
+                <div class="wfh-request-summary" aria-label="{{ __('WFH request summary') }}">
+                    <div class="wfh-request-summary__icon">
+                        <x-heroicon-o-home-modern class="h-5 w-5" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="wfh-request-summary__label">{{ __('Remote Work') }}</p>
+                        <p class="wfh-request-summary__copy">{{ __('Submit WFH with date, optional hours, location, and reason in one flow.') }}</p>
+                    </div>
+                </div>
 
                 <div class="wfh-request-list">
                         @forelse ($requests as $request)
@@ -39,9 +49,16 @@
                                         <div class="flex items-start justify-between gap-3">
                                             <div class="min-w-0">
                                                 <h3 class="wfh-request-item__title">{{ $request->date?->translatedFormat('l') }}</h3>
-                                                <p class="wfh-request-item__meta">
-                                                    {{ $request->start_time ?: '--:--' }} - {{ $request->end_time ?: '--:--' }}
-                                                </p>
+                                                <div class="wfh-request-item__meta">
+                                                    <x-heroicon-o-clock class="h-4 w-4" />
+                                                    <span>
+                                                        @if ($request->start_time && $request->end_time)
+                                                            {{ $request->start_time }} - {{ $request->end_time }}
+                                                        @else
+                                                            {{ __('Full-day request') }}
+                                                        @endif
+                                                    </span>
+                                                </div>
                                             </div>
                                             <span class="wfh-request-item__status {{ $tone }}">
                                                 {{ __(str($request->status)->headline()->toString()) }}
@@ -87,18 +104,24 @@
             </div>
         </section>
 
-        <x-overlays.dialog-modal wire:model.live="showCreateModal">
-            <x-slot name="title">{{ __('New Request') }}</x-slot>
+        <x-overlays.modal wire:model.live="showCreateModal" maxWidth="lg" onclose="$wire.close()">
+            <form wire:submit.prevent="submit" class="user-ui wfh-request-modal" aria-labelledby="wfh-request-modal-title">
+                <div class="wfh-request-modal__header">
+                    <div class="min-w-0">
+                        <p class="wfh-request-modal__eyebrow">{{ __('Remote Work') }}</p>
+                        <h2 id="wfh-request-modal-title" class="wfh-request-modal__title">{{ __('WFH Request') }}</h2>
+                    </div>
+                    <button type="button" wire:click="close" class="wfh-request-modal__close" aria-label="{{ __('Close') }}" wire:loading.attr="disabled">
+                        <x-heroicon-o-x-mark class="h-5 w-5" />
+                    </button>
+                </div>
 
-            <x-slot name="content">
-                <form wire:submit.prevent="submit" class="wfh-request-form wfh-request-form--modal">
-                    <div class="wfh-request-form__header">
-                        <div class="wfh-request-form__icon">
-                            <x-heroicon-o-home-modern class="h-5 w-5" />
-                        </div>
+                <div class="wfh-request-modal__body">
+                    <div class="wfh-request-step">
+                        <span class="wfh-request-step__number">1</span>
                         <div>
-                            <h2 class="wfh-request-form__title">{{ __('WFH Request') }}</h2>
-                            <p class="wfh-request-form__copy">{{ __('Request work-from-home approval with date, time, location, and reason.') }}</p>
+                            <p class="wfh-request-step__title">{{ __('Choose date and hours') }}</p>
+                            <p class="wfh-request-step__copy">{{ __('Leave start and end blank for a full-day WFH request.') }}</p>
                         </div>
                     </div>
 
@@ -128,6 +151,14 @@
                             />
                         </div>
 
+                        <div class="wfh-request-step">
+                            <span class="wfh-request-step__number">2</span>
+                            <div>
+                                <p class="wfh-request-step__title">{{ __('Add work context') }}</p>
+                                <p class="wfh-request-step__copy">{{ __('Tell the reviewer where you will work and why WFH is needed.') }}</p>
+                            </div>
+                        </div>
+
                         <x-user.native-text-field
                             id="wfh-location"
                             :label="__('Location')"
@@ -144,21 +175,17 @@
                             error="reason"
                             placeholder="{{ __('Explain why you need to work from home...') }}"
                         />
-
-                        <div class="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
-                            <x-actions.secondary-button type="button" wire:click="close" wire:loading.attr="disabled">
-                                {{ __('Cancel') }}
-                            </x-actions.secondary-button>
-                            <button type="submit" class="wfh-submit-button sm:w-auto" aria-label="{{ __('Submit WFH Request') }}" wire:loading.attr="disabled">
-                                <x-heroicon-m-paper-airplane class="h-5 w-5" />
-                                <span>{{ __('Submit WFH Request') }}</span>
-                            </button>
-                        </div>
                     </div>
-                </form>
-            </x-slot>
 
-            <x-slot name="footer"></x-slot>
-        </x-overlays.dialog-modal>
+                </div>
+
+                <div class="wfh-request-modal__footer">
+                    <button type="submit" class="wfh-submit-button" aria-label="{{ __('Submit WFH Request') }}" wire:loading.attr="disabled">
+                        <x-heroicon-m-paper-airplane class="h-5 w-5" />
+                        <span>{{ __('Submit WFH Request') }}</span>
+                    </button>
+                </div>
+            </form>
+        </x-overlays.modal>
     </div>
 </div>

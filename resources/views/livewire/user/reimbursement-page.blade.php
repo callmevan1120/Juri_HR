@@ -1,13 +1,6 @@
 <div class="user-page-shell">
-    {{-- App Header Slot --}}
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ $isCreating ? __('New Claim') : __('Reimbursement') }}
-        </h2>
-    </x-slot>
-
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="reimbursement-page-title" class="user-page-surface">
+        <section aria-labelledby="reimbursement-page-title" class="user-page-surface" @unless($isCreating) wire:poll.visible.20s @endunless>
             <x-user.page-header :back-href="!$isCreating ? route('home') : null" :title="$isCreating ? __('New Claim') : __('Reimbursement')" title-id="reimbursement-page-title"
                 class="border-b-0">
                 <x-slot name="icon">
@@ -15,13 +8,13 @@
                 </x-slot>
                 <x-slot name="actions">
                     @if ($isCreating)
-                        <button wire:click="cancel"
+                        <button type="button" wire:click="cancel" aria-label="{{ __('Back') }}"
                             class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                             <x-heroicon-o-arrow-left class="h-5 w-5" />
                             <span>{{ __('Back') }}</span>
                         </button>
                     @else
-                        <button wire:click="create"
+                        <button type="button" wire:click="create" aria-label="{{ __('New Request') }}"
                             class="wcag-touch-target inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
                             <x-heroicon-o-plus class="h-5 w-5" />
                             <span>{{ __('New Request') }}</span>
@@ -41,13 +34,13 @@
                             {{-- Date & Type --}}
                             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {{-- Date --}}
-                                <div>
-                                    <label
-                                        class="mb-2 block font-bold text-gray-700 dark:text-gray-300">{{ __('Transaction Date') }}</label>
-                                    <x-forms.input type="date" wire:model="date"
-                                        class="block w-full rounded-xl border-gray-200 bg-gray-50 py-3 dark:border-gray-700 dark:bg-gray-900/50" />
-                                    <x-forms.input-error for="date" class="mt-2" />
-                                </div>
+                                <x-user.native-date-field
+                                    id="reimbursement-date"
+                                    :label="__('Transaction Date')"
+                                    model="date"
+                                    error="date"
+                                    modifier="default"
+                                />
 
                                 {{-- Type --}}
                                 <div>
@@ -75,7 +68,7 @@
                                     class="mb-2 block font-bold text-gray-700 dark:text-gray-300">{{ __('Amount') }}</label>
                                 <div class="relative rounded-xl shadow-sm">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                                        <span class="text-gray-500 dark:text-gray-400 font-bold">Rp</span>
+                                        <span class="text-gray-500 dark:text-gray-400 font-bold">{{ __('Rp') }}</span>
                                     </div>
                                     <x-forms.input type="text"
                                         class="block w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-12 text-lg font-bold dark:border-gray-700 dark:bg-gray-900/50"
@@ -147,40 +140,43 @@
 
                     <div
                         class="user-compact-filter mb-4">
-                        <div class="user-filter-grid">
-                            <div>
-                                <label
-                                    class="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Search') }}</label>
-                                <x-forms.input type="text" wire:model.live.debounce.300ms="search"
-                                    class="block w-full rounded-xl border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900/50"
-                                    placeholder="{{ __('Search reimbursement history') }}" />
+                        <div class="space-y-2">
+                            <label class="sr-only" for="reimbursement-search">{{ __('Search') }}</label>
+                            <x-forms.input id="reimbursement-search" type="search" wire:model.live.debounce.300ms="search"
+                                class="block w-full"
+                                placeholder="{{ __('Search reimbursement history') }}" />
+
+                            <div class="user-filter-chip-row" role="tablist" aria-label="{{ __('Status') }}">
+                                @foreach ([
+                                    'all' => __('All'),
+                                    'pending' => __('Pending'),
+                                    'approved' => __('Approved'),
+                                    'rejected' => __('Rejected'),
+                                ] as $statusKey => $statusLabel)
+                                    <button type="button" wire:click="setStatusFilter('{{ $statusKey }}')"
+                                        aria-pressed="{{ $statusFilter === $statusKey ? 'true' : 'false' }}"
+                                        class="user-filter-chip">
+                                        {{ $statusLabel }}
+                                    </button>
+                                @endforeach
                             </div>
 
-                            <div>
-                                <label
-                                    class="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Status') }}</label>
-                                <x-forms.select wire:model.live="statusFilter"
-                                    class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500">
-                                    <option value="all">{{ __('All Statuses') }}</option>
-                                    <option value="pending">{{ __('Pending') }}</option>
-                                    <option value="approved">{{ __('Approved') }}</option>
-                                    <option value="rejected">{{ __('Rejected') }}</option>
-                                </x-forms.select>
-                            </div>
-
-                            <div>
-                                <label
-                                    class="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Type') }}</label>
-                                <x-forms.select wire:model.live="typeFilter"
-                                    class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500">
-                                    <option value="all">{{ __('All Types') }}</option>
-                                    <option value="medical">{{ __('Medical') }}</option>
-                                    <option value="transport">{{ __('Transport') }}</option>
-                                    <option value="project">{{ __('Project') }}</option>
-                                    <option value="optical">{{ __('Optical') }}</option>
-                                    <option value="dental">{{ __('Dental') }}</option>
-                                    <option value="other">{{ __('Other') }}</option>
-                                </x-forms.select>
+                            <div class="user-filter-chip-row" role="tablist" aria-label="{{ __('Type') }}">
+                                @foreach ([
+                                    'all' => __('All Types'),
+                                    'medical' => __('Medical'),
+                                    'transport' => __('Transport'),
+                                    'project' => __('Project'),
+                                    'optical' => __('Optical'),
+                                    'dental' => __('Dental'),
+                                    'other' => __('Other'),
+                                ] as $typeKey => $typeLabel)
+                                    <button type="button" wire:click="setTypeFilter('{{ $typeKey }}')"
+                                        aria-pressed="{{ $typeFilter === $typeKey ? 'true' : 'false' }}"
+                                        class="user-filter-chip">
+                                        {{ $typeLabel }}
+                                    </button>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -245,7 +241,7 @@
                                             <p
                                                 class="text-sm sm:text-lg font-black text-gray-900 dark:text-white tracking-tight">
                                                 <span
-                                                    class="text-[10px] sm:text-xs text-gray-400 font-normal mr-0.5">Rp</span>{{ number_format($claim->amount, 0, ',', '.') }}
+                                                    class="text-[10px] sm:text-xs text-gray-400 font-normal mr-0.5">{{ __('Rp') }}</span>{{ number_format($claim->amount, 0, ',', '.') }}
                                             </p>
                                         </div>
                                     </div>

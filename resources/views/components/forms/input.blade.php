@@ -11,6 +11,8 @@
     if ($isDatePicker) {
         $extraAttributes['data-ui-picker'] = $type === 'datetime-local' ? 'datetime' : $type;
         $extraAttributes['autocomplete'] = 'off';
+        $extraAttributes['inputmode'] = 'none';
+        $extraAttributes['readonly'] = 'readonly';
     }
 
     if ($isNumberLike) {

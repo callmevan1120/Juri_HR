@@ -34,7 +34,7 @@
         </x-admin.page-tools>
     </x-slot>
 
-    <div class="w-full">
+    <div class="w-full" @unless($showModal || $showHistoryModal) wire:poll.visible.10s @endunless>
         <!-- Pending OTP Return Banners -->
         @php
             $otpNotifications = auth()

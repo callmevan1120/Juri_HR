@@ -1,18 +1,19 @@
 <x-app-layout>
-    @php($backRoute = auth()->user()->preferredHomeUrl())
+    @php($profileUser = auth()->user())
+    @php($backRoute = $profileUser->preferredHomeUrl())
     @php($profilePanels = [])
     @if (Laravel\Fortify\Features::canUpdateProfileInformation())
-        @php($profilePanels['details'] = ['title' => __('Details'), 'copy' => __('Update your personal profile information')])
+        @php($profilePanels['details'] = ['title' => __('Details'), 'copy' => __('Update your personal profile information'), 'icon' => 'heroicon-o-identification'])
     @endif
     @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
-        @php($profilePanels['password'] = ['title' => __('Password'), 'copy' => __('Change and strengthen your password')])
+        @php($profilePanels['password'] = ['title' => __('Password'), 'copy' => __('Change and strengthen your password'), 'icon' => 'heroicon-o-key'])
     @endif
     @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
-        @php($profilePanels['security'] = ['title' => __('Security'), 'copy' => __('Manage verification and account protection')])
+        @php($profilePanels['security'] = ['title' => __('Security'), 'copy' => __('Manage verification and account protection'), 'icon' => 'heroicon-o-shield-check'])
     @endif
-    @php($profilePanels['sessions'] = ['title' => __('Sessions'), 'copy' => __('Review and sign out active devices')])
+    @php($profilePanels['sessions'] = ['title' => __('Sessions'), 'copy' => __('Review and sign out active devices'), 'icon' => 'heroicon-o-device-phone-mobile'])
     @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-        @php($profilePanels['danger'] = ['title' => __('Danger'), 'copy' => __('Request account deletion with admin approval')])
+        @php($profilePanels['danger'] = ['title' => __('Danger'), 'copy' => __('Request account deletion with admin approval'), 'icon' => 'heroicon-o-trash'])
     @endif
 
     <div class="profile-page user-page-shell" x-data="{
@@ -31,14 +32,14 @@
     }">
         <div class="user-page-container user-page-container--standard">
             <div aria-labelledby="profile-page-title">
-                <x-user.page-header :back-href="$backRoute" :title="__('Profile')" :description="auth()->user()->email" title-id="profile-page-title"
+                <x-user.page-header :back-href="$backRoute" :title="__('Profile')" title-id="profile-page-title"
                     plain>
                     <x-slot name="icon">
                         <x-heroicon-o-user-circle class="h-6 w-6" />
                     </x-slot>
 
                     <x-slot name="meta">
-                        @if (auth()->user()->hasVerifiedEmail())
+                        @if ($profileUser->hasVerifiedEmail())
                             <span class="profile-verified-mark" aria-label="{{ __('Verified account') }}" title="{{ __('Verified') }}">
                                 <x-heroicon-s-check-badge class="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
                             </span>
@@ -56,8 +57,43 @@
                     </x-slot>
                 </x-user.page-header>
 
+                <section class="profile-identity" aria-label="{{ __('Account summary') }}">
+                    <img class="profile-identity__avatar" src="{{ $profileUser->profile_photo_url }}" alt="{{ $profileUser->name }}">
+
+                    <div class="profile-identity__content">
+                        <p class="profile-identity__eyebrow">{{ __('Signed in as') }}</p>
+                        <h2 class="profile-identity__name">{{ $profileUser->name }}</h2>
+                        <p class="profile-identity__email">{{ $profileUser->email }}</p>
+
+                        <div class="profile-identity__meta">
+                            @if($profileUser->nip)
+                                <span>{{ $profileUser->nip }}</span>
+                            @endif
+
+                            @if($profileUser->division?->name)
+                                <span>{{ $profileUser->division->name }}</span>
+                            @endif
+
+                            @if($profileUser->jobTitle?->name)
+                                <span>{{ $profileUser->jobTitle->name }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ route('logout') }}" class="profile-logout-form">
+                        @csrf
+                        <button type="submit" class="profile-logout-button" aria-label="{{ __('Log Out') }}">
+                            <x-heroicon-o-arrow-right-on-rectangle class="h-5 w-5" />
+                            <span>{{ __('Log Out') }}</span>
+                        </button>
+                    </form>
+                </section>
+
                 <section class="profile-control-grid" aria-label="{{ __('Profile controls') }}">
                     <div class="profile-preferences__item">
+                        <div class="profile-preferences__icon">
+                            <x-heroicon-o-language class="h-5 w-5" />
+                        </div>
                         <div>
                             <h2 class="profile-preferences__title">{{ __('Language') }}</h2>
                             <p class="profile-preferences__copy">{{ __('Switch between Indonesian and English') }}</p>
@@ -85,6 +121,9 @@
                     </div>
 
                     <div class="profile-preferences__item">
+                        <div class="profile-preferences__icon">
+                            <x-heroicon-o-swatch class="h-5 w-5" />
+                        </div>
                         <div>
                             <h2 class="profile-preferences__title">{{ __('Appearance') }}</h2>
                             <p class="profile-preferences__copy">{{ __('Toggle light or dark mode') }}</p>
@@ -95,11 +134,18 @@
 
                     @foreach ($profilePanels as $panelKey => $panel)
                         <button type="button" class="profile-section-nav__link"
+                            data-profile-panel="{{ $panelKey }}"
                             x-on:click="openPanel(@js($panelKey))"
                             x-bind:aria-haspopup="'dialog'"
-                            x-bind:aria-expanded="(activePanel === @js($panelKey)).toString()">
-                            <span class="profile-section-nav__title">{{ $panel['title'] }}</span>
-                            <span class="profile-section-nav__copy">{{ $panel['copy'] }}</span>
+                            x-bind:aria-expanded="(activePanel === @js($panelKey)).toString()"
+                            aria-label="{{ $panel['title'] }}">
+                            <span class="profile-section-nav__icon">
+                                <x-dynamic-component :component="$panel['icon']" class="h-5 w-5" />
+                            </span>
+                            <span class="min-w-0">
+                                <span class="profile-section-nav__title">{{ $panel['title'] }}</span>
+                                <span class="profile-section-nav__copy">{{ $panel['copy'] }}</span>
+                            </span>
                         </button>
                     @endforeach
                 </section>

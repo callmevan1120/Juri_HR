@@ -12,12 +12,14 @@
 
 <style>
     .commercial-document-title {
+        border-bottom: 1.4px solid #badcb3;
         color: #083344;
         font-size: 18px;
         font-weight: 700;
         letter-spacing: .03em;
         line-height: 1.35;
         margin: 4px 0 18px;
+        padding-bottom: 8px;
         text-transform: uppercase;
     }
 
@@ -38,8 +40,11 @@
     }
 
     .commercial-document-party {
-        border-left: 3px solid #6ab45b;
-        padding: 0 18px 0 12px;
+        background: #f5faf4;
+        border: 1px solid #d7ead3;
+        border-left: 4px solid #6ab45b;
+        border-radius: 6px;
+        padding: 10px 18px 10px 12px;
     }
 
     .commercial-document-party-label,
@@ -67,7 +72,7 @@
 
     .commercial-document-meta {
         margin: 0 0 0 auto;
-        width: 86%;
+        width: 88%;
     }
 
     .commercial-document-meta,
@@ -76,7 +81,7 @@
     }
 
     .commercial-document-meta td {
-        padding: 0 0 5px;
+        padding: 0 0 6px;
     }
 
     .commercial-document-meta .label {
@@ -90,9 +95,19 @@
         text-align: right;
     }
 
+    .commercial-document-status {
+        background: #f0f9ee;
+        border-radius: 5px;
+        color: #31542a;
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        padding: 3px 8px;
+    }
+
     .commercial-document-items {
         border-collapse: collapse;
-        margin: 14px 0 0;
+        margin: 16px 0 0;
         width: 100%;
     }
 
@@ -118,7 +133,11 @@
     }
 
     .commercial-document-totals {
-        margin: 15px 0 0 auto;
+        background: #f5faf4;
+        border: 1px solid #d7ead3;
+        border-radius: 6px;
+        margin: 16px 0 0 auto;
+        padding: 8px 10px;
         width: 42%;
     }
 
@@ -128,7 +147,7 @@
     }
 
     .commercial-document-totals td {
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid #d7ead3;
         padding: 6px 0;
     }
 
@@ -141,10 +160,13 @@
     }
 
     .commercial-document-notes {
-        border-top: 1px solid #badcb3;
+        background: #f9fafb;
+        border: 1px solid #d1d5db;
+        border-left: 3px solid #6ab45b;
+        border-radius: 6px;
         color: #4b5563;
         margin-top: 18px;
-        padding-top: 10px;
+        padding: 9px 10px;
     }
 </style>
 
@@ -182,7 +204,9 @@
                 </tr>
                 <tr>
                     <td class="label">{{ __('Status') }}</td>
-                    <td class="value">{{ __(str($document['status'])->headline()->toString()) }}</td>
+                    <td class="value">
+                        <span class="commercial-document-status">{{ __(str($document['status'])->headline()->toString()) }}</span>
+                    </td>
                 </tr>
                 @if ($document['sourceNumber'] ?? null)
                     <tr>

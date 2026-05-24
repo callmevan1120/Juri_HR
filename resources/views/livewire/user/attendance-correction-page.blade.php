@@ -1,6 +1,6 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="attendance-correction-title" class="user-page-surface">
+        <section aria-labelledby="attendance-correction-title" class="user-page-surface" @unless($showCreateModal) wire:poll.visible.20s @endunless>
             <x-user.page-header :back-href="route('home')" :title="__('Attendance Corrections')" title-id="attendance-correction-title"
                 class="border-b-0">
                 <x-slot name="icon">
@@ -223,18 +223,18 @@
         <x-slot name="title">{{ __('New Attendance Correction') }}</x-slot>
 
         <x-slot name="content">
-            <div class="space-y-5 pb-48">
+            <div class="space-y-4">
                 <div class="user-soft-panel">
-                    <x-forms.label for="attendance-date" value="{{ __('Attendance Date') }}" class="mb-1.5 block" />
                     <p class="sr-only">
                         {{ __('Choose the date first, then fill the corrected times below for that same day.') }}
                     </p>
-                    <div wire:ignore>
-                        <x-forms.input id="attendance-date" type="date" wire:model.live="attendanceDate"
-                            value="{{ $attendanceDate }}" max="{{ now()->toDateString() }}"
-                            class="mt-1 block w-full" data-ui-picker-static="true" />
-                    </div>
-                    <x-forms.input-error for="attendanceDate" class="mt-2" />
+                    <x-user.native-date-field
+                        id="attendance-date"
+                        :label="__('Attendance Date')"
+                        model="attendanceDate"
+                        error="attendanceDate"
+                        :max="now()->toDateString()"
+                    />
                 </div>
 
                 @if ($existingAttendance)
@@ -298,14 +298,15 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <x-forms.label for="requested-time-in" value="{{ __('Corrected Check In') }}"
-                                            class="mb-1.5 block" />
-                                        <x-forms.input id="requested-time-in" type="datetime-local"
-                                            wire:model.live="requestedTimeIn" data-ui-picker-static="true"
-                                            class="block w-full" />
+                                        <x-user.native-date-field
+                                            id="requested-time-in"
+                                            :label="__('Corrected Check In')"
+                                            model="requestedTimeIn"
+                                            error="requestedTimeIn"
+                                            type="datetime-local"
+                                        />
                                     </div>
                                 </div>
-                                <x-forms.input-error for="requestedTimeIn" class="mt-2" />
                             @endif
                         </div>
 
@@ -338,14 +339,15 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <x-forms.label for="requested-time-out" value="{{ __('Corrected Check Out') }}"
-                                            class="mb-1.5 block" />
-                                        <x-forms.input id="requested-time-out" type="datetime-local"
-                                            wire:model.live="requestedTimeOut" data-ui-picker-static="true"
-                                            class="block w-full" />
+                                        <x-user.native-date-field
+                                            id="requested-time-out"
+                                            :label="__('Corrected Check Out')"
+                                            model="requestedTimeOut"
+                                            error="requestedTimeOut"
+                                            type="datetime-local"
+                                        />
                                     </div>
                                 </div>
-                                <x-forms.input-error for="requestedTimeOut" class="mt-2" />
                             @endif
                         </div>
 

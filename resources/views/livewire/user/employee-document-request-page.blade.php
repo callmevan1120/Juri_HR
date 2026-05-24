@@ -1,217 +1,139 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="document-request-title" class="user-page-surface">
+        <section aria-labelledby="document-request-title" class="user-page-surface" @unless($showModal) wire:poll.visible.20s @endunless>
             <x-user.page-header
                 :back-href="route('home')"
                 :title="__('Document Requests')"
                 title-id="document-request-title"
                 class="border-b-0">
-                <x-slot name="icon">
-                    <x-heroicon-o-document-text class="h-5 w-5" />
-                </x-slot>
                 <x-slot name="actions">
-                    <x-actions.button type="button" wire:click="create" class="w-full sm:w-auto">
+                    <button type="button" wire:click="create" class="wcag-touch-target inline-flex items-center justify-center rounded-full bg-primary-600 p-3 text-white shadow-none transition hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:bg-primary-400 dark:text-slate-950 dark:hover:bg-primary-300 dark:focus-visible:ring-offset-slate-950" aria-label="{{ __('New Request') }}">
                         <x-heroicon-o-plus class="h-5 w-5" />
-                        <span>{{ __('New Request') }}</span>
-                    </x-actions.button>
+                    </button>
                 </x-slot>
             </x-user.page-header>
 
             <div class="user-page-body pt-0">
-                <div class="user-stat-strip mb-3">
-                    <div class="grid grid-cols-2 gap-1 min-[420px]:grid-cols-4">
-                        <div class="user-stat-pill">
-                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
-                                <x-heroicon-m-folder-open class="h-3.5 w-3.5" />
-                            </div>
-                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['total'] }}</div>
-                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-primary-800 dark:text-primary-200">{{ __('Total') }}</div>
-                        </div>
-                        <div class="user-stat-pill">
-                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
-                                <x-heroicon-m-clock class="h-3.5 w-3.5" />
-                            </div>
-                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['in_progress'] }}</div>
-                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-200">{{ __('Process') }}</div>
-                        </div>
-                        <div class="user-stat-pill">
-                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
-                                <x-heroicon-m-check-circle class="h-3.5 w-3.5" />
-                            </div>
-                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['ready'] }}</div>
-                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">{{ __('Ready') }}</div>
-                        </div>
-                        <div class="user-stat-pill">
-                            <div class="mx-auto flex h-6 w-6 items-center justify-center rounded-lg bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
-                                <x-heroicon-m-arrow-up-tray class="h-3.5 w-3.5" />
-                            </div>
-                            <div class="mt-0.5 text-sm font-semibold leading-none text-gray-950 dark:text-white">{{ $requestStats['needs_upload'] }}</div>
-                            <div class="mt-0.5 truncate text-[8px] font-semibold uppercase tracking-wide text-sky-800 dark:text-sky-200">{{ __('Upload') }}</div>
-                        </div>
+                <div class="document-request-hero">
+                    <div class="document-request-hero__icon">
+                        <x-heroicon-o-document-text class="h-6 w-6" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="document-request-hero__label">{{ __('Documents') }}</p>
+                        <p class="document-request-hero__title">{{ __('Use Document Requests when uploads or generated letters are needed.') }}</p>
+                    </div>
+                    <div class="document-request-hero__count">
+                        <span>{{ $requestStats['total'] }}</span>
+                        <small>{{ __('Total') }}</small>
                     </div>
                 </div>
 
-                <div class="user-list-card hidden overflow-hidden p-0 md:block">
-                    <div class="overflow-x-visible">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-900">
-                                <tr>
-                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Document') }}</th>
-                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Purpose') }}</th>
-                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Status') }}</th>
-                                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Admin Note') }}</th>
-                                    <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 bg-white dark:divide-gray-700 dark:bg-gray-800">
-                                @forelse ($requests as $request)
-                                    <tr>
-                                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
-                                            <div class="font-semibold">{{ $request->documentTypeLabel() }}</div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ $request->created_at->diffForHumans() }}</div>
-                                            @if ($request->due_date)
-                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Due') }} {{ $request->due_date->format('d M Y') }}</div>
-                                            @endif
-                                            @if ($request->requester && $request->requested_by !== $request->user_id)
-                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Requested by') }} {{ $request->requester->name }}</div>
-                                            @endif
-                                        </td>
-                                        <td class="max-w-sm px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                                            <div class="font-medium text-gray-900 dark:text-white">{{ $request->purpose }}</div>
-                                            @if ($request->details)
-                                                <div class="sr-only">{{ $request->details }}</div>
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $request->status === \App\Models\EmployeeDocumentRequest::STATUS_READY ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_REJECTED ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_UPLOAD_PROCESSING ? 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200')) }}">
-                                                {{ $request->statusLabel() }}
-                                            </span>
-                                            @if ($request->reviewer)
-                                                <div class="mt-1 text-[10px] text-gray-400">{{ __('by') }} {{ $request->reviewer->name }}</div>
-                                            @endif
-                                        </td>
-                                        <td class="max-w-sm px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                                            <span class="truncate">{{ $request->fulfillment_note ?: $request->rejection_note ?: '-' }}</span>
-                                        </td>
-                                        <td class="px-4 py-3 text-right text-sm">
-                                            <div class="flex flex-wrap justify-end gap-2">
-                                                @can('upload', $request)
-                                                    <x-actions.icon-button wire:click="prepareUpload({{ $request->id }})" variant="primary" label="{{ __('Upload document') }}: {{ $request->documentTypeLabel() }}" data-e2e="document-upload-open" data-request-id="{{ $request->id }}">
-                                                        <x-heroicon-m-arrow-up-tray class="h-5 w-5" />
-                                                    </x-actions.icon-button>
-                                                @endcan
-                                                @if ($request->generated_path)
-                                                    <x-actions.icon-button href="{{ route('document-requests.download', $request) }}" variant="neutral" label="{{ __('Download generated document') }}: {{ $request->documentTypeLabel() }}">
-                                                        <x-heroicon-m-arrow-down-tray class="h-5 w-5" />
-                                                    </x-actions.icon-button>
-                                                @endif
-                                                @if ($request->uploaded_path)
-                                                    <x-actions.icon-button href="{{ route('document-requests.uploaded', $request) }}" variant="neutral" label="{{ __('Download uploaded document') }}: {{ $request->documentTypeLabel() }}">
-                                                        <x-heroicon-m-arrow-down-tray class="h-5 w-5" />
-                                                    </x-actions.icon-button>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                            <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
-                                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
-                                                    <x-heroicon-o-document-plus class="h-6 w-6" />
-                                                </span>
-                                                <span class="font-medium text-gray-900 dark:text-white">{{ __('No document requests yet.') }}</span>
-                                                <span>{{ __('Create a request when you need an employment letter, salary statement, upload request, or another HR/Finance document.') }}</span>
-                                                <x-actions.button type="button" wire:click="create" size="sm">
-                                                    {{ __('New Request') }}
-                                                </x-actions.button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                <div class="document-request-stats" aria-label="{{ __('Document Requests') }}">
+                    <div class="document-request-stat">
+                        <span class="document-request-stat__dot bg-amber-400"></span>
+                        <span class="document-request-stat__value">{{ $requestStats['in_progress'] }}</span>
+                        <span class="document-request-stat__label">{{ __('Process') }}</span>
+                    </div>
+                    <div class="document-request-stat">
+                        <span class="document-request-stat__dot bg-emerald-400"></span>
+                        <span class="document-request-stat__value">{{ $requestStats['ready'] }}</span>
+                        <span class="document-request-stat__label">{{ __('Ready') }}</span>
+                    </div>
+                    <div class="document-request-stat">
+                        <span class="document-request-stat__dot bg-sky-400"></span>
+                        <span class="document-request-stat__value">{{ $requestStats['needs_upload'] }}</span>
+                        <span class="document-request-stat__label">{{ __('Upload') }}</span>
                     </div>
                 </div>
 
-                <div class="space-y-4 md:hidden">
+                <div class="document-request-list">
                     @forelse ($requests as $request)
-                        <article class="user-list-card">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="min-w-0">
-                                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $request->documentTypeLabel() }}</div>
-                                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $request->created_at->diffForHumans() }}</div>
-                                @if ($request->due_date)
-                                    <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Due') }} {{ $request->due_date->format('d M Y') }}</div>
-                                @endif
-                                @if ($request->requester && $request->requested_by !== $request->user_id)
-                                    <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Requested by') }} {{ $request->requester->name }}</div>
-                                @endif
+                        @php
+                            $statusTone = match ($request->status) {
+                                \App\Models\EmployeeDocumentRequest::STATUS_READY => 'document-request-status--ready',
+                                \App\Models\EmployeeDocumentRequest::STATUS_REJECTED, \App\Models\EmployeeDocumentRequest::STATUS_EXPIRED => 'document-request-status--rejected',
+                                \App\Models\EmployeeDocumentRequest::STATUS_UPLOAD_PROCESSING, \App\Models\EmployeeDocumentRequest::STATUS_UPLOADED => 'document-request-status--upload',
+                                default => 'document-request-status--pending',
+                            };
+                            $note = $request->fulfillment_note ?: $request->rejection_note;
+                        @endphp
+
+                        <article class="document-request-card">
+                            <div class="document-request-card__top">
+                                <div class="document-request-card__icon">
+                                    <x-heroicon-o-document-text class="h-5 w-5" />
                                 </div>
-                                <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold {{ $request->status === \App\Models\EmployeeDocumentRequest::STATUS_READY ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_REJECTED ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : ($request->status === \App\Models\EmployeeDocumentRequest::STATUS_UPLOAD_PROCESSING ? 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200')) }}">
-                                    {{ $request->statusLabel() }}
-                                </span>
-                            </div>
-
-                            <div class="mt-3 rounded-xl bg-gray-50 p-3 dark:bg-gray-900/40">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Purpose') }}</p>
-                                <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">{{ $request->purpose }}</p>
-                                @if ($request->details)
-                                    <p class="sr-only">{{ $request->details }}</p>
-                                @endif
-                            </div>
-
-                            <div class="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Status') }}</p>
-                                    <div class="mt-1 text-sm text-gray-700 dark:text-gray-200">
-                                        {{ $request->statusLabel() }}
-                                        @if ($request->reviewer)
-                                            <div class="mt-1 text-[11px] text-gray-400">{{ __('by') }} {{ $request->reviewer->name }}</div>
-                                        @endif
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex min-w-0 items-start justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <h3 class="document-request-card__title">{{ $request->documentTypeLabel() }}</h3>
+                                            <p class="document-request-card__meta">
+                                                {{ $request->created_at->diffForHumans() }}
+                                                @if ($request->due_date)
+                                                    <span aria-hidden="true">·</span> {{ __('Due') }} {{ $request->due_date->translatedFormat('d M Y') }}
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <span class="document-request-status {{ $statusTone }}">
+                                            {{ $request->statusLabel() }}
+                                        </span>
                                     </div>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Admin Note') }}</p>
-                                    <p class="mt-1 truncate text-sm text-gray-700 dark:text-gray-200">
-                                        {{ $request->fulfillment_note ?: $request->rejection_note ?: '-' }}
-                                    </p>
+
+                                    <p class="document-request-card__purpose">{{ $request->purpose }}</p>
+
+                                    @if ($request->requester && $request->requested_by !== $request->user_id)
+                                        <p class="document-request-card__meta">{{ __('Requested by') }} {{ $request->requester->name }}</p>
+                                    @endif
+
+                                    @if ($request->reviewer || $note)
+                                        <div class="document-request-card__note">
+                                            @if ($request->reviewer)
+                                                <span>{{ __('by') }} {{ $request->reviewer->name }}</span>
+                                            @endif
+                                            @if ($note)
+                                                <span>{{ $note }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
-                            <div class="mt-4 flex flex-wrap gap-2">
+                            @if ($request->details)
+                                <p class="sr-only">{{ $request->details }}</p>
+                            @endif
+
+                            <div class="document-request-card__actions">
                                 @can('upload', $request)
-                                    <x-actions.button type="button" size="sm" wire:click="prepareUpload({{ $request->id }})" variant="soft-primary" data-e2e="document-upload-open" data-request-id="{{ $request->id }}">
+                                    <button type="button" wire:click="prepareUpload({{ $request->id }})" class="document-request-action document-request-action--primary" data-e2e="document-upload-open" data-request-id="{{ $request->id }}">
                                         <x-heroicon-m-arrow-up-tray class="h-4 w-4" />
-                                        {{ __('Upload') }}
-                                    </x-actions.button>
+                                        <span>{{ __('Upload') }}</span>
+                                    </button>
                                 @endcan
                                 @if ($request->generated_path)
-                                    <x-actions.button href="{{ route('document-requests.download', $request) }}" variant="soft-primary" size="sm">
+                                    <a href="{{ route('document-requests.download', $request) }}" class="document-request-action">
                                         <x-heroicon-m-arrow-down-tray class="h-4 w-4" />
-                                        {{ __('Generated') }}
-                                    </x-actions.button>
+                                        <span>{{ __('Generated') }}</span>
+                                    </a>
                                 @endif
                                 @if ($request->uploaded_path)
-                                    <x-actions.button href="{{ route('document-requests.uploaded', $request) }}" variant="soft-primary" size="sm">
+                                    <a href="{{ route('document-requests.uploaded', $request) }}" class="document-request-action">
                                         <x-heroicon-m-arrow-down-tray class="h-4 w-4" />
-                                        {{ __('Uploaded') }}
-                                    </x-actions.button>
+                                        <span>{{ __('Uploaded') }}</span>
+                                    </a>
                                 @endif
                             </div>
                         </article>
                     @empty
                         <div class="user-empty-state">
-                            <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
-                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
-                                    <x-heroicon-o-document-plus class="h-6 w-6" />
-                                </span>
-                                <span class="font-medium text-gray-900 dark:text-white">{{ __('No document requests yet.') }}</span>
-                                <span class="sr-only">{{ __('Create a request when you need a company document or need to upload an employee document.') }}</span>
-                                <x-actions.button type="button" wire:click="create" size="sm">
-                                    {{ __('New Request') }}
-                                </x-actions.button>
+                            <div class="user-empty-state__icon">
+                                <x-heroicon-o-document-plus class="h-10 w-10" />
                             </div>
+                            <h3 class="user-empty-state__title">{{ __('No document requests yet.') }}</h3>
+                            <p class="user-empty-state__copy">{{ __('Create a request when you need an employment letter, salary statement, upload request, or another HR/Finance document.') }}</p>
+                            <button type="button" wire:click="create" class="document-request-action document-request-action--primary mx-auto mt-2" aria-label="{{ __('New Request') }}">
+                                <x-heroicon-o-plus class="h-4 w-4" />
+                                <span>{{ __('New Request') }}</span>
+                            </button>
                         </div>
                     @endforelse
                 </div>
@@ -226,16 +148,22 @@
     @if ($showModal)
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-request-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
-                <div class="fixed inset-0 z-0 bg-gray-900/60" wire:click="close"></div>
-                <div class="user-list-card relative z-10 w-full max-w-xl overflow-y-auto p-4 sm:p-5"
-                    wire:click.stop
-                    style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
-                    <h2 id="document-request-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('New Document Request') }}</h2>
+                <div class="fixed inset-0 z-0 bg-slate-950/70 backdrop-blur-sm" wire:click="close"></div>
+                <form wire:submit="store" class="user-ui document-request-modal relative z-10 w-full max-w-xl" wire:click.stop>
+                    <div class="document-request-modal__header">
+                        <div class="min-w-0">
+                            <p class="document-request-modal__eyebrow">{{ __('Documents') }}</p>
+                            <h2 id="document-request-modal-title" class="document-request-modal__title">{{ __('New Document Request') }}</h2>
+                        </div>
+                        <button type="button" wire:click="close" class="document-request-modal__close" aria-label="{{ __('Close') }}" wire:loading.attr="disabled">
+                            <x-heroicon-o-x-mark class="h-5 w-5" />
+                        </button>
+                    </div>
 
-                    <form wire:submit="store" class="mt-4 space-y-4">
+                    <div class="document-request-modal__body">
                         <div>
                             <x-forms.label for="document-type" value="{{ __('Document Type') }}" class="mb-1.5 block" />
-                            <x-forms.select id="document-type" wire:model.live="documentType" class="block w-full">
+                            <x-forms.select id="document-type" wire:model.live="documentType" class="block w-full" aria-label="{{ __('Document Type') }}">
                                 @foreach ($documentTypes as $value => $label)
                                     <option value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
@@ -243,30 +171,32 @@
                             <x-forms.input-error for="documentType" class="mt-1" />
                         </div>
 
-                        <div>
-                            <x-forms.label for="document-purpose" value="{{ __('Purpose') }}" class="mb-1.5 block" />
-                            <x-forms.textarea id="document-purpose" wire:model.live="purpose" rows="3" class="block w-full"
-                                placeholder="{{ __('Example: bank account opening, visa application, or housing lease.') }}" />
-                            <x-forms.input-error for="purpose" class="mt-1" />
-                        </div>
+                        <x-user.native-textarea-field
+                            id="document-purpose"
+                            :label="__('Purpose')"
+                            model="purpose"
+                            error="purpose"
+                            placeholder="{{ __('Example: bank account opening, visa application, or housing lease.') }}"
+                        />
 
-                        <div>
-                            <x-forms.label for="document-details" value="{{ __('Additional Details') }} ({{ __('Optional') }})" class="mb-1.5 block" />
-                            <x-forms.textarea id="document-details" wire:model.live="details" rows="3" class="block w-full"
-                                placeholder="{{ __('Add recipient name, deadline, required language, or other notes.') }}" />
-                            <x-forms.input-error for="details" class="mt-1" />
-                        </div>
+                        <x-user.native-textarea-field
+                            id="document-details"
+                            :label="__('Additional Details') . ' (' . __('Optional') . ')'"
+                            model="details"
+                            error="details"
+                            placeholder="{{ __('Add recipient name, deadline, required language, or other notes.') }}"
+                        />
+                    </div>
 
-                        <div class="flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 dark:border-gray-700 sm:flex-row sm:justify-end">
-                            <x-actions.button type="button" wire:click="close" variant="secondary" class="w-full sm:w-auto">
-                                {{ __('Cancel') }}
-                            </x-actions.button>
-                            <x-actions.button type="submit" variant="primary" class="w-full sm:w-auto">
-                                {{ __('Submit Request') }}
-                            </x-actions.button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="document-request-modal__footer">
+                        <button type="button" wire:click="close" class="document-request-secondary-button" wire:loading.attr="disabled">
+                            {{ __('Cancel') }}
+                        </button>
+                        <button type="submit" class="document-request-primary-button" wire:loading.attr="disabled">
+                            {{ __('Submit Request') }}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif
@@ -274,33 +204,42 @@
     @if ($uploadingRequestId)
         <div class="fixed inset-0 z-[90] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="document-upload-modal-title">
             <div class="flex min-h-[100dvh] items-start justify-center px-4 py-[calc(1rem+env(safe-area-inset-top))] sm:items-center sm:px-6 sm:py-[calc(1.5rem+env(safe-area-inset-top))]">
-                <div class="fixed inset-0 z-0 bg-gray-900/60" wire:click="cancelUpload"></div>
-                <div class="user-list-card relative z-10 w-full max-w-lg overflow-y-auto p-4 sm:p-5"
-                    wire:click.stop
-                    style="max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));">
-                    <h2 id="document-upload-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Upload Document') }}</h2>
-
-                    <form wire:submit="upload" class="mt-4 space-y-4" data-e2e="document-upload-form">
-                        <div>
-                            <x-forms.label for="document-upload-file" value="{{ __('File') }}" class="mb-1.5 block" />
-                            <input id="document-upload-file" wire:model="attachment" type="file" data-e2e="document-upload-file" class="block w-full rounded-xl border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-primary-50 file:px-4 file:py-3 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:file:bg-primary-900/30 dark:file:text-primary-200" />
-                            <x-forms.input-error for="attachment" class="mt-1" />
-                            <p class="sr-only" wire:loading.remove wire:target="attachment,upload">{{ __('Accepted: PDF, image, Word, or Excel. Maximum 10 MB.') }}</p>
-                            <p class="mt-2 text-xs font-medium text-sky-700 dark:text-sky-300" wire:loading wire:target="attachment">{{ __('Uploading file...') }}</p>
-                            <p class="mt-2 text-xs font-medium text-sky-700 dark:text-sky-300" wire:loading wire:target="upload">{{ __('Processing upload...') }}</p>
+                <div class="fixed inset-0 z-0 bg-slate-950/70 backdrop-blur-sm" wire:click="cancelUpload"></div>
+                <form wire:submit="upload" class="user-ui document-request-modal relative z-10 w-full max-w-lg" wire:click.stop data-e2e="document-upload-form">
+                    <div class="document-request-modal__header">
+                        <div class="min-w-0">
+                            <p class="document-request-modal__eyebrow">{{ __('Upload') }}</p>
+                            <h2 id="document-upload-modal-title" class="document-request-modal__title">{{ __('Upload Document') }}</h2>
                         </div>
+                        <button type="button" wire:click="cancelUpload" class="document-request-modal__close" aria-label="{{ __('Close') }}" wire:loading.attr="disabled" wire:target="attachment,upload">
+                            <x-heroicon-o-x-mark class="h-5 w-5" />
+                        </button>
+                    </div>
 
-                        <div class="flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 dark:border-gray-700 sm:flex-row sm:justify-end">
-                            <x-actions.button type="button" wire:click="cancelUpload" variant="secondary" class="w-full sm:w-auto" wire:loading.attr="disabled" wire:target="attachment,upload">
-                                {{ __('Cancel') }}
-                            </x-actions.button>
-                            <x-actions.button type="submit" variant="primary" class="w-full sm:w-auto" wire:loading.attr="disabled" wire:target="attachment,upload" data-e2e="document-upload-submit">
-                                <span wire:loading.remove wire:target="upload">{{ __('Upload') }}</span>
-                                <span wire:loading wire:target="upload">{{ __('Processing...') }}</span>
-                            </x-actions.button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="document-request-modal__body">
+                        <label for="document-upload-file" class="document-upload-dropzone">
+                            <span class="document-upload-dropzone__icon">
+                                <x-heroicon-o-paper-clip class="h-6 w-6" />
+                            </span>
+                            <span class="document-upload-dropzone__title">{{ __('File') }}</span>
+                            <span class="document-upload-dropzone__copy">{{ __('Accepted: PDF, image, Word, or Excel. Maximum 10 MB.') }}</span>
+                            <input id="document-upload-file" wire:model="attachment" type="file" data-e2e="document-upload-file" class="sr-only" />
+                        </label>
+                        <x-forms.input-error for="attachment" class="mt-1" />
+                        <p class="text-sm font-semibold text-sky-700 dark:text-sky-300" wire:loading wire:target="attachment">{{ __('Uploading file...') }}</p>
+                        <p class="text-sm font-semibold text-sky-700 dark:text-sky-300" wire:loading wire:target="upload">{{ __('Processing upload...') }}</p>
+                    </div>
+
+                    <div class="document-request-modal__footer">
+                        <button type="button" wire:click="cancelUpload" class="document-request-secondary-button" wire:loading.attr="disabled" wire:target="attachment,upload">
+                            {{ __('Cancel') }}
+                        </button>
+                        <button type="submit" class="document-request-primary-button" wire:loading.attr="disabled" wire:target="attachment,upload" data-e2e="document-upload-submit">
+                            <span wire:loading.remove wire:target="upload">{{ __('Upload') }}</span>
+                            <span wire:loading wire:target="upload">{{ __('Processing...') }}</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif

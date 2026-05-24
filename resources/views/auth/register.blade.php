@@ -21,13 +21,18 @@
         <div class="auth-shell__backdrop" aria-hidden="true"></div>
 
         <div class="auth-shell__container auth-shell__container--wide">
-            <section class="auth-card auth-card--compact lg:col-span-2" aria-labelledby="register-form-title">
-                <div class="auth-card__header">
-                    <p class="auth-card__eyebrow">{{ __('Register') }}</p>
-                    <h2 id="register-form-title" class="auth-card__title">{{ __('Create an Account') }}</h2>
-                    <p class="auth-card__copy sr-only">
-                        {{ __('Complete your profile and account details below.') }}
-                    </p>
+            <section class="auth-card auth-card--compact auth-card--register lg:col-span-2" aria-labelledby="register-form-title">
+                <div class="auth-card__header auth-native-header">
+                    <div class="auth-native-mark" aria-hidden="true">
+                        <x-heroicon-o-user-plus class="h-8 w-8" />
+                    </div>
+                    <div>
+                        <p class="auth-card__eyebrow">{{ __('Register') }}</p>
+                        <h2 id="register-form-title" class="auth-card__title">{{ __('Create an Account') }}</h2>
+                        <p class="auth-card__copy">
+                            {{ __('Fill in your identity once so HR can verify your account faster.') }}
+                        </p>
+                    </div>
                 </div>
 
                 <div class="auth-form" x-data="{ submitting: false }">
@@ -53,8 +58,8 @@
                                             <input id="name" name="name" type="text" value="{{ old('name') }}" required autocomplete="name"
                                                 aria-describedby="@error('name') name-error @enderror"
                                                 aria-invalid="@error('name') true @else false @enderror"
-                                                class="auth-input auth-input--icon @error('name') auth-input--error @enderror"
-                                                placeholder="{{ __('Full Name') }}">
+                                            class="auth-input auth-input--icon @error('name') auth-input--error @enderror"
+                                            placeholder="{{ __('Name as listed in employee data') }}">
                                         </div>
                                         @error('name')
                                             <p id="name-error" class="auth-error" role="alert">{{ $message }}</p>
@@ -70,8 +75,8 @@
                                             <input id="nip" name="nip" type="text" value="{{ old('nip') }}" autocomplete="off"
                                                 aria-describedby="@error('nip') nip-error @enderror"
                                                 aria-invalid="@error('nip') true @else false @enderror"
-                                                class="auth-input auth-input--icon @error('nip') auth-input--error @enderror"
-                                                placeholder="{{ __('Employee ID') }}">
+                                            class="auth-input auth-input--icon @error('nip') auth-input--error @enderror"
+                                            placeholder="{{ __('Optional if you do not have an employee ID yet') }}">
                                         </div>
                                         @error('nip')
                                             <p id="nip-error" class="auth-error" role="alert">{{ $message }}</p>
@@ -212,7 +217,7 @@
 
                             <div class="auth-grid">
                                 <div class="auth-field">
-                                        <label for="password" class="auth-label">{{ __('Password') }}</label>
+                                    <label for="password" class="auth-label">{{ __('Password') }}</label>
                                     <div class="auth-input-wrap">
                                         <div class="auth-input-icon" aria-hidden="true">
                                             <x-heroicon-o-lock-closed class="h-5 w-5" />
@@ -228,7 +233,7 @@
                                     @enderror
                                 </div>
                                 <div class="auth-field">
-                                        <label for="password_confirmation" class="auth-label">{{ __('Confirm Password') }}</label>
+                                    <label for="password_confirmation" class="auth-label">{{ __('Confirm Password') }}</label>
                                     <div class="auth-input-wrap">
                                         <div class="auth-input-icon" aria-hidden="true">
                                             <x-heroicon-o-check class="h-5 w-5" />
@@ -268,7 +273,7 @@
                                 {{ __('Already registered?') }}
                             </a>
 
-                            <button type="submit" class="auth-button min-w-[10.5rem]" :disabled="submitting" :aria-busy="submitting.toString()">
+                            <button type="submit" class="auth-button min-w-[10.5rem]" :disabled="submitting" :aria-busy="submitting.toString()" aria-label="{{ __('Register') }}">
                                 <span x-show="!submitting" x-cloak>{{ __('Register') }}</span>
                                 <span x-show="submitting" x-cloak class="inline-flex items-center gap-2">
                                     <x-heroicon-o-arrow-path class="h-4 w-4 animate-spin" />
@@ -316,6 +321,29 @@
                     fetch(url)
                         .then((response) => response.json())
                         .catch(() => []);
+                const openInstance = (instance, loader = null) => {
+                    if (!instance) {
+                        return;
+                    }
+
+                    if (loader) {
+                        loader();
+                    } else {
+                        instance.refreshOptions(false);
+                    }
+
+                    requestAnimationFrame(() => {
+                        instance.open();
+                        instance.positionDropdown();
+                    });
+                };
+                const bindOpenOnTap = (instance, loader = null) => {
+                    const open = () => openInstance(instance, loader);
+
+                    instance.control?.addEventListener('mousedown', open);
+                    instance.control?.addEventListener('pointerdown', open);
+                    instance.control_input?.addEventListener('focus', open);
+                };
                 const syncErrorState = (instance) => {
                     if (!instance?.input) {
                         return;
@@ -352,24 +380,41 @@
 
                 const commonConfig = {
                     create: false,
+                    openOnFocus: true,
+                    closeAfterSelect: true,
                     preload: true,
+                    shouldLoad: () => true,
+                    maxOptions: 1000,
                     valueField: 'kode',
                     labelField: 'nama',
                     searchField: 'nama',
                     dropdownParent: 'body',
                     sortField: 'nama',
                     placeholder: '',
+                    onDropdownOpen() {
+                        this.positionDropdown();
+                    },
                 };
 
                 const tsGender = new window.TomSelect('#gender', {
                     create: false,
+                    openOnFocus: true,
+                    closeAfterSelect: true,
+                    shouldLoad: () => true,
                     dropdownParent: 'body',
                     placeholder: document.querySelector('#gender')?.dataset.placeholder ?? '',
                     allowEmptyOption: true,
                     sortField: {
                         field: '$order',
                     },
+                    onFocus() {
+                        openInstance(this);
+                    },
+                    onDropdownOpen() {
+                        this.positionDropdown();
+                    },
                 });
+                bindOpenOnTap(tsGender);
                 syncErrorState(tsGender);
 
                 tsProvinsi = new window.TomSelect('#provinsi_kode', {
@@ -381,6 +426,9 @@
                             .then(r => r.json())
                             .then(j => callback(j))
                             .catch(() => callback());
+                    },
+                    onFocus() {
+                        openInstance(this, () => this.load(''));
                     },
                     onChange: function (value) {
                         if (!tsKabupaten || !tsKecamatan || !tsKelurahan) {
@@ -399,6 +447,7 @@
                         }
                     }
                 });
+                bindOpenOnTap(tsProvinsi, () => tsProvinsi.load(''));
                 syncErrorState(tsProvinsi);
 
                 tsKabupaten = new window.TomSelect('#kabupaten_kode', {
@@ -416,6 +465,11 @@
                             .then(r => r.json())
                             .then(j => callback(j))
                             .catch(() => callback());
+                    },
+                    onFocus() {
+                        if (tsProvinsi.getValue()) {
+                            openInstance(this, () => this.load(''));
+                        }
                     },
                     onChange: function (value) {
                         if (!tsKecamatan || !tsKelurahan) {
@@ -435,6 +489,11 @@
                 tsKabupaten.on('focus', ensureLoadedOnFocus(tsKabupaten, () =>
                     tsProvinsi.getValue() ? `${wilayahApiBase}/regencies/${tsProvinsi.getValue()}` : null
                 ));
+                bindOpenOnTap(tsKabupaten, () => {
+                    if (tsProvinsi.getValue()) {
+                        tsKabupaten.load('');
+                    }
+                });
                 syncErrorState(tsKabupaten);
 
                 tsKecamatan = new window.TomSelect('#kecamatan_kode', {
@@ -453,6 +512,11 @@
                             .then(j => callback(j))
                             .catch(() => callback());
                     },
+                    onFocus() {
+                        if (tsKabupaten.getValue()) {
+                            openInstance(this, () => this.load(''));
+                        }
+                    },
                     onChange: function (value) {
                         if (!tsKelurahan) {
                             return;
@@ -469,6 +533,11 @@
                 tsKecamatan.on('focus', ensureLoadedOnFocus(tsKecamatan, () =>
                     tsKabupaten.getValue() ? `${wilayahApiBase}/districts/${tsKabupaten.getValue()}` : null
                 ));
+                bindOpenOnTap(tsKecamatan, () => {
+                    if (tsKabupaten.getValue()) {
+                        tsKecamatan.load('');
+                    }
+                });
                 syncErrorState(tsKecamatan);
 
                 tsKelurahan = new window.TomSelect('#kelurahan_kode', {
@@ -487,10 +556,20 @@
                             .then(j => callback(j))
                             .catch(() => callback());
                     },
+                    onFocus() {
+                        if (tsKecamatan.getValue()) {
+                            openInstance(this, () => this.load(''));
+                        }
+                    },
                 });
                 tsKelurahan.on('focus', ensureLoadedOnFocus(tsKelurahan, () =>
                     tsKecamatan.getValue() ? `${wilayahApiBase}/villages/${tsKecamatan.getValue()}` : null
                 ));
+                bindOpenOnTap(tsKelurahan, () => {
+                    if (tsKecamatan.getValue()) {
+                        tsKelurahan.load('');
+                    }
+                });
                 syncErrorState(tsKelurahan);
 
                 if (selectedCodes.provinsi) {

@@ -1,6 +1,6 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="shift-swap-title" class="user-page-surface">
+        <section aria-labelledby="shift-swap-title" class="user-page-surface" @unless($showModal) wire:poll.visible.20s @endunless>
             <x-user.page-header :back-href="route('my-schedule')" :title="__('Shift Swap Requests')" title-id="shift-swap-title" class="border-b-0">
                 <x-slot name="icon">
                     <x-heroicon-o-arrows-right-left class="h-5 w-5" />
@@ -165,15 +165,16 @@
 
             <form wire:submit="store" class="space-y-4">
                 <div class="user-list-card">
-                    <x-forms.label for="swap-schedule" value="{{ __('Schedule Date') }}" class="mb-1.5 block" />
                     <p class="sr-only">
                         {{ __('Choose the work date you want to change first. The assigned shift for that date will be loaded automatically below.') }}
                     </p>
-                    <div wire:ignore wire:key="swap-schedule-date-{{ $scheduleDate ?? 'empty' }}">
-                        <x-forms.input id="swap-schedule" type="date" wire:model.live="scheduleDate"
-                            value="{{ $scheduleDate }}" min="{{ now()->toDateString() }}" class="block w-full" />
-                    </div>
-                    <x-forms.input-error for="scheduleDate" class="mt-2" />
+                    <x-user.native-date-field
+                        id="swap-schedule"
+                        :label="__('Schedule Date')"
+                        model="scheduleDate"
+                        error="scheduleDate"
+                        :min="now()->toDateString()"
+                    />
                     <x-forms.input-error for="scheduleId" class="mt-2" />
                 </div>
 
@@ -259,7 +260,7 @@
                     </p>
                     <x-user.tom-select-user id="swap-replacement" wire:model.live="replacementUserId"
                         :options="$replacementUserOptions" placeholder="{{ __('Search replacement employee') }}"
-                        dropdown-parent="self" class="block w-full">
+                        class="block w-full">
                         <option value="">{{ __('No replacement specified') }}</option>
                         @foreach ($replacementUsers as $replacement)
                             <option value="{{ $replacement->id }}">

@@ -52,6 +52,8 @@ class HrTasksPage extends Component
         )->validate();
 
         $this->checklists->updateTaskStatus($task, auth()->user(), $status, $this->taskNotes[$taskId] ?? null);
+        unset($this->taskNotes[$taskId]);
+
         session()->flash('success', __('Task updated.'));
     }
 
@@ -75,8 +77,20 @@ class HrTasksPage extends Component
             ->paginate(10);
 
         return view('livewire.user.hr-tasks-page', [
+            'pollingEnabled' => ! $this->hasDraftTaskNotes(),
             'tasks' => $tasks,
             'statuses' => HrChecklistTask::statuses(),
         ])->layout('layouts.app');
+    }
+
+    private function hasDraftTaskNotes(): bool
+    {
+        foreach ($this->taskNotes as $note) {
+            if (is_string($note) && trim($note) !== '') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

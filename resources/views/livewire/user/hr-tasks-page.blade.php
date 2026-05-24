@@ -1,6 +1,6 @@
 <div class="user-page-shell">
     <div class="user-page-container user-page-container--wide">
-        <section aria-labelledby="hr-tasks-title" class="user-page-surface">
+        <section aria-labelledby="hr-tasks-title" class="user-page-surface" @if($pollingEnabled) wire:poll.visible.20s @endif>
             <x-user.page-header
                 :back-href="route('home')"
                 :title="__('HR Tasks')"
@@ -14,19 +14,21 @@
             <div class="user-page-body bg-gray-50/50 dark:bg-gray-900/20">
                 @include('components.feedback.alert-messages')
 
-                <div class="user-compact-filter mb-4 grid gap-3 sm:grid-cols-[1fr_220px]">
-                    <div>
-                        <x-forms.label for="hr-task-search" value="{{ __('Search') }}" class="mb-1.5 block" />
-                        <x-forms.input id="hr-task-search" type="search" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search task or employee...') }}" />
-                    </div>
-                    <div>
-                        <x-forms.label for="hr-task-status" value="{{ __('Status') }}" class="mb-1.5 block" />
-                        <x-forms.select id="hr-task-status" wire:model.live="statusFilter">
-                            <option value="all">{{ __('All statuses') }}</option>
-                            @foreach ($statuses as $statusKey => $statusLabel)
-                                <option value="{{ $statusKey }}">{{ $statusLabel }}</option>
-                            @endforeach
-                        </x-forms.select>
+                <div class="user-compact-filter mb-4">
+                    <div class="user-filter-grid">
+                        <div>
+                            <x-forms.label for="hr-task-search" value="{{ __('Search') }}" class="mb-1.5 block" />
+                            <x-forms.input id="hr-task-search" type="search" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search task or employee...') }}" />
+                        </div>
+                        <div>
+                            <x-forms.label for="hr-task-status" value="{{ __('Status') }}" class="mb-1.5 block" />
+                            <x-forms.select id="hr-task-status" wire:model.live="statusFilter">
+                                <option value="all">{{ __('All statuses') }}</option>
+                                @foreach ($statuses as $statusKey => $statusLabel)
+                                    <option value="{{ $statusKey }}">{{ $statusLabel }}</option>
+                                @endforeach
+                            </x-forms.select>
+                        </div>
                     </div>
                 </div>
 

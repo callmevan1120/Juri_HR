@@ -1,187 +1,175 @@
+@php
+    $totalTracked = collect(['present', 'late', 'excused', 'sick'])->sum(fn ($key) => $counts[$key] ?? 0);
+    $attendanceRate = $workingDaysCount > 0 ? min(100, round(($totalTracked / $workingDaysCount) * 100)) : 0;
+    $monthOptions = collect(range(1, 12))->map(fn ($month) => [
+        'id' => sprintf('%02d', $month),
+        'name' => Carbon\Carbon::create()->month($month)->translatedFormat('F'),
+    ])->values()->toArray();
+    $yearOptions = collect(range(date('Y') - 5, date('Y') + 1))->map(fn ($year) => [
+        'id' => $year,
+        'name' => $year,
+    ])->values()->toArray();
+    $statusStyles = [
+        'present' => ['dot' => 'bg-emerald-500', 'ring' => 'ring-emerald-400/30', 'label' => __('Present')],
+        'late' => ['dot' => 'bg-amber-500', 'ring' => 'ring-amber-400/30', 'label' => __('Late')],
+        'excused' => ['dot' => 'bg-sky-500', 'ring' => 'ring-sky-400/30', 'label' => __('Excused')],
+        'sick' => ['dot' => 'bg-violet-500', 'ring' => 'ring-violet-400/30', 'label' => __('Sick')],
+        'permission' => ['dot' => 'bg-teal-500', 'ring' => 'ring-teal-400/30', 'label' => __('Permission')],
+        'leave' => ['dot' => 'bg-indigo-500', 'ring' => 'ring-indigo-400/30', 'label' => __('Leave')],
+        'absent' => ['dot' => 'bg-rose-600', 'ring' => 'ring-rose-400/30', 'label' => __('Absent')],
+        'rejected' => ['dot' => 'bg-rose-500', 'ring' => 'ring-rose-400/30', 'label' => __('Rejected')],
+    ];
+    $summaryCards = [
+        ['label' => __('Present'), 'key' => 'present', 'color' => 'text-emerald-600 dark:text-emerald-300', 'bg' => 'bg-emerald-500'],
+        ['label' => __('Late'), 'key' => 'late', 'color' => 'text-amber-600 dark:text-amber-300', 'bg' => 'bg-amber-500'],
+        ['label' => __('Excused'), 'key' => 'excused', 'color' => 'text-sky-600 dark:text-sky-300', 'bg' => 'bg-sky-500'],
+        ['label' => __('Sick'), 'key' => 'sick', 'color' => 'text-violet-600 dark:text-violet-300', 'bg' => 'bg-violet-500'],
+        ['label' => __('Absent'), 'key' => 'absent', 'color' => 'text-rose-600 dark:text-rose-300', 'bg' => 'bg-rose-600'],
+    ];
+@endphp
+
 <div class="space-y-4">
-    <div class="user-page-toolbar">
+    <section class="user-history-hero" aria-label="{{ __('Attendance summary') }}">
         <div class="min-w-0">
-            <p class="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-primary-600 dark:text-primary-300">
-                {{ __('Calendar') }}
-            </p>
-            <h3 class="mt-1 text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
-                {{ $displayMonth->translatedFormat('F Y') }}
-            </h3>
-            <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                {{ __('Working Days') }}: {{ $workingDaysCount }}
+            <p class="user-history-eyebrow">{{ __('Attendance') }}</p>
+            <h2 class="user-history-title">{{ $displayMonth->translatedFormat('F Y') }}</h2>
+            <p class="user-history-copy">
+                {{ __('Working Days') }}: <span class="font-semibold text-slate-950 dark:text-white">{{ $workingDaysCount }}</span>
             </p>
         </div>
 
-        <div class="flex items-center gap-2">
-                <div class="w-24 sm:w-28">
-                    <x-forms.tom-select id="selectedMonth" wire:model.live="selectedMonth" placeholder="{{ __('Month') }}"
-                        :options="collect(range(1, 12))->map(fn($m) => ['id' => sprintf('%02d', $m), 'name' => Carbon\Carbon::create()->month($m)->translatedFormat('F')])->values()->toArray()" />
-                </div>
-                <div class="w-20">
-                    <x-forms.tom-select id="selectedYear" wire:model.live="selectedYear" placeholder="{{ __('Year') }}"
-                        :options="collect(range(date('Y') - 5, date('Y') + 1))->map(fn($y) => ['id' => $y, 'name' => $y])->values()->toArray()" />
-                </div>
+        <div class="user-history-score" role="status" aria-label="{{ __('Attendance rate') }} {{ $attendanceRate }}%">
+            <span class="text-2xl font-bold leading-none">{{ $attendanceRate }}%</span>
+            <span class="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{{ __('Rate') }}</span>
         </div>
-    </div>
+    </section>
 
-    <div class="user-list-card">
-            {{-- Days Header --}}
-            <div class="mb-2 grid grid-cols-[repeat(7,minmax(0,1fr))]">
-                @foreach ([__('Sun'), __('Mon'), __('Tue'), __('Wed'), __('Thu'), __('Fri'), __('Sat')] as $index => $day)
-                    <div class="py-1 text-center text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500 {{ $index === 0 ? 'text-rose-500' : ($index === 5 ? 'text-emerald-600 dark:text-emerald-500' : '') }}">
-                        {{ $day }}
-                    </div>
-                @endforeach
+    <section class="user-history-filters" aria-label="{{ __('Filter attendance history') }}">
+        <x-user.tom-select-user id="selectedMonth" wire:model.live="selectedMonth" placeholder="{{ __('Month') }}" :options="$monthOptions" />
+        <x-user.tom-select-user id="selectedYear" wire:model.live="selectedYear" placeholder="{{ __('Year') }}" :options="$yearOptions" />
+    </section>
+
+    <section class="user-history-calendar" aria-label="{{ __('Attendance calendar') }}">
+        <div class="user-history-calendar__header">
+            <div>
+                <h3 class="text-base font-semibold tracking-tight text-slate-950 dark:text-white">{{ __('Monthly Calendar') }}</h3>
+                <p class="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{{ __('Tap a marked date to view details.') }}</p>
             </div>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-bold text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
+                <span class="h-1.5 w-1.5 rounded-full bg-primary-500"></span>
+                {{ __('Today') }}
+            </span>
+        </div>
 
-            {{-- Calendar Dates --}}
-            <div class="grid grid-cols-[repeat(7,minmax(0,1fr))] gap-1 sm:gap-2">
-                @foreach ($dates as $date)
-                    @php
-                        $isCurrentMonth = $date->month == $currentMonth;
-                        $isToday = $date->isToday();
-                        $isWeekend = $date->isWeekend();
-                        
-                        // Check if this date is a holiday
-                        $dateKey = $date->format('Y-m-d');
-                        $holiday = $holidays[$dateKey] ?? null;
-                        $isHoliday = !is_null($holiday);
-                        
-                        // Find attendance
-                        $attendance = $attendances->firstWhere(fn($v, $k) => $v->date->isSameDay($date));
-                        $status = ($attendance ?? [
-                            'status' => $isWeekend || $isHoliday || !$date->isPast() ? '-' : 'absent',
-                        ])['status'];
+        <div class="user-history-week-grid mt-4 text-center">
+            @foreach ([__('Sun'), __('Mon'), __('Tue'), __('Wed'), __('Thu'), __('Fri'), __('Sat')] as $index => $day)
+                <div class="py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] {{ $index === 0 ? 'text-rose-500' : ($index === 5 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500') }}">
+                    {{ $day }}
+                </div>
+            @endforeach
+        </div>
 
-                        // Styles (Clean)
-                        $bgClass = $isCurrentMonth ? 'bg-white/68 dark:bg-slate-950/34' : 'bg-slate-100/48 dark:bg-slate-950/20 opacity-45';
-                        $textClass = $isCurrentMonth ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-600';
-                        $borderClass = $isToday ? 'ring-2 ring-primary-500 z-10 border border-primary-200 dark:border-primary-800' : ($isCurrentMonth ? 'border border-slate-200/70 dark:border-slate-800/80' : 'border border-transparent');
-                        
-                        // Holiday styling
-                        if ($isHoliday && $isCurrentMonth) {
-                            $bgClass = 'bg-rose-50/80 dark:bg-rose-950/18';
-                            $textClass = 'text-rose-600 dark:text-rose-400';
-                            $borderClass = $isToday ? 'ring-2 ring-primary-500 z-10 border border-primary-200 dark:border-primary-800' : 'border border-rose-100 dark:border-rose-900/30';
-                        } elseif ($date->isSunday() && $isCurrentMonth) {
-                            $textClass = 'text-rose-500 dark:text-rose-400';
-                        } elseif ($date->isFriday() && $isCurrentMonth) {
-                            $textClass = 'text-emerald-600 dark:text-emerald-400';
-                        }
+        <div class="user-history-date-grid mt-1">
+            @foreach ($dates as $date)
+                @php
+                    $isCurrentMonth = $date->month === $currentMonth;
+                    $isToday = $date->isToday();
+                    $dateKey = $date->format('Y-m-d');
+                    $holiday = $holidays[$dateKey] ?? null;
+                    $isHoliday = filled($holiday);
+                    $attendance = $attendances->first(fn ($item) => $item->date->isSameDay($date));
+                    $status = $attendance?->status ?? ($date->isPast() && ! $date->isWeekend() && ! $isHoliday ? 'absent' : '-');
+                    $approvalStatus = $attendance?->approval_status;
+                    $style = $statusStyles[$status] ?? null;
 
-                        // Status Marker
-                        $markerColor = match($status) {
-                            'present' => 'bg-emerald-500',
-                            'late' => 'bg-amber-500',
-                            'excused', 'sick', 'permission', 'leave' => match($attendance['approval_status'] ?? 'approved') {
-                                'pending' => 'bg-amber-300',
-                                'rejected' => 'bg-rose-500',
-                                default => match($status) {
-                                    'excused' => 'bg-sky-500',
-                                    'sick' => 'bg-violet-500',
-                                    'permission' => 'bg-teal-500',
-                                    'leave' => 'bg-indigo-500',
-                                    default => 'bg-gray-400'
-                                }
-                            },
-                            'rejected' => 'bg-rose-500',
-                            'absent' => 'bg-red-700', // Dark Red
-                            default => $isToday ? 'bg-primary-500' : null
-                        };
-                    @endphp
+                    if (in_array($status, ['excused', 'sick', 'permission', 'leave'], true) && $approvalStatus === 'pending') {
+                        $style = ['dot' => 'bg-amber-300', 'ring' => 'ring-amber-400/30', 'label' => __('Pending')];
+                    } elseif (in_array($status, ['excused', 'sick', 'permission', 'leave'], true) && $approvalStatus === 'rejected') {
+                        $style = $statusStyles['rejected'];
+                    }
 
-                    <div class="aspect-[1/1] sm:aspect-[4/3] group relative">
-                        <button type="button"
-                            @if($attendance) wire:click="show({{ $attendance['id'] }})" @endif
-                            class="flex h-full w-full flex-col items-center justify-between rounded-[0.9rem] p-1 transition duration-200 {{ $bgClass }} {{ $textClass }} {{ $borderClass }} hover:bg-white/80 dark:hover:bg-slate-900/70 {{ $attendance ? 'cursor-pointer' : 'cursor-default' }}">
-                            
-                            {{-- Holiday Indicator --}}
-                            @if($isHoliday && $isCurrentMonth)
-                                <span class="absolute top-1 right-1 text-[6px] text-rose-500">●</span>
+                    $dayClass = $isCurrentMonth
+                        ? 'bg-white/70 text-slate-800 ring-slate-200/70 hover:bg-white dark:bg-slate-950/32 dark:text-slate-100 dark:ring-slate-800/80 dark:hover:bg-slate-900/70'
+                        : 'bg-slate-100/45 text-slate-400 ring-transparent opacity-45 dark:bg-slate-950/20 dark:text-slate-600';
+
+                    if ($isHoliday && $isCurrentMonth) {
+                        $dayClass = 'bg-rose-50/80 text-rose-600 ring-rose-100 hover:bg-rose-50 dark:bg-rose-950/18 dark:text-rose-300 dark:ring-rose-900/35';
+                    } elseif ($date->isSunday() && $isCurrentMonth) {
+                        $dayClass .= ' text-rose-500 dark:text-rose-300';
+                    } elseif ($date->isFriday() && $isCurrentMonth) {
+                        $dayClass .= ' text-emerald-600 dark:text-emerald-300';
+                    }
+
+                    $timeIn = $attendance?->time_in ? Carbon\Carbon::parse($attendance->time_in)->format('H:i') : null;
+                    $ariaStatus = $style['label'] ?? ($isHoliday ? $holiday->name : __('No schedule'));
+                @endphp
+
+                <div class="aspect-square sm:aspect-[1.08/1]">
+                    <button type="button"
+                        @if ($attendance) wire:click="show({{ $attendance->id }})" @endif
+                        class="user-history-day {{ $dayClass }} {{ $isToday ? 'user-history-day--today' : '' }} {{ $attendance ? 'cursor-pointer' : 'cursor-default' }}"
+                        aria-label="{{ $date->translatedFormat('l, d F Y') }} - {{ $ariaStatus }}">
+                        <span class="text-sm font-bold leading-none">{{ $date->day }}</span>
+
+                        <span class="mt-auto flex min-h-4 items-center justify-center gap-1">
+                            @if ($style && $status !== '-')
+                                <span class="inline-flex h-2 w-2 rounded-full {{ $style['dot'] }} ring-4 {{ $style['ring'] }}"></span>
+                            @elseif ($isHoliday && $isCurrentMonth)
+                                <span class="text-[0.65rem] font-bold leading-none text-rose-500">{{ __('Holiday initial') }}</span>
                             @endif
-                            
-                            {{-- Date Number --}}
-                            <span class="text-xs font-bold leading-none mt-1">
-                                {{ $date->day }}
-                            </span>
-                            
-                            {{-- Holiday Name (visible on desktop) --}}
-                            {{-- Removed as per simplification --}}
 
-                            {{-- Status Indicator --}}
-                            <div class="mb-1 h-3 flex items-center justify-center">
-                                @if($markerColor && $status !== '-')
-                                    <span class="inline-flex h-1.5 w-1.5 rounded-full {{ $markerColor }}"></span>
-                                @elseif($isHoliday && $isCurrentMonth)
-                                     <span class="text-[8px] leading-none text-rose-500">{{ __('Holiday initial') }}</span>
-                                @endif
-                                
-                                @if($attendance && isset($attendance['time_in']) && !$isHoliday)
-                                    <span class="hidden sm:inline-block ml-1 text-[8px] text-gray-400 font-mono leading-none">
-                                        {{ \Carbon\Carbon::parse($attendance['time_in'])->format('H:i') }}
-                                    </span>
-                                @endif
-                            </div>
-                        </button>
-                    </div>
-                @endforeach
-            </div>
-    </div>
-        
-        {{-- Holidays List --}}
-        @if($holidays->isNotEmpty())
-        <div class="user-soft-panel">
-            <h4 class="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-red-600 dark:text-red-400">
-                {{ __('Holidays this Month') }}
-            </h4>
-            <div class="flex flex-wrap gap-2">
-                @foreach($holidays->sortBy(fn($h) => $h->date->day) as $holiday)
-                    <div class="inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50/70 px-2.5 py-1 text-[10px] text-red-700 shadow-none dark:border-rose-900/40 dark:bg-rose-950/24 dark:text-red-300">
-                        <span class="font-bold">{{ $holiday->date->day }}</span>
-                        <span class="opacity-75">{{ $holiday->name }}</span>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-        
-        {{-- Stats Grid (Compact) --}}
-        <div>
-            <h4 class="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
-                {{ __('Summary') }}
-            </h4>
-            <div class="user-stat-strip grid grid-cols-2 gap-1.5 sm:grid-cols-5">
-                @foreach([
-                    ['label' => 'Present', 'key' => 'present', 'color' => 'text-emerald-600'],
-                    ['label' => 'Late', 'key' => 'late', 'color' => 'text-amber-600'],
-                    ['label' => 'Excused', 'key' => 'excused', 'color' => 'text-sky-600'],
-                    ['label' => 'Sick', 'key' => 'sick', 'color' => 'text-violet-600'],
-                    ['label' => 'Absent', 'key' => 'absent', 'color' => 'text-red-700']
-                ] as $stat)
-                <div class="user-stat-pill {{ $stat['key'] === 'absent' ? 'col-span-2 sm:col-span-1' : '' }}">
-                    <p class="text-xl font-bold {{ $stat['color'] }} dark:text-white">{{ $counts[$stat['key']] ?? 0 }}</p>
-                    <p class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 mt-1">{{ __($stat['label']) }}</p>
+                            @if ($timeIn && ! $isHoliday)
+                                <span class="hidden text-[0.62rem] font-semibold leading-none text-slate-400 dark:text-slate-500 sm:inline">{{ $timeIn }}</span>
+                            @endif
+                        </span>
+                    </button>
                 </div>
+            @endforeach
+        </div>
+    </section>
+
+    <section aria-label="{{ __('Attendance summary') }}">
+        <div class="user-history-summary">
+            @foreach ($summaryCards as $stat)
+                <div class="user-history-summary__item">
+                    <span class="inline-flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full {{ $stat['bg'] }}"></span>
+                        <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ $stat['label'] }}</span>
+                    </span>
+                    <span class="text-lg font-bold leading-none {{ $stat['color'] }}">{{ $counts[$stat['key']] ?? 0 }}</span>
+                </div>
+            @endforeach
+        </div>
+    </section>
+
+    @if ($holidays->isNotEmpty())
+        <section class="user-history-panel" aria-label="{{ __('Holidays this Month') }}">
+            <div class="flex items-center justify-between gap-3">
+                <h3 class="text-sm font-semibold tracking-tight text-slate-950 dark:text-white">{{ __('Holidays this Month') }}</h3>
+                <span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-600 dark:bg-rose-950/28 dark:text-rose-300">{{ $holidays->count() }}</span>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2">
+                @foreach ($holidays->sortBy(fn ($holiday) => $holiday->date->day) as $holiday)
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50/72 px-2.5 py-1 text-xs font-semibold text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/24 dark:text-rose-300">
+                        <span>{{ $holiday->date->day }}</span>
+                        <span class="max-w-[12rem] truncate opacity-80">{{ $holiday->name }}</span>
+                    </span>
                 @endforeach
             </div>
-        </div>
-        
-        {{-- Legenda Modern --}}
-        <div class="user-soft-panel">
-            <div class="flex flex-wrap justify-center gap-4 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                <span class="flex items-center gap-1.5">
-                    <span class="h-2 w-2 rounded-full bg-amber-400"></span> {{ __('Pending') }}
-                </span>
-                <span class="flex items-center gap-1.5">
-                    <span class="h-2 w-2 rounded-full bg-rose-500"></span> {{ __('Rejected') }}
-                </span>
-                <span class="flex items-center gap-1.5">
-                    <span class="h-2 w-2 rounded-full bg-primary-500"></span> {{ __('Today') }}
-                </span>
-            </div>
-        </div>
+        </section>
+    @endif
 
-    {{-- Include Modal Component --}}
+    <section class="user-history-panel" aria-label="{{ __('Legend') }}">
+        <div class="flex flex-wrap gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            @foreach ([['bg-emerald-500', __('Present')], ['bg-amber-500', __('Late')], ['bg-sky-500', __('Excused')], ['bg-rose-600', __('Absent')], ['bg-primary-500', __('Today')]] as [$dot, $label])
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="h-2 w-2 rounded-full {{ $dot }}"></span>
+                    {{ $label }}
+                </span>
+            @endforeach
+        </div>
+    </section>
+
     <x-shared.attendance-detail-modal :current-attendance="$currentAttendance" />
 
     @stack('attendance-detail-scripts')

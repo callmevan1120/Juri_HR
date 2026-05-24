@@ -4,12 +4,17 @@
 
         <div class="auth-shell__container">
             <section class="auth-card lg:col-span-2" aria-labelledby="forgot-password-title">
-                <div class="auth-card__header">
-                    <p class="auth-card__eyebrow">{{ __('Password Recovery') }}</p>
-                    <h2 id="forgot-password-title" class="auth-card__title">{{ __('Forgot your password?') }}</h2>
-                    <p class="auth-card__copy sr-only">
-                        {{ __('Enter the email address tied to your account and we will send you a secure link to set a new password.') }}
-                    </p>
+                <div class="auth-card__header auth-native-header">
+                    <div class="auth-native-mark" aria-hidden="true">
+                        <x-heroicon-o-key class="h-8 w-8" />
+                    </div>
+                    <div>
+                        <p class="auth-card__eyebrow">{{ __('Password Recovery') }}</p>
+                        <h2 id="forgot-password-title" class="auth-card__title">{{ __('Forgot your password?') }}</h2>
+                        <p class="auth-card__copy">
+                            {{ __('Enter your registered email and we will send a secure reset link.') }}
+                        </p>
+                    </div>
                 </div>
 
                 <div class="auth-form">
@@ -19,7 +24,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('password.email') }}" class="space-y-5">
+                    <form method="POST" action="{{ route('password.email') }}" class="space-y-5" novalidate>
                         @csrf
 
                         <div class="auth-section">
@@ -29,11 +34,7 @@
                                     <label for="email" class="auth-label">{{ __('Email Address') }}</label>
                                     <div class="auth-input-wrap">
                                         <div class="auth-input-icon" aria-hidden="true">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                            </svg>
+                                            <x-heroicon-o-at-symbol class="h-5 w-5" />
                                         </div>
                                         <input id="email" name="email" type="email" autocomplete="email"
                                             required aria-describedby="@error('email') email-error @enderror"
@@ -53,7 +54,8 @@
                                 {{ __('Back to Login') }}
                             </a>
 
-                            <button type="submit" class="auth-button auth-button--full sm:w-auto">
+                            <button type="submit" class="auth-button auth-button--full sm:w-auto" aria-label="{{ __('Send Password Reset Link') }}">
+                                <x-heroicon-o-paper-airplane class="mr-2 h-5 w-5" />
                                 {{ __('Send Password Reset Link') }}
                             </button>
                         </div>

@@ -111,7 +111,7 @@
 
         .top-corner-brand {
             border-left: 60px solid transparent;
-            border-top: 60px solid #06b6d4;
+            border-top: 60px solid #badcb3;
             height: 0;
             right: 0;
             top: 0;
@@ -150,7 +150,7 @@
         }
 
         .top-rule-brand {
-            background: #06b6d4;
+            background: #badcb3;
             right: 96px;
             top: 26px;
             width: 118px;
@@ -187,7 +187,7 @@
         }
 
         .bottom-corner-brand {
-            border-bottom: 32px solid #06b6d4;
+            border-bottom: 32px solid #badcb3;
             border-right: 32px solid transparent;
             bottom: 0;
             height: 0;
@@ -208,7 +208,7 @@
         }
 
         .bottom-rule-brand {
-            background: #06b6d4;
+            background: #badcb3;
             bottom: 57px;
             left: 96px;
             width: 112px;

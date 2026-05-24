@@ -251,17 +251,21 @@
         <!-- Gender -->
         <div class="col-span-6 md:col-span-3">
             <x-forms.label for="gender" value="{{ __('Gender') }}" />
-            <x-forms.tom-select id="gender" class="mt-1 block w-full" wire:model.live="state.gender"
+            <x-user.tom-select-user id="gender" class="mt-1 block w-full" wire:model.live="state.gender"
                 :options="[['id' => 'male', 'name' => __('Male')], ['id' => 'female', 'name' => __('Female')]]" placeholder="{{ __('Select Gender') }}" />
             <x-forms.input-error for="gender" class="mt-2" />
         </div>
 
         <!-- Birth Date -->
         <div class="col-span-6 md:col-span-3">
-            <x-forms.label for="birth_date" value="{{ __('Birth Date') }}" />
-            <x-forms.input id="birth_date" type="date" class="mt-1 block w-full"
-                value="{{ $state['birth_date'] ?? '' }}" wire:model="state.birth_date" autocomplete="bday" />
-            <x-forms.input-error for="birth_date" class="mt-2" />
+            <x-user.native-date-field
+                id="birth_date"
+                :label="__('Birth Date')"
+                model="state.birth_date"
+                error="birth_date"
+                modifier="default"
+                autocomplete="bday"
+            />
         </div>
 
         <!-- Birth Place -->
@@ -285,7 +289,7 @@
                     <div>
                         <x-forms.label for="provinsi_kode" value="{{ __('Provinsi') }}" />
                         <div class="mt-1" wire:key="profile-province">
-                            <x-forms.tom-select id="provinsi_kode" wire:model.live="state.provinsi_kode"
+                            <x-user.tom-select-user id="provinsi_kode" wire:model.live="state.provinsi_kode"
                                 :options="$provinces" aria-describedby="profile-region-help"
                                 placeholder="{{ __('Pilih Provinsi') }}" />
                         </div>
@@ -295,7 +299,7 @@
                     <div>
                         <x-forms.label for="kabupaten_kode" value="{{ __('Kabupaten / Kota') }}" />
                         <div class="mt-1" wire:key="profile-regency-{{ $selectedProvince ?? 'empty' }}">
-                            <x-forms.tom-select id="kabupaten_kode" wire:model.live="state.kabupaten_kode"
+                            <x-user.tom-select-user id="kabupaten_kode" wire:model.live="state.kabupaten_kode"
                                 :options="$regencies" aria-describedby="profile-region-help"
                                 placeholder="{{ __('Pilih Kabupaten/Kota') }}" />
                         </div>
@@ -305,7 +309,7 @@
                     <div>
                         <x-forms.label for="kecamatan_kode" value="{{ __('Kecamatan') }}" />
                         <div class="mt-1" wire:key="profile-district-{{ $selectedRegency ?? 'empty' }}">
-                            <x-forms.tom-select id="kecamatan_kode" wire:model.live="state.kecamatan_kode"
+                            <x-user.tom-select-user id="kecamatan_kode" wire:model.live="state.kecamatan_kode"
                                 :options="$districts" aria-describedby="profile-region-help"
                                 placeholder="{{ __('Pilih Kecamatan') }}" />
                         </div>
@@ -315,7 +319,7 @@
                     <div>
                         <x-forms.label for="kelurahan_kode" value="{{ __('Kelurahan / Desa') }}" />
                         <div class="mt-1" wire:key="profile-village-{{ $selectedDistrict ?? 'empty' }}">
-                            <x-forms.tom-select id="kelurahan_kode" wire:model.live="state.kelurahan_kode"
+                            <x-user.tom-select-user id="kelurahan_kode" wire:model.live="state.kelurahan_kode"
                                 :options="$villages" aria-describedby="profile-region-help"
                                 placeholder="{{ __('Pilih Kelurahan/Desa') }}" />
                         </div>
@@ -340,7 +344,7 @@
         <!-- Division -->
         <div class="col-span-6 xl:col-span-2">
             <x-forms.label for="division" value="{{ __('Division') }}" />
-            <x-forms.tom-select id="division" class="mt-1 block w-full" wire:model.live="state.division_id"
+            <x-user.tom-select-user id="division" class="mt-1 block w-full" wire:model.live="state.division_id"
                 :options="App\Models\Division::all()" placeholder="{{ __('Select Division') }}" />
             <x-forms.input-error for="division" class="mt-2" />
         </div>
@@ -348,7 +352,7 @@
         <!-- Education -->
         <div class="col-span-6 xl:col-span-2">
             <x-forms.label for="education" value="{{ __('Last Education') }}" />
-            <x-forms.tom-select id="education" class="mt-1 block w-full" wire:model.live="state.education_id"
+            <x-user.tom-select-user id="education" class="mt-1 block w-full" wire:model.live="state.education_id"
                 :options="App\Models\Education::all()" placeholder="{{ __('Select Education') }}" />
             <x-forms.input-error for="education" class="mt-2" />
         </div>
@@ -356,7 +360,7 @@
         <!-- Job title -->
         <div class="col-span-6 xl:col-span-2">
             <x-forms.label for="job_title" value="{{ __('Job Title') }}" />
-            <x-forms.tom-select id="job_title" class="mt-1 block w-full" wire:model.live="state.job_title_id"
+            <x-user.tom-select-user id="job_title" class="mt-1 block w-full" wire:model.live="state.job_title_id"
                 :options="App\Models\JobTitle::all()" placeholder="{{ __('Select Job Title') }}" />
             <x-forms.input-error for="job_title" class="mt-2" />
         </div>

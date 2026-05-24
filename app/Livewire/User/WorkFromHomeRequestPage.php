@@ -5,6 +5,7 @@ namespace App\Livewire\User;
 use App\Models\WorkFromHomeRequest;
 use App\Support\WorkFromHomeRequestService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Carbon;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -44,6 +45,7 @@ class WorkFromHomeRequestPage extends Component
         $this->authorize('create', WorkFromHomeRequest::class);
 
         $this->resetValidation();
+        $this->date = $this->date ?: Carbon::today()->toDateString();
         $this->showCreateModal = true;
     }
 
@@ -60,8 +62,8 @@ class WorkFromHomeRequestPage extends Component
 
         $validated = $this->validate([
             'date' => ['required', 'date', 'after_or_equal:today'],
-            'startTime' => ['nullable', 'date_format:H:i'],
-            'endTime' => ['nullable', 'date_format:H:i', 'after:startTime'],
+            'startTime' => ['nullable', 'required_with:endTime', 'date_format:H:i'],
+            'endTime' => ['nullable', 'required_with:startTime', 'date_format:H:i', 'after:startTime'],
             'locationAddress' => ['nullable', 'string', 'max:500'],
             'reason' => ['required', 'string', 'min:10', 'max:1200'],
         ]);

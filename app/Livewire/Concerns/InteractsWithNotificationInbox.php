@@ -28,6 +28,17 @@ trait InteractsWithNotificationInbox
         $this->resetPage();
     }
 
+    public function setContentFilter(string $filter): void
+    {
+        if (! in_array($filter, ['all', 'unread', 'notifications', 'announcements'], true)) {
+            return;
+        }
+
+        $this->contentFilter = $filter;
+        $this->showUnreadOnly = $filter === 'unread';
+        $this->resetPage();
+    }
+
     public function markAsRead(string $notificationId): void
     {
         $notification = Auth::user()->notifications()->find($notificationId);

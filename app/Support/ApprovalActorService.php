@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class ApprovalActorService
@@ -12,7 +13,29 @@ class ApprovalActorService
      */
     public function subordinateIds(User $user): Collection
     {
-        return $user->subordinates->pluck('id');
+        $explicitReportIds = User::query()
+            ->where('manager_id', $user->id)
+            ->when($user->company_id !== null, fn (Builder $query) => $query->where('company_id', $user->company_id))
+            ->pluck('id');
+
+        if (! $this->canManageDivisionSubordinates($user) || ! $user->division_id || ! $user->jobTitle?->jobLevel) {
+            return $explicitReportIds->unique()->values();
+        }
+
+        $rank = (int) $user->jobTitle->jobLevel->rank;
+
+        $divisionReportIds = User::query()
+            ->where('id', '!=', $user->id)
+            ->where('division_id', $user->division_id)
+            ->whereNull('manager_id')
+            ->when($user->company_id !== null, fn (Builder $query) => $query->where('company_id', $user->company_id))
+            ->whereHas('jobTitle.jobLevel', fn (Builder $query) => $query->where('rank', '>', $rank))
+            ->pluck('id');
+
+        return $explicitReportIds
+            ->merge($divisionReportIds)
+            ->unique()
+            ->values();
     }
 
     public function hasSubordinates(User $user): bool

@@ -221,31 +221,39 @@
         ],
     ];
 
+    $teamItems = [];
+
     if ($canReviewSubordinateRequests) {
-        array_splice($moreItems, 1, 0, [
+        $teamItems = [
             [
                 'kind' => 'link',
                 'href' => route('approvals'),
-                'label' => __('Approvals'),
-                'description' => __('Review team requests.'),
+                'label' => __('Team Approvals'),
+                'description' => __('Review pending team requests.'),
                 'icon' => 'approvals',
                 'tone' => 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-200',
                 'locked' => false,
-                'completed' => false,
             ],
-        ]);
-
-        $moreItems[] = [
-            'kind' => $cashAdvanceLocked ? 'button' : 'link',
-            'href' => $cashAdvanceLocked ? null : route('team-kasbon'),
-            'label' => __('Team Kasbon'),
-            'description' => __('Follow team cash advance requests.'),
-            'icon' => 'team',
-            'tone' => 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-200',
-            'locked' => $cashAdvanceLocked,
-            'completed' => false,
-            'lockTitle' => __('Team Kasbon Locked'),
-            'lockMessage' => __('Team Kasbon Access is an Enterprise Feature. Please Upgrade.'),
+            [
+                'kind' => 'link',
+                'href' => route('approvals', ['activeTab' => 'attendance-corrections']),
+                'label' => __('Team Attendance'),
+                'description' => __('Review attendance corrections and leave requests.'),
+                'icon' => 'attendance',
+                'tone' => 'bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-200',
+                'locked' => false,
+            ],
+            [
+                'kind' => $cashAdvanceLocked ? 'button' : 'link',
+                'href' => $cashAdvanceLocked ? null : route('team-kasbon'),
+                'label' => __('Team Kasbon'),
+                'description' => __('Follow team cash advance requests.'),
+                'icon' => 'team',
+                'tone' => 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-200',
+                'locked' => $cashAdvanceLocked,
+                'lockTitle' => __('Team Kasbon Locked'),
+                'lockMessage' => __('Team Kasbon Access is an Enterprise Feature. Please Upgrade.'),
+            ],
         ];
     }
 @endphp
@@ -255,7 +263,7 @@
         <div class="quick-wallet-header">
             <div>
                 <p class="quick-wallet-badge">{{ __('Quick Access') }}</p>
-                <h3 id="quick-wallet-title" class="quick-wallet-title">{{ __('Start With Today’s Priorities') }}</h3>
+                <h3 id="quick-wallet-title" class="quick-wallet-title">{{ __('Shortcuts') }}</h3>
                 <p class="quick-wallet-copy">
                     {{ __('Use the fastest actions first, then open the rest only when you need them.') }}</p>
             </div>
@@ -288,6 +296,48 @@
                 </button>
             </li>
         </ul>
+
+        @if ($teamItems !== [])
+            <div class="quick-wallet-team" aria-labelledby="quick-wallet-team-title">
+                <div class="quick-wallet-team__header">
+                    <p class="quick-wallet-team__eyebrow">{{ __('Team') }}</p>
+                    <h4 id="quick-wallet-team-title" class="quick-wallet-team__title">{{ __('Manager tools') }}</h4>
+                </div>
+
+                <ul class="quick-wallet-team__grid" role="list">
+                    @foreach ($teamItems as $item)
+                        <li>
+                            @if ($item['kind'] === 'link')
+                                <a href="{{ $item['href'] }}" class="quick-wallet-team-card"
+                                    aria-label="{{ $item['label'] }}. {{ $item['description'] }}">
+                                    <span class="quick-wallet-team-card__icon {{ $item['tone'] }}" aria-hidden="true">
+                                        <x-user.quick-menu-icon :name="$item['icon']" class="h-5 w-5" />
+                                    </span>
+                                    <span class="quick-wallet-team-card__body">
+                                        <strong>{{ $item['label'] }}</strong>
+                                        <span>{{ $item['description'] }}</span>
+                                    </span>
+                                    <x-heroicon-o-chevron-right class="h-4 w-4 text-slate-400 dark:text-slate-500" aria-hidden="true" />
+                                </a>
+                            @else
+                                <button type="button" class="quick-wallet-team-card"
+                                    aria-label="{{ $item['label'] }}. {{ $item['description'] }}"
+                                    @click.prevent="$dispatch('feature-lock', { title: @js($item['lockTitle']), message: @js($item['lockMessage']) })">
+                                    <span class="quick-wallet-team-card__icon {{ $item['tone'] }}" aria-hidden="true">
+                                        <x-user.quick-menu-icon :name="$item['icon']" class="h-5 w-5" />
+                                    </span>
+                                    <span class="quick-wallet-team-card__body">
+                                        <strong>{{ $item['label'] }}</strong>
+                                        <span>{{ $item['description'] }}</span>
+                                    </span>
+                                    <x-heroicon-o-lock-closed class="h-4 w-4 text-slate-400 dark:text-slate-500" aria-hidden="true" />
+                                </button>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </section>
 
     <div id="quick-access-more-panel" x-cloak x-show="showMore" x-trap.inert.noscroll="showMore"
