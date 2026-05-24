@@ -180,6 +180,24 @@ test('broadcast runtime exposes safe echo client config for local and production
         ->and($production['reverb']['scheme'])->toBe('https');
 });
 
+test('broadcast auth accepts string user ids for private notification channels', function () {
+    enableReverbBroadcasting();
+    require base_path('routes/channels.php');
+
+    $user = User::factory()->create([
+        'group' => 'user',
+        'employment_status' => User::EMPLOYMENT_STATUS_ACTIVE,
+    ]);
+
+    $this->actingAs($user)
+        ->postJson('/broadcasting/auth', [
+            'socket_id' => '1234.5678',
+            'channel_name' => 'private-App.Models.User.'.$user->getKey(),
+        ])
+        ->assertOk()
+        ->assertJsonStructure(['auth']);
+});
+
 function componentListeners(object $component): array
 {
     $method = new ReflectionMethod($component, 'getListeners');
@@ -194,7 +212,9 @@ function componentListeners(object $component): array
 function enableReverbBroadcasting(array $options = []): void
 {
     Config::set('broadcasting.default', 'reverb');
+    Config::set('broadcasting.connections.reverb.app_id', 'test-reverb-app');
     Config::set('broadcasting.connections.reverb.key', 'test-reverb-key');
+    Config::set('broadcasting.connections.reverb.secret', 'test-reverb-secret');
     Config::set('broadcasting.connections.reverb.options.host', $options['host'] ?? '127.0.0.1');
     Config::set('broadcasting.connections.reverb.options.port', $options['port'] ?? 8080);
     Config::set('broadcasting.connections.reverb.options.scheme', $options['scheme'] ?? 'http');

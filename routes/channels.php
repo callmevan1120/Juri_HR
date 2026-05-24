@@ -3,7 +3,10 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('App.Models.User.{id}', fn (User $user, int $id): bool => (int) $user->id === $id);
+Broadcast::channel(
+    'App.Models.User.{user}',
+    fn (User $authenticatedUser, User $user): bool => $authenticatedUser->is($user),
+);
 
 Broadcast::channel('collaboration.company.{companyId}', function (User $user, int $companyId): bool {
     if (! $user->can('viewCollaborationWorkspace')) {
