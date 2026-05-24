@@ -252,15 +252,15 @@ Rilis mayor terbaru untuk branch fitur lengkap: [`v5.0.0`](https://github.com/Ri
 
 Branch fitur terbaru dan paling lengkap: [`main-vps`](https://github.com/RiprLutuk/PasPapan/tree/main-vps)
 
-- Target APK: `PasPapan-v5.0.0.apk`
-- Target checksum: `PasPapan-v5.0.0.apk.sha256`
+- APK: [`PasPapan-v5.0.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk)
+- Checksum: [`PasPapan-v5.0.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk.sha256)
 - Android `versionName`: `5.0.0`
 - Android `versionCode`: `50`
 - iOS `MARKETING_VERSION`: `5.0.0`
 - iOS `CURRENT_PROJECT_VERSION`: `50`
 - Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
-Catatan: artifact APK/checksum `v5.0.0` dibuat pada tahap release build. Rilis APK publik lama [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0) tetap tersedia sebagai arsip stable sebelumnya.
+Rilis APK publik lama [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0) tetap tersedia sebagai arsip stable sebelumnya.
 
 ## Demo
 

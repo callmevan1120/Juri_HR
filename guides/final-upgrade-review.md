@@ -5,6 +5,7 @@ Tanggal review: 24 Mei 2026
 Branch sumber: `chore/major-upgrade-audit`
 Target release branch: `main-vps`
 Target release version: `v5.0.0`
+GitHub default branch: `main-vps`
 Baseline sebelum pass ini: `a2a3559`
 Release-prep commit awal: `3a6bd56`
 
@@ -16,6 +17,8 @@ Pass ini menyiapkan PasPapan sebagai track produksi VPS penuh. `main-vps` menjad
 
 - Menambahkan dokumentasi branch `main-vps` di README, pusat dokumen, deployment, operations, dan changelog.
 - Menetapkan metadata rilis mayor `v5.0.0` untuk package, Android, iOS, README, changelog, dan release checklist.
+- Memindahkan default branch GitHub ke `main-vps` agar workflow release dan dokumentasi utama mengikuti jalur VPS penuh.
+- Membuild APK release `PasPapan-v5.0.0.apk` dan checksum SHA-256 untuk GitHub Release.
 - Membuat `update.sh` branch-aware: default `main-vps`, tetap bisa `main` jika eksplisit untuk legacy.
 - Menambahkan `PASPAPAN_RELEASE_BRANCH=main-vps` ke `.env.example`.
 - Memastikan script smoke yang direferensikan fresh clone/CI ikut tracked, bukan lagi tertahan `.gitignore`.
@@ -31,6 +34,11 @@ Pass ini menyiapkan PasPapan sebagai track produksi VPS penuh. `main-vps` menjad
 | `bun install` | PASS, no changes |
 | `bun run build` | PASS |
 | Release metadata sync (`package.json`, README, changelog, Android, iOS) | PASS, `5.0.0` / `versionCode 50` / `CURRENT_PROJECT_VERSION 50` |
+| `gh repo edit RiprLutuk/PasPapan --default-branch main-vps` | PASS |
+| `gh workflow run release-preflight.yml --ref main-vps -f version=5.0.0 -f android_version_code=50` | TRIGGERED, run `26357068714`; GitHub completed failure before step logs were available (`steps: []`) |
+| `bunx cap sync android` | PASS |
+| `./android/gradlew -p android assembleRelease` | PASS, APK release built |
+| APK checksum | PASS, `6522fe7f9ccd71de5fc5703dcf52c46e93c73670df849e412fc94def91edbbd2` |
 | `composer check-platform-reqs` | PASS, PHP 8.3.31 dan extension required terpenuhi |
 | `composer check:modern-stack` | PASS |
 | `composer check:ui` | PASS, 0 active warning, 31 baseline legacy |

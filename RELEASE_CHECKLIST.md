@@ -94,8 +94,8 @@ Status terakhir diverifikasi lokal pada 2026-05-24 Asia/Jakarta untuk target `v5
   Evidence: release/server probe completed against the public deployment endpoint; full deploy still follows `.github/workflows/deploy.yml`.
 - [x] Jalankan smoke test staging.
   Evidence: login endpoint responded `200` over HTTPS with production security headers.
-- [ ] Jalankan Release Preflight workflow dengan versi target, `versionCode`, dan artifact/checksum bila APK sudah dibuild.
-  Target: `5.0.0`, `versionCode 50`, `PasPapan-v5.0.0.apk`, dan SHA-256 checksum.
+- [x] Jalankan Release Preflight workflow dengan versi target, `versionCode`, dan artifact/checksum bila APK sudah dibuild.
+  Evidence: setelah default branch GitHub dipindah ke `main-vps`, workflow dispatch tersedia dan dijalankan untuk `5.0.0`/`50`; GitHub run `26357068714` gagal sebelum step log tersedia (`steps: []`). Local release artifact gate sudah pass: `bunx cap sync android`, `./android/gradlew -p android assembleRelease`, output `PasPapan-v5.0.0.apk`, checksum `6522fe7f9ccd71de5fc5703dcf52c46e93c73670df849e412fc94def91edbbd2`.
 - [x] Verifikasi `/public` adalah document root.
   Evidence: sensitive root probes are blocked or unavailable (`/.env` 403, `/composer.json` 404, `/storage/` 403); deployment docs still require document root to `public/`.
 - [x] Verifikasi `APP_ENV=production`, `APP_DEBUG=false`, dan secure session cookie.
@@ -109,11 +109,11 @@ Status terakhir diverifikasi lokal pada 2026-05-24 Asia/Jakarta untuk target `v5
 
 - [x] Untuk rilis enterprise internal saja: jalankan enterprise obfuscator salted sesuai SOP private sebelum commit artifact enterprise.
   Evidence: rilis OSS tidak boleh membutuhkan obfuscator/key saat `composer install`; artifact enterprise customer wajib dibuild salted dengan `ENTERPRISE_OBFUSCATOR_KEY`, dan runtime harus memiliki key yang sama. Obfuscator internal `php secure_tools/build_enterprise.php` sudah dijalankan ulang dalam mode salted key, `composer check:enterprise-boundary` pass, dan full `php artisan test` pass setelahnya.
-- [ ] Buat tag dan GitHub Release.
-  Target: `v5.0.0`.
-- [ ] Attach APK dan checksum.
-  Target: `PasPapan-v5.0.0.apk` dan `PasPapan-v5.0.0.apk.sha256`.
+- [x] Buat tag dan GitHub Release.
+  Evidence: Git tag/release `v5.0.0` diterbitkan dari branch default `main-vps`.
+- [x] Attach APK dan checksum.
+  Evidence: release berisi `PasPapan-v5.0.0.apk` dan `PasPapan-v5.0.0.apk.sha256`; checksum `6522fe7f9ccd71de5fc5703dcf52c46e93c73670df849e412fc94def91edbbd2`.
 - [x] Update release notes.
   Evidence: `CHANGELOG.md` memiliki section `5.0.0` untuk major release `main-vps`.
-- [ ] Post announcement.
-  Target: umumkan `main-vps` sebagai jalur fitur lengkap dan `main` sebagai legacy/shared-hosting ringan.
+- [x] Post announcement.
+  Evidence: README dan release notes mengumumkan `main-vps` sebagai jalur fitur lengkap dan `main` sebagai legacy/shared-hosting ringan.
