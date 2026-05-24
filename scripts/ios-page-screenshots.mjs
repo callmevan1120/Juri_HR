@@ -12,7 +12,7 @@ const userEmail = process.env.APK_SCREENSHOT_USER_EMAIL || 'apk.demo.user@paspap
 const adminEmail = process.env.APK_SCREENSHOT_ADMIN_EMAIL || 'apk.demo.superadmin@paspapan.test';
 const password = process.env.APK_SCREENSHOT_PASSWORD || '12345678';
 const settleMs = Number(process.env.IOS_PAGE_SCREENSHOT_SETTLE_MS || 1400);
-const deviceName = process.env.IOS_PAGE_DEVICE || 'iPhone 15 Pro';
+const deviceName = process.env.IOS_PAGE_DEVICE || 'iPhone 14 Pro Max';
 const deviceProfile = devices[deviceName] || devices['iPhone 14 Pro'] || {
   viewport: { width: 393, height: 852 },
   deviceScaleFactor: 3,
@@ -20,6 +20,19 @@ const deviceProfile = devices[deviceName] || devices['iPhone 14 Pro'] || {
   hasTouch: true,
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
 };
+const emulateNativeApp = process.env.IOS_PAGE_NATIVE_APP !== 'false';
+const nativeViewport = {
+  width: Number(process.env.IOS_PAGE_SCREENSHOT_WIDTH || 430),
+  height: Number(process.env.IOS_PAGE_SCREENSHOT_HEIGHT || 932),
+};
+const screenshotProfile = emulateNativeApp
+  ? {
+      ...deviceProfile,
+      viewport: nativeViewport,
+      isMobile: true,
+      hasTouch: true,
+    }
+  : deviceProfile;
 
 let serverProcess = null;
 
@@ -146,11 +159,19 @@ async function waitForPageReady(page) {
   await page.waitForLoadState('domcontentloaded');
   await page.waitForLoadState('networkidle').catch(() => {});
   await page.locator('body').waitFor({ state: 'visible' });
+  if (emulateNativeApp) {
+    await page.evaluate(() => {
+      document.body?.classList.add('is-native-platform', 'platform-ios');
+      document.documentElement?.classList.add('is-native-platform', 'platform-ios');
+      document.documentElement?.style.setProperty('--safe-area-inset-top', '47px');
+      document.documentElement?.style.setProperty('--safe-area-inset-bottom', '34px');
+    });
+  }
   await page.evaluate(() => window.scrollTo(0, 0));
   await delay(settleMs);
 }
 
-async function capturePage(page, entry, index) {
+async function capturePage(page, entry, index, engine) {
   preparePageState(entry);
 
   if (entry.clearCookies) {
@@ -166,8 +187,12 @@ async function capturePage(page, entry, index) {
   await waitForPageReady(page);
 
   if (entry.readyExpression) {
-    await page.waitForFunction(entry.readyExpression, null, { timeout: 30000 });
-    await delay(settleMs);
+    try {
+      await page.waitForFunction(entry.readyExpression, null, { timeout: 15000 });
+      await delay(settleMs);
+    } catch (error) {
+      console.warn(`Readiness check timed out for ${entry.slug}; capturing current rendered state. ${error.message}`);
+    }
   }
 
   if (entry.afterNavigate) {
@@ -186,10 +211,11 @@ async function capturePage(page, entry, index) {
     url: page.url(),
     title: await page.title(),
     screenshot: {
-      mode: 'ios-webkit-viewport',
+      mode: engine === 'webkit' ? 'ios-webkit-viewport' : 'ios-native-emulated-viewport',
       device: deviceName,
-      viewport: deviceProfile.viewport,
-      deviceScaleFactor: deviceProfile.deviceScaleFactor,
+      nativeAppEmulated: emulateNativeApp,
+      viewport: screenshotProfile.viewport,
+      deviceScaleFactor: screenshotProfile.deviceScaleFactor,
     },
   };
 }
@@ -206,18 +232,26 @@ prepareDemoData();
 
 const { browser, engine } = await launchBrowser();
 const context = await browser.newContext({
-  ...deviceProfile,
+  ...screenshotProfile,
   locale: 'id-ID',
   timezoneId: 'Asia/Jakarta',
-  permissions: ['camera', 'geolocation'],
+  permissions: engine === 'webkit' ? ['geolocation'] : ['camera', 'geolocation'],
   geolocation: { latitude: -6.2, longitude: 106.816666 },
   colorScheme: process.env.IOS_PAGE_COLOR_SCHEME || 'light',
 });
+if (emulateNativeApp) {
+  await context.addInitScript(() => {
+    window.CapacitorCustomPlatform = { name: 'ios' };
+    window.webkit = window.webkit || { messageHandlers: {} };
+    window.webkit.messageHandlers = window.webkit.messageHandlers || {};
+    window.webkit.messageHandlers.bridge = window.webkit.messageHandlers.bridge || { postMessage() {} };
+  });
+}
 const page = await context.newPage();
 const captured = [];
 
 for (const [index, entry] of userPages().entries()) {
-  const result = await capturePage(page, entry, index);
+  const result = await capturePage(page, entry, index, engine);
   captured.push(result);
   console.log(JSON.stringify(result));
 }
@@ -228,6 +262,8 @@ fs.writeFileSync(manifestPath, `${JSON.stringify({
   app_url: appUrl,
   browser_engine: engine,
   device: deviceName,
+  native_app_emulated: emulateNativeApp,
+  viewport: screenshotProfile.viewport,
   screenshots: captured,
 }, null, 2)}\n`);
 
