@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Barcode;
 use App\Models\Company;
 use App\Models\Division;
 use App\Models\Education;
@@ -30,6 +31,9 @@ class FakeDataSeeder extends Seeder
         if ($this->shouldSkipDemoSeeding()) {
             return;
         }
+
+        $this->call(ProductionMasterDataSeeder::class);
+        $this->seedDemoBarcodes();
 
         $divisions = Division::query()->orderBy('name')->get();
         $jobTitles = JobTitle::query()->with('jobLevel')->get()->keyBy('name');
@@ -131,6 +135,46 @@ class FakeDataSeeder extends Seeder
             DemoFinanceWorkflowSeeder::class,
             DemoCustomFormSeeder::class,
         ]);
+    }
+
+    private function seedDemoBarcodes(): void
+    {
+        foreach ([
+            [
+                'name' => 'Kantor Pusat Demo',
+                'value' => 'PASPAPAN-HQ-ATTENDANCE',
+                'secret_key' => hash('sha256', 'PASPAPAN-HQ-ATTENDANCE'),
+                'latitude' => -6.200000,
+                'longitude' => 106.816666,
+                'radius' => 75,
+                'dynamic_enabled' => true,
+                'dynamic_ttl_seconds' => 60,
+            ],
+            [
+                'name' => 'Gudang Operasional Demo',
+                'value' => 'PASPAPAN-WAREHOUSE-ATTENDANCE',
+                'secret_key' => hash('sha256', 'PASPAPAN-WAREHOUSE-ATTENDANCE'),
+                'latitude' => -6.238270,
+                'longitude' => 106.975570,
+                'radius' => 100,
+                'dynamic_enabled' => true,
+                'dynamic_ttl_seconds' => 60,
+            ],
+            [
+                'name' => 'Area Lapangan Demo',
+                'value' => 'PASPAPAN-FIELD-ATTENDANCE',
+                'secret_key' => hash('sha256', 'PASPAPAN-FIELD-ATTENDANCE'),
+                'latitude' => -6.302445,
+                'longitude' => 106.895155,
+                'radius' => 150,
+                'dynamic_enabled' => true,
+                'dynamic_ttl_seconds' => 60,
+            ],
+        ] as $barcode) {
+            Barcode::query()->updateOrCreate([
+                'value' => $barcode['value'],
+            ], $barcode);
+        }
     }
 
     private function renameLegacyStaffEmployeesToOfficers(Division $division, ?JobTitle $officerTitle): void

@@ -1746,7 +1746,7 @@
     "Maintenance mode enabled. Admin users can still access the application.": "Maintenance mode enabled. Admin users can still access the application.",
     "Make active template": "Make active template",
     "Make sure the Company Name and Support Email in the General tab match the registered data, because the license key is tied to that information.": "Make sure the Company Name and Support Email in the General tab match the registered data, because the license key is tied to that information.",
-    "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information.": "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information.",
+    "Make sure the Company Name and Contact Support in the General tab match the registered data, because the license key is tied to that information.": "Make sure the Company Name and Contact Support in the General tab match the registered data, because the license key is tied to that information.",
     "Make sure the document is clear, valid, and matches the administration requirement.": "Make sure the document is clear, valid, and matches the administration requirement.",
     "Make sure your location is updated, scan the same work QR, then complete the selfie if your attendance flow requires it.": "Make sure your location is updated, scan the same work QR, then complete the selfie if your attendance flow requires it.",
     "Male": "Male",
@@ -4520,5 +4520,6 @@
     "Please enter a value greater than or equal to :min.": "Please enter a value greater than or equal to :min.",
     "Please enter a value less than or equal to :max.": "Please enter a value less than or equal to :max.",
     "Please review this field.": "Please review this field.",
-    "Please review the highlighted fields before continuing.": "Please review the highlighted fields before continuing."
+    "Please review the highlighted fields before continuing.": "Please review the highlighted fields before continuing.",
+    "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information.": "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information."
 }

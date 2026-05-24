@@ -553,7 +553,7 @@
                         <div class="sm:col-span-2">
                             <x-forms.label for="create_employment_status" value="{{ __('Employment Status') }}" />
                             <x-forms.select id="create_employment_status" wire:model="form.employment_status"
-                                class="mt-1 block w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
+                                class="mt-1 block w-full">
                                 @foreach ($manualEmploymentStatuses as $statusKey)
                                     <option value="{{ $statusKey }}">{{ __($employmentStatuses[$statusKey]) }}</option>
                                 @endforeach
@@ -764,7 +764,7 @@
                         <div class="sm:col-span-2">
                             <x-forms.label for="edit_employment_status" value="{{ __('Employment Status') }}" />
                             <x-forms.select id="edit_employment_status" wire:model="form.employment_status"
-                                class="mt-1 block w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
+                                class="mt-1 block w-full">
                                 @if (isset($employmentStatuses[$form->employment_status]) && ! in_array($form->employment_status, $manualEmploymentStatuses, true))
                                     <option value="{{ $form->employment_status }}">{{ __($employmentStatuses[$form->employment_status]) }}</option>
                                 @endif

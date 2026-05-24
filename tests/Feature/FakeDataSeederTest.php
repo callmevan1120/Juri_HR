@@ -38,12 +38,13 @@ test('database seeder is idempotent for real master data', function () {
     $this->seed(DatabaseSeeder::class);
     $this->seed(DatabaseSeeder::class);
 
-    expect(Company::query()->where('slug', 'paspapan-demo')->count())->toBe(1)
+    expect(Company::query()->where('metadata->source', 'real_master_data')->count())->toBe(1)
+        ->and(Company::query()->where('slug', 'paspapan-demo')->exists())->toBeFalse()
         ->and(Barcode::query()->whereIn('value', [
             'PASPAPAN-HQ-ATTENDANCE',
             'PASPAPAN-WAREHOUSE-ATTENDANCE',
             'PASPAPAN-FIELD-ATTENDANCE',
-        ])->count())->toBe(3)
+        ])->exists())->toBeFalse()
         ->and(Shift::query()->whereIn('name', [
             'Shift Pagi',
             'Shift Sore',
@@ -206,13 +207,21 @@ test('paspapan seeding commands keep real and fake data separated', function () 
     $this->artisan('paspapan:seed-real')
         ->assertSuccessful();
 
-    expect(Company::query()->where('slug', 'paspapan-demo')->exists())->toBeTrue()
+    expect(Company::query()->where('metadata->source', 'real_master_data')->exists())->toBeTrue()
+        ->and(Company::query()->where('slug', 'paspapan-demo')->exists())->toBeFalse()
         ->and(Product::query()->where('sku', 'DEVICE-BUNDLE-001')->exists())->toBeFalse();
 
     $this->artisan('paspapan:seed-fake')
         ->assertSuccessful();
 
-    expect(Product::query()->where('sku', 'DEVICE-BUNDLE-001')->exists())->toBeTrue()
+    expect(Wilayah::query()->count())->toBeGreaterThan(80000)
+        ->and(JobTitle::query()->whereIn('name', ['Head', 'Manager', 'Senior', 'Officer', 'Staff'])->whereNotNull('job_level_id')->count())->toBe(5)
+        ->and(Barcode::query()->whereIn('value', [
+            'PASPAPAN-HQ-ATTENDANCE',
+            'PASPAPAN-WAREHOUSE-ATTENDANCE',
+            'PASPAPAN-FIELD-ATTENDANCE',
+        ])->count())->toBe(3)
+        ->and(Product::query()->where('sku', 'DEVICE-BUNDLE-001')->exists())->toBeTrue()
         ->and(CustomFormTemplate::query()->where('title', 'Bukti Kunjungan Lokasi')->exists())->toBeTrue();
 });
 

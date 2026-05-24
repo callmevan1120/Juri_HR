@@ -12,7 +12,7 @@ return new class extends Migration
             ->whereIn('value', ['', 'example@gmail.com', 'support@example.com'])
             ->update([
                 'value' => 'https://t.me/RiprLutuk',
-                'description' => 'Support Telegram',
+                'description' => 'Contact Support',
                 'updated_at' => now(),
             ]);
     }

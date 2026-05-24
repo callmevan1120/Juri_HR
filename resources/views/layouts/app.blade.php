@@ -309,11 +309,14 @@
 
                 this.tomSelectInstance = new window.TomSelect(this.$refs.select, config);
 
-                if (this.$root?.classList.contains('ts-wrapper-user') || this.$root?.closest('.user-ui')) {
+                const isUserSelect = this.$root?.classList.contains('ts-wrapper-user') || this.$root?.closest('.user-ui');
+                const isAdminSelect = this.$root?.classList.contains('ts-wrapper-admin') || this.$root?.closest('.admin-ui');
+
+                if (isUserSelect) {
                     this.tomSelectInstance.dropdown?.classList.add('ts-dropdown-user');
                 }
 
-                if (this.$root?.classList.contains('ts-wrapper-admin') || this.$root?.closest('.admin-ui')) {
+                if (isAdminSelect) {
                     this.tomSelectInstance.dropdown?.classList.add('ts-dropdown-admin');
                 }
 
@@ -326,8 +329,11 @@
                     requestAnimationFrame(() => this.tomSelectInstance?.open());
                 };
 
-                this.tomSelectInstance.control.addEventListener('mousedown', openOptions);
-                this.tomSelectInstance.control.addEventListener('pointerdown', openOptions);
+                if (!isAdminSelect) {
+                    this.tomSelectInstance.control.addEventListener('mousedown', openOptions);
+                    this.tomSelectInstance.control.addEventListener('pointerdown', openOptions);
+                }
+
                 this.tomSelectInstance.control_input?.addEventListener('focus', openOptions);
                 this.configureDropdownPosition();
 

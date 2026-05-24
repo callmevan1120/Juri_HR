@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\AdminSeeder;
+use Database\Seeders\ProductionMasterDataSeeder;
 use Illuminate\Console\Command;
 
 class SeedRealMasterData extends Command
@@ -15,10 +16,23 @@ class SeedRealMasterData extends Command
     {
         $this->info('Seeding production-safe master data...');
         $this->call('db:seed', [
-            '--class' => DatabaseSeeder::class,
+            '--class' => ProductionMasterDataSeeder::class,
         ]);
+
+        if ($this->bootstrapAdminSeedingEnabled()) {
+            $this->warn('BOOTSTRAP_ADMIN_SEEDING_ENABLED is enabled. Seeding bootstrap admin accounts for this controlled run.');
+            $this->call('db:seed', [
+                '--class' => AdminSeeder::class,
+            ]);
+        }
+
         $this->info('Real master data seed completed.');
 
         return self::SUCCESS;
+    }
+
+    private function bootstrapAdminSeedingEnabled(): bool
+    {
+        return filter_var(config('paspapan.bootstrap_admin_seeding_enabled', false), FILTER_VALIDATE_BOOL);
     }
 }

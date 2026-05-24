@@ -87,6 +87,27 @@ test('setting seeder preserves saved enterprise license when env seed is blank',
         ->and($setting->type)->toBe('textarea');
 });
 
+test('setting seeder preserves production-edited setting values', function () {
+    Setting::query()->updateOrCreate(
+        ['key' => 'app.company_name'],
+        [
+            'value' => 'PT Production Customer',
+            'group' => 'identity',
+            'type' => 'text',
+            'description' => 'Old label',
+        ],
+    );
+
+    app(SettingSeeder::class)->run();
+
+    $setting = Setting::query()->where('key', 'app.company_name')->firstOrFail();
+
+    expect($setting->value)->toBe('PT Production Customer')
+        ->and($setting->group)->toBe('identity')
+        ->and($setting->type)->toBe('text')
+        ->and($setting->description)->toBe('Company Name for Reports');
+});
+
 test('repository and public htaccess block sensitive paths as defense in depth', function () {
     $rootHtaccess = file_get_contents(base_path('.htaccess'));
     $publicHtaccess = file_get_contents(public_path('.htaccess'));

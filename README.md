@@ -135,15 +135,16 @@ FILESYSTEM_ATTACHMENT_DISKS=local
 
 ## Seeder
 
-Seeder default bersifat idempotent dan production-safe untuk master data.
+Seeder dipisah agar aman untuk production dan tidak mencampur data contoh.
 
 ```bash
 php artisan paspapan:seed-real
 php artisan paspapan:seed-fake
 ```
 
-- `paspapan:seed-real` untuk master data nyata.
-- `paspapan:seed-fake` untuk demo/staging.
+- `paspapan:seed-real` untuk master data nyata: settings default, wilayah Indonesia, libur nasional, job level/title, pendidikan, divisi, shift, payroll component, KPI, template dokumen karyawan, company awal bila belum ada, dan COA per company.
+- `paspapan:seed-real` tidak membuat data demo, produk demo, barcode lokasi demo, atau akun admin kecuali `BOOTSTRAP_ADMIN_SEEDING_ENABLED=true` diset secara sadar untuk bootstrap terkontrol.
+- `paspapan:seed-fake` untuk lokal, QA, atau staging demo. Command ini selalu menjalankan master data real lebih dulu, lalu menambahkan akun/data/sample workflow demo.
 - Jangan melakukan refresh/truncate database production kecuali operator sengaja menjalankan runbook restore/migration dengan backup.
 
 ## Realtime

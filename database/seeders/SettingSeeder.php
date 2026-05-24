@@ -18,10 +18,20 @@ class SettingSeeder extends Seeder
                 unset($setting['value']);
             }
 
-            Setting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting
-            );
+            $attributes = $setting;
+            $key = $attributes['key'];
+            unset($attributes['key']);
+
+            $existing = Setting::query()->where('key', $key)->first();
+
+            if ($existing !== null) {
+                unset($attributes['value']);
+                $existing->fill($attributes)->save();
+
+                continue;
+            }
+
+            Setting::query()->create(['key' => $key] + $attributes);
         }
     }
 }

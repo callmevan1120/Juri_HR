@@ -5135,6 +5135,34 @@
         box-sizing: border-box;
     }
 
+    .admin-ui .ts-wrapper-admin {
+        position: relative;
+        z-index: 20;
+        display: block !important;
+        width: 100% !important;
+        min-height: 0 !important;
+        height: auto !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .admin-ui .ts-wrapper-admin > .ts-wrapper,
+    .admin-ui .ts-wrapper-admin .ts-wrapper {
+        width: 100% !important;
+        min-height: 2.75rem !important;
+        height: 2.75rem !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
     .admin-ui .ts-wrapper-admin.ts-wrapper,
     .admin-ui .ts-wrapper-admin .ts-control {
         min-height: 2.75rem !important;
@@ -5143,10 +5171,95 @@
         box-sizing: border-box !important;
     }
 
+    .admin-ui .ts-wrapper-admin .ts-control {
+        width: 100% !important;
+        padding: 0 2.5rem 0 1rem !important;
+        overflow: hidden !important;
+        border: 1px solid rgb(203 213 225 / 0.9) !important;
+        border-radius: 0.9rem !important;
+        background: rgb(255 255 255) !important;
+        box-shadow: none !important;
+        color: rgb(15 23 42) !important;
+    }
+
+    .dark .admin-ui .ts-wrapper-admin .ts-control {
+        border-color: rgb(51 65 85 / 0.95) !important;
+        background: rgb(15 23 42) !important;
+        color: rgb(241 245 249) !important;
+    }
+
     .admin-ui .ts-wrapper-admin .ts-control > input,
     .admin-ui .ts-wrapper-admin .ts-control .item {
         line-height: 1.25rem !important;
         height: 1.25rem !important;
+    }
+
+    .admin-ui .ts-wrapper-admin.dropdown-active,
+    .admin-ui .ts-wrapper-admin.focus,
+    .admin-ui .ts-wrapper-admin.input-active,
+    .admin-ui .ts-wrapper-admin:has(.ts-wrapper.dropdown-active),
+    .admin-ui .ts-wrapper-admin:has(.ts-wrapper.focus),
+    .admin-ui .ts-wrapper-admin:has(.ts-wrapper.input-active) {
+        z-index: 1200;
+    }
+
+    .ts-dropdown-admin,
+    body > .ts-dropdown.ts-dropdown-admin {
+        z-index: 99999 !important;
+        overflow: hidden;
+        border-radius: 0.9rem !important;
+        border: 1px solid rgb(203 213 225 / 0.9) !important;
+        background: rgb(255 255 255) !important;
+        color: rgb(15 23 42) !important;
+        box-shadow: 0 22px 50px -28px rgb(15 23 42 / 0.45) !important;
+    }
+
+    .ts-dropdown-admin .ts-dropdown-content,
+    body > .ts-dropdown.ts-dropdown-admin .ts-dropdown-content {
+        max-height: min(18rem, calc(100vh - 3rem));
+        overflow-y: auto;
+        background: inherit !important;
+        color: inherit !important;
+    }
+
+    .ts-dropdown-admin .option,
+    body > .ts-dropdown.ts-dropdown-admin .option {
+        color: rgb(30 41 59) !important;
+        background: transparent !important;
+    }
+
+    .ts-dropdown-admin .option:not(.disabled):hover,
+    .ts-dropdown-admin .option.active,
+    body > .ts-dropdown.ts-dropdown-admin .option:not(.disabled):hover,
+    body > .ts-dropdown.ts-dropdown-admin .option.active {
+        background: rgb(241 245 249) !important;
+        color: rgb(15 23 42) !important;
+    }
+
+    .dark .ts-dropdown-admin,
+    .dark body > .ts-dropdown.ts-dropdown-admin,
+    body.dark > .ts-dropdown.ts-dropdown-admin {
+        border-color: rgb(51 65 85 / 0.95) !important;
+        background: rgb(15 23 42) !important;
+        color: rgb(241 245 249) !important;
+        box-shadow: 0 24px 60px -30px rgb(0 0 0 / 0.76) !important;
+    }
+
+    .dark .ts-dropdown-admin .option,
+    .dark body > .ts-dropdown.ts-dropdown-admin .option,
+    body.dark > .ts-dropdown.ts-dropdown-admin .option {
+        color: rgb(226 232 240) !important;
+        background: transparent !important;
+    }
+
+    .dark .ts-dropdown-admin .option:not(.disabled):hover,
+    .dark .ts-dropdown-admin .option.active,
+    .dark body > .ts-dropdown.ts-dropdown-admin .option:not(.disabled):hover,
+    .dark body > .ts-dropdown.ts-dropdown-admin .option.active,
+    body.dark > .ts-dropdown.ts-dropdown-admin .option:not(.disabled):hover,
+    body.dark > .ts-dropdown.ts-dropdown-admin .option.active {
+        background: rgb(30 41 59) !important;
+        color: rgb(255 255 255) !important;
     }
 
     /* Prevent elastic scrolling (pull-down effect) on native */

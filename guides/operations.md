@@ -337,8 +337,10 @@ Sebelum go-live:
 - ganti password
 - hapus user demo yang tidak boleh ada di produksi
 - jangan menjalankan seeder sembarang pada database produksi
-- master wilayah Indonesia ikut `DatabaseSeeder` dan import-nya idempotent; operator/automation tidak boleh refresh/truncate lewat seeder production. Penggantian dataset penuh tetap mungkin, tetapi harus lewat runbook migration/restore terpisah dengan backup, staging rehearsal, dan approval.
-- gunakan `php artisan paspapan:seed-real` untuk master data aman dan `php artisan paspapan:seed-fake` hanya untuk lokal, QA, atau staging demo
+- master wilayah Indonesia ikut jalur master-data (`DatabaseSeeder` dan `paspapan:seed-real`) dan import-nya idempotent; operator/automation tidak boleh refresh/truncate lewat seeder production. Penggantian dataset penuh tetap mungkin, tetapi harus lewat runbook migration/restore terpisah dengan backup, staging rehearsal, dan approval.
+- gunakan `php artisan paspapan:seed-real` untuk master data aman: settings default tanpa menimpa value yang sudah diedit, wilayah Indonesia, libur nasional, job level/title, pendidikan, divisi, shift, payroll component, KPI, template dokumen karyawan, company awal bila belum ada, dan COA per company
+- `paspapan:seed-real` tidak membuat data demo, produk demo, barcode lokasi demo, atau akun admin kecuali `BOOTSTRAP_ADMIN_SEEDING_ENABLED=true` diset secara sadar untuk bootstrap terkontrol
+- gunakan `php artisan paspapan:seed-fake` hanya untuk lokal, QA, atau staging demo; command ini menjalankan master data real lebih dulu, lalu menambahkan akun/data/sample workflow demo
 
 ### Storage dan Attachment Privat
 

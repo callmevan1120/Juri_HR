@@ -50,7 +50,7 @@ final class DefaultApplicationSettings
                 'value' => 'https://t.me/RiprLutuk',
                 'group' => 'identity',
                 'type' => 'text',
-                'description' => 'Support Telegram',
+                'description' => 'Contact Support',
             ],
             [
                 'key' => 'feature.require_photo',
