@@ -4,238 +4,109 @@
 
 # PasPapan
 
-Satu platform kerja untuk HR, absensi, payroll preparation, operasional, CRM, accounting foundation, kolaborasi tim, approval, reporting, dan mobile workforce.
+Sistem HRIS Indonesia self-hosted untuk absensi GPS/foto/QR, cuti-lembur-WFH, payroll dan slip gaji PDF, reimbursement, kasbon, approval, multi-cabang, laporan Excel/PDF, dan operasional lapangan.
 
-[![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
-[![Livewire 4](https://img.shields.io/badge/Livewire-4-4E56A6?style=flat-square&logo=livewire&logoColor=white)](https://livewire.laravel.com)
-[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
-[![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
+[![Release](https://img.shields.io/badge/Release-v5.0.0-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0)
+[![Self Hosted](https://img.shields.io/badge/Self--Hosted-VPS%20Ready-2563eb?style=flat-square)](./guides/deployment.md)
+[![Android APK](https://img.shields.io/badge/Android-APK-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk)
+[![License](https://img.shields.io/badge/Open%20Source-Community-111827?style=flat-square)](#open-source--enterprise)
 
 </div>
 
-> Dokumentasi utama PasPapan memakai Bahasa Indonesia supaya gampang dipakai tim lokal, vendor implementasi, HR, finance, dan engineer.
+PasPapan dibuat untuk perusahaan yang ingin merapikan kerja harian HR, finance, manager, dan tim operasional dalam satu sistem yang bisa dikontrol sendiri. Cocok untuk tim yang selama ini masih memakai spreadsheet, chat manual, form terpisah, dan file penggajian yang tercecer.
 
-## Jalur Branch
+Dengan PasPapan, karyawan bisa absen, mengajukan cuti/lembur/WFH, reimbursement, kasbon, dan melihat dokumen atau slip gaji. HR dan manager bisa memantau approval, data karyawan, checklist, risiko absensi, laporan, serta aktivitas tim tanpa pindah-pindah aplikasi.
 
-| Branch | Untuk | Rekomendasi |
-| --- | --- | --- |
-| `main-vps` | VPS production penuh, PostgreSQL, queue worker, scheduler, private storage, Reverb, import/export panjang, Android/iOS wrapper | Gunakan ini untuk instalasi baru dan fitur lengkap |
-| `main` | Track legacy/shared-hosting ringan dengan fitur lebih terbatas | Tetap tersedia untuk instalasi lama, tetapi upgrade ke `main-vps` disarankan |
+## Yang Bisa Dikerjakan
 
-Untuk free/community build yang paling aman, gunakan `main-vps` di VPS kecil atau local server dengan `BROADCAST_CONNECTION=log` dulu. Fitur enterprise tetap terkunci tanpa license, tetapi fitur open-source harus bisa install dan boot tanpa `ENTERPRISE_OBFUSCATOR_KEY`.
-
-## Kenapa Pilih `main-vps`?
-
-Kalau kebutuhanmu bukan cuma absensi sederhana, `main-vps` adalah versi yang paling masuk akal untuk dipakai serius. Branch ini dibuat untuk perusahaan Indonesia yang ingin punya sistem HRIS, absensi online, payroll preparation, reimbursement, kasbon, approval, operasional, CRM ringan, accounting foundation, dan laporan dalam satu aplikasi Laravel yang bisa dikontrol sendiri di VPS.
-
-Kelebihan utama `main-vps`:
-
-- **Lebih lengkap untuk operasional harian**: tidak hanya clock in/out, tapi juga cuti, izin, lembur, WFH, reimbursement, kasbon, dokumen karyawan, HR checklist, asset, KPI, project, task, client, quotation, invoice, dan laporan.
-- **Lebih siap untuk multi cabang/multi perusahaan**: data company, branch, user, dokumen, attendance, finance, report, dan dashboard dijaga dengan company scope supaya tidak bocor antar perusahaan.
-- **Lebih cocok untuk perusahaan lapangan**: absensi bisa memakai GPS, foto, barcode, Dynamic QR, Face ID, offline submission, dan risk scoring untuk bantu deteksi lokasi mencurigakan.
-- **Lebih siap untuk HR dan finance Indonesia**: ada payroll period bulanan/mingguan/harian, metadata BPJS/PPh21/Coretax, THR/prorata foundation, payment instruction, payslip PDF, reimbursement, kasbon, dan aging/cashflow/journal foundation.
-- **Lebih kuat untuk produksi**: default VPS memakai PostgreSQL, queue worker, scheduler, private storage, backup, Reverb/WebSocket optional, import/export background, audit log, RBAC, policy/gate, dan security checklist.
-- **Lebih enak untuk vendor/implementor**: dokumentasi deploy, operations, database portability, security, release evidence, Android/iOS wrapper, dan command seed real/fake sudah dipisah.
-- **Tetap bisa dipakai free/community**: fitur open-source bisa install dan boot tanpa enterprise key; fitur enterprise tetap terkunci rapi untuk deployment berlisensi.
-
-Kata kunci yang cocok untuk menemukan PasPapan: aplikasi absensi karyawan, HRIS Indonesia, aplikasi payroll Laravel, sistem reimbursement karyawan, aplikasi kasbon karyawan, aplikasi cuti lembur WFH, absensi GPS dan foto, absensi QR code, aplikasi HR multi cabang, aplikasi operasional lapangan, aplikasi approval karyawan, aplikasi slip gaji PDF, aplikasi manajemen aset kantor, aplikasi CRM sederhana, aplikasi invoice dan quotation, aplikasi laporan Excel PDF, dan aplikasi workforce management Indonesia.
-
-## Kenapa PasPapan?
-
-PasPapan dibuat untuk perusahaan yang ingin aktivitas harian karyawan, HR, finance, dan operasional tidak tercecer di spreadsheet, chat, dan file manual.
-
-Yang dikejar bukan sekadar "aplikasi absensi", tapi sistem kerja yang bisa dipakai setiap hari:
-
-- HR bisa mengurus karyawan, kontrak, checklist onboarding/offboarding, dokumen, cuti, lembur, dan approval.
-- Karyawan bisa clock in/out dari web/APK, mengajukan cuti, reimbursement, kasbon, WFH, koreksi absensi, dan melihat slip/dokumen.
-- Manager bisa memantau approval, risiko absensi, pekerjaan tim, checklist, dan tugas operasional.
-- Finance bisa menyiapkan payroll, payment instruction, reimbursement/kasbon, invoice, aging, dan laporan dasar.
-- Operasional bisa mengelola client, project, tugas, checklist, bukti kunjungan, stock, quotation, invoice, dan follow-up sales.
-
-## Cakupan Fitur
-
-| Area | Yang Tersedia |
+| Area | Fitur Utama |
 | --- | --- |
-| HR & Employee | data karyawan, divisi/jabatan/level, direct manager, employee lifecycle, dokumen, HR checklist, clearance summary |
-| Absensi Pintar | GPS, foto, Face ID, static barcode, Dynamic QR, offline/cached location, risk scoring, koreksi absensi |
-| Approval | cuti, lembur, reimbursement, kasbon, attendance correction, shift swap, HR task, approval matrix foundation |
-| Payroll | payroll period bulanan/mingguan/harian, komponen payroll, BPJS/PPh21/Coretax metadata, THR/prorata foundation, payment instruction, payslip PDF |
-| Finance | reimbursement, expense, kasbon/simpan pinjam foundation, AR/AP aging, cashflow, journal, ledger, closing period, tax filing workflow |
-| Operasional & CRM | branch, client, project, task, checklist, bukti kunjungan/foto, product, stock, quotation, invoice, vendor bill, sales tracking |
-| Collaboration | thread personal/grup/proyek, private cloud file, secure download policy, meeting link, optional realtime via Reverb |
-| Reporting | dashboard admin, KPI/analytics, Excel/PDF export, import/export background, operational health |
-| Mobile | PWA, Android Capacitor APK, iOS Capacitor project dengan simulator preflight |
-| Security | RBAC, policy/gate, private attachment, audit trail, multi-company isolation, enterprise feature lock |
+| HR & Karyawan | data karyawan, divisi/jabatan/level, direct manager, kontrak, probation, dokumen, HR checklist, onboarding/offboarding |
+| Absensi Pintar | GPS, foto, barcode, Dynamic QR, Face ID, offline submission, risk scoring, koreksi presensi |
+| Approval Harian | cuti, izin, lembur, WFH, reimbursement, kasbon, tukar shift, koreksi absensi, task HR |
+| Payroll & Finance | periode payroll bulanan/mingguan/harian, komponen gaji, BPJS/PPh21/Coretax metadata, THR/prorata foundation, payment instruction, slip gaji PDF |
+| Reimburse & Kasbon | pengajuan, approval, lampiran privat, status pembayaran, aging, dan laporan |
+| Operasional | client, project, task, checklist, bukti kunjungan, foto lokasi, asset, QR asset, product, stock |
+| Commercial & Accounting | quotation, invoice, vendor bill, journal, ledger, cashflow, AR/AP aging, closing period foundation |
+| Laporan | dashboard admin, export Excel/PDF, import/export background, KPI, operational health |
+| Mobile | PWA, Android APK, dan project iOS untuk build/smoke lanjutan |
 
 Detail lengkap ada di [guides/features.md](./guides/features.md).
 
-## Untuk Siapa?
+## Kenapa Dipakai
 
-- UMKM yang butuh absensi + HR + payroll preparation dalam satu sistem.
-- Perusahaan lapangan yang butuh bukti lokasi, foto, QR, dan risk scoring.
-- Konsultan/vendor yang mengelola banyak perusahaan/cabang.
-- Tim operasional yang ingin client, project, task, checklist, invoice, dan laporan berada dalam sistem yang sama.
-- Engineer Laravel yang butuh baseline aplikasi produksi dengan test, RBAC, queue, scheduler, dan deployment docs.
+- **Satu sistem untuk kerja harian**: absensi, pengajuan, approval, persiapan payroll, dokumen, dan laporan berada di tempat yang sama.
+- **Cocok untuk perusahaan Indonesia**: alur cuti, lembur, kasbon, reimbursement, slip gaji, BPJS/PPh21/Coretax metadata, dan kebutuhan multi-cabang disiapkan dari awal.
+- **Siap untuk tim lapangan**: mendukung bukti lokasi, foto, QR, Face ID, dan penilaian risiko lokasi mencurigakan.
+- **Data lebih aman**: attachment privat, RBAC, audit trail, policy/gate, dan isolasi multi-company membantu mencegah akses silang.
+- **Bisa dikontrol sendiri**: cocok untuk VPS perusahaan, vendor implementasi, konsultan HR, atau tim IT internal yang ingin self-hosted.
+- **Tetap ramah komunitas**: fitur open-source bisa install dan boot tanpa enterprise key.
 
-## Stack Resmi
+## Cocok Untuk
 
-- PHP `8.3+`; PHP `8.4` direkomendasikan
-- Laravel `13`
-- Livewire `4`
-- Tailwind CSS `4` dengan CSS-first config di `resources/css/app.css`
-- Vite `7`
-- Node.js `20+`
-- Bun `1.3.6+`
-- PostgreSQL `15+` sebagai default local/VPS
-- Queue/cache/session database-backed
-- Capacitor `8` untuk Android dan iOS wrapper
+- UMKM yang butuh aplikasi absensi karyawan dan pengajuan harian.
+- Perusahaan multi-cabang yang perlu kontrol HR, approval, dan laporan.
+- Tim lapangan yang butuh absensi GPS, foto, QR, dan bukti kunjungan.
+- Finance yang ingin menyiapkan payroll, slip gaji PDF, reimbursement, kasbon, dan laporan dengan lebih rapi.
+- Vendor atau konsultan yang ingin baseline HRIS Laravel yang bisa dikembangkan lebih jauh.
 
-Panduan stack ada di [guides/modern-stack.md](./guides/modern-stack.md).
+## Deployment
 
-## Target Deployment
+`main-vps` adalah jalur utama dan default untuk fitur lengkap. Target terbaiknya adalah VPS dengan database production, queue worker, scheduler, private storage, backup, dan optional realtime.
 
-| Target | Status | Keterangan |
-| --- | --- | --- |
-| VPS | Production penuh | Target utama: PostgreSQL, queue worker, scheduler, storage privat, backup, Reverb, import/export panjang |
-| Vercel | Demo/staging ringan | Serverless, queue sync, storage `/tmp` sementara, tanpa worker/scheduler long-running |
-| Shared hosting | Legacy/best-effort | Bisa untuk instalasi kecil tertentu, tetapi bukan baseline fitur penuh |
+| Target | Rekomendasi |
+| --- | --- |
+| VPS | Jalur utama untuk production penuh |
+| Shared hosting | Legacy/best-effort untuk instalasi ringan |
+| Serverless/Vercel | Demo atau staging ringan, bukan production penuh |
 
-Panduan lengkap ada di [guides/deployment.md](./guides/deployment.md). Operasi harian ada di [guides/operations.md](./guides/operations.md).
+Panduan lengkap ada di [guides/deployment.md](./guides/deployment.md) dan [guides/operations.md](./guides/operations.md).
 
-## Quick Start
+## Mulai Cepat
 
 ```bash
 git clone https://github.com/RiprLutuk/PasPapan.git
 cd PasPapan
-git checkout main-vps
-
-php -v
-node -v
-bun --version
-composer check-platform-reqs
 
 composer install
 bun install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate --seed
+php artisan migrate
+php artisan paspapan:seed-real
 php artisan storage:link
 ```
 
-Jalankan aplikasi:
+Jalankan lokal:
 
 ```bash
 php artisan serve
 bun run dev
 ```
 
-Worker lokal jika ingin menguji background job:
+Untuk data demo/staging:
 
 ```bash
-php artisan queue:work database --queue=maintenance,default --tries=3 --timeout=1800
-```
-
-## Environment Minimal
-
-```dotenv
-APP_NAME=PasPapan
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://127.0.0.1:8000
-
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=absensi
-DB_USERNAME=your_user
-DB_PASSWORD=your_password
-DB_SCHEMA=public
-DB_SSLMODE=prefer
-
-QUEUE_CONNECTION=database
-SESSION_DRIVER=database
-CACHE_STORE=database
-BROADCAST_CONNECTION=log
-FILESYSTEM_ATTACHMENT_DISKS=local
-```
-
-## Seeder
-
-Seeder dipisah agar aman untuk production dan tidak mencampur data contoh.
-
-```bash
-php artisan paspapan:seed-real
 php artisan paspapan:seed-fake
 ```
 
-- `paspapan:seed-real` untuk master data nyata: settings default, wilayah Indonesia, libur nasional, job level/title, pendidikan, divisi, shift, payroll component, KPI, template dokumen karyawan, company awal bila belum ada, dan COA per company.
-- `paspapan:seed-real` tidak membuat data demo, produk demo, barcode lokasi demo, atau akun admin kecuali `BOOTSTRAP_ADMIN_SEEDING_ENABLED=true` diset secara sadar untuk bootstrap terkontrol.
-- `paspapan:seed-fake` untuk lokal, QA, atau staging demo. Command ini selalu menjalankan master data real lebih dulu, lalu menambahkan akun/data/sample workflow demo.
-- Jangan melakukan refresh/truncate database production kecuali operator sengaja menjalankan runbook restore/migration dengan backup.
+Catatan: `paspapan:seed-real` untuk master data production-ready. `paspapan:seed-fake` untuk demo/QA dan tidak disarankan untuk production.
 
-## Realtime
+## Rilis
 
-Local/default bisa memakai log/polling:
+Rilis mayor terbaru: [`v5.0.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0)
 
-```dotenv
-BROADCAST_CONNECTION=log
-ANNOUNCEMENT_REFRESH_MODE=auto
-COLLABORATION_REALTIME_ENABLED=false
-```
+- APK: [`PasPapan-v5.0.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk)
+- Checksum: [`PasPapan-v5.0.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk.sha256)
+- Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
-VPS production bisa memakai Reverb:
-
-```bash
-php -r 'echo "REVERB_APP_ID=paspapan-".bin2hex(random_bytes(6)).PHP_EOL; echo "REVERB_APP_KEY=".bin2hex(random_bytes(16)).PHP_EOL; echo "REVERB_APP_SECRET=".bin2hex(random_bytes(32)).PHP_EOL;'
-php artisan reverb:start
-php artisan queue:work database --queue=maintenance,default --tries=3 --timeout=1800
-```
-
-Detail ada di [guides/operations.md](./guides/operations.md).
-
-## Quality Gate
-
-Command yang paling sering dipakai sebelum merge/rilis:
-
-```bash
-php artisan test
-composer check:ui
-composer check:modern-stack
-composer check:database-portability
-composer check:enterprise-boundary
-./vendor/bin/pint --test
-composer phpstan
-composer audit
-bun audit
-bun run build
-php artisan rbac:audit
-```
-
-Smoke tambahan:
-
-```bash
-bun run e2e:smoke
-bun run apk:smoke
-bun run apk:e2e:attendance
-bun run ios:preflight
-```
-
-Checklist rilis ada di [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
-
-## Mobile
-
-- Android APK memakai Capacitor.
-- iOS project sudah tersedia untuk simulator preflight.
-- Icon dan splash diambil dari `resources/icon.png` dan `resources/splash.png`.
-- iOS belum diklaim App Store/TestFlight-ready sampai signing, provisioning, TestFlight upload, dan smoke test iPhone fisik selesai.
-
-Panduan iOS ada di [guides/ios-release.md](./guides/ios-release.md).
+Branch default dan fitur paling lengkap: [`main-vps`](https://github.com/RiprLutuk/PasPapan/tree/main-vps)
 
 ## Dokumentasi
 
 Mulai dari [guides/README.md](./guides/README.md) untuk mencari dokumen yang tepat.
 
-Jalur cepat:
+Dokumen penting:
 
 - [Fitur produk](./guides/features.md)
 - [Deployment](./guides/deployment.md)
@@ -246,36 +117,11 @@ Jalur cepat:
 - [Feature maturity](./guides/feature-maturity.md)
 - [Reviewer evidence](./guides/reviewer-evidence.md)
 
-## Rilis
-
-Rilis mayor terbaru untuk branch fitur lengkap: [`v5.0.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0)
-
-Branch fitur terbaru dan paling lengkap: [`main-vps`](https://github.com/RiprLutuk/PasPapan/tree/main-vps)
-
-- APK: [`PasPapan-v5.0.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk)
-- Checksum: [`PasPapan-v5.0.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk.sha256)
-- Android `versionName`: `5.0.0`
-- Android `versionCode`: `50`
-- iOS `MARKETING_VERSION`: `5.0.0`
-- iOS `CURRENT_PROJECT_VERSION`: `50`
-- Changelog: [CHANGELOG.md](./CHANGELOG.md)
-
-Rilis APK publik lama [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0) tetap tersedia sebagai arsip stable sebelumnya.
-
-## Demo
-
-Demo publik, jika aktif:
-
-- [paspapan.vercel.app](https://paspapan.vercel.app)
-- [paspapan.pandanteknik.com](https://paspapan.pandanteknik.com)
-
-Kredensial demo tidak dipublikasikan di README. Operator dapat membuat akun demo khusus di local/staging. Jangan memakai akun demo atau password contoh untuk production.
-
-## Enterprise
+## Open Source & Enterprise
 
 Repository open source harus bisa `composer install` dan boot tanpa `ENTERPRISE_OBFUSCATOR_KEY`.
 
-Fitur enterprise yang dibuild sebagai artifact obfuscated salted dapat membutuhkan `ENTERPRISE_OBFUSCATOR_KEY` di runtime customer. `ENTERPRISE_LICENSE_KEY` hanya untuk validasi lisensi fitur, bukan secret obfuscator.
+Fitur enterprise tertentu dapat dikunci dengan license dan artifact obfuscated salted. `ENTERPRISE_LICENSE_KEY` dipakai untuk validasi fitur, sedangkan `ENTERPRISE_OBFUSCATOR_KEY` hanya untuk runtime artifact enterprise yang memang dibuild dengan proteksi tersebut.
 
 Panduan packaging ada di [guides/enterprise-packaging.md](./guides/enterprise-packaging.md).
 
