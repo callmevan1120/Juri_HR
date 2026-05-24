@@ -5,6 +5,7 @@ Tanggal review: 24 Mei 2026
 Branch sumber: `chore/major-upgrade-audit`
 Target release branch: `main-vps`
 Baseline sebelum pass ini: `a2a3559`
+Release-prep commit awal: `3a6bd56`
 
 ## Ringkasan
 
@@ -48,6 +49,7 @@ Pass ini menyiapkan PasPapan sebagai track produksi VPS penuh. `main-vps` menjad
 | `./vendor/bin/pint --test --dirty` | PASS |
 | `php secure_tools/build_enterprise.php` | PASS, 39 enterprise files secured with salted runtime key |
 | `git diff --check` | PASS |
+| `gh workflow run database-portability.yml --ref main-vps` | TRIGGERED: https://github.com/RiprLutuk/PasPapan/actions/runs/26355693441 |
 
 ## Security Notes
 
@@ -55,6 +57,7 @@ Pass ini menyiapkan PasPapan sebagai track produksi VPS penuh. `main-vps` menjad
 - `secure_tools/`, `enterprise_build/`, and `*.Source.php` remain untracked.
 - Multi-company isolation is covered by feature tests for user, attendance, document, HR checklist, import/export, report, and dashboard scopes.
 - Database portability is now validated by SQLite and PostgreSQL locally. MySQL smoke needs valid local MySQL credentials or CI secrets to complete.
+- GitHub workflow dispatch untuk database portability berhasil dibuat, tetapi run `26355693441` selesai `failure` tanpa step log yang bisa diambil (`BlobNotFound`). Local SQLite/PostgreSQL smoke sudah hijau; CI run ini perlu rerun/inspect dari GitHub UI.
 
 ## Demo / Free Build
 
