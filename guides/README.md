@@ -2,6 +2,15 @@
 
 Mulai dari halaman ini kalau bingung harus membaca file yang mana. README utama dibuat sebagai landing page; detail teknis dan runbook ditempatkan di folder `guides/`.
 
+## Branch Release
+
+| Branch | Catatan |
+| --- | --- |
+| `main-vps` | Jalur terbaru dan direkomendasikan untuk fitur lengkap: PostgreSQL, queue worker, scheduler, storage privat, backup, Reverb, import/export, Android/iOS wrapper, HR/finance/ops/commercial/collaboration. |
+| `main` | Jalur legacy/shared-hosting ringan. Cocok untuk instalasi lama, tetapi tidak menjadi target fitur penuh. |
+
+Untuk instalasi baru, mulai dari `main-vps`. Gunakan `main` hanya jika benar-benar membutuhkan compatibility shared-hosting lama.
+
 ## Jalur Cepat
 
 | Kebutuhan | Baca |

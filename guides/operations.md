@@ -122,7 +122,8 @@ Syarat backup queued berjalan baik:
 
 Review destructive action sebelum maintenance:
 
-- `update.sh` wajib dijalankan dengan `PASPAPAN_UPDATE_CONFIRM=main`
+- `update.sh` default mengikuti `main-vps`; jalankan dengan `PASPAPAN_UPDATE_CONFIRM=main-vps`
+- server legacy yang masih mengikuti `main` wajib eksplisit: `PASPAPAN_RELEASE_BRANCH=main PASPAPAN_UPDATE_CONFIRM=main`
 - jika ada perubahan lokal yang akan dibuang, wajib tambah `PASPAPAN_UPDATE_DISCARD_LOCAL_CHANGES=1`
 - retained backup delete harus memakai dialog konfirmasi UI
 - restore database harus mengetik `RESTORE` dan disarankan membuat backup baru terlebih dahulu
@@ -168,7 +169,7 @@ Catatan PHP 8.5: Laravel 13 sudah memakai constant `Pdo\Mysql::ATTR_SSL_CA` di k
 Urutan update manual yang aman:
 
 ```bash
-git pull origin main
+git pull origin main-vps
 composer install --no-dev --optimize-autoloader
 bun install
 bun run build
@@ -183,7 +184,8 @@ Repository juga menyertakan [`update.sh`](../update.sh).
 
 Catatan:
 
-- script melakukan `git reset --hard origin/main` setelah `PASPAPAN_UPDATE_CONFIRM=main`
+- branch `main-vps` adalah target update untuk fitur lengkap VPS
+- script melakukan `git reset --hard origin/${PASPAPAN_RELEASE_BRANCH:-main-vps}` setelah nilai `PASPAPAN_UPDATE_CONFIRM` sesuai
 - script memaksa environment deployment sama dengan branch remote
 - script memanggil `view:cache`, yang mungkin perlu dihapus jika environment terkena limit regex kompilasi Blade Livewire
 
@@ -191,7 +193,7 @@ Gunakan script hanya jika workflow hard reset memang aman untuk server Anda.
 
 ## Testing dan Quality
 
-CI menjalankan quality gate berikut pada push ke `main` dan `develop`, serta pada pull request:
+CI menjalankan quality gate berikut pada push ke `main-vps`, `main`, dan `develop`, serta pada pull request:
 
 ```bash
 php artisan test

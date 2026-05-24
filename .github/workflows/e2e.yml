@@ -2,7 +2,7 @@ name: E2E Smoke
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "main-vps", "develop"]
   pull_request:
 
 jobs:

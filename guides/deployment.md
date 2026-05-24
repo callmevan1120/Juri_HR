@@ -2,6 +2,8 @@
 
 Target produksi resmi PasPapan adalah VPS. Shared hosting tidak lagi menjadi target utama karena fitur penuh membutuhkan worker, scheduler, storage privat stabil, backup, dan WebSocket.
 
+Branch deployment yang direkomendasikan untuk instalasi baru adalah `main-vps`. Branch `main` tetap dipertahankan sebagai jalur legacy/shared-hosting ringan, tetapi fitur penuh dan hardening terbaru diarahkan ke `main-vps`.
+
 ## Kebutuhan Sistem
 
 Minimum produksi:
@@ -65,7 +67,7 @@ composer check-platform-reqs
 ### 2. Ambil source dan install dependency
 
 ```bash
-git clone https://github.com/RiprLutuk/PasPapan.git .
+git clone --branch main-vps https://github.com/RiprLutuk/PasPapan.git .
 composer install --no-dev --optimize-autoloader
 bun install
 cp .env.example .env

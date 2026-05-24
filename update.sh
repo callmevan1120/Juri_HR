@@ -1,12 +1,13 @@
 #!/bin/bash
 # ============================================================
 # PasPapan - Auto Update Script
-# Usage: PASPAPAN_UPDATE_CONFIRM=main bash update.sh
+# Usage: PASPAPAN_UPDATE_CONFIRM=main-vps bash update.sh
+# Legacy shared-hosting track: PASPAPAN_RELEASE_BRANCH=main PASPAPAN_UPDATE_CONFIRM=main bash update.sh
 # ============================================================
 
 set -e
 
-TARGET_BRANCH="${PASPAPAN_RELEASE_BRANCH:-main}"
+TARGET_BRANCH="${PASPAPAN_RELEASE_BRANCH:-main-vps}"
 MAINTENANCE_ENABLED=0
 
 cleanup() {
@@ -23,11 +24,15 @@ echo "🔄 PasPapan Auto Updater"
 echo "========================"
 echo ""
 
-if [ "$TARGET_BRANCH" != "main" ]; then
-    echo "❌ Refusing to update from '$TARGET_BRANCH'. Production releases must use main."
-    echo "   Set PASPAPAN_RELEASE_BRANCH=main and rerun."
-    exit 1
-fi
+case "$TARGET_BRANCH" in
+    main-vps|main)
+        ;;
+    *)
+        echo "❌ Refusing to update from '$TARGET_BRANCH'."
+        echo "   Supported release branches: main-vps, main."
+        exit 1
+        ;;
+esac
 
 # 1. Fetch and summarize before the destructive reset
 echo "📥 Fetching latest code..."

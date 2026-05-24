@@ -6,6 +6,9 @@ Semua perubahan penting PasPapan dicatat di file ini.
 
 ### Dokumentasi & Runtime
 
+- Menetapkan `main-vps` sebagai jalur fitur lengkap untuk instalasi VPS/PostgreSQL, sementara `main` tetap menjadi jalur legacy/shared-hosting ringan.
+- Memperbaiki referensi script release/smoke yang sebelumnya masih mengarah ke file lokal ignored agar fresh clone dan CI tidak kehilangan command.
+- Memperluas database portability smoke untuk approval workflow dan attendance media/API selain WFH dan payroll.
 - Merapikan README menjadi landing page produk + teknis yang lebih mudah dicari, menambahkan pusat dokumentasi di `guides/README.md`, dan menghapus snapshot TODO/review branch yang sudah tidak relevan sebagai sumber utama.
 - Menyelaraskan dokumentasi stack resmi ke Laravel 13, Livewire 4, PHP 8.3+ minimum, dan PHP 8.4 rekomendasi.
 - Menaikkan Tailwind CSS ke versi 4 lewat plugin resmi `@tailwindcss/vite`.

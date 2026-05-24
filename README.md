@@ -15,6 +15,15 @@ Satu platform kerja untuk HR, absensi, payroll preparation, operasional, CRM, ac
 
 > Dokumentasi utama PasPapan memakai Bahasa Indonesia supaya gampang dipakai tim lokal, vendor implementasi, HR, finance, dan engineer.
 
+## Jalur Branch
+
+| Branch | Untuk | Rekomendasi |
+| --- | --- | --- |
+| `main-vps` | VPS production penuh, PostgreSQL, queue worker, scheduler, private storage, Reverb, import/export panjang, Android/iOS wrapper | Gunakan ini untuk instalasi baru dan fitur lengkap |
+| `main` | Track legacy/shared-hosting ringan dengan fitur lebih terbatas | Tetap tersedia untuk instalasi lama, tetapi upgrade ke `main-vps` disarankan |
+
+Untuk free/community build yang paling aman, gunakan `main-vps` di VPS kecil atau local server dengan `BROADCAST_CONNECTION=log` dulu. Fitur enterprise tetap terkunci tanpa license, tetapi fitur open-source harus bisa install dan boot tanpa `ENTERPRISE_OBFUSCATOR_KEY`.
+
 ## Kenapa PasPapan?
 
 PasPapan dibuat untuk perusahaan yang ingin aktivitas harian karyawan, HR, finance, dan operasional tidak tercecer di spreadsheet, chat, dan file manual.
@@ -82,6 +91,7 @@ Panduan lengkap ada di [guides/deployment.md](./guides/deployment.md). Operasi h
 ```bash
 git clone https://github.com/RiprLutuk/PasPapan.git
 cd PasPapan
+git checkout main-vps
 
 php -v
 node -v
@@ -222,7 +232,9 @@ Jalur cepat:
 
 ## Rilis
 
-Rilis terbaru stabil: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0)
+Rilis APK publik terbaru tetap: [`v4.3.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v4.3.0)
+
+Branch fitur terbaru dan paling lengkap: [`main-vps`](https://github.com/RiprLutuk/PasPapan/tree/main-vps)
 
 - APK: [`PasPapan-v4.3.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk)
 - Checksum: [`PasPapan-v4.3.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v4.3.0/PasPapan-v4.3.0.apk.sha256)

@@ -28,6 +28,8 @@ yarn-error.log
 !update.sh
 !scripts/apk-attendance-e2e.sh
 !scripts/collect-review-evidence.sh
+!scripts/database-portability-smoke.sh
+!scripts/apk-page-screenshots.sh
 !scripts/ios-polish-splash.sh
 !scripts/ios-release-preflight.sh
 !scripts/ios-simulator-screenshot.sh
@@ -39,5 +41,3 @@ server.php
 /secure_tools/
 /enterprise_build/
 /test-results/
-/scripts/apk-page-screenshots.mjs
-/scripts/prepare-apk-screenshots-demo.php

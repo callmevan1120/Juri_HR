@@ -2,7 +2,7 @@ name: Security Scans
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "main-vps", "develop"]
   pull_request:
   schedule:
     - cron: "17 20 * * 1"

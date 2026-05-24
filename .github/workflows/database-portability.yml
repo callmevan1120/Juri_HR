@@ -2,7 +2,7 @@ name: Database Portability
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "main-vps", "develop"]
   pull_request:
   workflow_dispatch:
 
@@ -81,6 +81,8 @@ jobs:
             tests/Feature/WilayahApiHardeningTest.php \
             tests/Feature/AuthenticationTest.php \
             tests/Feature/AdminLeaveApprovalTest.php \
+            tests/Feature/ApprovalWorkflowTest.php \
+            tests/Feature/AttendanceMediaAndApiTest.php \
             tests/Feature/DynamicBarcodeTest.php \
             tests/Feature/WorkFromHomeRequestFlowTest.php \
             tests/Feature/IndonesiaPayrollCalculatorTest.php
@@ -137,6 +139,8 @@ jobs:
             tests/Feature/WilayahApiHardeningTest.php \
             tests/Feature/AuthenticationTest.php \
             tests/Feature/AdminLeaveApprovalTest.php \
+            tests/Feature/ApprovalWorkflowTest.php \
+            tests/Feature/AttendanceMediaAndApiTest.php \
             tests/Feature/DynamicBarcodeTest.php \
             tests/Feature/WorkFromHomeRequestFlowTest.php \
             tests/Feature/IndonesiaPayrollCalculatorTest.php
@@ -211,6 +215,8 @@ jobs:
             tests/Feature/WilayahApiHardeningTest.php \
             tests/Feature/AuthenticationTest.php \
             tests/Feature/AdminLeaveApprovalTest.php \
+            tests/Feature/ApprovalWorkflowTest.php \
+            tests/Feature/AttendanceMediaAndApiTest.php \
             tests/Feature/DynamicBarcodeTest.php \
             tests/Feature/WorkFromHomeRequestFlowTest.php \
             tests/Feature/IndonesiaPayrollCalculatorTest.php
