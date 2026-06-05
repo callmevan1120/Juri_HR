@@ -73,6 +73,10 @@
         } else {
             document.documentElement.classList.remove('dark');
         }
+
+        if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform() && window.Capacitor.getPlatform() === 'ios') {
+            document.documentElement.classList.add('ios-native');
+        }
     </script>
 
     @php

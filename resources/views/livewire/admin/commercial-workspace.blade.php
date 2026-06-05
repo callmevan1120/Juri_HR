@@ -482,85 +482,85 @@
                     <form wire:submit.prevent="createOpportunity" class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="opportunity-company" value="{{ __('Company') }}" />
-                            <x-forms.select id="opportunity-company" wire:model.live="opportunityCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                            <x-forms.select id="opportunity-company" wire:model.live="opportunityForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
                                 <option value="">{{ __('Choose company') }}</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}">{{ $company->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="opportunityCompanyId" />
+                            <x-forms.input-error for="opportunityForm.companyId" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <x-forms.label for="opportunity-client" value="{{ __('Client') }}" />
-                                <x-forms.select id="opportunity-client" wire:model.live="opportunityClientId" class="w-full" placeholder="{{ __('No client') }}">
+                                <x-forms.select id="opportunity-client" wire:model.live="opportunityForm.clientId" class="w-full" placeholder="{{ __('No client') }}">
                                     <option value="">{{ __('No client') }}</option>
                                     @foreach ($opportunityClientOptions as $client)
                                         <option value="{{ $client->id }}">{{ $client->name }}</option>
                                     @endforeach
                                 </x-forms.select>
-                                <x-forms.input-error for="opportunityClientId" />
+                                <x-forms.input-error for="opportunityForm.clientId" />
                             </div>
 
                             <div class="space-y-1.5">
                                 <x-forms.label for="opportunity-project" value="{{ __('Project') }}" />
-                                <x-forms.select id="opportunity-project" wire:model.live="opportunityProjectId" class="w-full" placeholder="{{ __('No project') }}">
+                                <x-forms.select id="opportunity-project" wire:model.live="opportunityForm.projectId" class="w-full" placeholder="{{ __('No project') }}">
                                     <option value="">{{ __('No project') }}</option>
                                     @foreach ($opportunityProjectOptions as $project)
                                         <option value="{{ $project->id }}">{{ $project->name }}</option>
                                     @endforeach
                                 </x-forms.select>
-                                <x-forms.input-error for="opportunityProjectId" />
+                                <x-forms.input-error for="opportunityForm.projectId" />
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="opportunity-title" value="{{ __('Opportunity title') }}" />
-                            <x-forms.input id="opportunity-title" wire:model.live="opportunityTitle" placeholder="{{ __('e.g. Annual service contract') }}" />
-                            <x-forms.input-error for="opportunityTitle" />
+                            <x-forms.input id="opportunity-title" wire:model.live="opportunityForm.title" placeholder="{{ __('e.g. Annual service contract') }}" />
+                            <x-forms.input-error for="opportunityForm.title" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <x-forms.label for="opportunity-stage" value="{{ __('Stage') }}" />
-                                <x-forms.select id="opportunity-stage" wire:model.live="opportunityStage" class="w-full" placeholder="{{ __('Stage') }}">
+                                <x-forms.select id="opportunity-stage" wire:model.live="opportunityForm.stage" class="w-full" placeholder="{{ __('Stage') }}">
                                     @foreach ($opportunityStages as $stage)
                                         <option value="{{ $stage }}">{{ __(str($stage)->headline()->toString()) }}</option>
                                     @endforeach
                                 </x-forms.select>
-                                <x-forms.input-error for="opportunityStage" />
+                                <x-forms.input-error for="opportunityForm.stage" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="opportunity-value" value="{{ __('Expected value') }}" />
-                                <x-forms.input id="opportunity-value" type="number" min="0" step="0.01" wire:model.live="opportunityExpectedValue" placeholder="0" />
-                                <x-forms.input-error for="opportunityExpectedValue" />
+                                <x-forms.input id="opportunity-value" type="number" min="0" step="0.01" wire:model.live="opportunityForm.expectedValue" placeholder="0" />
+                                <x-forms.input-error for="opportunityForm.expectedValue" />
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <x-forms.label for="opportunity-close-date" value="{{ __('Expected close date') }}" />
-                                <x-forms.input id="opportunity-close-date" type="date" wire:model.live="opportunityExpectedCloseAt" />
-                                <x-forms.input-error for="opportunityExpectedCloseAt" />
+                                <x-forms.input id="opportunity-close-date" type="date" wire:model.live="opportunityForm.expectedCloseAt" />
+                                <x-forms.input-error for="opportunityForm.expectedCloseAt" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="opportunity-follow-up-date" value="{{ __('Next follow-up') }}" />
-                                <x-forms.input id="opportunity-follow-up-date" type="date" wire:model.live="opportunityNextFollowUpAt" />
-                                <x-forms.input-error for="opportunityNextFollowUpAt" />
+                                <x-forms.input id="opportunity-follow-up-date" type="date" wire:model.live="opportunityForm.nextFollowUpAt" />
+                                <x-forms.input-error for="opportunityForm.nextFollowUpAt" />
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="opportunity-source" value="{{ __('Source') }}" />
-                            <x-forms.input id="opportunity-source" wire:model.live="opportunitySource" placeholder="{{ __('Referral, ads, event, or outbound') }}" />
-                            <x-forms.input-error for="opportunitySource" />
+                            <x-forms.input id="opportunity-source" wire:model.live="opportunityForm.source" placeholder="{{ __('Referral, ads, event, or outbound') }}" />
+                            <x-forms.input-error for="opportunityForm.source" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="opportunity-notes" value="{{ __('Follow-up notes') }}" />
-                            <x-forms.textarea id="opportunity-notes" wire:model.live="opportunityNotes" rows="3" placeholder="{{ __('Next action, buyer concern, or proposal note.') }}" />
-                            <x-forms.input-error for="opportunityNotes" />
+                            <x-forms.textarea id="opportunity-notes" wire:model.live="opportunityForm.notes" rows="3" placeholder="{{ __('Next action, buyer concern, or proposal note.') }}" />
+                            <x-forms.input-error for="opportunityForm.notes" />
                         </div>
                         <x-actions.button type="submit" class="w-full">{{ __('Create Opportunity') }}</x-actions.button>
                     </form>
@@ -575,49 +575,49 @@
                     <form wire:submit.prevent="createProduct" class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="product-company" value="{{ __('Company') }}" />
-                            <x-forms.select id="product-company" wire:model.live="productCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                            <x-forms.select id="product-company" wire:model.live="productForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
                                 <option value="">{{ __('Choose company') }}</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}">{{ $company->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="productCompanyId" />
+                            <x-forms.input-error for="productForm.companyId" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="product-name" value="{{ __('Product name') }}" />
-                            <x-forms.input id="product-name" wire:model.live="productName" placeholder="{{ __('e.g. Monthly Support Package') }}" />
-                            <x-forms.input-error for="productName" />
+                            <x-forms.input id="product-name" wire:model.live="productForm.name" placeholder="{{ __('e.g. Monthly Support Package') }}" />
+                            <x-forms.input-error for="productForm.name" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-sku" value="{{ __('SKU') }}" />
-                                <x-forms.input id="product-sku" wire:model.live="productSku" placeholder="{{ __('Optional') }}" />
-                                <x-forms.input-error for="productSku" />
+                                <x-forms.input id="product-sku" wire:model.live="productForm.sku" placeholder="{{ __('Optional') }}" />
+                                <x-forms.input-error for="productForm.sku" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-unit" value="{{ __('Unit') }}" />
-                                <x-forms.input id="product-unit" wire:model.live="productUnit" placeholder="{{ __('pcs, unit, hour') }}" />
-                                <x-forms.input-error for="productUnit" />
+                                <x-forms.input id="product-unit" wire:model.live="productForm.unit" placeholder="{{ __('pcs, unit, hour') }}" />
+                                <x-forms.input-error for="productForm.unit" />
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-selling-price" value="{{ __('Selling price') }}" />
-                                <x-forms.input id="product-selling-price" type="number" min="0" step="0.01" wire:model.live="productSellingPrice" placeholder="0" />
-                                <x-forms.input-error for="productSellingPrice" />
+                                <x-forms.input id="product-selling-price" type="number" min="0" step="0.01" wire:model.live="productForm.sellingPrice" placeholder="0" />
+                                <x-forms.input-error for="productForm.sellingPrice" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-cost-price" value="{{ __('Cost price') }}" />
-                                <x-forms.input id="product-cost-price" type="number" min="0" step="0.01" wire:model.live="productCostPrice" placeholder="0" />
-                                <x-forms.input-error for="productCostPrice" />
+                                <x-forms.input id="product-cost-price" type="number" min="0" step="0.01" wire:model.live="productForm.costPrice" placeholder="0" />
+                                <x-forms.input-error for="productForm.costPrice" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-reorder-point" value="{{ __('Min stock') }}" />
-                                <x-forms.input id="product-reorder-point" type="number" min="0" step="0.001" wire:model.live="productReorderPoint" placeholder="0" />
-                                <x-forms.input-error for="productReorderPoint" />
+                                <x-forms.input id="product-reorder-point" type="number" min="0" step="0.001" wire:model.live="productForm.reorderPoint" placeholder="0" />
+                                <x-forms.input-error for="productForm.reorderPoint" />
                             </div>
                         </div>
                         <x-actions.button type="submit" class="w-full">
@@ -636,42 +636,42 @@
                     <form wire:submit.prevent="recordStockMovement" class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="stock-product" value="{{ __('Product') }}" />
-                            <x-forms.select id="stock-product" wire:model.live="stockProductId" class="w-full" placeholder="{{ __('Choose product') }}">
+                            <x-forms.select id="stock-product" wire:model.live="stockMovementForm.productId" class="w-full" placeholder="{{ __('Choose product') }}">
                                 <option value="">{{ __('Choose product') }}</option>
                                 @foreach ($products as $product)
                                     <option value="{{ $product->id }}">{{ $product->name }} · {{ $product->company?->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="stockProductId" />
+                            <x-forms.input-error for="stockMovementForm.productId" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <x-forms.label for="stock-type" value="{{ __('Stock type') }}" />
-                                <x-forms.select id="stock-type" wire:model.live="stockType" class="w-full" placeholder="{{ __('Stock type') }}">
+                                <x-forms.select id="stock-type" wire:model.live="stockMovementForm.type" class="w-full" placeholder="{{ __('Stock type') }}">
                                     <option value="{{ \App\Models\StockMovement::TYPE_IN }}">{{ __('Stock In') }}</option>
                                     <option value="{{ \App\Models\StockMovement::TYPE_OUT }}">{{ __('Stock Out') }}</option>
                                     <option value="{{ \App\Models\StockMovement::TYPE_ADJUSTMENT }}">{{ __('Adjustment') }}</option>
                                 </x-forms.select>
-                                <x-forms.input-error for="stockType" />
+                                <x-forms.input-error for="stockMovementForm.type" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="stock-quantity" value="{{ __('Quantity') }}" />
-                                <x-forms.input id="stock-quantity" type="number" min="0.001" step="0.001" wire:model.live="stockQuantity" placeholder="0" />
-                                <x-forms.input-error for="stockQuantity" />
+                                <x-forms.input id="stock-quantity" type="number" min="0.001" step="0.001" wire:model.live="stockMovementForm.quantity" placeholder="0" />
+                                <x-forms.input-error for="stockMovementForm.quantity" />
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="stock-unit-cost" value="{{ __('Unit cost for accounting') }}" />
-                            <x-forms.input id="stock-unit-cost" type="number" min="0" step="0.01" wire:model.live="stockUnitCost" placeholder="0" />
-                            <x-forms.input-error for="stockUnitCost" />
+                            <x-forms.input id="stock-unit-cost" type="number" min="0" step="0.01" wire:model.live="stockMovementForm.unitCost" placeholder="0" />
+                            <x-forms.input-error for="stockMovementForm.unitCost" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="stock-notes" value="{{ __('Stock notes') }}" />
-                            <x-forms.textarea id="stock-notes" wire:model.live="stockNotes" rows="3" placeholder="{{ __('Opening balance, transfer, adjustment reason, or delivery note.') }}" />
-                            <x-forms.input-error for="stockNotes" />
+                            <x-forms.textarea id="stock-notes" wire:model.live="stockMovementForm.notes" rows="3" placeholder="{{ __('Opening balance, transfer, adjustment reason, or delivery note.') }}" />
+                            <x-forms.input-error for="stockMovementForm.notes" />
                         </div>
                         <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Record Stock') }}</x-actions.button>
                     </form>
@@ -686,37 +686,37 @@
                     <form wire:submit.prevent="createVendor" class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="vendor-company" value="{{ __('Company') }}" />
-                            <x-forms.select id="vendor-company" wire:model.live="vendorCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                            <x-forms.select id="vendor-company" wire:model.live="vendorForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
                                 <option value="">{{ __('Choose company') }}</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}">{{ $company->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="vendorCompanyId" />
+                            <x-forms.input-error for="vendorForm.companyId" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="vendor-name" value="{{ __('Vendor name') }}" />
-                            <x-forms.input id="vendor-name" wire:model.live="vendorName" placeholder="{{ __('e.g. PT Supplier Utama') }}" />
-                            <x-forms.input-error for="vendorName" />
+                            <x-forms.input id="vendor-name" wire:model.live="vendorForm.name" placeholder="{{ __('e.g. PT Supplier Utama') }}" />
+                            <x-forms.input-error for="vendorForm.name" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="vendor-contact-name" value="{{ __('Contact name') }}" />
-                            <x-forms.input id="vendor-contact-name" wire:model.live="vendorContactName" placeholder="{{ __('Optional') }}" />
-                            <x-forms.input-error for="vendorContactName" />
+                            <x-forms.input id="vendor-contact-name" wire:model.live="vendorForm.contactName" placeholder="{{ __('Optional') }}" />
+                            <x-forms.input-error for="vendorForm.contactName" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <x-forms.label for="vendor-email" value="{{ __('Email') }}" />
-                                <x-forms.input id="vendor-email" type="email" wire:model.live="vendorEmail" placeholder="{{ __('Optional') }}" />
-                                <x-forms.input-error for="vendorEmail" />
+                                <x-forms.input id="vendor-email" type="email" wire:model.live="vendorForm.email" placeholder="{{ __('Optional') }}" />
+                                <x-forms.input-error for="vendorForm.email" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="vendor-phone" value="{{ __('Phone') }}" />
-                                <x-forms.input id="vendor-phone" wire:model.live="vendorPhone" placeholder="{{ __('Optional') }}" inputmode="tel" />
-                                <x-forms.input-error for="vendorPhone" />
+                                <x-forms.input id="vendor-phone" wire:model.live="vendorForm.phone" placeholder="{{ __('Optional') }}" inputmode="tel" />
+                                <x-forms.input-error for="vendorForm.phone" />
                             </div>
                         </div>
                         <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Create Vendor') }}</x-actions.button>
@@ -731,60 +731,60 @@
                     <form wire:submit.prevent="createVendorBill" class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="bill-vendor" value="{{ __('Vendor') }}" />
-                            <x-forms.select id="bill-vendor" wire:model.live="billVendorId" class="w-full" placeholder="{{ __('Choose vendor') }}">
+                            <x-forms.select id="bill-vendor" wire:model.live="vendorBillForm.vendorId" class="w-full" placeholder="{{ __('Choose vendor') }}">
                                 <option value="">{{ __('Choose vendor') }}</option>
                                 @foreach ($vendors as $vendor)
                                     <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="billVendorId" />
+                            <x-forms.input-error for="vendorBillForm.vendorId" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="bill-product" value="{{ __('Product / expense line') }}" />
-                            <x-forms.select id="bill-product" wire:model.live="billProductId" class="w-full" placeholder="{{ __('Expense line / no product') }}">
+                            <x-forms.select id="bill-product" wire:model.live="vendorBillForm.productId" class="w-full" placeholder="{{ __('Expense line / no product') }}">
                                 <option value="">{{ __('Expense line / no product') }}</option>
                                 @foreach ($billProductOptions as $product)
                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="billProductId" />
+                            <x-forms.input-error for="vendorBillForm.productId" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="bill-description" value="{{ __('Bill line description') }}" />
-                            <x-forms.input id="bill-description" wire:model.live="billDescription" placeholder="{{ __('e.g. Opening stock purchase') }}" />
-                            <x-forms.input-error for="billDescription" />
+                            <x-forms.input id="bill-description" wire:model.live="vendorBillForm.description" placeholder="{{ __('e.g. Opening stock purchase') }}" />
+                            <x-forms.input-error for="vendorBillForm.description" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div class="space-y-1.5">
                                 <x-forms.label for="bill-quantity" value="{{ __('Quantity') }}" />
-                                <x-forms.input id="bill-quantity" type="number" min="0.001" step="0.001" wire:model.live="billQuantity" placeholder="0" />
-                                <x-forms.input-error for="billQuantity" />
+                                <x-forms.input id="bill-quantity" type="number" min="0.001" step="0.001" wire:model.live="vendorBillForm.quantity" placeholder="0" />
+                                <x-forms.input-error for="vendorBillForm.quantity" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="bill-unit-cost" value="{{ __('Unit cost') }}" />
-                                <x-forms.input id="bill-unit-cost" type="number" min="0" step="0.01" wire:model.live="billUnitCost" placeholder="0" />
-                                <x-forms.input-error for="billUnitCost" />
+                                <x-forms.input id="bill-unit-cost" type="number" min="0" step="0.01" wire:model.live="vendorBillForm.unitCost" placeholder="0" />
+                                <x-forms.input-error for="vendorBillForm.unitCost" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="bill-tax-rate" value="{{ __('Tax rate') }}" />
-                                <x-forms.input id="bill-tax-rate" type="number" min="0" max="100" step="0.01" wire:model.live="billTaxRate" placeholder="11" />
-                                <x-forms.input-error for="billTaxRate" />
+                                <x-forms.input id="bill-tax-rate" type="number" min="0" max="100" step="0.01" wire:model.live="vendorBillForm.taxRate" placeholder="11" />
+                                <x-forms.input-error for="vendorBillForm.taxRate" />
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="bill-due-date" value="{{ __('Due date') }}" />
-                            <x-forms.input id="bill-due-date" type="date" wire:model.live="billDueAt" />
-                            <x-forms.input-error for="billDueAt" />
+                            <x-forms.input id="bill-due-date" type="date" wire:model.live="vendorBillForm.dueAt" />
+                            <x-forms.input-error for="vendorBillForm.dueAt" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="bill-notes" value="{{ __('Bill notes') }}" />
-                            <x-forms.textarea id="bill-notes" wire:model.live="billNotes" rows="3" placeholder="{{ __('Payment term, PO number, or receiving notes.') }}" />
-                            <x-forms.input-error for="billNotes" />
+                            <x-forms.textarea id="bill-notes" wire:model.live="vendorBillForm.notes" rows="3" placeholder="{{ __('Payment term, PO number, or receiving notes.') }}" />
+                            <x-forms.input-error for="vendorBillForm.notes" />
                         </div>
                         <x-actions.button type="submit" variant="soft-success" class="w-full">{{ __('Post Bill to AP') }}</x-actions.button>
                     </form>
@@ -799,78 +799,78 @@
                     <div class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="document-company" value="{{ __('Company') }}" />
-                            <x-forms.select id="document-company" wire:model.live="documentCompanyId" class="w-full" placeholder="{{ __('Choose company') }}">
+                            <x-forms.select id="document-company" wire:model.live="documentForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
                                 <option value="">{{ __('Choose company') }}</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}">{{ $company->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="documentCompanyId" />
+                            <x-forms.input-error for="documentForm.companyId" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <x-forms.label for="document-client" value="{{ __('Client') }}" />
-                                <x-forms.select id="document-client" wire:model.live="documentClientId" class="w-full" placeholder="{{ __('No client') }}">
+                                <x-forms.select id="document-client" wire:model.live="documentForm.clientId" class="w-full" placeholder="{{ __('No client') }}">
                                     <option value="">{{ __('No client') }}</option>
                                     @foreach ($documentClientOptions as $client)
                                         <option value="{{ $client->id }}">{{ $client->name }}</option>
                                     @endforeach
                                 </x-forms.select>
-                                <x-forms.input-error for="documentClientId" />
+                                <x-forms.input-error for="documentForm.clientId" />
                             </div>
 
                             <div class="space-y-1.5">
                                 <x-forms.label for="document-project" value="{{ __('Project') }}" />
-                                <x-forms.select id="document-project" wire:model.live="documentProjectId" class="w-full" placeholder="{{ __('No project') }}">
+                                <x-forms.select id="document-project" wire:model.live="documentForm.projectId" class="w-full" placeholder="{{ __('No project') }}">
                                     <option value="">{{ __('No project') }}</option>
                                     @foreach ($documentProjectOptions as $project)
                                         <option value="{{ $project->id }}">{{ $project->name }}</option>
                                     @endforeach
                                 </x-forms.select>
-                                <x-forms.input-error for="documentProjectId" />
+                                <x-forms.input-error for="documentForm.projectId" />
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="document-product" value="{{ __('Product') }}" />
-                            <x-forms.select id="document-product" wire:model.live="documentProductId" class="w-full" placeholder="{{ __('No product') }}">
+                            <x-forms.select id="document-product" wire:model.live="documentForm.productId" class="w-full" placeholder="{{ __('No product') }}">
                                 <option value="">{{ __('No product') }}</option>
                                 @foreach ($documentProductOptions as $product)
                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                                 @endforeach
                             </x-forms.select>
-                            <x-forms.input-error for="documentProductId" />
+                            <x-forms.input-error for="documentForm.productId" />
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="document-description" value="{{ __('Line description') }}" />
-                            <x-forms.input id="document-description" wire:model.live="documentDescription" placeholder="{{ __('e.g. Monthly service package') }}" />
-                            <x-forms.input-error for="documentDescription" />
+                            <x-forms.input id="document-description" wire:model.live="documentForm.description" placeholder="{{ __('e.g. Monthly service package') }}" />
+                            <x-forms.input-error for="documentForm.description" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div class="space-y-1.5">
                                 <x-forms.label for="document-quantity" value="{{ __('Quantity') }}" />
-                                <x-forms.input id="document-quantity" type="number" min="0.001" step="0.001" wire:model.live="documentQuantity" placeholder="0" />
-                                <x-forms.input-error for="documentQuantity" />
+                                <x-forms.input id="document-quantity" type="number" min="0.001" step="0.001" wire:model.live="documentForm.quantity" placeholder="0" />
+                                <x-forms.input-error for="documentForm.quantity" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="document-unit-price" value="{{ __('Unit price') }}" />
-                                <x-forms.input id="document-unit-price" type="number" min="0" step="0.01" wire:model.live="documentUnitPrice" placeholder="0" />
-                                <x-forms.input-error for="documentUnitPrice" />
+                                <x-forms.input id="document-unit-price" type="number" min="0" step="0.01" wire:model.live="documentForm.unitPrice" placeholder="0" />
+                                <x-forms.input-error for="documentForm.unitPrice" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="document-tax-rate" value="{{ __('Tax rate') }}" />
-                                <x-forms.input id="document-tax-rate" type="number" min="0" max="100" step="0.01" wire:model.live="documentTaxRate" placeholder="11" />
-                                <x-forms.input-error for="documentTaxRate" />
+                                <x-forms.input id="document-tax-rate" type="number" min="0" max="100" step="0.01" wire:model.live="documentForm.taxRate" placeholder="11" />
+                                <x-forms.input-error for="documentForm.taxRate" />
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="document-notes" value="{{ __('Notes') }}" />
-                            <x-forms.textarea id="document-notes" wire:model.live="documentNotes" rows="3" placeholder="{{ __('Payment note, project scope, or terms.') }}" />
-                            <x-forms.input-error for="documentNotes" />
+                            <x-forms.textarea id="document-notes" wire:model.live="documentForm.notes" rows="3" placeholder="{{ __('Payment note, project scope, or terms.') }}" />
+                            <x-forms.input-error for="documentForm.notes" />
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <x-actions.button type="button" wire:click="createQuotation" variant="soft-primary">{{ __('Quotation') }}</x-actions.button>

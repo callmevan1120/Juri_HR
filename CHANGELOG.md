@@ -4,6 +4,13 @@ Semua perubahan penting PasPapan dicatat di file ini.
 
 ## [Unreleased]
 
+### Mobile & iOS Native
+
+- **Dukungan Penuh iOS (iOS Native Ready):** Aplikasi kini sepenuhnya dioptimasi untuk berjalan sebagai aplikasi native di iPhone/iPad via Capacitor.
+- Menyempurnakan layout iOS, termasuk adaptasi otomatis terhadap *Dynamic Island* dan *Safe Area* untuk halaman utama, halaman Profil, dan modal interaktif.
+- Menambahkan izin *Privacy* (`Info.plist` untuk Kamera, Lokasi, Galeri) secara bawaan sehingga siap untuk proses review App Store.
+- Menghapus komponen *bottom navigation* web pada mode native iOS agar antarmuka lebih lega dan kompatibel dengan fitur navigasi gestur bawaan iPhone (Home Indicator).
+
 ## [5.0.0] - 2026-05-24
 
 ### Sorotan

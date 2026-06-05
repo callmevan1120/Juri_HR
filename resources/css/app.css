@@ -1266,7 +1266,11 @@
     .user-page-shell {
         @apply pb-4 lg:pb-6;
         min-height: 100dvh;
-        padding-top: max(0.85rem, calc(env(safe-area-inset-top) + 0.85rem));
+        padding-top: max(1rem, calc(env(safe-area-inset-top) + 1rem));
+    }
+
+    body.platform-ios .user-page-shell {
+        padding-top: max(3rem, calc(env(safe-area-inset-top) + 1.5rem)) !important;
     }
 
     .user-page-container {
@@ -1570,6 +1574,11 @@
 
     .profile-modal {
         @apply fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto px-4 py-6 sm:items-center;
+    }
+
+    body.platform-ios .profile-modal {
+        padding-top: max(3rem, calc(env(safe-area-inset-top) + 1rem)) !important;
+        padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
     }
 
     .profile-modal__backdrop {
@@ -2674,7 +2683,7 @@
     }
 
     .topbar-tool--icon {
-        @apply h-11 w-11 p-0 sm:h-12 sm:w-12;
+        @apply h-9 w-9 p-0 sm:h-10 sm:w-10;
     }
 
     .notifications-dropdown {
@@ -2686,7 +2695,7 @@
     }
 
     .notifications-trigger__badge {
-        @apply absolute right-0 top-0 inline-flex h-6 min-w-6 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded-full bg-rose-500 px-1 text-[0.68rem] font-black leading-none text-white ring-2 ring-white dark:ring-slate-900;
+        @apply absolute right-0 top-0 inline-flex h-4 min-w-4 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded-full bg-rose-500 px-1 text-[0.55rem] font-bold leading-none text-white ring-[1.5px] ring-white dark:ring-slate-900;
     }
 
     .notifications-panel {
@@ -4632,8 +4641,16 @@
         display: none;
     }
 
+    body.platform-ios .user-bottom-navigation {
+        display: none !important;
+    }
+
     body.is-native-platform:not(.is-native-scanning) .app-shell {
         padding-bottom: max(1rem, calc(env(safe-area-inset-bottom) + 1rem)) !important;
+    }
+
+    body.platform-ios .app-shell {
+        padding-bottom: env(safe-area-inset-bottom) !important;
     }
 
     @media (prefers-reduced-motion: reduce) {

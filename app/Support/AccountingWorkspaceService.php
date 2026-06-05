@@ -82,13 +82,12 @@ class AccountingWorkspaceService
         $companyId = $company instanceof Company ? $company->id : $company;
 
         return $actor->isSuperadmin
-            || $actor->company_id === null
             || (int) $actor->company_id === (int) $companyId;
     }
 
     public function scopeCompanies(Builder $query, User $actor): Builder
     {
-        if ($actor->isSuperadmin || $actor->company_id === null) {
+        if ($actor->isSuperadmin) {
             return $query;
         }
 

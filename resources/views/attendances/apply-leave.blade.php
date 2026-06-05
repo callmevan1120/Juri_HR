@@ -42,13 +42,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="mb-4 rounded-[1.05rem] border border-slate-200/70 bg-white/50 p-3 text-sm text-slate-600 dark:border-slate-800/80 dark:bg-slate-950/30 dark:text-slate-300">
-                        <p class="font-semibold text-gray-800 dark:text-gray-100">{{ __('Before you submit') }}</p>
-                        <p class="sr-only">
-                            {{ __('Choose the correct leave type, set the date range carefully, and attach supporting files when required. Only annual leave types reduce the annual quota; sick leave and special leave types do not use quota.') }}
-                        </p>
-                    </div>
                     
                     @if ($attendance && ($attendance->time_in || $attendance->time_out))
                         <div class="mb-6 flex gap-3 rounded-xl border border-orange-200 bg-orange-50 p-3 text-sm dark:border-orange-800/50 dark:bg-orange-900/20" role="status" aria-live="polite">

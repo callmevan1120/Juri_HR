@@ -24,7 +24,7 @@ test('device offline attendance sync processes queued local submissions with ris
                 'barcode_data' => $barcode->value,
                 'latitude' => -6.2,
                 'longitude' => 106.8,
-                'timestamp' => '2026-05-11 08:00:00',
+                'timestamp' => now()->subHour()->format('Y-m-d H:i:s'),
                 'accuracy' => 1.4,
                 'gps_variance' => 0,
                 'mock_location_detected' => false,
@@ -46,7 +46,7 @@ test('device offline attendance sync processes queued local submissions with ris
 
     expect($submission->processed_attendance_id)->toBe($attendance->id)
         ->and($submission->status)->toBe('processed')
-        ->and($attendance->date?->toDateString())->toBe('2026-05-11')
+        ->and($attendance->date?->toDateString())->toBe(now()->toDateString())
         ->and($submission->risk_score)->toBe($attendance->risk_score)
         ->and($attendance->risk_level)->toBe('high')
         ->and($codes)->toContain('offline_submitted')
@@ -72,7 +72,7 @@ test('device offline attendance sync is idempotent per client uuid', function ()
                 'barcode_data' => $barcode->value,
                 'latitude' => -6.2,
                 'longitude' => 106.8,
-                'timestamp' => '2026-05-11 08:00:00',
+                'timestamp' => now()->subHour()->format('Y-m-d H:i:s'),
             ],
         ],
     ];
@@ -101,7 +101,7 @@ test('device offline attendance sync requires dedicated offline attendance abili
                 'barcode_data' => $barcode->value,
                 'latitude' => -6.2,
                 'longitude' => 106.8,
-                'timestamp' => '2026-05-11 08:00:00',
+                'timestamp' => now()->subHour()->format('Y-m-d H:i:s'),
             ],
         ],
     ])->assertForbidden();

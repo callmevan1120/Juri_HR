@@ -33,11 +33,11 @@ class AttendanceRiskScorer
         ];
 
         if (($context['mock_location_detected'] ?? false) === true) {
-            $factors[] = $this->factor('mock_location_detected', 40, $event, $metadata);
+            $factors[] = $this->factor('mock_location_detected', 100, $event, $metadata);
         }
 
         if (($context['offline_submitted'] ?? false) === true) {
-            $factors[] = $this->factor('offline_submitted', 25, $event, $metadata);
+            $factors[] = $this->factor('offline_submitted', 40, $event, $metadata);
         }
 
         if (($context['cached_location'] ?? false) === true) {

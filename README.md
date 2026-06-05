@@ -2,45 +2,50 @@
 
 <img src="./public/hero-banner.png" alt="PasPapan Hero" width="880">
 
-# PasPapan
+# PasPapan: Revolusi HRIS & Operasional Perusahaan Anda
 
-Sistem HRIS Indonesia self-hosted untuk absensi GPS/foto/QR, cuti-lembur-WFH, payroll dan slip gaji PDF, reimbursement, kasbon, approval, multi-cabang, laporan Excel/PDF, dan operasional lapangan.
+**Sistem HRIS All-in-One Terlengkap di Indonesia** yang dirancang khusus untuk membebaskan Anda dari kerumitan *spreadsheet* manual. PasPapan menghadirkan solusi *self-hosted* canggih mulai dari **Absensi Face ID & GPS akurat**, otomatisasi **Payroll & Slip Gaji PDF**, pengelolaan **Cuti/Lembur/WFH**, **Kasbon & Reimbursement**, hingga pantauan **Operasional Lapangan**. Kini hadir dengan dukungan penuh untuk **Android & iOS Native**!
 
 [![Release](https://img.shields.io/badge/Release-v5.0.0-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0)
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-VPS%20Ready-2563eb?style=flat-square)](./guides/deployment.md)
 [![Android APK](https://img.shields.io/badge/Android-APK-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk)
+[![iOS Support](https://img.shields.io/badge/iOS-Native%20Ready-000000?style=flat-square&logo=apple&logoColor=white)](#rilis)
 [![License](https://img.shields.io/badge/Open%20Source-Community-111827?style=flat-square)](#open-source--enterprise)
 
 </div>
 
-PasPapan dibuat untuk perusahaan yang ingin merapikan kerja harian HR, finance, manager, dan tim operasional dalam satu sistem yang bisa dikontrol sendiri. Cocok untuk tim yang selama ini masih memakai spreadsheet, chat manual, form terpisah, dan file penggajian yang tercecer.
+PasPapan diciptakan bagi perusahaan modern yang ingin memusatkan seluruh aktivitas harian HR, Finance, Manager, dan Tim Operasional ke dalam satu platform eksklusif yang bisa dikontrol sendiri 100%. Sangat direkomendasikan bagi tim yang lelah menggunakan WhatsApp, tumpukan kertas form terpisah, dan perhitungan gaji Excel yang rentan *human-error*.
 
-Dengan PasPapan, karyawan bisa absen, mengajukan cuti/lembur/WFH, reimbursement, kasbon, dan melihat dokumen atau slip gaji. HR dan manager bisa memantau approval, data karyawan, checklist, risiko absensi, laporan, serta aktivitas tim tanpa pindah-pindah aplikasi.
+Dengan PasPapan, karyawan menikmati kemudahan *mobile experience* premium untuk absen *selfie*, klaim *reimbursement*, hingga cek sisa cuti. Di sisi lain, HR dan Manajemen memiliki *dashboard* analitik *real-time* untuk memantau produktivitas, mengunci radius absen GPS, mendeteksi kecurangan (*anti-mock location*), serta mengeksekusi *payroll* dengan sekali klik!
 
 ## Yang Bisa Dikerjakan
 
 | Area | Fitur Utama |
 | --- | --- |
-| HR & Karyawan | data karyawan, divisi/jabatan/level, direct manager, kontrak, probation, dokumen, HR checklist, onboarding/offboarding |
-| Absensi Pintar | GPS, foto, barcode, Dynamic QR, Face ID, offline submission, risk scoring, koreksi presensi |
-| Approval Harian | cuti, izin, lembur, WFH, reimbursement, kasbon, tukar shift, koreksi absensi, task HR |
-| Payroll & Finance | periode payroll bulanan/mingguan/harian, komponen gaji, BPJS/PPh21/Coretax metadata, THR/prorata foundation, payment instruction, slip gaji PDF |
-| Reimburse & Kasbon | pengajuan, approval, lampiran privat, status pembayaran, aging, dan laporan |
-| Operasional | client, project, task, checklist, bukti kunjungan, foto lokasi, asset, QR asset, product, stock |
-| Commercial & Accounting | quotation, invoice, vendor bill, journal, ledger, cashflow, AR/AP aging, closing period foundation |
-| Laporan | dashboard admin, export Excel/PDF, import/export background, KPI, operational health |
-| Mobile | PWA, Android APK, dan project iOS untuk build/smoke lanjutan |
+| HR & Karyawan | Database karyawan lengkap, struktur divisi/jabatan/level, rantai persetujuan (*direct manager*), kontrak & probation, dokumen privat, checklist *onboarding/offboarding* |
+| Absensi Pintar | Validasi GPS Akurat, Face ID Liveness, Foto *Selfie*, Barcode/Dynamic QR Scanner, *Offline Submission*, **Fraud Risk Scoring** (Anti-Mock Location) |
+| Shift & Jadwal | *Visual Shift Planning* (Kalender), *Drag-and-Drop Roster*, Deteksi Bentrok Jadwal, Kalender Libur Nasional, hingga Tukar Shift Antar Karyawan (*Shift Swap*) |
+| Approval Harian | Cuti, Izin, Lembur, *Work From Home* (WFH), Reimbursement, Kasbon, dan Koreksi Absensi dengan alur multi-level approval |
+| Payroll & Finance | *One-Click Payroll* (periode bulanan/harian), Komponen Gaji Kustom, Integrasi BPJS & PPh21 / Coretax, THR Prorata, *Payment Instruction*, hingga Cetak Slip Gaji PDF |
+| Reimburse & Kasbon | Siklus pengajuan hingga pelunasan, pencairan dana, lampiran kuitansi privat, pantauan *aging*, dan rekapitulasi pengeluaran per divisi |
+| Operasional Lapangan | CRM Ringan (Client & Project), Penugasan (*Task*), Bukti Kunjungan Lapangan GPS & Foto, Manajemen Aset dengan QR Tagging, Katalog Produk & Stok |
+| Kolaborasi Tim | *Collaboration Workspace*: Chat Terenkripsi (Personal/Grup/Proyek), *Secure File Sharing*, hingga Pengikatan Link Meeting (Zoom/Google Meet/Teams) |
+| Commercial & Invoice | Modul Akuntansi Lengkap: Cetak *Quotation* & *Invoice*, *Vendor Bill*, *Journal/Ledger*, *Chart of Accounts*, *Cashflow*, hingga Pemantauan AR/AP Aging |
+| Laporan & Analytics | **Admin Dashboard Gahar**: Analitik *Real-time* interaktif, Penilaian Performa/KPI, hingga Ekspor Laporan Excel/PDF super lengkap |
+| Security & Maintenance | Hak Akses (RBAC) granular, *Audit Trail*, *Custom Form Builder*, Isolasi Data Multi-Cabang, *Operational Health Dashboard*, hingga **Pusat Backup & Restore Otomatis** |
+| Data Management | Modul *Export & Import Background* (Ekspor ribuan data tanpa takut *Timeout/Loading* lama), serta *System Cleanup Tools* untuk menjaga storage tetap lega |
+| Mobile Native | **Aplikasi Native iOS & Android Ready!** Terintegrasi sempurna dengan Face ID, Kamera GPS, Notifikasi *Push*, dan UI mulus setara aplikasi App Store/Play Store |
 
 Detail lengkap ada di [guides/features.md](./guides/features.md).
 
 ## Kenapa Dipakai
 
-- **Satu sistem untuk kerja harian**: absensi, pengajuan, approval, persiapan payroll, dokumen, dan laporan berada di tempat yang sama.
-- **Cocok untuk perusahaan Indonesia**: alur cuti, lembur, kasbon, reimbursement, slip gaji, BPJS/PPh21/Coretax metadata, dan kebutuhan multi-cabang disiapkan dari awal.
-- **Siap untuk tim lapangan**: mendukung bukti lokasi, foto, QR, Face ID, dan penilaian risiko lokasi mencurigakan.
-- **Data lebih aman**: attachment privat, RBAC, audit trail, policy/gate, dan isolasi multi-company membantu mencegah akses silang.
-- **Bisa dikontrol sendiri**: cocok untuk VPS perusahaan, vendor implementasi, konsultan HR, atau tim IT internal yang ingin self-hosted.
-- **Tetap ramah komunitas**: fitur open-source bisa install dan boot tanpa enterprise key.
+- **Satu Ekosistem Lengkap (All-in-One)**: Lupakan langganan mahal ke banyak aplikasi. Absensi, pengajuan cuti, perhitungan *payroll*, hingga pencatatan aset operasional ada di satu atap.
+- **Didesain Sempurna untuk Kebijakan Indonesia**: Mengerti kebutuhan lokal! Mulai dari pengaturan PPh21, BPJS Kesehatan/TK, THR prorata, kasbon karyawan, hingga format slip gaji standar Disnaker.
+- **Anti-Kecurangan (Fraud-Proof) & Siap Lapangan**: Menggunakan validasi GPS presisi tinggi, Face ID, *anti-mock location*, dan *Dynamic QR* untuk memastikan absensi selalu sah.
+- **Kemananan Privasi & Data Eksklusif**: Data Anda bukan komoditas. Fitur *self-hosted*, *attachment private*, dan isolasi *multi-company* memastikan data perusahaan tetap aman di *server* Anda sendiri.
+- **Mobile Native Ready (iOS & Android)**: Pengalaman *smartphone* tingkat atas. Tampilan UI disesuaikan otomatis dari iPhone *Dynamic Island* hingga Android modern.
+- **Tumbuh Bersama Komunitas**: Versi *open-source* yang ramah diakses, siap digunakan sebagai basis (baseline) tanpa perlu khawatir kunci akses *enterprise* pihak ketiga.
 
 ## Cocok Untuk
 

@@ -2,6 +2,12 @@
 
 namespace App\Livewire\Admin;
 
+use App\Livewire\Forms\Commercial\DocumentForm;
+use App\Livewire\Forms\Commercial\OpportunityForm;
+use App\Livewire\Forms\Commercial\ProductForm;
+use App\Livewire\Forms\Commercial\StockMovementForm;
+use App\Livewire\Forms\Commercial\VendorBillForm;
+use App\Livewire\Forms\Commercial\VendorForm;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Invoice;
@@ -10,13 +16,11 @@ use App\Models\Project;
 use App\Models\Quotation;
 use App\Models\SalesFollowUp;
 use App\Models\SalesOpportunity;
-use App\Models\StockMovement;
 use App\Models\Vendor;
 use App\Models\VendorBill;
 use App\Support\CommercialWorkspaceService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -36,93 +40,12 @@ class CommercialWorkspace extends Component
 
     public string $search = '';
 
-    public string $productCompanyId = '';
-
-    public string $productName = '';
-
-    public string $productSku = '';
-
-    public string $productUnit = 'pcs';
-
-    public string $productSellingPrice = '0';
-
-    public string $productCostPrice = '0';
-
-    public string $productReorderPoint = '0';
-
-    public string $stockProductId = '';
-
-    public string $stockType = StockMovement::TYPE_IN;
-
-    public string $stockQuantity = '1';
-
-    public string $stockUnitCost = '0';
-
-    public string $stockNotes = '';
-
-    public string $vendorCompanyId = '';
-
-    public string $vendorName = '';
-
-    public string $vendorContactName = '';
-
-    public string $vendorEmail = '';
-
-    public string $vendorPhone = '';
-
-    public string $billVendorId = '';
-
-    public string $billProductId = '';
-
-    public string $billDescription = '';
-
-    public string $billQuantity = '1';
-
-    public string $billUnitCost = '0';
-
-    public string $billTaxRate = '11';
-
-    public string $billDueAt = '';
-
-    public string $billNotes = '';
-
-    public string $documentCompanyId = '';
-
-    public string $documentClientId = '';
-
-    public string $documentProjectId = '';
-
-    public string $documentProductId = '';
-
-    public string $documentDescription = '';
-
-    public string $documentQuantity = '1';
-
-    public string $documentUnitPrice = '0';
-
-    public string $documentTaxRate = '11';
-
-    public string $documentNotes = '';
-
-    public string $opportunityCompanyId = '';
-
-    public string $opportunityClientId = '';
-
-    public string $opportunityProjectId = '';
-
-    public string $opportunityTitle = '';
-
-    public string $opportunityStage = SalesOpportunity::STAGE_LEAD;
-
-    public string $opportunityExpectedValue = '0';
-
-    public string $opportunityExpectedCloseAt = '';
-
-    public string $opportunityNextFollowUpAt = '';
-
-    public string $opportunitySource = '';
-
-    public string $opportunityNotes = '';
+    public ProductForm $productForm;
+    public StockMovementForm $stockMovementForm;
+    public VendorForm $vendorForm;
+    public VendorBillForm $vendorBillForm;
+    public DocumentForm $documentForm;
+    public OpportunityForm $opportunityForm;
 
     public function boot(CommercialWorkspaceService $commerce): void
     {
@@ -141,25 +64,25 @@ class CommercialWorkspace extends Component
             return;
         }
 
-        $this->productCompanyId = $companyId;
-        $this->vendorCompanyId = $companyId;
-        $this->documentCompanyId = $companyId;
-        $this->opportunityCompanyId = $companyId;
+        $this->productForm->companyId = $companyId;
+        $this->vendorForm->companyId = $companyId;
+        $this->documentForm->companyId = $companyId;
+        $this->opportunityForm->companyId = $companyId;
     }
 
-    public function updatedDocumentCompanyId(): void
+    public function updatedDocumentFormCompanyId(): void
     {
-        $this->reset(['documentClientId', 'documentProjectId', 'documentProductId']);
+        $this->documentForm->reset(['clientId', 'projectId', 'productId']);
     }
 
-    public function updatedOpportunityCompanyId(): void
+    public function updatedOpportunityFormCompanyId(): void
     {
-        $this->reset(['opportunityClientId', 'opportunityProjectId']);
+        $this->opportunityForm->reset(['clientId', 'projectId']);
     }
 
-    public function updatedBillVendorId(): void
+    public function updatedVendorBillFormVendorId(): void
     {
-        $this->reset('billProductId');
+        $this->vendorBillForm->reset('productId');
     }
 
     public function updatedActiveTab(): void
@@ -171,31 +94,20 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
-        $validated = $this->validate([
-            'productCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
-            'productName' => ['required', 'string', 'max:180'],
-            'productSku' => ['nullable', 'string', 'max:80'],
-            'productUnit' => ['required', 'string', 'max:32'],
-            'productSellingPrice' => ['required', 'numeric', 'min:0', 'max:999999999999'],
-            'productCostPrice' => ['required', 'numeric', 'min:0', 'max:999999999999'],
-            'productReorderPoint' => ['required', 'numeric', 'min:0', 'max:999999999'],
-        ]);
+        $validated = $this->productForm->validate();
 
         $this->commerce->createProduct(auth()->user(), [
-            'company_id' => (int) $validated['productCompanyId'],
-            'name' => $validated['productName'],
-            'sku' => $validated['productSku'] ?: null,
-            'unit' => $validated['productUnit'],
-            'selling_price' => $validated['productSellingPrice'],
-            'cost_price' => $validated['productCostPrice'],
+            'company_id' => (int) $validated['companyId'],
+            'name' => $validated['name'],
+            'sku' => $validated['sku'] ?: null,
+            'unit' => $validated['unit'],
+            'selling_price' => $validated['sellingPrice'],
+            'cost_price' => $validated['costPrice'],
             'stock_tracking' => true,
-            'reorder_point' => $validated['productReorderPoint'],
+            'reorder_point' => $validated['reorderPoint'],
         ]);
 
-        $this->reset(['productName', 'productSku', 'productSellingPrice', 'productCostPrice', 'productReorderPoint']);
-        $this->productSellingPrice = '0';
-        $this->productCostPrice = '0';
-        $this->productReorderPoint = '0';
+        $this->productForm->resetForm();
         $this->banner(__('Product created.'));
     }
 
@@ -203,26 +115,17 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
-        $validated = $this->validate([
-            'stockProductId' => ['required', 'integer', Rule::exists('products', 'id')],
-            'stockType' => ['required', Rule::in([StockMovement::TYPE_IN, StockMovement::TYPE_OUT, StockMovement::TYPE_ADJUSTMENT])],
-            'stockQuantity' => ['required', 'numeric', 'min:0.001', 'max:999999999'],
-            'stockUnitCost' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
-            'stockNotes' => ['nullable', 'string', 'max:1000'],
-        ]);
-
-        $product = Product::query()->findOrFail((int) $validated['stockProductId']);
+        $validated = $this->stockMovementForm->validate();
+        $product = Product::query()->findOrFail((int) $validated['productId']);
 
         $this->commerce->recordStockMovement(auth()->user(), $product, [
-            'type' => $validated['stockType'],
-            'quantity' => $validated['stockQuantity'],
-            'unit_cost' => $validated['stockUnitCost'] !== '' ? $validated['stockUnitCost'] : null,
-            'notes' => $validated['stockNotes'] ?: null,
+            'type' => $validated['type'],
+            'quantity' => $validated['quantity'],
+            'unit_cost' => $validated['unitCost'] !== '' ? $validated['unitCost'] : null,
+            'notes' => $validated['notes'] ?: null,
         ]);
 
-        $this->reset(['stockQuantity', 'stockUnitCost', 'stockNotes']);
-        $this->stockQuantity = '1';
-        $this->stockUnitCost = '0';
+        $this->stockMovementForm->resetForm();
         $this->banner(__('Stock movement recorded.'));
     }
 
@@ -230,23 +133,17 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
-        $validated = $this->validate([
-            'vendorCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
-            'vendorName' => ['required', 'string', 'max:180'],
-            'vendorContactName' => ['nullable', 'string', 'max:180'],
-            'vendorEmail' => ['nullable', 'email', 'max:180'],
-            'vendorPhone' => ['nullable', 'string', 'max:80'],
-        ]);
+        $validated = $this->vendorForm->validate();
 
         $this->commerce->createVendor(auth()->user(), [
-            'company_id' => (int) $validated['vendorCompanyId'],
-            'name' => $validated['vendorName'],
-            'contact_name' => $validated['vendorContactName'] ?: null,
-            'email' => $validated['vendorEmail'] ?: null,
-            'phone' => $validated['vendorPhone'] ?: null,
+            'company_id' => (int) $validated['companyId'],
+            'name' => $validated['name'],
+            'contact_name' => $validated['contactName'] ?: null,
+            'email' => $validated['email'] ?: null,
+            'phone' => $validated['phone'] ?: null,
         ]);
 
-        $this->reset(['vendorName', 'vendorContactName', 'vendorEmail', 'vendorPhone']);
+        $this->vendorForm->resetForm();
         $this->banner(__('Vendor created.'));
     }
 
@@ -254,37 +151,23 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
-        $validated = $this->validate([
-            'billVendorId' => ['required', 'integer', Rule::exists('vendors', 'id')],
-            'billProductId' => [
-                'nullable',
-                'integer',
-                Rule::exists('products', 'id')->where('company_id', $this->selectedVendorCompanyId()),
-            ],
-            'billDescription' => ['required', 'string', 'max:180'],
-            'billQuantity' => ['required', 'numeric', 'min:0.001', 'max:999999999'],
-            'billUnitCost' => ['required', 'numeric', 'min:0', 'max:999999999999'],
-            'billTaxRate' => ['required', 'numeric', 'min:0', 'max:100'],
-            'billDueAt' => ['nullable', 'date'],
-            'billNotes' => ['nullable', 'string', 'max:1000'],
-        ]);
-
-        $vendor = Vendor::query()->findOrFail((int) $validated['billVendorId']);
+        $validated = $this->vendorBillForm->validate();
+        $vendor = Vendor::query()->findOrFail((int) $validated['vendorId']);
 
         $this->commerce->createVendorBill(auth()->user(), [
             'company_id' => $vendor->company_id,
             'vendor_id' => $vendor->id,
-            'due_at' => $validated['billDueAt'] ?: null,
-            'notes' => $validated['billNotes'] ?: null,
+            'due_at' => $validated['dueAt'] ?: null,
+            'notes' => $validated['notes'] ?: null,
         ], [[
-            'product_id' => $validated['billProductId'] ?: null,
-            'description' => $validated['billDescription'],
-            'quantity' => $validated['billQuantity'],
-            'unit_cost' => $validated['billUnitCost'],
-            'tax_rate' => $validated['billTaxRate'],
+            'product_id' => $validated['productId'] ?: null,
+            'description' => $validated['description'],
+            'quantity' => $validated['quantity'],
+            'unit_cost' => $validated['unitCost'],
+            'tax_rate' => $validated['taxRate'],
         ]]);
 
-        $this->resetVendorBillForm();
+        $this->vendorBillForm->resetForm();
         $this->banner(__('Vendor bill posted to AP.'));
     }
 
@@ -293,9 +176,7 @@ class CommercialWorkspace extends Component
         Gate::authorize('manageCommercialWorkspace');
 
         $bill = VendorBill::query()->findOrFail($billId);
-
         $this->commerce->markVendorBillPaid(auth()->user(), $bill);
-
         $this->banner(__('Vendor bill paid and posted to accounting.'));
     }
 
@@ -303,16 +184,22 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
-        $validated = $this->documentValidation();
+        $validated = $this->documentForm->validate();
 
         $this->commerce->createQuotation(auth()->user(), [
-            'company_id' => (int) $validated['documentCompanyId'],
-            'client_id' => $validated['documentClientId'] ?: null,
-            'project_id' => $validated['documentProjectId'] ?: null,
-            'notes' => $validated['documentNotes'] ?: null,
-        ], [$this->documentItem($validated)]);
+            'company_id' => (int) $validated['companyId'],
+            'client_id' => $validated['clientId'] ?: null,
+            'project_id' => $validated['projectId'] ?: null,
+            'notes' => $validated['notes'] ?: null,
+        ], [[
+            'product_id' => $validated['productId'] ?: null,
+            'description' => $validated['description'],
+            'quantity' => $validated['quantity'],
+            'unit_price' => $validated['unitPrice'],
+            'tax_rate' => $validated['taxRate'],
+        ]]);
 
-        $this->resetDocumentForm();
+        $this->documentForm->resetForm();
         $this->banner(__('Quotation created.'));
     }
 
@@ -320,16 +207,22 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
-        $validated = $this->documentValidation();
+        $validated = $this->documentForm->validate();
 
         $this->commerce->createInvoice(auth()->user(), [
-            'company_id' => (int) $validated['documentCompanyId'],
-            'client_id' => $validated['documentClientId'] ?: null,
-            'project_id' => $validated['documentProjectId'] ?: null,
-            'notes' => $validated['documentNotes'] ?: null,
-        ], [$this->documentItem($validated)]);
+            'company_id' => (int) $validated['companyId'],
+            'client_id' => $validated['clientId'] ?: null,
+            'project_id' => $validated['projectId'] ?: null,
+            'notes' => $validated['notes'] ?: null,
+        ], [[
+            'product_id' => $validated['productId'] ?: null,
+            'description' => $validated['description'],
+            'quantity' => $validated['quantity'],
+            'unit_price' => $validated['unitPrice'],
+            'tax_rate' => $validated['taxRate'],
+        ]]);
 
-        $this->resetDocumentForm();
+        $this->documentForm->resetForm();
         $this->banner(__('Invoice created.'));
     }
 
@@ -338,9 +231,7 @@ class CommercialWorkspace extends Component
         Gate::authorize('manageCommercialWorkspace');
 
         $invoice = Invoice::query()->findOrFail($invoiceId);
-
         $this->commerce->markInvoicePaid(auth()->user(), $invoice);
-
         $this->banner(__('Invoice marked as paid and posted to accounting.'));
     }
 
@@ -349,7 +240,6 @@ class CommercialWorkspace extends Component
         Gate::authorize('manageCommercialWorkspace');
 
         $quotation = Quotation::query()->findOrFail($quotationId);
-
         $this->commerce->convertQuotationToInvoice(auth()->user(), $quotation);
 
         $this->activeTab = 'invoices';
@@ -360,42 +250,23 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
-        $validated = $this->validate([
-            'opportunityCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
-            'opportunityClientId' => [
-                'nullable',
-                'integer',
-                Rule::exists('clients', 'id')->where('company_id', (int) $this->opportunityCompanyId),
-            ],
-            'opportunityProjectId' => [
-                'nullable',
-                'integer',
-                Rule::exists('projects', 'id')->where('company_id', (int) $this->opportunityCompanyId),
-            ],
-            'opportunityTitle' => ['required', 'string', 'max:180'],
-            'opportunityStage' => ['required', Rule::in($this->commerce->opportunityStages())],
-            'opportunityExpectedValue' => ['required', 'numeric', 'min:0', 'max:999999999999'],
-            'opportunityExpectedCloseAt' => ['nullable', 'date'],
-            'opportunityNextFollowUpAt' => ['nullable', 'date'],
-            'opportunitySource' => ['nullable', 'string', 'max:80'],
-            'opportunityNotes' => ['nullable', 'string', 'max:1000'],
-        ]);
+        $validated = $this->opportunityForm->validate($this->opportunityForm->rules($this->commerce->opportunityStages()));
 
         $this->commerce->createOpportunity(auth()->user(), [
-            'company_id' => (int) $validated['opportunityCompanyId'],
-            'client_id' => $validated['opportunityClientId'] ?: null,
-            'project_id' => $validated['opportunityProjectId'] ?: null,
-            'title' => $validated['opportunityTitle'],
-            'stage' => $validated['opportunityStage'],
-            'expected_value' => $validated['opportunityExpectedValue'],
-            'expected_close_at' => $validated['opportunityExpectedCloseAt'] ?: null,
-            'next_follow_up_at' => $validated['opportunityNextFollowUpAt'] ?: null,
-            'source' => $validated['opportunitySource'] ?: null,
-            'notes' => $validated['opportunityNotes'] ?: null,
-            'follow_up_notes' => $validated['opportunityNotes'] ?: null,
+            'company_id' => (int) $validated['companyId'],
+            'client_id' => $validated['clientId'] ?: null,
+            'project_id' => $validated['projectId'] ?: null,
+            'title' => $validated['title'],
+            'stage' => $validated['stage'],
+            'expected_value' => $validated['expectedValue'],
+            'expected_close_at' => $validated['expectedCloseAt'] ?: null,
+            'next_follow_up_at' => $validated['nextFollowUpAt'] ?: null,
+            'source' => $validated['source'] ?: null,
+            'notes' => $validated['notes'] ?: null,
+            'follow_up_notes' => $validated['notes'] ?: null,
         ]);
 
-        $this->resetOpportunityForm();
+        $this->opportunityForm->resetForm();
         $this->banner(__('Sales opportunity created.'));
     }
 
@@ -404,9 +275,7 @@ class CommercialWorkspace extends Component
         Gate::authorize('manageCommercialWorkspace');
 
         $opportunity = SalesOpportunity::query()->findOrFail($opportunityId);
-
         $this->commerce->updateOpportunityStage(auth()->user(), $opportunity, $stage);
-
         $this->banner(__('Sales stage updated.'));
     }
 
@@ -415,7 +284,6 @@ class CommercialWorkspace extends Component
         Gate::authorize('manageCommercialWorkspace');
 
         $opportunity = SalesOpportunity::query()->findOrFail($opportunityId);
-
         $this->commerce->createQuotationFromOpportunity(auth()->user(), $opportunity);
 
         $this->activeTab = 'quotations';
@@ -427,9 +295,7 @@ class CommercialWorkspace extends Component
         Gate::authorize('manageCommercialWorkspace');
 
         $followUp = SalesFollowUp::query()->findOrFail($followUpId);
-
         $this->commerce->completeFollowUp(auth()->user(), $followUp);
-
         $this->banner(__('Follow-up marked as done.'));
     }
 
@@ -508,8 +374,8 @@ class CommercialWorkspace extends Component
             ->latest()
             ->get();
 
-        $documentCompanyId = $this->scopedCompanyId($companyIds, $this->documentCompanyId);
-        $opportunityCompanyId = $this->scopedCompanyId($companyIds, $this->opportunityCompanyId);
+        $documentCompanyId = $this->scopedCompanyId($companyIds, $this->documentForm->companyId);
+        $opportunityCompanyId = $this->scopedCompanyId($companyIds, $this->opportunityForm->companyId);
         $billVendorCompanyId = $this->selectedVendorCompanyId();
 
         return view('livewire.admin.commercial-workspace', [
@@ -533,83 +399,6 @@ class CommercialWorkspace extends Component
             'collectionSummary' => $this->commerce->collectionSummaryForCompanies($companyIds),
             'canManage' => $user->can('manageCommercialWorkspace'),
         ]);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function documentValidation(): array
-    {
-        return $this->validate([
-            'documentCompanyId' => ['required', 'integer', Rule::exists('companies', 'id')],
-            'documentClientId' => [
-                'nullable',
-                'integer',
-                Rule::exists('clients', 'id')->where('company_id', (int) $this->documentCompanyId),
-            ],
-            'documentProjectId' => [
-                'nullable',
-                'integer',
-                Rule::exists('projects', 'id')->where('company_id', (int) $this->documentCompanyId),
-            ],
-            'documentProductId' => [
-                'nullable',
-                'integer',
-                Rule::exists('products', 'id')->where('company_id', (int) $this->documentCompanyId),
-            ],
-            'documentDescription' => ['required', 'string', 'max:180'],
-            'documentQuantity' => ['required', 'numeric', 'min:0.001', 'max:999999999'],
-            'documentUnitPrice' => ['required', 'numeric', 'min:0', 'max:999999999999'],
-            'documentTaxRate' => ['required', 'numeric', 'min:0', 'max:100'],
-            'documentNotes' => ['nullable', 'string', 'max:1000'],
-        ]);
-    }
-
-    /**
-     * @param  array<string, mixed>  $validated
-     * @return array<string, mixed>
-     */
-    private function documentItem(array $validated): array
-    {
-        return [
-            'product_id' => $validated['documentProductId'] ?: null,
-            'description' => $validated['documentDescription'],
-            'quantity' => $validated['documentQuantity'],
-            'unit_price' => $validated['documentUnitPrice'],
-            'tax_rate' => $validated['documentTaxRate'],
-        ];
-    }
-
-    private function resetDocumentForm(): void
-    {
-        $this->reset(['documentProjectId', 'documentProductId', 'documentDescription', 'documentQuantity', 'documentUnitPrice', 'documentTaxRate', 'documentNotes']);
-        $this->documentQuantity = '1';
-        $this->documentUnitPrice = '0';
-        $this->documentTaxRate = '11';
-    }
-
-    private function resetVendorBillForm(): void
-    {
-        $this->reset(['billProductId', 'billDescription', 'billQuantity', 'billUnitCost', 'billTaxRate', 'billDueAt', 'billNotes']);
-        $this->billQuantity = '1';
-        $this->billUnitCost = '0';
-        $this->billTaxRate = '11';
-    }
-
-    private function resetOpportunityForm(): void
-    {
-        $this->reset([
-            'opportunityClientId',
-            'opportunityProjectId',
-            'opportunityTitle',
-            'opportunityExpectedValue',
-            'opportunityExpectedCloseAt',
-            'opportunityNextFollowUpAt',
-            'opportunitySource',
-            'opportunityNotes',
-        ]);
-        $this->opportunityStage = SalesOpportunity::STAGE_LEAD;
-        $this->opportunityExpectedValue = '0';
     }
 
     private function defaultCompanyId(): ?string
@@ -644,11 +433,11 @@ class CommercialWorkspace extends Component
 
     private function selectedVendorCompanyId(): ?int
     {
-        if ($this->billVendorId === '') {
+        if ($this->vendorBillForm->vendorId === '') {
             return null;
         }
 
-        return Vendor::query()->whereKey($this->billVendorId)->value('company_id');
+        return Vendor::query()->whereKey($this->vendorBillForm->vendorId)->value('company_id');
     }
 
     private function normalizeActiveTab(): void

@@ -35,13 +35,27 @@ class OfflineAttendanceSyncService
                 continue;
             }
 
+            try {
+                $capturedAt = Carbon::createFromFormat('Y-m-d H:i:s', (string) $item['timestamp']);
+            } catch (\Throwable) {
+                $submission->update(['status' => 'failed', 'error_message' => 'Invalid timestamp format.']);
+                $results[] = $this->result($submission);
+                continue;
+            }
+
+            if ($capturedAt->isFuture() || $capturedAt->diffInHours(now()) > 48) {
+                $submission->update(['status' => 'failed', 'error_message' => 'Timestamp is invalid or expired.']);
+                $results[] = $this->result($submission);
+                continue;
+            }
+
             $submission->fill([
                 'barcode_data' => (string) $item['barcode_data'],
                 'latitude' => (float) $item['latitude'],
                 'longitude' => (float) $item['longitude'],
                 'accuracy' => isset($item['accuracy']) ? (float) $item['accuracy'] : null,
                 'gps_variance' => isset($item['gps_variance']) ? (float) $item['gps_variance'] : null,
-                'captured_at' => Carbon::createFromFormat('Y-m-d H:i:s', (string) $item['timestamp']),
+                'captured_at' => $capturedAt,
                 'synced_at' => now(),
                 'payload' => [
                     'mock_location_detected' => (bool) ($item['mock_location_detected'] ?? false),

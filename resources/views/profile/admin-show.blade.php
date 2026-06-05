@@ -30,6 +30,23 @@
             'description' => __('Review active sessions and sign out from other devices.'),
         ];
 
+        $profileSections['activity'] = [
+            'title' => __('Activity Logs'),
+            'description' => __('Review your recent administrative actions.'),
+        ];
+
+        $profileSections['notifications'] = [
+            'title' => __('Notifications'),
+            'description' => __('Manage alert and notification channels.'),
+        ];
+
+        if (Laravel\Jetstream\Jetstream::hasApiFeatures()) {
+            $profileSections['api'] = [
+                'title' => __('API Tokens'),
+                'description' => __('Manage API tokens for external integrations.'),
+            ];
+        }
+
         $defaultProfileTab = array_key_first($profileSections);
         $profileTabKeys = array_keys($profileSections);
     @endphp
@@ -38,8 +55,8 @@
         :title="__('Admin Profile')"
         :description="__('Manage your administrator account, security, and preferences.')"
         x-data="{
-            tabs: @js($profileTabKeys),
-            activeTab: @js($defaultProfileTab),
+            tabs: {{ json_encode($profileTabKeys) }},
+            activeTab: '{{ $defaultProfileTab }}',
             init() {
                 const hash = window.location.hash.slice(1);
                 if (this.tabs.includes(hash)) {
@@ -103,8 +120,8 @@
             <aside class="space-y-2">
                 @foreach ($profileSections as $sectionKey => $section)
                     <button type="button" class="w-full rounded-xl border px-4 py-3 text-left transition"
-                        x-on:click="setTab(@js($sectionKey))"
-                        x-bind:class="activeTab === @js($sectionKey) ?
+                        x-on:click="setTab('{{ $sectionKey }}')"
+                        x-bind:class="activeTab === '{{ $sectionKey }}' ?
                             'border-primary-300 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-700 dark:bg-primary-900/20 dark:text-primary-100' :
                             'border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600'">
                         <span class="block text-sm font-semibold">{{ $section['title'] }}</span>
@@ -136,6 +153,20 @@
                 <section x-cloak x-show="activeTab === 'sessions'" x-transition.opacity.duration.150ms>
                     <livewire:profile.logout-other-browser-sessions-form />
                 </section>
+
+                <section x-cloak x-show="activeTab === 'activity'" x-transition.opacity.duration.150ms>
+                    <livewire:admin.profile.activity-log-viewer />
+                </section>
+
+                <section x-cloak x-show="activeTab === 'notifications'" x-transition.opacity.duration.150ms>
+                    <livewire:admin.profile.notification-preferences-form />
+                </section>
+
+                @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
+                    <section x-cloak x-show="activeTab === 'api'" x-transition.opacity.duration.150ms>
+                        <livewire:api.api-token-manager />
+                    </section>
+                @endif
             </div>
         </div>
     </x-admin.page-shell>

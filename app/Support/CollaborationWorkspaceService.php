@@ -24,17 +24,16 @@ class CollaborationWorkspaceService
     public function canAccessCompany(User $actor, int|string|null $companyId): bool
     {
         if ($companyId === null || $companyId === '') {
-            return $actor->isSuperadmin || $actor->company_id === null;
+            return $actor->isSuperadmin;
         }
 
         return $actor->isSuperadmin
-            || $actor->company_id === null
             || (int) $actor->company_id === (int) $companyId;
     }
 
     public function scopeCompanies(Builder $query, User $actor): Builder
     {
-        if ($actor->isSuperadmin || $actor->company_id === null) {
+        if ($actor->isSuperadmin) {
             return $query;
         }
 

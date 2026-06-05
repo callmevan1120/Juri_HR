@@ -40,46 +40,46 @@ test('superadmin can manage commercial products stock quotations and invoices', 
     $this->actingAs($superadmin);
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('productCompanyId', (string) $company->id)
-        ->set('productName', 'Monthly Support Package')
-        ->set('productSku', 'support-001')
-        ->set('productUnit', 'month')
-        ->set('productSellingPrice', '1500000')
-        ->set('productCostPrice', '900000')
-        ->set('productReorderPoint', '10')
+        ->set('productForm.companyId', (string) $company->id)
+        ->set('productForm.name', 'Monthly Support Package')
+        ->set('productForm.sku', 'support-001')
+        ->set('productForm.unit', 'month')
+        ->set('productForm.sellingPrice', '1500000')
+        ->set('productForm.costPrice', '900000')
+        ->set('productForm.reorderPoint', '10')
         ->call('createProduct')
         ->assertHasNoErrors();
 
     $product = Product::query()->where('sku', 'SUPPORT-001')->firstOrFail();
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('stockProductId', (string) $product->id)
-        ->set('stockType', StockMovement::TYPE_IN)
-        ->set('stockQuantity', '5')
-        ->set('stockUnitCost', '900000')
-        ->set('stockNotes', 'Opening balance')
+        ->set('stockMovementForm.productId', (string) $product->id)
+        ->set('stockMovementForm.type', StockMovement::TYPE_IN)
+        ->set('stockMovementForm.quantity', '5')
+        ->set('stockMovementForm.unitCost', '900000')
+        ->set('stockMovementForm.notes', 'Opening balance')
         ->call('recordStockMovement')
         ->assertHasNoErrors();
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('documentCompanyId', (string) $company->id)
-        ->set('documentClientId', (string) $client->id)
-        ->set('documentProjectId', (string) $project->id)
-        ->set('documentProductId', (string) $product->id)
-        ->set('documentDescription', 'Monthly support')
-        ->set('documentQuantity', '2')
-        ->set('documentUnitPrice', '1500000')
-        ->set('documentTaxRate', '11')
+        ->set('documentForm.companyId', (string) $company->id)
+        ->set('documentForm.clientId', (string) $client->id)
+        ->set('documentForm.projectId', (string) $project->id)
+        ->set('documentForm.productId', (string) $product->id)
+        ->set('documentForm.description', 'Monthly support')
+        ->set('documentForm.quantity', '2')
+        ->set('documentForm.unitPrice', '1500000')
+        ->set('documentForm.taxRate', '11')
         ->call('createQuotation')
         ->assertHasNoErrors()
-        ->set('documentCompanyId', (string) $company->id)
-        ->set('documentClientId', (string) $client->id)
-        ->set('documentProjectId', (string) $project->id)
-        ->set('documentProductId', (string) $product->id)
-        ->set('documentDescription', 'Monthly support')
-        ->set('documentQuantity', '2')
-        ->set('documentUnitPrice', '1500000')
-        ->set('documentTaxRate', '11')
+        ->set('documentForm.companyId', (string) $company->id)
+        ->set('documentForm.clientId', (string) $client->id)
+        ->set('documentForm.projectId', (string) $project->id)
+        ->set('documentForm.productId', (string) $product->id)
+        ->set('documentForm.description', 'Monthly support')
+        ->set('documentForm.quantity', '2')
+        ->set('documentForm.unitPrice', '1500000')
+        ->set('documentForm.taxRate', '11')
         ->call('createInvoice')
         ->assertHasNoErrors();
 
@@ -121,13 +121,13 @@ test('accepted quotations convert to invoices once and keep project context', fu
     $this->actingAs($superadmin);
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('documentCompanyId', (string) $company->id)
-        ->set('documentClientId', (string) $client->id)
-        ->set('documentProjectId', (string) $project->id)
-        ->set('documentDescription', 'Implementation package')
-        ->set('documentQuantity', '1')
-        ->set('documentUnitPrice', '2500000')
-        ->set('documentTaxRate', '11')
+        ->set('documentForm.companyId', (string) $company->id)
+        ->set('documentForm.clientId', (string) $client->id)
+        ->set('documentForm.projectId', (string) $project->id)
+        ->set('documentForm.description', 'Implementation package')
+        ->set('documentForm.quantity', '1')
+        ->set('documentForm.unitPrice', '2500000')
+        ->set('documentForm.taxRate', '11')
         ->call('createQuotation')
         ->assertHasNoErrors();
 
@@ -213,11 +213,11 @@ test('stock out posts cost of goods sold once', function () {
     $this->actingAs($superadmin);
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('stockProductId', (string) $product->id)
-        ->set('stockType', StockMovement::TYPE_OUT)
-        ->set('stockQuantity', '2')
-        ->set('stockUnitCost', '300000')
-        ->set('stockNotes', 'Delivered to client')
+        ->set('stockMovementForm.productId', (string) $product->id)
+        ->set('stockMovementForm.type', StockMovement::TYPE_OUT)
+        ->set('stockMovementForm.quantity', '2')
+        ->set('stockMovementForm.unitCost', '300000')
+        ->set('stockMovementForm.notes', 'Delivered to client')
         ->call('recordStockMovement')
         ->assertHasNoErrors();
 
@@ -245,18 +245,18 @@ test('vendor bills post inventory AP and payment journals', function () {
     $this->actingAs($superadmin);
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('vendorCompanyId', (string) $company->id)
-        ->set('vendorName', 'PT Supplier Utama')
-        ->set('vendorContactName', 'Budi Supplier')
-        ->set('vendorEmail', 'supplier@example.com')
+        ->set('vendorForm.companyId', (string) $company->id)
+        ->set('vendorForm.name', 'PT Supplier Utama')
+        ->set('vendorForm.contactName', 'Budi Supplier')
+        ->set('vendorForm.email', 'supplier@example.com')
         ->call('createVendor')
         ->assertHasNoErrors()
-        ->set('productCompanyId', (string) $company->id)
-        ->set('productName', 'Inventory Pack')
-        ->set('productUnit', 'pcs')
-        ->set('productSellingPrice', '250000')
-        ->set('productCostPrice', '100000')
-        ->set('productReorderPoint', '5')
+        ->set('productForm.companyId', (string) $company->id)
+        ->set('productForm.name', 'Inventory Pack')
+        ->set('productForm.unit', 'pcs')
+        ->set('productForm.sellingPrice', '250000')
+        ->set('productForm.costPrice', '100000')
+        ->set('productForm.reorderPoint', '5')
         ->call('createProduct')
         ->assertHasNoErrors();
 
@@ -265,12 +265,12 @@ test('vendor bills post inventory AP and payment journals', function () {
 
     Livewire::test(CommercialWorkspace::class)
         ->set('activeTab', 'purchases')
-        ->set('billVendorId', (string) $vendor->id)
-        ->set('billProductId', (string) $product->id)
-        ->set('billDescription', 'Opening stock purchase')
-        ->set('billQuantity', '3')
-        ->set('billUnitCost', '100000')
-        ->set('billTaxRate', '11')
+        ->set('vendorBillForm.vendorId', (string) $vendor->id)
+        ->set('vendorBillForm.productId', (string) $product->id)
+        ->set('vendorBillForm.description', 'Opening stock purchase')
+        ->set('vendorBillForm.quantity', '3')
+        ->set('vendorBillForm.unitCost', '100000')
+        ->set('vendorBillForm.taxRate', '11')
         ->call('createVendorBill')
         ->assertHasNoErrors()
         ->assertSee('PT Supplier Utama')
@@ -318,10 +318,10 @@ test('tenant scoped commercial admin cannot create product for another company',
     $this->actingAs($admin->fresh());
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('productCompanyId', (string) $companyB->id)
-        ->set('productName', 'Cross tenant product')
-        ->set('productUnit', 'pcs')
-        ->set('productSellingPrice', '10000')
+        ->set('productForm.companyId', (string) $companyB->id)
+        ->set('productForm.name', 'Cross tenant product')
+        ->set('productForm.unit', 'pcs')
+        ->set('productForm.sellingPrice', '10000')
         ->call('createProduct')
         ->assertForbidden();
 
@@ -348,16 +348,16 @@ test('commercial pipeline tracks opportunities follow ups and stage summary', fu
     $this->actingAs($superadmin);
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('opportunityCompanyId', (string) $company->id)
-        ->set('opportunityClientId', (string) $client->id)
-        ->set('opportunityProjectId', (string) $project->id)
-        ->set('opportunityTitle', 'Implementation deal')
-        ->set('opportunityStage', SalesOpportunity::STAGE_QUALIFIED)
-        ->set('opportunityExpectedValue', '12500000')
-        ->set('opportunityExpectedCloseAt', now()->addDays(14)->toDateString())
-        ->set('opportunityNextFollowUpAt', now()->subDay()->toDateString())
-        ->set('opportunitySource', 'Referral')
-        ->set('opportunityNotes', 'Send proposal')
+        ->set('opportunityForm.companyId', (string) $company->id)
+        ->set('opportunityForm.clientId', (string) $client->id)
+        ->set('opportunityForm.projectId', (string) $project->id)
+        ->set('opportunityForm.title', 'Implementation deal')
+        ->set('opportunityForm.stage', SalesOpportunity::STAGE_QUALIFIED)
+        ->set('opportunityForm.expectedValue', '12500000')
+        ->set('opportunityForm.expectedCloseAt', now()->addDays(14)->toDateString())
+        ->set('opportunityForm.nextFollowUpAt', now()->subDay()->toDateString())
+        ->set('opportunityForm.source', 'Referral')
+        ->set('opportunityForm.notes', 'Send proposal')
         ->call('createOpportunity')
         ->assertHasNoErrors();
 
@@ -462,7 +462,7 @@ test('commercial collection summary tracks overdue and due soon receivables by c
 
     Livewire::test(CommercialWorkspace::class)
         ->assertViewHas('collectionSummary', fn (array $summary): bool => $summary['overdue_total'] === 10000000.0)
-        ->set('documentCompanyId', (string) $companyA->id)
+        ->set('documentForm.companyId', (string) $companyA->id)
         ->assertViewHas('collectionSummary', fn (array $summary): bool => $summary['due_soon_total'] === 2000000.0);
 });
 
@@ -484,12 +484,12 @@ test('sales opportunities can create quotations once', function () {
     $this->actingAs($superadmin);
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('opportunityCompanyId', (string) $company->id)
-        ->set('opportunityClientId', (string) $client->id)
-        ->set('opportunityProjectId', (string) $project->id)
-        ->set('opportunityTitle', 'Quotation package')
-        ->set('opportunityStage', SalesOpportunity::STAGE_QUALIFIED)
-        ->set('opportunityExpectedValue', '7500000')
+        ->set('opportunityForm.companyId', (string) $company->id)
+        ->set('opportunityForm.clientId', (string) $client->id)
+        ->set('opportunityForm.projectId', (string) $project->id)
+        ->set('opportunityForm.title', 'Quotation package')
+        ->set('opportunityForm.stage', SalesOpportunity::STAGE_QUALIFIED)
+        ->set('opportunityForm.expectedValue', '7500000')
         ->call('createOpportunity')
         ->assertHasNoErrors();
 
@@ -522,12 +522,12 @@ test('commercial follow ups can be completed from the workspace', function () {
     $this->actingAs($superadmin);
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('opportunityCompanyId', (string) $company->id)
-        ->set('opportunityTitle', 'Follow-up deal')
-        ->set('opportunityStage', SalesOpportunity::STAGE_PROPOSAL)
-        ->set('opportunityExpectedValue', '5000000')
-        ->set('opportunityNextFollowUpAt', now()->subDay()->toDateString())
-        ->set('opportunityNotes', 'Call prospect')
+        ->set('opportunityForm.companyId', (string) $company->id)
+        ->set('opportunityForm.title', 'Follow-up deal')
+        ->set('opportunityForm.stage', SalesOpportunity::STAGE_PROPOSAL)
+        ->set('opportunityForm.expectedValue', '5000000')
+        ->set('opportunityForm.nextFollowUpAt', now()->subDay()->toDateString())
+        ->set('opportunityForm.notes', 'Call prospect')
         ->call('createOpportunity')
         ->assertHasNoErrors();
 
@@ -575,12 +575,12 @@ test('tenant scoped commercial admin cannot create opportunity for another compa
     $this->actingAs($admin->fresh());
 
     Livewire::test(CommercialWorkspace::class)
-        ->set('opportunityCompanyId', (string) $companyA->id)
-        ->set('opportunityProjectId', (string) $projectB->id)
-        ->set('opportunityTitle', 'Cross tenant opportunity')
-        ->set('opportunityExpectedValue', '1000000')
+        ->set('opportunityForm.companyId', (string) $companyA->id)
+        ->set('opportunityForm.projectId', (string) $projectB->id)
+        ->set('opportunityForm.title', 'Cross tenant opportunity')
+        ->set('opportunityForm.expectedValue', '1000000')
         ->call('createOpportunity')
-        ->assertHasErrors('opportunityProjectId');
+        ->assertHasErrors('opportunityForm.projectId');
 
     expect(SalesOpportunity::query()->where('client_id', $clientB->id)->exists())->toBeFalse();
 });
@@ -635,13 +635,13 @@ test('commercial forms scope selectable clients projects and products to selecte
 
     Livewire::test(CommercialWorkspace::class)
         ->set('activeTab', 'pipeline')
-        ->set('opportunityCompanyId', (string) $companyA->id)
+        ->set('opportunityForm.companyId', (string) $companyA->id)
         ->assertSee('Buyer Scope A')
         ->assertSee('Commercial Project A')
         ->assertDontSee('Buyer Scope B')
         ->assertDontSee('Commercial Project B')
         ->set('activeTab', 'quotations')
-        ->set('documentCompanyId', (string) $companyA->id)
+        ->set('documentForm.companyId', (string) $companyA->id)
         ->assertSee('Buyer Scope A')
         ->assertSee('Commercial Project A')
         ->assertSee('Scoped Product A')
@@ -649,7 +649,7 @@ test('commercial forms scope selectable clients projects and products to selecte
         ->assertDontSee('Commercial Project B')
         ->assertDontSee('Scoped Product B')
         ->set('activeTab', 'purchases')
-        ->set('billVendorId', (string) $vendorA->id)
+        ->set('vendorBillForm.vendorId', (string) $vendorA->id)
         ->assertSee('Scoped Product A')
         ->assertDontSee('Scoped Product B');
 
