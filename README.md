@@ -55,6 +55,18 @@ Detail lengkap ada di [guides/features.md](./guides/features.md).
 - Finance yang ingin menyiapkan payroll, slip gaji PDF, reimbursement, kasbon, dan laporan dengan lebih rapi.
 - Vendor atau konsultan yang ingin baseline HRIS Laravel yang bisa dikembangkan lebih jauh.
 
+## Live Demo
+
+Anda dapat mencoba PasPapan secara langsung melalui tautan demo berikut:
+
+- **URL:** [https://paspapan.pandanteknik.com](https://paspapan.pandanteknik.com)
+
+**Akun Akses Demo:**
+- **Demo Admin:** `admin123@paspapan.com` / `password`
+- **Demo Karyawan:** `user123@paspapan.com` / `password`
+
+*(Catatan: Akun demo ini dibatasi untuk tidak dapat melakukan aksi destruktif atau mengubah pengaturan sistem).*
+
 ## Deployment
 
 `main-vps` adalah jalur utama dan default untuk fitur lengkap. Target terbaiknya adalah VPS dengan database production, queue worker, scheduler, private storage, backup, dan optional realtime.
