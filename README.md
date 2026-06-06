@@ -62,8 +62,8 @@ Anda dapat mencoba PasPapan secara langsung melalui tautan demo berikut:
 - **URL:** [https://paspapan.pandanteknik.com](https://paspapan.pandanteknik.com)
 
 **Akun Akses Demo:**
-- **Demo Admin:** `admin123@paspapan.com` / `password`
-- **Demo Karyawan:** `user123@paspapan.com` / `password`
+- **Demo Admin:** `admin123@paspapan.com` / `12345678`
+- **Demo Karyawan:** `user123@paspapan.com` / `12345678`
 
 *(Catatan: Akun demo ini dibatasi untuk tidak dapat melakukan aksi destruktif atau mengubah pengaturan sistem).*
 
