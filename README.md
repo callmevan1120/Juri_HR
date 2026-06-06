@@ -6,9 +6,9 @@
 
 **Sistem HRIS All-in-One Terlengkap di Indonesia** yang dirancang khusus untuk membebaskan Anda dari kerumitan *spreadsheet* manual. PasPapan menghadirkan solusi *self-hosted* canggih mulai dari **Absensi Face ID & GPS akurat**, otomatisasi **Payroll & Slip Gaji PDF**, pengelolaan **Cuti/Lembur/WFH**, **Kasbon & Reimbursement**, hingga pantauan **Operasional Lapangan**. Kini hadir dengan dukungan penuh untuk **Android & iOS Native**!
 
-[![Release](https://img.shields.io/badge/Release-v5.0.0-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0)
+[![Release](https://img.shields.io/badge/Release-v5.0.1-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.1)
 [![Self Hosted](https://img.shields.io/badge/Self--Hosted-VPS%20Ready-2563eb?style=flat-square)](./guides/deployment.md)
-[![Android APK](https://img.shields.io/badge/Android-APK-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk)
+[![Android APK](https://img.shields.io/badge/Android-APK-3f7d3a?style=flat-square)](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.1/PasPapan-v5.0.1.apk)
 [![iOS Support](https://img.shields.io/badge/iOS-Native%20Ready-000000?style=flat-square&logo=apple&logoColor=white)](#rilis)
 [![License](https://img.shields.io/badge/Open%20Source-Community-111827?style=flat-square)](#open-source--enterprise)
 
@@ -111,10 +111,10 @@ Catatan: `paspapan:seed-real` untuk master data production-ready. `paspapan:seed
 
 ## Rilis
 
-Rilis mayor terbaru: [`v5.0.0`](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.0)
+Rilis mayor terbaru: [`v5.0.1`](https://github.com/RiprLutuk/PasPapan/releases/tag/v5.0.1)
 
-- APK: [`PasPapan-v5.0.0.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk)
-- Checksum: [`PasPapan-v5.0.0.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.0/PasPapan-v5.0.0.apk.sha256)
+- APK: [`PasPapan-v5.0.1.apk`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.1/PasPapan-v5.0.1.apk)
+- Checksum: [`PasPapan-v5.0.1.apk.sha256`](https://github.com/RiprLutuk/PasPapan/releases/download/v5.0.1/PasPapan-v5.0.1.apk.sha256)
 - Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
 Branch default dan fitur paling lengkap: [`main-vps`](https://github.com/RiprLutuk/PasPapan/tree/main-vps)
