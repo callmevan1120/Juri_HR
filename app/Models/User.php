@@ -515,8 +515,12 @@ class User extends Authenticatable implements MustVerifyEmail
         $permissions = (array) $permissions;
 
         if ($this->isDemo) {
+            if ($this->hasAssignedRoles()) {
+                return $this->hasAnyPermission($permissions);
+            }
+            
+            // Fallback to readonly if no roles assigned
             $readOnlyPermissions = RbacRegistry::readOnlyPermissionKeys();
-
             foreach ($permissions as $permission) {
                 if (in_array($permission, $readOnlyPermissions, true)) {
                     return true;

@@ -34,6 +34,11 @@ class Settings extends Component
     {
         Gate::authorize('manageSystemSettings');
 
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('Settings cannot be modified in demo mode.'));
+            return;
+        }
+
         $result = $this->settings->updateValue($id, $value);
         $this->hydrateEnterpriseLicenseState($result['license_state']);
 
@@ -45,6 +50,11 @@ class Settings extends Component
     public function applyEnterpriseLicense()
     {
         Gate::authorize('manageEnterpriseLicense');
+
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('License cannot be modified in demo mode.'));
+            return;
+        }
 
         $result = $this->settings->applyEnterpriseLicense($this->enterpriseLicenseDraft);
         $this->hydrateEnterpriseLicenseState($result['license_state']);

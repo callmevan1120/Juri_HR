@@ -218,10 +218,18 @@ class UserForm extends Form
 
         // Demo User Protection: Cannot update password of Demo User
         if ($this->user->is_demo && $this->password) {
-            $this->addError('password', __('Demo user password cannot be changed.'));
-
-            return;
+            throw ValidationException::withMessages([
+                'form.password' => __('Demo user password cannot be changed.'),
+            ]);
         }
+
+        // Demo User Protection: Protect default employee account
+        if (auth()->user()?->is_demo && $this->user->email === 'user123@paspapan.com') {
+            throw ValidationException::withMessages([
+                'form.email' => __('Default user profile cannot be modified in demo mode.'),
+            ]);
+        }
+
         $this->validate();
         $this->ensureManagerDoesNotCreateCycle();
         $newPassword = filled($this->password) ? (string) $this->password : null;
@@ -276,12 +284,21 @@ class UserForm extends Form
     {
         $this->authorizeMutation();
 
+        if (auth()->user()?->is_demo && $this->user->email === 'user123@paspapan.com') {
+            throw new AuthorizationException(__('Default user profile cannot be modified in demo mode.'));
+        }
+
         return $this->user->deleteProfilePhoto();
     }
 
     public function delete()
     {
         $this->authorizeMutation();
+
+        if (auth()->user()?->is_demo && $this->user->email === 'user123@paspapan.com') {
+            throw new AuthorizationException(__('Default user profile cannot be deleted in demo mode.'));
+        }
+
         $this->user->delete();
         $this->deleteProfilePhoto();
         $this->reset();

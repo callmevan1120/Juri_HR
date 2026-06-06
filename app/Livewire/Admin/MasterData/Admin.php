@@ -67,6 +67,11 @@ class Admin extends Component
 
     public function create()
     {
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('Admin accounts cannot be created in demo mode.'));
+            return;
+        }
+
         $this->form->password = $this->credential;
         $this->form->store();
         $this->credential = null;
@@ -87,6 +92,11 @@ class Admin extends Component
 
     public function update()
     {
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('Admin accounts cannot be modified in demo mode.'));
+            return;
+        }
+
         $this->form->password = $this->credential;
         $this->form->update();
         $this->credential = null;
@@ -96,6 +106,10 @@ class Admin extends Component
 
     public function deleteProfilePhoto()
     {
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('Admin accounts cannot be modified in demo mode.'));
+            return;
+        }
         $this->form->deleteProfilePhoto();
     }
 
@@ -109,6 +123,11 @@ class Admin extends Component
 
     public function delete()
     {
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('Admin accounts cannot be deleted in demo mode.'));
+            return;
+        }
+
         $user = $this->findVisibleAdminOrFail($this->selectedId);
         $this->authorizeDeletion($user);
         $this->form->setUser($user)->delete();

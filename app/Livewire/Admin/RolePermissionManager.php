@@ -77,6 +77,11 @@ class RolePermissionManager extends Component
 
     public function save(): void
     {
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('Roles cannot be modified in demo mode.'));
+            return;
+        }
+
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'slug' => [
@@ -125,6 +130,11 @@ class RolePermissionManager extends Component
 
     public function deleteRole(): void
     {
+        if (auth()->user()?->is_demo) {
+            $this->dispatch('error', message: __('Roles cannot be deleted in demo mode.'));
+            return;
+        }
+
         $role = Role::query()->findOrFail($this->deleteRoleId);
 
         if ($role->is_system) {

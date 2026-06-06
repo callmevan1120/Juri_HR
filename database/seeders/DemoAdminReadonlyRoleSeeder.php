@@ -21,12 +21,16 @@ class DemoAdminReadonlyRoleSeeder extends Seeder
             return;
         }
 
+        // Grant all permissions so the demo admin can see all menus.
+        // Destructive actions are blocked inside the Livewire components using the is_demo guard.
+        $permissions = array_values(RbacRegistry::permissionKeys());
+
         $role = Role::query()->updateOrCreate([
             'slug' => 'demo_admin_readonly',
         ], [
-            'name' => 'Demo Admin Read Only',
-            'description' => 'Read-only demo role with broad admin visibility and no destructive actions.',
-            'permissions' => RbacRegistry::readOnlyPermissionKeys(),
+            'name' => 'Demo Admin',
+            'description' => 'Near-superadmin access for demo. Excludes settings, RBAC, maintenance, and superadmin account management. Password changes blocked by is_demo guard.',
+            'permissions' => $permissions,
             'is_system' => true,
             'is_super_admin' => false,
         ]);
