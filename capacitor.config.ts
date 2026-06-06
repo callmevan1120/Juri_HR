@@ -4,6 +4,7 @@ const defaultServerUrl = 'https://paspapan.pandanteknik.com';
 const serverUrl = process.env.CAP_SERVER_URL?.trim() || defaultServerUrl;
 const serverOrigin = new URL(serverUrl);
 const usesCleartext = serverOrigin.protocol === 'http:';
+const isE2eTest = !!process.env.CAP_SERVER_URL;
 
 const config: CapacitorConfig = {
   appId: 'com.pandanteknik.paspapan',
@@ -13,7 +14,7 @@ const config: CapacitorConfig = {
     url: serverUrl,
     androidScheme: usesCleartext ? 'http' : 'https',
     cleartext: usesCleartext,
-    allowNavigation: [serverOrigin.host]
+    allowNavigation: isE2eTest ? [serverOrigin.host, serverOrigin.hostname, '*'] : [serverOrigin.host]
   },
   android: {
     backgroundColor: '#00000000',
