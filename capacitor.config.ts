@@ -1,6 +1,6 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
-const defaultServerUrl = 'http://127.0.0.1:8000';
+const defaultServerUrl = 'https://paspapan.pandanteknik.com';
 const serverUrl = process.env.CAP_SERVER_URL?.trim() || defaultServerUrl;
 const serverOrigin = new URL(serverUrl);
 const usesCleartext = serverOrigin.protocol === 'http:';
