@@ -11,6 +11,28 @@ Semua perubahan penting PasPapan dicatat di file ini.
 - Menambahkan izin *Privacy* (`Info.plist` untuk Kamera, Lokasi, Galeri) secara bawaan sehingga siap untuk proses review App Store.
 - Menghapus komponen *bottom navigation* web pada mode native iOS agar antarmuka lebih lega dan kompatibel dengan fitur navigasi gestur bawaan iPhone (Home Indicator).
 
+## [5.0.1] - 2026-06-06
+
+### Sorotan & Perbaikan
+
+- **iOS Native Scanner**: Menyempurnakan masking dan layout UI scanner iOS native agar tampil lebih presisi di berbagai ukuran layar device.
+- **Authentication**: Menyederhanakan layout UI autentikasi dan memperbarui pesan prioritas pada halaman utama.
+- **Admin App**: Memperketat akses API barcode dan device pada panel admin untuk batas operasional yang lebih aman.
+- Memperbarui hero banner publik dan menambahkan aset marketing baru.
+- Memperbarui screenshot halaman pengguna Android dan iOS di dokumentasi.
+- Merampingkan positioning produk di `README.md`.
+- Memperbarui dependencies untuk keamanan dan kompatibilitas (`symfony/polyfill-intl-idn`).
+- Memperbarui `defaultServerUrl` Capacitor ke domain produksi `https://paspapan.pandanteknik.com`.
+
+### APK Android
+
+- Nama file: `PasPapan-v5.0.1.apk`
+- ID aplikasi: `com.pandanteknik.paspapan`
+- Nama versi: `5.0.1`
+- Kode versi: `51`
+- Tipe build: APK rilis
+- SHA-256: `dbf944a9db9cac8c6f03cbd4a3329dce1cf5c9853a67fc6e91ee788589c8929a`
+
 ## [5.0.0] - 2026-05-24
 
 ### Sorotan
