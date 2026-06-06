@@ -34,15 +34,15 @@
         <div id="debug-log" class="word-break space-y-0.5 whitespace-pre-wrap font-mono text-[10px] text-green-400"></div>
     </div>
 
-    <div class="scanner-container group relative mx-auto flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden"
+    <div class="scanner-container group relative mx-auto flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl"
         id="scanner" onclick="handleScanClick()">
         <div id="scanner-overlay" class="pointer-events-none absolute inset-0 z-10 hidden">
-            <div class="animate-scan-line absolute inset-x-4 z-20 h-0.5 bg-blue-500/80 shadow-[0_0_15px_rgba(59,130,246,0.8)]"></div>
-            <div class="absolute inset-4 rounded-xl border-2 border-white/50"></div>
-            <div class="absolute left-4 top-4 h-6 w-6 rounded-tl-xl border-l-4 border-t-4 border-blue-500"></div>
-            <div class="absolute right-4 top-4 h-6 w-6 rounded-tr-xl border-r-4 border-t-4 border-blue-500"></div>
-            <div class="absolute bottom-4 left-4 h-6 w-6 rounded-bl-xl border-b-4 border-l-4 border-blue-500"></div>
-            <div class="absolute bottom-4 right-4 h-6 w-6 rounded-br-xl border-b-4 border-r-4 border-blue-500"></div>
+            <div class="absolute inset-8 shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]">
+                <div class="absolute -left-1 -top-1 h-10 w-10 border-l-[4px] border-t-[4px] border-white"></div>
+                <div class="absolute -right-1 -top-1 h-10 w-10 border-r-[4px] border-t-[4px] border-white"></div>
+                <div class="absolute -bottom-1 -left-1 h-10 w-10 border-b-[4px] border-l-[4px] border-white"></div>
+                <div class="absolute -bottom-1 -right-1 h-10 w-10 border-b-[4px] border-r-[4px] border-white"></div>
+            </div>
         </div>
 
         <span id="scanner-placeholder" class="scanner-placeholder z-0">

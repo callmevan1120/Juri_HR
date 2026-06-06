@@ -5359,51 +5359,58 @@
         border-radius: 1rem;
     }
 
-    /* 7. RESTORE HEADER/FOOTER VISIBILITY */
-    /* Access classes added in scanner-card.blade.php */
+    /* 7. PERFECT NATIVE SCANNER MASKING */
+    /* Ensure the main page header is above the card's page-covering shadow and matches the black background */
+    body.is-native-scanning .native-scan-page-header {
+        position: relative;
+        z-index: 80 !important;
+        background-color: #111827 !important; /* Force to dark mode page background */
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Make the scanner card clip its inner shadow to its rounded corners,
+       and cast an outward shadow to paint the page background opaque. */
+    body.is-native-scanning #scanner-card {
+        background-color: transparent !important;
+        border-color: transparent !important;
+        box-shadow: 0 0 0 9999px #f8fafc !important; /* Light mode page bg */
+        overflow: hidden !important;
+        position: relative;
+        z-index: 60 !important;
+        backdrop-filter: none !important;
+    }
+    
+    .dark body.is-native-scanning #scanner-card {
+        box-shadow: 0 0 0 9999px #111827 !important; /* Dark mode page bg */
+        border: none !important;
+    }
+
+    /* Let the scanner hole cast an outward shadow to paint the card's opaque background.
+       It will be clipped by the card's overflow:hidden. */
+    body.is-native-scanning #scanner {
+        background: transparent !important;
+        position: relative;
+        z-index: 10 !important;
+        box-shadow: 0 0 0 9999px #ffffff !important; /* Light mode card bg */
+        border: none !important;
+    }
+    
+    .dark body.is-native-scanning #scanner {
+        /* Matches exact webview dark mode card background (#1f2937) */
+        box-shadow: 0 0 0 9999px #1f2937 !important; 
+    }
+
+    /* Ensure card children stay above the scanner's shadow and blend in completely */
     body.is-native-scanning .scanner-header,
     body.is-native-scanning .scanner-footer {
-        background-color: #fff !important;
         position: relative;
-        z-index: 60 !important;
-        padding: 1rem !important;
-        border-radius: 1rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        margin-bottom: 0.75rem;
-        width: 100%;
-    }
-
-    .dark body.is-native-scanning .scanner-header,
-    .dark body.is-native-scanning .scanner-footer {
-        background-color: #1f2937 !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    body.is-native-scanning .native-scan-page-header,
-    body.is-native-scanning .native-scan-surface {
-        position: relative;
-        z-index: 60 !important;
-        box-shadow: 0 10px 30px -24px rgba(15, 23, 42, 0.35);
-    }
-
-    body.is-native-scanning .native-scan-page-header.user-page-header--plain {
-        border: 1px solid rgb(229 231 235 / 0.95) !important;
-        background-color: rgb(255 255 255 / 0.96) !important;
-        padding: 1rem 1.25rem !important;
-        border-radius: 1.5rem;
-        backdrop-filter: blur(10px);
-    }
-
-    body.is-native-scanning #scanner-card {
-        box-shadow: none !important;
+        z-index: 20 !important;
+        background-color: transparent !important;
+        border: none !important; /* "buang border di title" */
         border-color: transparent !important;
-    }
-
-    .dark
-        body.is-native-scanning
-        .native-scan-page-header.user-page-header--plain {
-        border-color: rgb(55 65 81 / 0.95) !important;
-        background-color: rgb(31 41 55 / 0.96) !important;
+        box-shadow: none !important;
     }
 
     /* 8. GLOBAL APP HEADER FIX */
@@ -6530,7 +6537,11 @@
         background: transparent !important;
         border-color: transparent !important;
         box-shadow: none !important;
-        padding: 1rem !important;
+        padding: 0 !important;
+        margin-left: -1rem !important;
+        margin-right: -1rem !important;
+        width: calc(100% + 2rem) !important;
+        max-width: none !important;
     }
 
     body.is-native-scanning .scan-attendance-page .scanner-header,

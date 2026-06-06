@@ -237,6 +237,14 @@ const loginUrl = `${appUrl}/__e2e-login?token=${encodeURIComponent(loginToken)}&
 await cdp.send('Page.navigate', { url: loginUrl });
 await cdp.waitFor("location.pathname === '/scan' && document.body.innerText.length > 0", 'post-login scan page');
 
+await cdp.evaluate(`(async () => {
+  const scanner = document.getElementById('scanner');
+  if (scanner) {
+    scanner.click();
+    await new Promise(r => setTimeout(r, 3000));
+  }
+})()`);
+
 const result = await cdp.evaluate(`(async () => {
   const submitBarcode = async (timestamp) => {
     const response = await fetch('/api/device/barcode', {
