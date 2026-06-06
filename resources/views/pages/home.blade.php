@@ -9,13 +9,12 @@
     <section aria-labelledby="home-page-title" class="user-home-hero user-home-hero--command">
         <div class="user-home-hero__inner">
             <div class="user-home-hero__copy">
-                <p class="user-home-hero__eyebrow">{{ __('Today’s Priorities') }}</p>
-                <p class="mt-1 text-lg font-medium text-slate-600 dark:text-slate-300">{{ $greeting }},</p>
+                <p class="text-lg font-medium text-slate-600 dark:text-slate-300">{{ $greeting }},</p>
                 <h1 id="home-page-title" class="user-home-hero__title !mt-0">{{ $currentUser->name }}</h1>
                 <p class="user-home-hero__subtitle">
                     {{ $homeCommandCenter['attentionCount'] > 0
-                        ? trans_choice('{1} :count item needs attention|[2,*] :count items need attention', $homeCommandCenter['attentionCount'], ['count' => $homeCommandCenter['attentionCount']])
-                        : __('You are all caught up for now.') }}
+                        ? trans_choice('{1} :count priority today|[2,*] :count priorities today', $homeCommandCenter['attentionCount'], ['count' => $homeCommandCenter['attentionCount']])
+                        : __('No priorities for today.') }}
                 </p>
             </div>
 

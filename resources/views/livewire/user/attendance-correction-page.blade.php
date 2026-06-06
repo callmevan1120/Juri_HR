@@ -224,7 +224,7 @@
 
         <x-slot name="content">
             <div class="space-y-4">
-                <div class="user-soft-panel">
+                <div class="user-soft-panel relative z-[40]">
                     <p class="sr-only">
                         {{ __('Choose the date first, then fill the corrected times below for that same day.') }}
                     </p>
@@ -270,7 +270,7 @@
 
                     <div class="space-y-4">
                         <div
-                            class="user-soft-panel">
+                            class="user-soft-panel relative z-[30]">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -288,12 +288,12 @@
 
                             @if ($includeRequestedTimeIn)
                                 <div
-                                    class="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3 dark:border-emerald-900/50 dark:bg-emerald-950/10">
-                                    <div class="mb-3 flex items-center justify-between gap-3">
+                                    class="mt-4 rounded-[1rem] border border-emerald-100 bg-emerald-50/50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/20">
+                                    <div class="mb-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                                         <div class="text-xs font-medium text-emerald-800 dark:text-emerald-200">
                                             {{ __('Base date: :date', ['date' => \Illuminate\Support\Carbon::parse($attendanceDate)->translatedFormat('d M Y')]) }}
                                         </div>
-                                        <div class="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-100 dark:bg-gray-900/40 dark:text-emerald-200 dark:ring-emerald-900/60">
+                                        <div class="whitespace-nowrap rounded-full bg-emerald-100/80 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
                                             {{ __('Date & time') }}
                                         </div>
                                     </div>
@@ -311,7 +311,7 @@
                         </div>
 
                         <div
-                            class="user-soft-panel">
+                            class="user-soft-panel relative z-[20]">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -329,12 +329,12 @@
 
                             @if ($includeRequestedTimeOut)
                                 <div
-                                    class="mt-4 rounded-2xl border border-amber-100 bg-amber-50/60 p-3 dark:border-amber-900/50 dark:bg-amber-950/10">
-                                    <div class="mb-3 flex items-center justify-between gap-3">
+                                    class="mt-4 rounded-[1rem] border border-amber-100 bg-amber-50/50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20">
+                                    <div class="mb-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                                         <div class="text-xs font-medium text-amber-800 dark:text-amber-200">
                                             {{ __('Base date: :date', ['date' => \Illuminate\Support\Carbon::parse($attendanceDate)->translatedFormat('d M Y')]) }}
                                         </div>
-                                        <div class="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-100 dark:bg-gray-900/40 dark:text-amber-200 dark:ring-amber-900/60">
+                                        <div class="whitespace-nowrap rounded-full bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">
                                             {{ __('Date & time') }}
                                         </div>
                                     </div>
@@ -352,7 +352,7 @@
                         </div>
 
                         <div
-                            class="user-soft-panel">
+                            class="user-soft-panel relative z-[10]">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">

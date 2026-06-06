@@ -34,7 +34,7 @@
         <section aria-labelledby="face-enrollment-heading"
             class="attendance-panel">
             <div class="attendance-panel__header">
-                <div class="min-w-0">
+                <div class="min-w-0 flex-1">
                     <p class="attendance-panel__eyebrow">{{ __('Attendance') }}</p>
                     <h2 id="face-enrollment-heading" class="attendance-panel__title">
                         {{ __('Face ID Registration Required') }}

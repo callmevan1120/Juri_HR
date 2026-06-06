@@ -287,41 +287,41 @@
 
                 <div class="mt-4 grid gap-4 md:grid-cols-2">
                     <div>
-                        <x-forms.label for="provinsi_kode" value="{{ __('Provinsi') }}" />
+                        <x-forms.label for="provinsi_kode" value="{{ __('Province') }}" />
                         <div class="mt-1" wire:key="profile-province">
                             <x-user.tom-select-user id="provinsi_kode" wire:model.live="state.provinsi_kode"
                                 :options="$provinces" aria-describedby="profile-region-help"
-                                placeholder="{{ __('Pilih Provinsi') }}" />
+                                placeholder="{{ __('Select Province') }}" />
                         </div>
                         <x-forms.input-error for="provinsi_kode" class="mt-2" />
                     </div>
 
                     <div>
-                        <x-forms.label for="kabupaten_kode" value="{{ __('Kabupaten / Kota') }}" />
+                        <x-forms.label for="kabupaten_kode" value="{{ __('Regency / City') }}" />
                         <div class="mt-1" wire:key="profile-regency-{{ $selectedProvince ?? 'empty' }}">
                             <x-user.tom-select-user id="kabupaten_kode" wire:model.live="state.kabupaten_kode"
                                 :options="$regencies" aria-describedby="profile-region-help"
-                                placeholder="{{ __('Pilih Kabupaten/Kota') }}" />
+                                placeholder="{{ __('Select Regency/City') }}" />
                         </div>
                         <x-forms.input-error for="kabupaten_kode" class="mt-2" />
                     </div>
 
                     <div>
-                        <x-forms.label for="kecamatan_kode" value="{{ __('Kecamatan') }}" />
+                        <x-forms.label for="kecamatan_kode" value="{{ __('District') }}" />
                         <div class="mt-1" wire:key="profile-district-{{ $selectedRegency ?? 'empty' }}">
                             <x-user.tom-select-user id="kecamatan_kode" wire:model.live="state.kecamatan_kode"
                                 :options="$districts" aria-describedby="profile-region-help"
-                                placeholder="{{ __('Pilih Kecamatan') }}" />
+                                placeholder="{{ __('Select District') }}" />
                         </div>
                         <x-forms.input-error for="kecamatan_kode" class="mt-2" />
                     </div>
 
                     <div>
-                        <x-forms.label for="kelurahan_kode" value="{{ __('Kelurahan / Desa') }}" />
+                        <x-forms.label for="kelurahan_kode" value="{{ __('Village') }}" />
                         <div class="mt-1" wire:key="profile-village-{{ $selectedDistrict ?? 'empty' }}">
                             <x-user.tom-select-user id="kelurahan_kode" wire:model.live="state.kelurahan_kode"
                                 :options="$villages" aria-describedby="profile-region-help"
-                                placeholder="{{ __('Pilih Kelurahan/Desa') }}" />
+                                placeholder="{{ __('Select Village') }}" />
                         </div>
                         <x-forms.input-error for="kelurahan_kode" class="mt-2" />
                     </div>

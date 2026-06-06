@@ -22,17 +22,11 @@
 
         <div class="auth-shell__container auth-shell__container--wide">
             <section class="auth-card auth-card--compact auth-card--register lg:col-span-2" aria-labelledby="register-form-title">
-                <div class="auth-card__header auth-native-header">
-                    <div class="auth-native-mark" aria-hidden="true">
-                        <x-heroicon-o-user-plus class="h-8 w-8" />
-                    </div>
-                    <div>
-                        <p class="auth-card__eyebrow">{{ __('Register') }}</p>
-                        <h2 id="register-form-title" class="auth-card__title">{{ __('Create an Account') }}</h2>
-                        <p class="auth-card__copy">
-                            {{ __('Fill in your identity once so HR can verify your account faster.') }}
-                        </p>
-                    </div>
+                <div class="auth-card__header text-center">
+                    <h2 id="register-form-title" class="auth-card__title !text-2xl !font-bold">{{ __('Create an Account') }}</h2>
+                    <p class="auth-card__copy mt-2 text-sm text-gray-500">
+                        {{ __('Fill in your identity once so HR can verify your account faster.') }}
+                    </p>
                 </div>
 
                 <div class="auth-form" x-data="{ submitting: false }">
@@ -145,7 +139,7 @@
 
                                 <div class="auth-grid">
                                     <div class="auth-field">
-                                        <label for="provinsi_kode" class="auth-label">{{ __('Provinsi') }}</label>
+                                        <label for="provinsi_kode" class="auth-label">{{ __('Province') }}</label>
                                         <select id="provinsi_kode" name="provinsi_kode" required
                                             aria-describedby="@error('provinsi_kode') provinsi-error @enderror"
                                             aria-invalid="@error('provinsi_kode') true @else false @enderror"
@@ -157,7 +151,7 @@
                                     </div>
 
                                     <div class="auth-field">
-                                        <label for="kabupaten_kode" class="auth-label">{{ __('Kabupaten / Kota') }}</label>
+                                        <label for="kabupaten_kode" class="auth-label">{{ __('Regency / City') }}</label>
                                         <select id="kabupaten_kode" name="kabupaten_kode" required
                                             aria-describedby="@error('kabupaten_kode') kabupaten-error @enderror"
                                             aria-invalid="@error('kabupaten_kode') true @else false @enderror"
@@ -169,7 +163,7 @@
                                     </div>
 
                                     <div class="auth-field">
-                                        <label for="kecamatan_kode" class="auth-label">{{ __('Kecamatan') }}</label>
+                                        <label for="kecamatan_kode" class="auth-label">{{ __('District') }}</label>
                                         <select id="kecamatan_kode" name="kecamatan_kode" required
                                             aria-describedby="@error('kecamatan_kode') kecamatan-error @enderror"
                                             aria-invalid="@error('kecamatan_kode') true @else false @enderror"
@@ -181,7 +175,7 @@
                                     </div>
 
                                     <div class="auth-field">
-                                        <label for="kelurahan_kode" class="auth-label">{{ __('Kelurahan / Desa') }}</label>
+                                        <label for="kelurahan_kode" class="auth-label">{{ __('Village') }}</label>
                                         <select id="kelurahan_kode" name="kelurahan_kode" required
                                             aria-describedby="@error('kelurahan_kode') kelurahan-error @enderror"
                                             aria-invalid="@error('kelurahan_kode') true @else false @enderror"

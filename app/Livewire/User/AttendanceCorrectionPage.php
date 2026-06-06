@@ -46,19 +46,29 @@ class AttendanceCorrectionPage extends Component
         $this->correctionService = $correctionService;
     }
 
-    public function mount(): void
+    public function mount(?string $date = null): void
     {
         $this->authorize('viewAny', AttendanceCorrection::class);
-        $this->attendanceDate = now()->toDateString();
+        $dateParam = $date ?? request()->query('date');
+        $this->attendanceDate = $dateParam ?? now()->toDateString();
+
+        if ($dateParam) {
+            $this->createWithDate($dateParam);
+        }
     }
 
     public function create(): void
+    {
+        $this->createWithDate(now()->toDateString());
+    }
+
+    public function createWithDate(string $date): void
     {
         $this->authorize('create', AttendanceCorrection::class);
 
         $this->resetErrorBag();
         $this->showCreateModal = true;
-        $this->attendanceDate = now()->toDateString();
+        $this->attendanceDate = $date;
         $this->includeRequestedTimeIn = false;
         $this->includeRequestedTimeOut = false;
         $this->includeRequestedShift = false;
@@ -66,6 +76,7 @@ class AttendanceCorrectionPage extends Component
         $this->requestedTimeOut = null;
         $this->requestedShiftId = null;
         $this->reason = '';
+        $this->updatedAttendanceDate();
     }
 
     public function closeModal(): void

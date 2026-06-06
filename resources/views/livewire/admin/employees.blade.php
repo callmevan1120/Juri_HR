@@ -428,34 +428,34 @@
                     <!-- Wilayah Selection (Create) -->
                     <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <x-forms.label for="create_provinsi" value="{{ __('Provinsi') }}" />
+                            <x-forms.label for="create_provinsi" value="{{ __('Province') }}" />
                             <div class="mt-1">
                                 <x-forms.tom-select id="create_provinsi" wire:model.live="form.provinsi_kode"
-                                    placeholder="{{ __('Pilih Provinsi') }}" :options="$provinces->map(fn($p) => ['id' => $p->kode, 'name' => $p->nama])" />
+                                    placeholder="{{ __('Select Province') }}" :options="$provinces->map(fn($p) => ['id' => $p->kode, 'name' => $p->nama])" />
                             </div>
                             <x-forms.input-error for="form.provinsi_kode" class="mt-2" />
                         </div>
                         <div>
-                            <x-forms.label for="create_kabupaten" value="{{ __('Kabupaten/Kota') }}" />
+                            <x-forms.label for="create_kabupaten" value="{{ __('Regency / City') }}" />
                             <div class="mt-1" wire:key="create-kab-{{ $form->provinsi_kode ?? 'empty' }}">
                                 <x-forms.tom-select id="create_kabupaten" wire:model.live="form.kabupaten_kode"
-                                    placeholder="{{ __('Pilih Kabupaten/Kota') }}" :options="$regencies->map(fn($r) => ['id' => $r->kode, 'name' => $r->nama])" />
+                                    placeholder="{{ __('Select Regency/City') }}" :options="$regencies->map(fn($r) => ['id' => $r->kode, 'name' => $r->nama])" />
                             </div>
                             <x-forms.input-error for="form.kabupaten_kode" class="mt-2" />
                         </div>
                         <div>
-                            <x-forms.label for="create_kecamatan" value="{{ __('Kecamatan') }}" />
+                            <x-forms.label for="create_kecamatan" value="{{ __('District') }}" />
                             <div class="mt-1" wire:key="create-kec-{{ $form->kabupaten_kode ?? 'empty' }}">
                                 <x-forms.tom-select id="create_kecamatan" wire:model.live="form.kecamatan_kode"
-                                    placeholder="{{ __('Pilih Kecamatan') }}" :options="$districts->map(fn($d) => ['id' => $d->kode, 'name' => $d->nama])" />
+                                    placeholder="{{ __('Select District') }}" :options="$districts->map(fn($d) => ['id' => $d->kode, 'name' => $d->nama])" />
                             </div>
                             <x-forms.input-error for="form.kecamatan_kode" class="mt-2" />
                         </div>
                         <div>
-                            <x-forms.label for="create_kelurahan" value="{{ __('Kelurahan/Desa') }}" />
+                            <x-forms.label for="create_kelurahan" value="{{ __('Village') }}" />
                             <div class="mt-1" wire:key="create-kel-{{ $form->kecamatan_kode ?? 'empty' }}">
                                 <x-forms.tom-select id="create_kelurahan" wire:model.live="form.kelurahan_kode"
-                                    placeholder="{{ __('Pilih Kelurahan/Desa') }}" :options="$villages->map(fn($v) => ['id' => $v->kode, 'name' => $v->nama])" />
+                                    placeholder="{{ __('Select Village') }}" :options="$villages->map(fn($v) => ['id' => $v->kode, 'name' => $v->nama])" />
                             </div>
                             <x-forms.input-error for="form.kelurahan_kode" class="mt-2" />
                         </div>
@@ -642,34 +642,34 @@
                     <!-- Wilayah Selection (Edit) -->
                     <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <x-forms.label for="edit_provinsi" value="{{ __('Provinsi') }}" />
+                            <x-forms.label for="edit_provinsi" value="{{ __('Province') }}" />
                             <div class="mt-1">
                                 <x-forms.tom-select id="edit_provinsi" wire:model.live="form.provinsi_kode"
-                                    placeholder="{{ __('Pilih Provinsi') }}" :options="$provinces->map(fn($p) => ['id' => $p->kode, 'name' => $p->nama])" />
+                                    placeholder="{{ __('Select Province') }}" :options="$provinces->map(fn($p) => ['id' => $p->kode, 'name' => $p->nama])" />
                             </div>
                             <x-forms.input-error for="form.provinsi_kode" class="mt-2" />
                         </div>
                         <div>
-                            <x-forms.label for="edit_kabupaten" value="{{ __('Kabupaten/Kota') }}" />
+                            <x-forms.label for="edit_kabupaten" value="{{ __('Regency / City') }}" />
                             <div class="mt-1" wire:key="edit-kab-{{ $form->provinsi_kode ?? 'empty' }}">
                                 <x-forms.tom-select id="edit_kabupaten" wire:model.live="form.kabupaten_kode"
-                                    placeholder="{{ __('Pilih Kabupaten/Kota') }}" :options="$regencies->map(fn($r) => ['id' => $r->kode, 'name' => $r->nama])" />
+                                    placeholder="{{ __('Select Regency/City') }}" :options="$regencies->map(fn($r) => ['id' => $r->kode, 'name' => $r->nama])" />
                             </div>
                             <x-forms.input-error for="form.kabupaten_kode" class="mt-2" />
                         </div>
                         <div>
-                            <x-forms.label for="edit_kecamatan" value="{{ __('Kecamatan') }}" />
+                            <x-forms.label for="edit_kecamatan" value="{{ __('District') }}" />
                             <div class="mt-1" wire:key="edit-kec-{{ $form->kabupaten_kode ?? 'empty' }}">
                                 <x-forms.tom-select id="edit_kecamatan" wire:model.live="form.kecamatan_kode"
-                                    placeholder="{{ __('Pilih Kecamatan') }}" :options="$districts->map(fn($d) => ['id' => $d->kode, 'name' => $d->nama])" />
+                                    placeholder="{{ __('Select District') }}" :options="$districts->map(fn($d) => ['id' => $d->kode, 'name' => $d->nama])" />
                             </div>
                             <x-forms.input-error for="form.kecamatan_kode" class="mt-2" />
                         </div>
                         <div>
-                            <x-forms.label for="edit_kelurahan" value="{{ __('Kelurahan/Desa') }}" />
+                            <x-forms.label for="edit_kelurahan" value="{{ __('Village') }}" />
                             <div class="mt-1" wire:key="edit-kel-{{ $form->kecamatan_kode ?? 'empty' }}">
                                 <x-forms.tom-select id="edit_kelurahan" wire:model.live="form.kelurahan_kode"
-                                    placeholder="{{ __('Pilih Kelurahan/Desa') }}" :options="$villages->map(fn($v) => ['id' => $v->kode, 'name' => $v->nama])" />
+                                    placeholder="{{ __('Select Village') }}" :options="$villages->map(fn($v) => ['id' => $v->kode, 'name' => $v->nama])" />
                             </div>
                             <x-forms.input-error for="form.kelurahan_kode" class="mt-2" />
                         </div>

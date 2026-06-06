@@ -90,13 +90,30 @@
                 </section>
 
                 <section class="profile-control-grid" aria-label="{{ __('Profile controls') }}">
+                    @unless (\App\Helpers\Editions::attendanceLocked())
+                        <a href="{{ route('face.enrollment') }}" class="profile-preferences__item !flex !items-center !justify-between no-underline" style="text-decoration: none;">
+                            <div class="flex items-center gap-4">
+                                <div class="profile-preferences__icon bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
+                                    <x-heroicon-o-face-smile class="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h2 class="profile-preferences__title">{{ __('Face ID') }}</h2>
+                                    <p class="profile-preferences__copy">{{ auth()->user()->hasFaceRegistered() ? __('Face ID is ready to use.') : __('Manage face verification.') }}</p>
+                                </div>
+                            </div>
+                            <x-heroicon-o-chevron-right class="h-5 w-5 text-slate-400 dark:text-slate-500" />
+                        </a>
+                    @endunless
+
                     <div class="profile-preferences__item">
-                        <div class="profile-preferences__icon">
-                            <x-heroicon-o-language class="h-5 w-5" />
-                        </div>
-                        <div>
-                            <h2 class="profile-preferences__title">{{ __('Language') }}</h2>
-                            <p class="profile-preferences__copy">{{ __('Switch between Indonesian and English') }}</p>
+                        <div class="flex items-center gap-4">
+                            <div class="profile-preferences__icon">
+                                <x-heroicon-o-language class="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h2 class="profile-preferences__title">{{ __('Language') }}</h2>
+                                <p class="profile-preferences__copy">{{ __('Switch between Indonesian and English') }}</p>
+                            </div>
                         </div>
 
                         <form method="POST" action="{{ route('user.language.update') }}">
@@ -121,12 +138,14 @@
                     </div>
 
                     <div class="profile-preferences__item">
-                        <div class="profile-preferences__icon">
-                            <x-heroicon-o-swatch class="h-5 w-5" />
-                        </div>
-                        <div>
-                            <h2 class="profile-preferences__title">{{ __('Appearance') }}</h2>
-                            <p class="profile-preferences__copy">{{ __('Toggle light or dark mode') }}</p>
+                        <div class="flex items-center gap-4">
+                            <div class="profile-preferences__icon">
+                                <x-heroicon-o-swatch class="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h2 class="profile-preferences__title">{{ __('Appearance') }}</h2>
+                                <p class="profile-preferences__copy">{{ __('Toggle light or dark mode') }}</p>
+                            </div>
                         </div>
 
                         <x-navigation.theme-toggle id="theme-switcher-profile" class="shrink-0" />
@@ -150,65 +169,67 @@
                     @endforeach
                 </section>
 
-                <div x-cloak x-show="activePanel" x-trap.inert.noscroll="activePanel !== null"
-                    x-on:keydown.escape.window="closePanel()" class="profile-modal">
-                    <div class="profile-modal__backdrop" x-on:click="closePanel()"></div>
+                <template x-teleport="body">
+                    <div x-cloak x-show="activePanel" x-trap.inert.noscroll="activePanel !== null"
+                        x-on:keydown.escape.window="closePanel()" class="profile-modal">
+                        <div class="profile-modal__backdrop" x-on:click="closePanel()"></div>
 
-                    <div x-show="activePanel" class="profile-modal__panel" role="dialog" aria-modal="true"
-                        x-transition:enter="ease-out duration-300"
-                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave="ease-in duration-200"
-                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                        <div class="profile-modal__header">
-                            <div>
-                                <h2 class="profile-modal__title" x-text="activePanel ? panels[activePanel].title : ''"></h2>
-                                <p class="profile-modal__copy" x-text="activePanel ? panels[activePanel].copy : ''"></p>
+                        <div x-show="activePanel" class="profile-modal__panel" role="dialog" aria-modal="true"
+                            x-transition:enter="ease-out duration-300"
+                            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave="ease-in duration-200"
+                            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                            <div class="profile-modal__header">
+                                <div>
+                                    <h2 class="profile-modal__title" x-text="activePanel ? panels[activePanel].title : ''"></h2>
+                                    <p class="profile-modal__copy" x-text="activePanel ? panels[activePanel].copy : ''"></p>
+                                </div>
+
+                                <button type="button" class="profile-modal__close" x-on:click="closePanel()"
+                                    aria-label="{{ __('Close panel') }}">
+                                    <x-heroicon-o-x-mark class="h-5 w-5" />
+                                </button>
                             </div>
 
-                            <button type="button" class="profile-modal__close" x-on:click="closePanel()"
-                                aria-label="{{ __('Close panel') }}">
-                                <x-heroicon-o-x-mark class="h-5 w-5" />
-                            </button>
-                        </div>
+                            <div class="profile-modal__body">
+                                @if (Laravel\Fortify\Features::canUpdateProfileInformation())
+                                    <section x-cloak x-show="activePanel === 'details'" x-transition.opacity.duration.150ms>
+                                        <h3 class="sr-only">{{ __('Profile Information') }}</h3>
+                                        <livewire:profile.update-profile-information-form />
+                                    </section>
+                                @endif
 
-                        <div class="profile-modal__body">
-                            @if (Laravel\Fortify\Features::canUpdateProfileInformation())
-                                <section x-cloak x-show="activePanel === 'details'" x-transition.opacity.duration.150ms>
-                                    <h3 class="sr-only">{{ __('Profile Information') }}</h3>
-                                    <livewire:profile.update-profile-information-form />
+                                @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
+                                    <section x-cloak x-show="activePanel === 'password'" x-transition.opacity.duration.150ms>
+                                        <h3 class="sr-only">{{ __('Update Password') }}</h3>
+                                        <livewire:profile.update-password-form />
+                                    </section>
+                                @endif
+
+                                @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+                                    <section x-cloak x-show="activePanel === 'security'" x-transition.opacity.duration.150ms>
+                                        <h3 class="sr-only">{{ __('Two Factor Authentication') }}</h3>
+                                        <livewire:profile.two-factor-authentication-form />
+                                    </section>
+                                @endif
+
+                                <section x-cloak x-show="activePanel === 'sessions'" x-transition.opacity.duration.150ms>
+                                    <h3 class="sr-only">{{ __('Browser Sessions') }}</h3>
+                                    <livewire:profile.logout-other-browser-sessions-form />
                                 </section>
-                            @endif
 
-                            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
-                                <section x-cloak x-show="activePanel === 'password'" x-transition.opacity.duration.150ms>
-                                    <h3 class="sr-only">{{ __('Update Password') }}</h3>
-                                    <livewire:profile.update-password-form />
-                                </section>
-                            @endif
-
-                            @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
-                                <section x-cloak x-show="activePanel === 'security'" x-transition.opacity.duration.150ms>
-                                    <h3 class="sr-only">{{ __('Two Factor Authentication') }}</h3>
-                                    <livewire:profile.two-factor-authentication-form />
-                                </section>
-                            @endif
-
-                            <section x-cloak x-show="activePanel === 'sessions'" x-transition.opacity.duration.150ms>
-                                <h3 class="sr-only">{{ __('Browser Sessions') }}</h3>
-                                <livewire:profile.logout-other-browser-sessions-form />
-                            </section>
-
-                            @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-                                <section x-cloak x-show="activePanel === 'danger'" x-transition.opacity.duration.150ms>
-                                    <h3 class="sr-only">{{ __('Delete Account') }}</h3>
-                                    <livewire:profile.request-account-deletion-form />
-                                </section>
-                            @endif
+                                @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+                                    <section x-cloak x-show="activePanel === 'danger'" x-transition.opacity.duration.150ms>
+                                        <h3 class="sr-only">{{ __('Delete Account') }}</h3>
+                                        <livewire:profile.request-account-deletion-form />
+                                    </section>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
             </div>
         </div>
     </div>

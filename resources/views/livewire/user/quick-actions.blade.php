@@ -48,183 +48,138 @@
         ],
     ];
 
-    $moreItems = [
-        [
-            'kind' => 'link',
-            'href' => route('my-schedule'),
-            'label' => __('My Schedule'),
-            'description' => __('Check shifts and work hours.'),
-            'icon' => 'calendar',
-            'tone' => 'bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-200',
-            'locked' => false,
-            'completed' => false,
+        $rawMoreGroups = [
+        __('Requests & Schedule') => [
+            [
+                'kind' => 'link',
+                'href' => route('my-schedule'),
+                'label' => __('My Schedule'),
+                'description' => __('Check shifts and work hours.'),
+                'icon' => 'calendar',
+                'tone' => 'bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-200',
+                'locked' => false,
+            ],
+            [
+                'kind' => 'link',
+                'href' => route('shift-swap-requests'),
+                'label' => __('Shift Swap'),
+                'description' => __('Request schedule changes.'),
+                'icon' => 'swap',
+                'tone' => 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200',
+                'locked' => false,
+            ],
+            [
+                'kind' => 'link',
+                'href' => route('wfh-requests'),
+                'label' => __('WFH'),
+                'description' => __('Request work-from-home approval.'),
+                'icon' => 'home',
+                'tone' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200',
+                'locked' => false,
+            ],
         ],
-        [
-            'kind' => 'link',
-            'href' => route('hr-tasks'),
-            'label' => __('HR Tasks'),
-            'description' => __('Complete onboarding and offboarding follow-ups.'),
-            'icon' => 'tasks',
-            'tone' => 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-200',
-            'locked' => false,
-            'completed' => false,
+        __('Tasks & Collaboration') => [
+            [
+                'kind' => 'link',
+                'href' => route('hr-tasks'),
+                'label' => __('HR Tasks'),
+                'description' => __('Complete onboarding and offboarding follow-ups.'),
+                'icon' => 'tasks',
+                'tone' => 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-200',
+                'locked' => false,
+            ],
+            [
+                'kind' => 'link',
+                'href' => route('my-tasks'),
+                'label' => __('Operational Tasks'),
+                'description' => __('Follow client, project, and field-work tasks.'),
+                'icon' => 'tasks',
+                'tone' => 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-200',
+                'locked' => false,
+            ],
+            [
+                'kind' => 'link',
+                'href' => route('collaboration'),
+                'label' => __('Team Chat'),
+                'description' => __('Open conversations and shared files.'),
+                'icon' => 'chat',
+                'tone' => 'bg-teal-100 text-teal-700 dark:bg-teal-950/40 dark:text-teal-200',
+                'locked' => false,
+            ],
+            [
+                'kind' => 'link',
+                'href' => route('my-forms'),
+                'label' => __('Forms'),
+                'description' => __('Submit HR and operations forms.'),
+                'icon' => 'forms',
+                'tone' => 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-200',
+                'locked' => false,
+            ],
         ],
-        [
-            'kind' => 'link',
-            'href' => route('my-tasks'),
-            'label' => __('Operational Tasks'),
-            'description' => __('Follow client, project, and field-work tasks.'),
-            'icon' => 'tasks',
-            'tone' => 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-200',
-            'locked' => false,
-            'completed' => false,
+        __('Finance & Asset') => [
+            [
+                'kind' => \App\Helpers\Editions::payrollLocked() ? 'button' : 'link',
+                'href' => \App\Helpers\Editions::payrollLocked() ? null : route('my-payslips'),
+                'label' => __('Payslip'),
+                'description' => __('Open salary statements.'),
+                'icon' => 'payslip',
+                'tone' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200',
+                'locked' => \App\Helpers\Editions::payrollLocked(),
+            ],
+            [
+                'kind' => $cashAdvanceLocked ? 'button' : (!$canRequestKasbon ? 'disabled' : 'link'),
+                'href' => ($cashAdvanceLocked || !$canRequestKasbon) ? null : route('my-kasbon'),
+                'label' => __('Kasbon'),
+                'description' => __('Track cash advance requests.'),
+                'icon' => 'kasbon',
+                'tone' => !$canRequestKasbon
+                    ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-200',
+                'locked' => $cashAdvanceLocked,
+                'disabledMessage' => __('Kasbon is available after your basic salary has been updated.'),
+            ],
+            [
+                'kind' => \App\Helpers\Editions::assetLocked() ? 'button' : 'link',
+                'href' => \App\Helpers\Editions::assetLocked() ? null : route('my-assets'),
+                'label' => __('Assets'),
+                'description' => __('Review assigned company assets.'),
+                'icon' => 'assets',
+                'tone' => 'bg-stone-100 text-stone-700 dark:bg-stone-900/50 dark:text-stone-200',
+                'locked' => \App\Helpers\Editions::assetLocked(),
+            ],
         ],
-        [
-            'kind' => 'link',
-            'href' => route('collaboration'),
-            'label' => __('Team Chat'),
-            'description' => __('Open conversations and shared files.'),
-            'icon' => 'chat',
-            'tone' => 'bg-teal-100 text-teal-700 dark:bg-teal-950/40 dark:text-teal-200',
-            'locked' => false,
-            'completed' => false,
-        ],
-        [
-            'kind' => 'link',
-            'href' => route('my-forms'),
-            'label' => __('Forms'),
-            'description' => __('Submit HR and operations forms.'),
-            'icon' => 'forms',
-            'tone' => 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-200',
-            'locked' => false,
-            'completed' => false,
-        ],
-        [
-            'kind' => 'link',
-            'href' => route('shift-swap-requests'),
-            'label' => __('Shift Swap'),
-            'description' => __('Request schedule changes.'),
-            'icon' => 'swap',
-            'tone' => 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200',
-            'locked' => false,
-            'completed' => false,
-        ],
-        [
-            'kind' => 'link',
-            'href' => route('wfh-requests'),
-            'label' => __('WFH'),
-            'description' => __('Request work-from-home approval.'),
-            'icon' => 'home',
-            'tone' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200',
-            'locked' => false,
-            'completed' => false,
-        ],
-        [
-            'kind' => \App\Helpers\Editions::documentRequestsLocked() ? 'button' : 'link',
-            'href' => \App\Helpers\Editions::documentRequestsLocked() ? null : route('document-requests'),
-            'label' => __('Documents'),
-            'description' => __('Request and upload HR documents.'),
-            'icon' => 'document',
-            'tone' => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-200',
-            'locked' => \App\Helpers\Editions::documentRequestsLocked(),
-            'completed' => false,
-            'lockTitle' => __('Documents Locked'),
-            'lockMessage' => __('Document Workflow is an Enterprise Feature. Please Upgrade.'),
-        ],
-        [
-            'kind' => \App\Helpers\Editions::attendanceLocked() ? 'button' : 'link',
-            'href' => \App\Helpers\Editions::attendanceLocked() ? null : route('face.enrollment'),
-            'label' => __('Face ID'),
-            'description' => $hasFaceRegistered ? __('Face ID is ready to use.') : __('Manage face verification.'),
-            'icon' => 'face',
-            'tone' => $hasFaceRegistered
-                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
-                : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-200',
-            'locked' => \App\Helpers\Editions::attendanceLocked(),
-            'completed' => $hasFaceRegistered,
-            'lockTitle' => __('Face ID Locked'),
-            'lockMessage' => __('Face ID Biometrics is an Enterprise Feature. Please Upgrade.'),
-        ],
-        [
-            'kind' => \App\Helpers\Editions::payrollLocked() ? 'button' : 'link',
-            'href' => \App\Helpers\Editions::payrollLocked() ? null : route('my-payslips'),
-            'label' => __('Payslip'),
-            'description' => __('Open salary statements.'),
-            'icon' => 'payslip',
-            'tone' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200',
-            'locked' => \App\Helpers\Editions::payrollLocked(),
-            'completed' => false,
-            'lockTitle' => __('Payroll Locked'),
-            'lockMessage' => __('Payroll Access is an Enterprise Feature. Please Upgrade.'),
-        ],
-        [
-            'kind' => $cashAdvanceLocked ? 'button' : (!$canRequestKasbon ? 'disabled' : 'link'),
-            'href' => ($cashAdvanceLocked || !$canRequestKasbon) ? null : route('my-kasbon'),
-            'label' => __('Kasbon'),
-            'description' => __('Track cash advance requests.'),
-            'icon' => 'kasbon',
-            'tone' => !$canRequestKasbon
-                ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
-                : 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-200',
-            'locked' => $cashAdvanceLocked,
-            'disabled' => !$canRequestKasbon && ! $cashAdvanceLocked,
-            'completed' => false,
-            'lockTitle' => __('Kasbon Locked'),
-            'lockMessage' => $cashAdvanceLocked
-                ? __('Kasbon Access is an Enterprise Feature. Please Upgrade.')
-                : null,
-            'disabledMessage' => __('Kasbon is available after your basic salary has been updated.'),
-        ],
-        [
-            'kind' => \App\Helpers\Editions::assetLocked() ? 'button' : 'link',
-            'href' => \App\Helpers\Editions::assetLocked() ? null : route('my-assets'),
-            'label' => __('Assets'),
-            'description' => __('Review assigned company assets.'),
-            'icon' => 'assets',
-            'tone' => 'bg-stone-100 text-stone-700 dark:bg-stone-900/50 dark:text-stone-200',
-            'locked' => \App\Helpers\Editions::assetLocked(),
-            'completed' => false,
-            'lockTitle' => __('Assets Locked'),
-            'lockMessage' => __('Company Asset Management is an Enterprise Feature. Please Upgrade.'),
-        ],
-        [
-            'kind' => \App\Helpers\Editions::appraisalLocked() ? 'button' : 'link',
-            'href' => \App\Helpers\Editions::appraisalLocked() ? null : route('my-performance'),
-            'label' => __('Performance'),
-            'description' => __('Check KPI and appraisal results.'),
-            'icon' => 'performance',
-            'tone' => 'bg-lime-100 text-lime-700 dark:bg-lime-950/40 dark:text-lime-200',
-            'locked' => \App\Helpers\Editions::appraisalLocked(),
-            'completed' => false,
-            'lockTitle' => __('Performance Locked'),
-            'lockMessage' => __('KPI & Performance Appraisal is an Enterprise Feature. Please Upgrade.'),
-        ],
-        [
-            'kind' => 'link',
-            'href' => route('profile.show'),
-            'label' => __('Profile'),
-            'description' => __('Update account and security.'),
-            'icon' => 'profile',
-            'tone' => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
-            'locked' => false,
-            'completed' => false,
-        ],
-        [
-            'kind' => 'form',
-            'action' => route('logout'),
-            'label' => __('Log Out'),
-            'description' => __('Sign out from your account.'),
-            'icon' => 'logout',
-            'tone' => 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-200',
-            'locked' => false,
-            'completed' => false,
+        __('HR & Document') => [
+            [
+                'kind' => \App\Helpers\Editions::documentRequestsLocked() ? 'button' : 'link',
+                'href' => \App\Helpers\Editions::documentRequestsLocked() ? null : route('document-requests'),
+                'label' => __('Documents'),
+                'description' => __('Request and upload HR documents.'),
+                'icon' => 'document',
+                'tone' => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-200',
+                'locked' => \App\Helpers\Editions::documentRequestsLocked(),
+            ],
+            [
+                'kind' => \App\Helpers\Editions::appraisalLocked() ? 'button' : 'link',
+                'href' => \App\Helpers\Editions::appraisalLocked() ? null : route('my-performance'),
+                'label' => __('Performance'),
+                'description' => __('Check KPI and appraisal results.'),
+                'icon' => 'performance',
+                'tone' => 'bg-lime-100 text-lime-700 dark:bg-lime-950/40 dark:text-lime-200',
+                'locked' => \App\Helpers\Editions::appraisalLocked(),
+            ],
         ],
     ];
 
-    $teamItems = [];
+    $flattenedMoreItems = [];
+    foreach ($rawMoreGroups as $groupName => $items) {
+        $filteredItems = collect($items)->reject(fn($i) => !empty($i['locked']))->values()->all();
+        $flattenedMoreItems = array_merge($flattenedMoreItems, $filteredItems);
+    }
+
+    $teamItemsRaw = [];
 
     if ($canReviewSubordinateRequests) {
-        $teamItems = [
+        $teamItemsRaw = [
             [
                 'kind' => 'link',
                 'href' => route('approvals'),
@@ -251,11 +206,11 @@
                 'icon' => 'team',
                 'tone' => 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-200',
                 'locked' => $cashAdvanceLocked,
-                'lockTitle' => __('Team Kasbon Locked'),
-                'lockMessage' => __('Team Kasbon Access is an Enterprise Feature. Please Upgrade.'),
             ],
         ];
     }
+    
+    $teamItems = collect($teamItemsRaw)->reject(fn($i) => !empty($i['locked']))->values()->all();
 @endphp
 
 <div x-data="{ showMore: false }" class="space-y-3" aria-label="{{ __('User shortcuts') }}">
@@ -368,7 +323,7 @@
 
                 <div class="quick-wallet-modal__body">
                     <ul class="quick-wallet-more-grid" role="list">
-                        @foreach ($moreItems as $item)
+                        @foreach ($flattenedMoreItems as $item)
                             <li>
                                 @if ($item['kind'] === 'link')
                                     <a href="{{ $item['href'] }}" class="quick-wallet-more-item relative"
@@ -377,44 +332,7 @@
                                             <x-user.quick-menu-icon :name="$item['icon']" class="h-5 w-5" />
                                         </div>
                                         <div class="quick-wallet-more-item__label">{{ $item['label'] }}</div>
-                                        @if ($item['completed'] ?? false)
-                                            <span
-                                                class="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
-                                                aria-label="{{ __('Registered') }}">
-                                                <x-heroicon-o-check class="h-3.5 w-3.5" />
-                                            </span>
-                                        @endif
-                                        @if ($item['locked'])
-                                            <span
-                                                class="user-lock-badge"
-                                                aria-hidden="true">
-                                                <x-heroicon-o-lock-closed class="h-3.5 w-3.5" />
-                                            </span>
-                                        @endif
                                     </a>
-                                @elseif ($item['kind'] === 'button')
-                                    <button type="button" class="quick-wallet-more-item relative"
-                                        aria-label="{{ $item['label'] }}. {{ $item['description'] }}"
-                                        @click.prevent="$dispatch('feature-lock', { title: @js($item['lockTitle']), message: @js($item['lockMessage']) })">
-                                        <div class="quick-wallet-more-item__icon {{ $item['tone'] }}">
-                                            <x-user.quick-menu-icon :name="$item['icon']" class="h-5 w-5" />
-                                        </div>
-                                        <div class="quick-wallet-more-item__label">{{ $item['label'] }}</div>
-                                        @if ($item['completed'] ?? false)
-                                            <span
-                                                class="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
-                                                aria-label="{{ __('Registered') }}">
-                                                <x-heroicon-o-check class="h-3.5 w-3.5" />
-                                            </span>
-                                        @endif
-                                        @if ($item['locked'])
-                                            <span
-                                                class="user-lock-badge"
-                                                aria-hidden="true">
-                                                <x-heroicon-o-lock-closed class="h-3.5 w-3.5" />
-                                            </span>
-                                        @endif
-                                    </button>
                                 @elseif ($item['kind'] === 'disabled')
                                     <button type="button" class="quick-wallet-more-item relative cursor-not-allowed opacity-70"
                                         disabled title="{{ $item['disabledMessage'] ?? $item['description'] }}"
@@ -424,31 +342,6 @@
                                         </div>
                                         <div class="quick-wallet-more-item__label">{{ $item['label'] }}</div>
                                     </button>
-                                @else
-                                    <form method="POST" action="{{ $item['action'] }}">
-                                        @csrf
-                                        <button type="submit" class="quick-wallet-more-item relative"
-                                            aria-label="{{ $item['label'] }}. {{ $item['description'] }}">
-                                            <div class="quick-wallet-more-item__icon {{ $item['tone'] }}">
-                                                <x-user.quick-menu-icon :name="$item['icon']" class="h-5 w-5" />
-                                            </div>
-                                            <div class="quick-wallet-more-item__label">{{ $item['label'] }}</div>
-                                            @if ($item['completed'] ?? false)
-                                                <span
-                                                    class="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
-                                                    aria-label="{{ __('Registered') }}">
-                                                    <x-heroicon-o-check class="h-3.5 w-3.5" />
-                                                </span>
-                                            @endif
-                                            @if ($item['locked'])
-                                                <span
-                                                    class="user-lock-badge"
-                                                    aria-hidden="true">
-                                                    <x-heroicon-o-lock-closed class="h-3.5 w-3.5" />
-                                                </span>
-                                            @endif
-                                        </button>
-                                    </form>
                                 @endif
                             </li>
                         @endforeach

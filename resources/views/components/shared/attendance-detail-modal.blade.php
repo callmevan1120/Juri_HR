@@ -29,7 +29,7 @@
 
                     @if($isExcused)
                     <div class="md:col-span-2">
-                        <x-forms.label value="{{ __('Status Pengajuan') }}"></x-forms.label>
+                        <x-forms.label value="{{ __('Request Status') }}"></x-forms.label>
                         @php
                             $approvalStatus = $currentAttendance['approval_status'] ?? 'approved';
                             $statusColor = match($approvalStatus) {
@@ -239,9 +239,14 @@
                 @endif
             </div>
 
-            {{-- Close Button --}}
-            <div class="mt-6 flex justify-end">
-                <x-actions.secondary-button wire:click="$set('showDetail', false)" class="!px-3 !py-1.5">
+            {{-- Action Buttons --}}
+            <div class="mt-6 flex items-center justify-between gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <a href="{{ route('attendance-corrections', ['date' => $currentAttendance['date'] ?? '']) }}" 
+                   class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-violet-700 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500/30 dark:text-violet-300 dark:hover:bg-violet-500/10">
+                    <x-heroicon-o-pencil-square class="h-4 w-4" />
+                    {{ __('Request Correction') }}
+                </a>
+                <x-actions.secondary-button wire:click="$set('showDetail', false)" class="!px-4 !py-2">
                     {{ __('Close') }}
                 </x-actions.secondary-button>
             </div>

@@ -4,15 +4,9 @@
 
         <div class="auth-shell__container">
             <section class="auth-card lg:col-span-2" aria-labelledby="login-form-title">
-                <div class="auth-card__header auth-native-header">
-                    <div class="auth-native-mark" aria-hidden="true">
-                        <img src="{{ asset('images/icons/logo.jpeg') }}" alt="">
-                    </div>
-                    <div>
-                        <p class="auth-card__eyebrow">{{ __('Sign in') }}</p>
-                        <h2 id="login-form-title" class="auth-card__title">{{ __('Welcome Back!') }}</h2>
-                        <p class="auth-card__copy">{{ __('Sign in to start attendance, review tasks, and manage daily requests.') }}</p>
-                    </div>
+                <div class="auth-card__header text-center">
+                    <h2 id="login-form-title" class="auth-card__title !text-2xl !font-bold">{{ __('Welcome Back!') }}</h2>
+                    <p class="auth-card__copy mt-2 text-sm text-gray-500">{{ __('Sign in to start attendance, review tasks, and manage daily requests.') }}</p>
                 </div>
 
                 <div class="auth-form">

@@ -4,17 +4,11 @@
 
         <div class="auth-shell__container">
             <section class="auth-card lg:col-span-2" aria-labelledby="forgot-password-title">
-                <div class="auth-card__header auth-native-header">
-                    <div class="auth-native-mark" aria-hidden="true">
-                        <x-heroicon-o-key class="h-8 w-8" />
-                    </div>
-                    <div>
-                        <p class="auth-card__eyebrow">{{ __('Password Recovery') }}</p>
-                        <h2 id="forgot-password-title" class="auth-card__title">{{ __('Forgot your password?') }}</h2>
-                        <p class="auth-card__copy">
-                            {{ __('Enter your registered email and we will send a secure reset link.') }}
-                        </p>
-                    </div>
+                <div class="auth-card__header text-center">
+                    <h2 id="forgot-password-title" class="auth-card__title !text-2xl !font-bold">{{ __('Forgot your password?') }}</h2>
+                    <p class="auth-card__copy mt-2 text-sm text-gray-500">
+                        {{ __('Enter your registered email and we will send a secure reset link.') }}
+                    </p>
                 </div>
 
                 <div class="auth-form">

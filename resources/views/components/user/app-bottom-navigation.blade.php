@@ -21,7 +21,7 @@
             'icon' => 'heroicon-o-calendar-days',
         ],
         [
-            'label' => __('Clock In'),
+            'label' => __('Scan'),
             'href' => route('scan'),
             'active' => request()->routeIs('scan'),
             'icon' => 'heroicon-o-qr-code',
