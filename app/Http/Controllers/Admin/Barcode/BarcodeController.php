@@ -22,9 +22,12 @@ class BarcodeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Barcode $barcode, AdminBarcodeService $barcodeService)
     {
-        //
+        return view('admin.barcodes.show', [
+            'barcode' => $barcode,
+            'qrPreviewDataUri' => $barcodeService->generatePreviewDataUri($barcode),
+        ]);
     }
 
     public function create()
@@ -127,7 +130,7 @@ class BarcodeController extends Controller
         return response()->view('admin.barcodes.dynamic-display', [
             'barcode' => $barcode,
             'tokenPayload' => $dynamicBarcodeTokenService->generateTokenPayload($barcode),
-        ])->withHeaders($this->noStoreHeaders());
+        ])->withHeaders($this->noStoreHeaders(expires: 'Fri, 01 Jan 1990 00:00:00 GMT'));
     }
 
     public function dynamicToken(Barcode $barcode, DynamicBarcodeTokenService $dynamicBarcodeTokenService)
@@ -163,12 +166,12 @@ class BarcodeController extends Controller
             ->with('flash.bannerStyle', 'success');
     }
 
-    private function noStoreHeaders(): array
+    private function noStoreHeaders(string $expires = '0'): array
     {
         return [
             'Cache-Control' => 'no-store, no-cache, must-revalidate, private, max-age=0',
             'Pragma' => 'no-cache',
-            'Expires' => '0',
+            'Expires' => $expires,
         ];
     }
 }

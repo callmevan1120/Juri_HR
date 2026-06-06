@@ -16,12 +16,14 @@ class RedirectAdminProfileRequests
     {
         $user = $request->user();
 
-        if (
-            $request->isMethod('GET')
-            && $request->routeIs('profile.show')
-            && $user?->can('accessAdminPanel')
-        ) {
-            return redirect()->route('admin.profile.show');
+        if ($request->isMethod('GET') && $user?->can('accessAdminPanel')) {
+            if ($request->routeIs('profile.show')) {
+                return redirect()->route('admin.profile.show');
+            }
+
+            if ($request->routeIs('api-tokens.index')) {
+                return redirect()->to(route('admin.profile.show').'#api');
+            }
         }
 
         return $next($request);

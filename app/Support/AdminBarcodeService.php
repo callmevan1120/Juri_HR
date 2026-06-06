@@ -65,6 +65,19 @@ class AdminBarcodeService
         ];
     }
 
+    public function generatePreviewDataUri(Barcode $barcode): ?string
+    {
+        if ($barcode->dynamic_enabled) {
+            return null;
+        }
+
+        $file = (new BarcodeGenerator(width: 640, height: 640))
+            ->generateQrCode($barcode->value)
+            ->toString();
+
+        return 'data:image/png;base64,'.base64_encode($file);
+    }
+
     public function generateBulkDownload(): ?array
     {
         $barcodes = Barcode::query()

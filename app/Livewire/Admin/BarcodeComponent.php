@@ -28,6 +28,8 @@ class BarcodeComponent extends Component
 
     public function confirmDeletion($id)
     {
+        Gate::authorize('manageBarcodes');
+
         $barcode = Barcode::findOrFail($id);
         $this->deleteName = $barcode->name;
         $this->confirmingDeletion = true;
@@ -37,7 +39,8 @@ class BarcodeComponent extends Component
     public function delete()
     {
         Gate::authorize('manageBarcodes');
-        $barcode = Barcode::find($this->selectedId);
+
+        $barcode = Barcode::findOrFail($this->selectedId);
         $barcode->delete();
         $this->confirmingDeletion = false;
         $this->selectedId = null;

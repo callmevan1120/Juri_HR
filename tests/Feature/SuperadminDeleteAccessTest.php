@@ -77,6 +77,23 @@ test('superadmin can delete admin account from admin directory', function () {
     $this->assertDatabaseMissing('users', ['id' => $admin->id]);
 });
 
+test('admin directory clears delete modal state after deleting an admin account', function () {
+    $superadmin = User::factory()->admin(true)->create();
+    $admin = User::factory()->admin()->create(['name' => 'Delete State Admin']);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(AdminDirectory::class)
+        ->call('confirmDeletion', $admin->id)
+        ->assertSet('confirmingDeletion', true)
+        ->assertSet('selectedId', $admin->id)
+        ->assertSet('deleteName', 'Delete State Admin')
+        ->call('delete')
+        ->assertSet('confirmingDeletion', false)
+        ->assertSet('selectedId', null)
+        ->assertSet('deleteName', null);
+});
+
 test('superadmin cannot delete own account from admin directory', function () {
     $superadmin = User::factory()->admin(true)->create();
 

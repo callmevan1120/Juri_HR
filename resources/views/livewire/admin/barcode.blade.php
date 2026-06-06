@@ -80,8 +80,10 @@
                 <div class="px-4 pb-2 text-sm space-y-2">
                     <div class="flex items-start gap-2 text-gray-600 dark:text-gray-400">
                         <x-heroicon-o-map-pin class="mt-0.5 h-4 w-4 shrink-0" />
-                        <a href="#"
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ $barcode->latitude }},{{ $barcode->longitude }}"
                             onclick="window.openMap({{ $barcode->latitude }}, {{ $barcode->longitude }}); return false;"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             aria-label="{{ __('Open map for barcode') }}: {{ $barcode->name }}"
                             class="rounded hover:text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 dark:focus:ring-offset-gray-800 truncate">
                             {{ $barcode->latitude }}, {{ $barcode->longitude }}
@@ -102,7 +104,14 @@
                 </div>
 
                 <!-- Actions Footer -->
-                <div class="px-2 pb-2 pt-4 grid grid-cols-3 gap-3">
+                <div class="px-2 pb-2 pt-4 grid grid-cols-4 gap-3">
+                    <x-actions.icon-button href="{{ route('admin.barcodes.show', $barcode) }}"
+                        label="{{ __('View barcode details') }}: {{ $barcode->name }}" variant="secondary"
+                        class="h-auto w-full rounded-lg py-2">
+                        <x-heroicon-o-information-circle class="h-4 w-4" />
+                        <span class="sr-only">{{ __('Details') }}</span>
+                    </x-actions.icon-button>
+
                     @if ($barcode->dynamic_enabled)
                         <x-actions.icon-button href="{{ route('admin.barcodes.dynamic-display', $barcode) }}"
                             label="{{ __('Show dynamic barcode') }}: {{ $barcode->name }}" variant="warning"

@@ -6,6 +6,8 @@
     $isAdminUser = $user?->can('accessAdminPanel') ?? false;
     $homeHref = $user?->preferredHomeUrl() ?? route('home');
     $homeLabel = $isAdminUser ? __('Go to admin home') : __('Go to home');
+    $profileHref = $isAdminRoute ? route('admin.profile.show') : route('profile.show');
+    $apiTokensHref = $isAdminRoute ? route('admin.profile.show').'#api' : route('api-tokens.index');
     $reportingLocked = \App\Helpers\Editions::reportingLocked();
     $payrollLocked = \App\Helpers\Editions::payrollLocked();
     $cashAdvanceLocked = \App\Helpers\Editions::cashAdvanceLocked();
@@ -410,12 +412,12 @@
                                         {{ __('Manage Account') }}
                                     </div>
 
-                                    <x-navigation.dropdown-link href="{{ route($isAdminRoute ? 'admin.profile.show' : 'profile.show') }}">
+                                    <x-navigation.dropdown-link href="{{ $profileHref }}">
                                         {{ __('Profile') }}
                                     </x-navigation.dropdown-link>
 
                                     @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                                        <x-navigation.dropdown-link href="{{ route('api-tokens.index') }}">
+                                        <x-navigation.dropdown-link href="{{ $apiTokensHref }}">
                                             {{ __('API Tokens') }}
                                         </x-navigation.dropdown-link>
                                     @endif
@@ -557,12 +559,12 @@
 
                 <div class="mt-3 space-y-1">
                     <!-- Account Management -->
-                    <x-navigation.responsive-nav-link href="{{ route($isAdminRoute ? 'admin.profile.show' : 'profile.show') }}" :active="request()->routeIs($isAdminRoute ? 'admin.profile.show' : 'profile.show')">
+                    <x-navigation.responsive-nav-link href="{{ $profileHref }}" :active="request()->routeIs($isAdminRoute ? 'admin.profile.show' : 'profile.show')">
                         {{ __('Profile') }}
                     </x-navigation.responsive-nav-link>
 
                     @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                        <x-navigation.responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">
+                        <x-navigation.responsive-nav-link href="{{ $apiTokensHref }}" :active="$isAdminRoute ? request()->routeIs('admin.profile.show') : request()->routeIs('api-tokens.index')">
                             {{ __('API Tokens') }}
                         </x-navigation.responsive-nav-link>
                     @endif

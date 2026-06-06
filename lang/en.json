@@ -4521,5 +4521,20 @@
     "Please enter a value less than or equal to :max.": "Please enter a value less than or equal to :max.",
     "Please review this field.": "Please review this field.",
     "Please review the highlighted fields before continuing.": "Please review the highlighted fields before continuing.",
-    "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information.": "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information."
+    "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information.": "Make sure the Company Name and Support Telegram in the General tab match the registered data, because the license key is tied to that information.",
+    "Checkpoint ID": "Checkpoint ID",
+    "Download QR": "Download QR",
+    "Inspect checkpoint QR mode, location, radius, and operational actions.": "Inspect checkpoint QR mode, location, radius, and operational actions.",
+    "Internal Checkpoint Code": "Internal Checkpoint Code",
+    "Location and Attendance Boundary": "Location and Attendance Boundary",
+    "Map Pin": "Map Pin",
+    "Open Live Display": "Open Live Display",
+    "Open Map": "Open Map",
+    "QR Status": "QR Status",
+    "QR preview for": "QR preview for",
+    "Rotating token display": "Rotating token display",
+    "Secret Status": "Secret Status",
+    "Static checkpoint QR": "Static checkpoint QR",
+    "Use the live display page for scanning. Static downloads are disabled for dynamic checkpoints.": "Use the live display page for scanning. Static downloads are disabled for dynamic checkpoints.",
+    "View barcode details": "View barcode details"
 }

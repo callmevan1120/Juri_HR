@@ -335,3 +335,26 @@ test('device permissions api requires explicit permissions ability', function ()
         ->assertJsonPath('success', true)
         ->assertJsonPath('permissions.camera.state', 'prompt');
 });
+
+test('device api rejects administrator personal access tokens', function () {
+    $admin = User::factory()->admin()->create();
+
+    Sanctum::actingAs($admin, [
+        ApiTokenPermission::DEVICE_PERMISSIONS,
+        ApiTokenPermission::DEVICE_BARCODE,
+    ]);
+
+    $this
+        ->getJson('/api/device/permissions')
+        ->assertForbidden()
+        ->assertJsonPath('message', 'Device API is only available for employee accounts.');
+
+    $this
+        ->postJson('/api/device/barcode', [
+            'barcode_data' => 'ANY-CODE',
+            'latitude' => -6.2,
+            'longitude' => 106.8,
+        ])
+        ->assertForbidden()
+        ->assertJsonPath('message', 'Device API is only available for employee accounts.');
+});

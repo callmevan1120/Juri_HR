@@ -240,6 +240,54 @@ test('admin can open dynamic barcode edit page without regex compilation errors'
         ->assertSee(__('Regenerate Secret'));
 });
 
+test('admin can inspect static barcode checkpoint details', function () {
+    $admin = User::factory()->admin()->create();
+    $barcode = Barcode::factory()->create([
+        'name' => 'Lobby Gate',
+        'value' => 'CHK-LOBBY-GATE',
+        'dynamic_enabled' => false,
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+        'radius' => 75,
+    ]);
+
+    $this
+        ->actingAs($admin)
+        ->get(route('admin.barcodes.show', $barcode))
+        ->assertOk()
+        ->assertSee('Lobby Gate')
+        ->assertSee('CHK-LOBBY-GATE')
+        ->assertSee('-6.200000')
+        ->assertSee('106.800000')
+        ->assertSee('75m')
+        ->assertSee(__('Download QR'))
+        ->assertSee(__('Edit'));
+});
+
+test('admin can inspect dynamic barcode checkpoint details without static download action', function () {
+    $admin = User::factory()->admin()->create();
+    $barcode = Barcode::factory()->create([
+        'name' => 'Rotating Lobby',
+        'value' => 'CHK-DYNAMIC-DETAIL',
+        'secret_key' => Str::random(64),
+        'dynamic_enabled' => true,
+        'dynamic_ttl_seconds' => 60,
+        'latitude' => -6.2,
+        'longitude' => 106.8,
+        'radius' => 75,
+    ]);
+
+    $this
+        ->actingAs($admin)
+        ->get(route('admin.barcodes.show', $barcode))
+        ->assertOk()
+        ->assertSee('Rotating Lobby')
+        ->assertSee(__('Dynamic QR'))
+        ->assertSee(__('Open Live Display'))
+        ->assertSee(__('Regenerate Secret'))
+        ->assertDontSee(__('Download QR'));
+});
+
 test('admin can fetch dynamic barcode token payload', function () {
     $admin = User::factory()->admin()->create();
     $barcode = Barcode::factory()->create([

@@ -99,3 +99,21 @@ test('operational health distinguishes scheduler heartbeat from queue heartbeat'
     expect(Cache::get('health:queue_heartbeat_at'))->not->toBeNull()
         ->and($codes)->not->toContain('queue_stale');
 });
+
+test('admin account dropdown and direct api token route stay inside admin profile', function () {
+    enableJetstreamApiFeaturesForTests();
+
+    $admin = User::factory()->admin()->create();
+
+    $this
+        ->actingAs($admin)
+        ->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertSee(route('admin.profile.show').'#api', false)
+        ->assertDontSee(route('api-tokens.index'), false);
+
+    $this
+        ->actingAs($admin)
+        ->get(route('api-tokens.index'))
+        ->assertRedirect(route('admin.profile.show').'#api');
+});

@@ -109,10 +109,12 @@ class Admin extends Component
 
     public function delete()
     {
-        $user = User::find($this->selectedId);
+        $user = $this->findVisibleAdminOrFail($this->selectedId);
         $this->authorizeDeletion($user);
         $this->form->setUser($user)->delete();
         $this->confirmingDeletion = false;
+        $this->selectedId = null;
+        $this->deleteName = null;
         $this->banner(__('Deleted successfully.'));
     }
 
