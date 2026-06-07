@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Integrations;
 
 use App\Http\Controllers\Controller;
+use App\Models\IntegrationClient;
 use App\Services\Integrations\AttendanceEventIngestionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,10 @@ class AttendanceEventController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $allowedSources = config('services.attendance_integration.allowed_sources', []);
+        $client = $request->attributes->get('integrationClient');
+        $allowedSources = $client instanceof IntegrationClient
+            ? ($client->allowed_sources ?? [])
+            : config('services.attendance_integration.allowed_sources', []);
         $sourceRules = ['nullable', 'string', 'max:80', 'regex:/^[A-Za-z0-9_.-]+$/'];
 
         if (is_array($allowedSources) && $allowedSources !== []) {
@@ -35,7 +39,7 @@ class AttendanceEventController extends Controller
             'payload' => ['nullable', 'array'],
         ]);
 
-        $event = $this->ingestion->ingest($validated, $request->all());
+        $event = $this->ingestion->ingest($validated, $request->all(), $client instanceof IntegrationClient ? $client : null);
 
         return response()->json([
             'success' => $event->status !== 'failed',

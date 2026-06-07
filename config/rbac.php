@@ -623,6 +623,19 @@ return [
                 'manage' => ['permission' => 'admin.user_sessions.manage', 'label' => 'Manage'],
             ],
         ],
+        'api_integrations' => [
+            'section' => 'system',
+            'label' => 'API Integrations',
+            'description' => 'Issue, rotate, and revoke third-party integration credentials.',
+            'route_names' => ['admin.api-integrations'],
+            'existing_authorization' => 'Gate:manageApiIntegrations',
+            'menu_location' => 'Admin navigation > System > API Integrations',
+            'surface' => 'admin',
+            'enterprise' => false,
+            'actions' => [
+                'manage' => ['permission' => 'admin.api_integrations.manage', 'label' => 'Manage'],
+            ],
+        ],
         'notifications' => [
             'section' => 'system',
             'label' => 'Notifications',

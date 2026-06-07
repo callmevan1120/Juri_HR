@@ -5,6 +5,7 @@ namespace App\Services\Integrations;
 use App\Models\ActivityLog;
 use App\Models\Attendance;
 use App\Models\IntegrationAttendanceEvent;
+use App\Models\IntegrationClient;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -16,11 +17,11 @@ class AttendanceEventIngestionService
      * @param  array<string, mixed>  $payload
      * @param  array<string, mixed>  $rawPayload
      */
-    public function ingest(array $payload, array $rawPayload): IntegrationAttendanceEvent
+    public function ingest(array $payload, array $rawPayload, ?IntegrationClient $client = null): IntegrationAttendanceEvent
     {
         $normalized = $this->normalize($payload);
 
-        return DB::transaction(function () use ($normalized, $rawPayload): IntegrationAttendanceEvent {
+        return DB::transaction(function () use ($normalized, $rawPayload, $client): IntegrationAttendanceEvent {
             $event = IntegrationAttendanceEvent::query()
                 ->where('source', $normalized['source'])
                 ->where('idempotency_key', $normalized['idempotency_key'])
@@ -33,6 +34,7 @@ class AttendanceEventIngestionService
 
             $event = IntegrationAttendanceEvent::query()->create([
                 ...$normalized,
+                'integration_client_id' => $client?->id,
                 'status' => IntegrationAttendanceEvent::STATUS_ACCEPTED,
                 'normalized_payload' => $normalized,
                 'raw_payload' => $rawPayload,

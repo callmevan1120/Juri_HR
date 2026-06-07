@@ -18,6 +18,7 @@ class IntegrationAttendanceEvent extends Model
     public const EVENT_CHECK_OUT = 'check_out';
 
     protected $fillable = [
+        'integration_client_id',
         'source',
         'idempotency_key',
         'employee_code',
@@ -55,5 +56,10 @@ class IntegrationAttendanceEvent extends Model
     public function attendance(): BelongsTo
     {
         return $this->belongsTo(Attendance::class);
+    }
+
+    public function integrationClient(): BelongsTo
+    {
+        return $this->belongsTo(IntegrationClient::class);
     }
 }
