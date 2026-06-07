@@ -4620,6 +4620,7 @@
     "Pick a template, enter the client name, then generate credentials.": "Pick a template, enter the client name, then generate credentials.",
     "Schedule read-only sync": "Schedule read-only sync",
     "The template fills sensible scopes. You can still adjust scopes before creating the client.": "The template fills sensible scopes. You can still adjust scopes before creating the client.",
+    "This is the source code that the machine or vendor sends in the API payload. For the default above, their request must include source: mesin-absensi.": "This is the source code that the machine or vendor sends in the API payload. For the default above, their request must include source: mesin-absensi.",
     "Use the smallest scope set that the integration actually needs.": "Use the smallest scope set that the integration actually needs.",
     "Centralized": "Centralized",
     "Endpoint": "Endpoint",

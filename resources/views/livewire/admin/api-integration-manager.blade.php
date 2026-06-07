@@ -139,7 +139,10 @@
                     <div>
                         <x-forms.label for="integration-sources" value="{{ __('Allowed Sources') }}" />
                         <x-forms.textarea id="integration-sources" class="mt-1 w-full" rows="3" wire:model="allowedSourcesText" placeholder="{{ __('Auto from client name when empty') }}" />
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Optional. Use this when one credential serves multiple machines or source codes.') }}</p>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('This is the source code that the machine or vendor sends in the API payload. For the default above, their request must include source: mesin-absensi.') }}</p>
+                        <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
+                            { "source": "{{ trim(explode("\n", $allowedSourcesText)[0] ?? '') ?: $activePreset['default_source'] }}" }
+                        </div>
                         <x-forms.input-error for="allowedSourcesText" class="mt-2" />
                     </div>
 
