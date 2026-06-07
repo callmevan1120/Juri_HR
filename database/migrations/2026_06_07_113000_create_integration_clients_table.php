@@ -60,7 +60,7 @@ return new class extends Migration
         }
 
         $roles = DB::table('roles')
-            ->whereIn('slug', ['super_admin', 'admin', 'it'])
+            ->whereIn('slug', ['super_admin', 'admin', 'it', 'demo_admin_readonly'])
             ->get(['id', 'permissions']);
 
         foreach ($roles as $role) {
