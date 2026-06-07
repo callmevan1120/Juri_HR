@@ -129,10 +129,13 @@
         opacity: 1 !important;
     }
 
-    .flatpickr-wrapper input[readonly],
-    .user-native-field__input[readonly],
-    .auth-card input[data-ui-picker][readonly],
+    .flatpickr-wrapper input[data-ui-picker][readonly],
     input[data-ui-picker][readonly] {
+        @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+    }
+
+    .user-native-field__input[readonly],
+    .auth-card input[data-ui-picker][readonly] {
         background-color: inherit;
     }
 
