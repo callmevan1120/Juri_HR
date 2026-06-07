@@ -73,21 +73,39 @@
 
                 <form wire:submit="save" class="space-y-4 p-4">
                     <div>
-                        <x-forms.label for="integration-preset" value="{{ __('Integration Template') }}" />
+                        <x-forms.label for="integration-preset" value="{{ __('Integration Container') }}" />
                         <x-forms.select id="integration-preset" class="mt-1 w-full" wire:model.live="preset">
-                            <option value="attendance">{{ __('Attendance machine / vendor write') }}</option>
-                            <option value="hris_read">{{ __('HRIS read-only sync') }}</option>
-                            <option value="schedule_read">{{ __('Schedule read-only sync') }}</option>
-                            <option value="custom">{{ __('Custom scopes') }}</option>
+                            @foreach ($integrationPresets as $presetKey => $presetConfig)
+                                <option value="{{ $presetKey }}">{{ $presetConfig['label'] }}</option>
+                            @endforeach
                         </x-forms.select>
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('The template fills sensible scopes. You can still adjust scopes before creating the client.') }}</p>
                         <x-forms.input-error for="preset" class="mt-2" />
+                    </div>
+
+                    <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-950/60">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-slate-950 dark:text-white">{{ $activePreset['label'] }}</p>
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $activePreset['description'] }}</p>
+                            </div>
+
+                            <x-admin.status-badge tone="neutral">{{ __('Default source') }}: {{ $activePreset['default_source'] }}</x-admin.status-badge>
+                        </div>
+
+                        <div class="mt-3 grid grid-cols-1 gap-2">
+                            @foreach ($activePreset['capabilities'] as $capability)
+                                <div class="flex items-start gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                                    <x-heroicon-m-check class="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                                    <span>{{ $capability }}</span>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <div>
                         <x-forms.label for="integration-name" value="{{ __('Client Name') }}" />
                         <x-forms.input id="integration-name" type="text" class="mt-1 w-full" wire:model="name" />
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Example: Vendor Attendance Bridge. If source is empty, PasPapan will use a slug from this name.') }}</p>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Auto-filled from the selected container. Rename it only when this vendor or machine needs a specific identity.') }}</p>
                         <x-forms.input-error for="name" class="mt-2" />
                     </div>
 

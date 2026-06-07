@@ -46,6 +46,11 @@ class ApiIntegrationManager extends Component
 
     public string $plainTextSecret = '';
 
+    public function mount(): void
+    {
+        $this->applyPresetDefaults($this->preset, force: true);
+    }
+
     protected function rules(): array
     {
         return [
@@ -73,11 +78,7 @@ class ApiIntegrationManager extends Component
 
     public function updatedPreset(string $preset): void
     {
-        if ($preset === 'custom') {
-            return;
-        }
-
-        $this->abilities = $this->presetAbilities($preset);
+        $this->applyPresetDefaults($preset, force: true);
     }
 
     public function save(): void
@@ -166,6 +167,8 @@ class ApiIntegrationManager extends Component
                 ->orderBy('name')
                 ->paginate(10),
             'availableAbilities' => $this->availableAbilities(),
+            'integrationPresets' => $this->integrationPresets(),
+            'activePreset' => $this->integrationPresets()[$this->preset] ?? $this->integrationPresets()['custom'],
             'machineEndpoint' => url('/api/integrations/attendance-events'),
             'recentAttendanceEvents' => IntegrationAttendanceEvent::query()
                 ->with('integrationClient')
@@ -199,7 +202,7 @@ class ApiIntegrationManager extends Component
             'expiresAt',
         ]);
         $this->preset = 'attendance';
-        $this->abilities = [IntegrationClient::ABILITY_ATTENDANCE_WRITE];
+        $this->applyPresetDefaults('attendance', force: true);
     }
 
     /**
@@ -222,23 +225,76 @@ class ApiIntegrationManager extends Component
         return $value === '' ? null : $value;
     }
 
-    /**
-     * @return array<int, string>
-     */
-    private function presetAbilities(string $preset): array
+    private function applyPresetDefaults(string $preset, bool $force = false): void
     {
-        return match ($preset) {
+        $config = $this->integrationPresets()[$preset] ?? $this->integrationPresets()['custom'];
+
+        if ($force || trim($this->name) === '') {
+            $this->name = $config['default_name'];
+        }
+
+        if ($force || trim($this->allowedSourcesText) === '') {
+            $this->allowedSourcesText = $config['default_source'];
+        }
+
+        $this->abilities = $config['abilities'];
+    }
+
+    /**
+     * @return array<string, array{label: string, description: string, default_name: string, default_source: string, capabilities: array<int, string>, abilities: array<int, string>}>
+     */
+    private function integrationPresets(): array
+    {
+        return [
+            'attendance' => [
+                'label' => __('Attendance machine / vendor write'),
+                'description' => __('For fingerprint machines, kiosks, vendor bridges, or attendance devices.'),
+                'default_name' => __('Mesin Absensi / Kiosk'),
+                'default_source' => 'mesin-absensi',
+                'capabilities' => [
+                    __('Can send check-in/check-out attendance events from machines, kiosks, or vendor bridges.'),
+                    __('Can include employee code, event time, machine ID, and optional coordinates.'),
+                    __('Cannot access user sessions or employee self-service APIs.'),
+                ],
+                'abilities' => [IntegrationClient::ABILITY_ATTENDANCE_WRITE],
+            ],
             'hris_read' => [
-                IntegrationClient::ABILITY_ATTENDANCE_READ,
-                IntegrationClient::ABILITY_EMPLOYEES_READ,
-                IntegrationClient::ABILITY_SCHEDULES_READ,
+                'label' => __('HRIS read-only sync'),
+                'description' => __('For HRIS, BI, or reporting systems that only need to read operational data.'),
+                'default_name' => __('HRIS Read-only Sync'),
+                'default_source' => 'hris-sync',
+                'capabilities' => [
+                    __('Can read attendance, employee, and schedule data for reporting or HRIS synchronization.'),
+                    __('Cannot write attendance events or mutate PasPapan records.'),
+                ],
+                'abilities' => [
+                    IntegrationClient::ABILITY_ATTENDANCE_READ,
+                    IntegrationClient::ABILITY_EMPLOYEES_READ,
+                    IntegrationClient::ABILITY_SCHEDULES_READ,
+                ],
             ],
             'schedule_read' => [
-                IntegrationClient::ABILITY_SCHEDULES_READ,
+                'label' => __('Schedule read-only sync'),
+                'description' => __('For external workforce planners that only need schedule data.'),
+                'default_name' => __('Schedule Read-only Sync'),
+                'default_source' => 'schedule-sync',
+                'capabilities' => [
+                    __('Can read schedule data for planning or external roster displays.'),
+                    __('Cannot read employee details beyond allowed schedule payloads.'),
+                ],
+                'abilities' => [IntegrationClient::ABILITY_SCHEDULES_READ],
             ],
-            default => [
-                IntegrationClient::ABILITY_ATTENDANCE_WRITE,
+            'custom' => [
+                'label' => __('Custom scopes'),
+                'description' => __('For advanced integrations that need manually selected scopes.'),
+                'default_name' => __('Custom Integration Client'),
+                'default_source' => 'custom-integration',
+                'capabilities' => [
+                    __('Capabilities depend on the scopes selected below.'),
+                    __('Use the smallest scope set that the integration actually needs.'),
+                ],
+                'abilities' => [IntegrationClient::ABILITY_ATTENDANCE_WRITE],
             ],
-        };
+        ];
     }
 }

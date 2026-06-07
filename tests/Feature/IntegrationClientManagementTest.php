@@ -71,6 +71,25 @@ test('integration client form can use preset defaults and auto source from name'
         ->and($client->abilities)->toBe([IntegrationClient::ABILITY_ATTENDANCE_WRITE]);
 });
 
+test('integration presets prefill container name source and capability guidance', function () {
+    $superadmin = User::factory()->admin(true)->create();
+
+    Livewire::actingAs($superadmin)
+        ->test(ApiIntegrationManager::class)
+        ->assertSet('name', 'Mesin Absensi / Kiosk')
+        ->assertSet('allowedSourcesText', 'mesin-absensi')
+        ->assertSee(__('Can send check-in/check-out attendance events from machines, kiosks, or vendor bridges.'))
+        ->set('preset', 'hris_read')
+        ->assertSet('name', 'HRIS Read-only Sync')
+        ->assertSet('allowedSourcesText', 'hris-sync')
+        ->assertSet('abilities', [
+            IntegrationClient::ABILITY_ATTENDANCE_READ,
+            IntegrationClient::ABILITY_EMPLOYEES_READ,
+            IntegrationClient::ABILITY_SCHEDULES_READ,
+        ])
+        ->assertSee(__('Can read attendance, employee, and schedule data for reporting or HRIS synchronization.'));
+});
+
 test('api integrations page exposes the machine attendance api endpoint guidance', function () {
     $superadmin = User::factory()->admin(true)->create();
 
