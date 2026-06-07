@@ -4604,5 +4604,14 @@
     "Optional. Use this when one credential serves multiple machines or source codes.": "Opsional. Gunakan jika satu credential melayani beberapa mesin atau kode source.",
     "Pick a template, enter the client name, then generate credentials.": "Pilih template, isi nama client, lalu generate credential.",
     "Schedule read-only sync": "Sinkronisasi jadwal read-only",
-    "The template fills sensible scopes. You can still adjust scopes before creating the client.": "Template akan mengisi scope yang sesuai. Scope tetap bisa disesuaikan sebelum client dibuat."
+    "The template fills sensible scopes. You can still adjust scopes before creating the client.": "Template akan mengisi scope yang sesuai. Scope tetap bisa disesuaikan sebelum client dibuat.",
+    "Centralized": "Terpusat",
+    "Endpoint": "Endpoint",
+    "Machine Attendance API": "API Mesin Absensi",
+    "No machine events yet.": "Belum ada event mesin.",
+    "Payload Fields": "Field Payload",
+    "Recent Machine Events": "Event Mesin Terbaru",
+    "Required Headers": "Header Wajib",
+    "Source must match the allowed source on the client. Empty allowed source will auto-use the client name slug.": "Source harus cocok dengan source yang diizinkan pada client. Source kosong akan otomatis memakai slug nama client.",
+    "Use integration clients on this page for fingerprint machines, kiosks, vendor bridges, or external attendance systems.": "Gunakan client integrasi di halaman ini untuk mesin fingerprint, kios, bridge vendor, atau sistem presensi eksternal."
 }

@@ -3,6 +3,67 @@
         :title="__('API Integrations')"
         :description="__('Manage third-party clients that connect to PasPapan APIs.')"
     >
+        <x-admin.panel class="mb-4">
+            <div class="grid grid-cols-1 gap-4 p-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h2 class="text-lg font-semibold text-slate-950 dark:text-white">{{ __('Machine Attendance API') }}</h2>
+                            <x-admin.status-badge tone="success">{{ __('Centralized') }}</x-admin.status-badge>
+                        </div>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Use integration clients on this page for fingerprint machines, kiosks, vendor bridges, or external attendance systems.') }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/50">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Endpoint') }}</p>
+                            <p class="mt-2 break-all font-mono text-sm text-slate-950 dark:text-white">POST {{ $machineEndpoint }}</p>
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/50">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Required Headers') }}</p>
+                            <div class="mt-2 flex flex-wrap gap-1.5">
+                                <x-admin.status-badge tone="neutral">X-PasPapan-Api-Key</x-admin.status-badge>
+                                <x-admin.status-badge tone="neutral">X-PasPapan-Timestamp</x-admin.status-badge>
+                                <x-admin.status-badge tone="neutral">X-PasPapan-Signature</x-admin.status-badge>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/50">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Payload Fields') }}</p>
+                        <div class="mt-2 flex flex-wrap gap-1.5">
+                            @foreach (['source', 'idempotency_key', 'employee_code', 'event_type', 'occurred_at', 'device_id', 'latitude', 'longitude'] as $field)
+                                <x-admin.status-badge tone="neutral">{{ $field }}</x-admin.status-badge>
+                            @endforeach
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">{{ __('Source must match the allowed source on the client. Empty allowed source will auto-use the client name slug.') }}</p>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/50">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="text-sm font-semibold text-slate-950 dark:text-white">{{ __('Recent Machine Events') }}</h3>
+                        <x-admin.status-badge tone="neutral">{{ $recentAttendanceEvents->count() }}</x-admin.status-badge>
+                    </div>
+
+                    <div class="mt-3 space-y-2">
+                        @forelse ($recentAttendanceEvents as $event)
+                            <div class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <span class="font-medium text-slate-950 dark:text-white">{{ $event->integrationClient?->name ?? $event->source }}</span>
+                                    <x-admin.status-badge tone="{{ $event->status === 'processed' ? 'success' : ($event->status === 'failed' ? 'danger' : 'warning') }}">{{ __(ucfirst($event->status)) }}</x-admin.status-badge>
+                                </div>
+                                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $event->employee_code }} · {{ $event->event_type }} · {{ $event->occurred_at?->format('Y-m-d H:i') }}</p>
+                            </div>
+                        @empty
+                            <p class="rounded-lg border border-dashed border-slate-200 px-3 py-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">{{ __('No machine events yet.') }}</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </x-admin.panel>
+
         <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.2fr)]">
             <x-admin.panel>
                 <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-700/70">

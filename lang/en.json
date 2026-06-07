@@ -4604,5 +4604,14 @@
     "Optional. Use this when one credential serves multiple machines or source codes.": "Optional. Use this when one credential serves multiple machines or source codes.",
     "Pick a template, enter the client name, then generate credentials.": "Pick a template, enter the client name, then generate credentials.",
     "Schedule read-only sync": "Schedule read-only sync",
-    "The template fills sensible scopes. You can still adjust scopes before creating the client.": "The template fills sensible scopes. You can still adjust scopes before creating the client."
+    "The template fills sensible scopes. You can still adjust scopes before creating the client.": "The template fills sensible scopes. You can still adjust scopes before creating the client.",
+    "Centralized": "Centralized",
+    "Endpoint": "Endpoint",
+    "Machine Attendance API": "Machine Attendance API",
+    "No machine events yet.": "No machine events yet.",
+    "Payload Fields": "Payload Fields",
+    "Recent Machine Events": "Recent Machine Events",
+    "Required Headers": "Required Headers",
+    "Source must match the allowed source on the client. Empty allowed source will auto-use the client name slug.": "Source must match the allowed source on the client. Empty allowed source will auto-use the client name slug.",
+    "Use integration clients on this page for fingerprint machines, kiosks, vendor bridges, or external attendance systems.": "Use integration clients on this page for fingerprint machines, kiosks, vendor bridges, or external attendance systems."
 }

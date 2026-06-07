@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\ActivityLog;
+use App\Models\IntegrationAttendanceEvent;
 use App\Models\IntegrationClient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -165,6 +166,12 @@ class ApiIntegrationManager extends Component
                 ->orderBy('name')
                 ->paginate(10),
             'availableAbilities' => $this->availableAbilities(),
+            'machineEndpoint' => url('/api/integrations/attendance-events'),
+            'recentAttendanceEvents' => IntegrationAttendanceEvent::query()
+                ->with('integrationClient')
+                ->latest()
+                ->limit(5)
+                ->get(),
         ]);
     }
 

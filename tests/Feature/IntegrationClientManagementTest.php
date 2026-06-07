@@ -71,6 +71,18 @@ test('integration client form can use preset defaults and auto source from name'
         ->and($client->abilities)->toBe([IntegrationClient::ABILITY_ATTENDANCE_WRITE]);
 });
 
+test('api integrations page exposes the machine attendance api endpoint guidance', function () {
+    $superadmin = User::factory()->admin(true)->create();
+
+    Livewire::actingAs($superadmin)
+        ->test(ApiIntegrationManager::class)
+        ->assertSee(__('Machine Attendance API'))
+        ->assertSee('/api/integrations/attendance-events')
+        ->assertSee('X-PasPapan-Api-Key')
+        ->assertSee('employee_code')
+        ->assertSee('idempotency_key');
+});
+
 test('attendance integration endpoint accepts active clients and enforces scope and source', function () {
     [$client, $apiKey, $secret] = IntegrationClient::issue([
         'name' => 'Vendor Attendance Bridge',
