@@ -59,6 +59,10 @@ if (Schema::hasTable('sessions') && Schema::hasColumn('sessions', 'user_id')) {
     DB::table('sessions')->where('user_id', $user->id)->delete();
 }
 
+$user->tokens()
+    ->where('name', 'apk-attendance-e2e')
+    ->delete();
+
 Attendance::query()
     ->where('user_id', $user->id)
     ->whereDate('date', now()->toDateString())
