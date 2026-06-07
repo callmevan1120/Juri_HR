@@ -5159,6 +5159,18 @@
         box-sizing: border-box;
     }
 
+    .admin-ui input[data-ui-picker][readonly],
+    .admin-ui .flatpickr-wrapper input[data-ui-picker][readonly] {
+        background-color: rgb(255 255 255) !important;
+        color: rgb(17 24 39) !important;
+    }
+
+    .dark .admin-ui input[data-ui-picker][readonly],
+    .dark .admin-ui .flatpickr-wrapper input[data-ui-picker][readonly] {
+        background-color: rgb(17 24 39) !important;
+        color: rgb(243 244 246) !important;
+    }
+
     .admin-ui .ts-wrapper-admin {
         position: relative;
         z-index: 20;
