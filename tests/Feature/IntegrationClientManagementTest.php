@@ -53,6 +53,24 @@ test('superadmin can create rotate and revoke third party integration clients', 
     expect($client->refresh()->revoked_at)->not->toBeNull();
 });
 
+test('integration client form can use preset defaults and auto source from name', function () {
+    $superadmin = User::factory()->admin(true)->create();
+
+    Livewire::actingAs($superadmin)
+        ->test(ApiIntegrationManager::class)
+        ->assertSet('preset', 'attendance')
+        ->set('name', 'Vendor Attendance Bridge')
+        ->set('allowedSourcesText', '')
+        ->call('save')
+        ->assertSet('showCredentialModal', true);
+
+    $client = IntegrationClient::query()->firstOrFail();
+
+    expect($client->allowed_sources)->toBe(['vendor-attendance-bridge'])
+        ->and($client->allowed_ips)->toBe([])
+        ->and($client->abilities)->toBe([IntegrationClient::ABILITY_ATTENDANCE_WRITE]);
+});
+
 test('attendance integration endpoint accepts active clients and enforces scope and source', function () {
     [$client, $apiKey, $secret] = IntegrationClient::issue([
         'name' => 'Vendor Attendance Bridge',

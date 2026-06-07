@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\IntegrationClient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -18,6 +19,8 @@ class ApiIntegrationManager extends Component
     use WithPagination;
 
     public string $search = '';
+
+    public string $preset = 'attendance';
 
     public string $name = '';
 
@@ -46,6 +49,7 @@ class ApiIntegrationManager extends Component
     {
         return [
             'name' => ['required', 'string', 'max:120'],
+            'preset' => ['required', 'string', 'in:attendance,hris_read,schedule_read,custom'],
             'contactName' => ['nullable', 'string', 'max:120'],
             'contactEmail' => ['nullable', 'email', 'max:160'],
             'allowedSourcesText' => ['nullable', 'string', 'max:2000'],
@@ -66,16 +70,31 @@ class ApiIntegrationManager extends Component
         $this->resetPage();
     }
 
+    public function updatedPreset(string $preset): void
+    {
+        if ($preset === 'custom') {
+            return;
+        }
+
+        $this->abilities = $this->presetAbilities($preset);
+    }
+
     public function save(): void
     {
         $this->validate();
+
+        $allowedSources = $this->lines($this->allowedSourcesText);
+
+        if ($allowedSources === []) {
+            $allowedSources = [(string) Str::of($this->name)->slug('-')];
+        }
 
         [$client, $apiKey, $secret] = IntegrationClient::issue([
             'name' => $this->name,
             'contact_name' => $this->blankToNull($this->contactName),
             'contact_email' => $this->blankToNull($this->contactEmail),
             'abilities' => array_values(array_unique($this->abilities)),
-            'allowed_sources' => $this->lines($this->allowedSourcesText),
+            'allowed_sources' => $allowedSources,
             'allowed_ips' => $this->lines($this->allowedIpsText),
             'expires_at' => $this->blankToNull($this->expiresAt),
             'created_by' => Auth::id(),
@@ -172,6 +191,7 @@ class ApiIntegrationManager extends Component
             'allowedIpsText',
             'expiresAt',
         ]);
+        $this->preset = 'attendance';
         $this->abilities = [IntegrationClient::ABILITY_ATTENDANCE_WRITE];
     }
 
@@ -193,5 +213,25 @@ class ApiIntegrationManager extends Component
         $value = trim($value);
 
         return $value === '' ? null : $value;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function presetAbilities(string $preset): array
+    {
+        return match ($preset) {
+            'hris_read' => [
+                IntegrationClient::ABILITY_ATTENDANCE_READ,
+                IntegrationClient::ABILITY_EMPLOYEES_READ,
+                IntegrationClient::ABILITY_SCHEDULES_READ,
+            ],
+            'schedule_read' => [
+                IntegrationClient::ABILITY_SCHEDULES_READ,
+            ],
+            default => [
+                IntegrationClient::ABILITY_ATTENDANCE_WRITE,
+            ],
+        };
     }
 }

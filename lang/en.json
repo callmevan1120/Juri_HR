@@ -4591,5 +4591,18 @@
     "Rotate this integration credential?": "Rotate this integration credential?",
     "Scopes": "Scopes",
     "Search clients...": "Search clients...",
-    "Sources": "Sources"
+    "Sources": "Sources",
+    "Attendance machine / vendor write": "Attendance machine / vendor write",
+    "Auto from client name when empty": "Auto from client name when empty",
+    "Custom scopes": "Custom scopes",
+    "Example: Vendor Attendance Bridge. If source is empty, PasPapan will use a slug from this name.": "Example: Vendor Attendance Bridge. If source is empty, PasPapan will use a slug from this name.",
+    "HRIS read-only sync": "HRIS read-only sync",
+    "Integration Template": "Integration Template",
+    "Leave empty to allow any IP": "Leave empty to allow any IP",
+    "Optional but recommended when the vendor has fixed server IPs.": "Optional but recommended when the vendor has fixed server IPs.",
+    "Optional. Leave empty for long-running integrations, then rotate credentials periodically.": "Optional. Leave empty for long-running integrations, then rotate credentials periodically.",
+    "Optional. Use this when one credential serves multiple machines or source codes.": "Optional. Use this when one credential serves multiple machines or source codes.",
+    "Pick a template, enter the client name, then generate credentials.": "Pick a template, enter the client name, then generate credentials.",
+    "Schedule read-only sync": "Schedule read-only sync",
+    "The template fills sensible scopes. You can still adjust scopes before creating the client.": "The template fills sensible scopes. You can still adjust scopes before creating the client."
 }

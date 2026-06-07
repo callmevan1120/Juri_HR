@@ -7,13 +7,26 @@
             <x-admin.panel>
                 <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-700/70">
                     <h2 class="text-lg font-semibold text-slate-950 dark:text-white">{{ __('Create Integration Client') }}</h2>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Generate credentials for a vendor, app, or external system.') }}</p>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Pick a template, enter the client name, then generate credentials.') }}</p>
                 </div>
 
                 <form wire:submit="save" class="space-y-4 p-4">
                     <div>
+                        <x-forms.label for="integration-preset" value="{{ __('Integration Template') }}" />
+                        <x-forms.select id="integration-preset" class="mt-1 w-full" wire:model.live="preset">
+                            <option value="attendance">{{ __('Attendance machine / vendor write') }}</option>
+                            <option value="hris_read">{{ __('HRIS read-only sync') }}</option>
+                            <option value="schedule_read">{{ __('Schedule read-only sync') }}</option>
+                            <option value="custom">{{ __('Custom scopes') }}</option>
+                        </x-forms.select>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('The template fills sensible scopes. You can still adjust scopes before creating the client.') }}</p>
+                        <x-forms.input-error for="preset" class="mt-2" />
+                    </div>
+
+                    <div>
                         <x-forms.label for="integration-name" value="{{ __('Client Name') }}" />
                         <x-forms.input id="integration-name" type="text" class="mt-1 w-full" wire:model="name" />
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Example: Vendor Attendance Bridge. If source is empty, PasPapan will use a slug from this name.') }}</p>
                         <x-forms.input-error for="name" class="mt-2" />
                     </div>
 
@@ -46,19 +59,22 @@
 
                     <div>
                         <x-forms.label for="integration-sources" value="{{ __('Allowed Sources') }}" />
-                        <x-forms.textarea id="integration-sources" class="mt-1 w-full" rows="3" wire:model="allowedSourcesText" placeholder="vendor&#10;vendor-kiosk" />
+                        <x-forms.textarea id="integration-sources" class="mt-1 w-full" rows="3" wire:model="allowedSourcesText" placeholder="{{ __('Auto from client name when empty') }}" />
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Optional. Use this when one credential serves multiple machines or source codes.') }}</p>
                         <x-forms.input-error for="allowedSourcesText" class="mt-2" />
                     </div>
 
                     <div>
                         <x-forms.label for="integration-ips" value="{{ __('Allowed IPs') }}" />
-                        <x-forms.textarea id="integration-ips" class="mt-1 w-full" rows="3" wire:model="allowedIpsText" placeholder="203.0.113.10&#10;198.51.100.8" />
+                        <x-forms.textarea id="integration-ips" class="mt-1 w-full" rows="3" wire:model="allowedIpsText" placeholder="{{ __('Leave empty to allow any IP') }}" />
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Optional but recommended when the vendor has fixed server IPs.') }}</p>
                         <x-forms.input-error for="allowedIpsText" class="mt-2" />
                     </div>
 
                     <div>
                         <x-forms.label for="integration-expires-at" value="{{ __('Expires At') }}" />
                         <x-forms.input id="integration-expires-at" type="date" class="mt-1 w-full" wire:model="expiresAt" />
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Optional. Leave empty for long-running integrations, then rotate credentials periodically.') }}</p>
                         <x-forms.input-error for="expiresAt" class="mt-2" />
                     </div>
 

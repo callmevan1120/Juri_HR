@@ -4591,5 +4591,18 @@
     "Rotate this integration credential?": "Rotasi credential integrasi ini?",
     "Scopes": "Scope",
     "Search clients...": "Cari client...",
-    "Sources": "Source"
+    "Sources": "Source",
+    "Attendance machine / vendor write": "Mesin absensi / vendor write",
+    "Auto from client name when empty": "Otomatis dari nama client jika kosong",
+    "Custom scopes": "Scope custom",
+    "Example: Vendor Attendance Bridge. If source is empty, PasPapan will use a slug from this name.": "Contoh: Vendor Attendance Bridge. Jika source kosong, PasPapan akan memakai slug dari nama ini.",
+    "HRIS read-only sync": "Sinkronisasi HRIS read-only",
+    "Integration Template": "Template Integrasi",
+    "Leave empty to allow any IP": "Kosongkan untuk mengizinkan IP apa pun",
+    "Optional but recommended when the vendor has fixed server IPs.": "Opsional, tapi direkomendasikan jika vendor memiliki IP server tetap.",
+    "Optional. Leave empty for long-running integrations, then rotate credentials periodically.": "Opsional. Kosongkan untuk integrasi jangka panjang, lalu rotasi credential secara berkala.",
+    "Optional. Use this when one credential serves multiple machines or source codes.": "Opsional. Gunakan jika satu credential melayani beberapa mesin atau kode source.",
+    "Pick a template, enter the client name, then generate credentials.": "Pilih template, isi nama client, lalu generate credential.",
+    "Schedule read-only sync": "Sinkronisasi jadwal read-only",
+    "The template fills sensible scopes. You can still adjust scopes before creating the client.": "Template akan mengisi scope yang sesuai. Scope tetap bisa disesuaikan sebelum client dibuat."
 }
