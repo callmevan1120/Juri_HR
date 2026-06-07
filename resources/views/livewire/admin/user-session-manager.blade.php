@@ -45,8 +45,8 @@
         <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(280px,0.8fr)_minmax(0,1.2fr)]">
             <x-admin.panel>
                 <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-700/70">
-                    <h2 class="text-lg font-semibold text-slate-950 dark:text-white">{{ __('Users With Active Sessions') }}</h2>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Only non-expired database sessions are shown.') }}</p>
+                    <h2 class="text-lg font-semibold text-slate-950 dark:text-white">{{ __('Users With Active Access') }}</h2>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Non-expired browser sessions and API tokens are shown.') }}</p>
                 </div>
 
                 <div class="max-h-[34rem] space-y-2 overflow-y-auto p-3">
@@ -69,15 +69,20 @@
                                         @endif
                                     </div>
                                 </div>
-                                <span class="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-slate-100 px-2 text-sm font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                                    {{ (int) $user->active_sessions_count }}
-                                </span>
+                                <div class="flex shrink-0 flex-col items-end gap-1">
+                                    <span class="inline-flex min-h-7 items-center justify-center rounded-full bg-slate-100 px-2.5 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                                        {{ __('Browser: :count', ['count' => (int) $user->active_sessions_count]) }}
+                                    </span>
+                                    <span class="inline-flex min-h-7 items-center justify-center rounded-full bg-emerald-100 px-2.5 text-xs font-bold text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-100">
+                                        {{ __('API: :count', ['count' => (int) $user->active_api_tokens_count]) }}
+                                    </span>
+                                </div>
                             </div>
                         </button>
                     @empty
                         <x-admin.empty-state
-                            :title="__('No stuck sessions found')"
-                            :description="__('Try another search term, or the active session may have already expired.')"
+                            :title="__('No active access found')"
+                            :description="__('Try another search term, or the browser sessions and API tokens may have already expired.')"
                             class="border-0 bg-transparent p-6 shadow-none dark:bg-transparent"
                         >
                             <x-slot name="icon">
@@ -94,7 +99,7 @@
                         <div>
                             <h2 class="text-lg font-semibold text-slate-950 dark:text-white">{{ __('Session Detail') }}</h2>
                             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                {{ $selectedUser ? __('Disconnect one device or clear every active session for this user.') : __('Select a user from the left panel first.') }}
+                                {{ $selectedUser ? __('Disconnect browser sessions or revoke API tokens for this user.') : __('Select a user from the left panel first.') }}
                             </p>
                         </div>
 
@@ -124,10 +129,10 @@
                                 <x-heroicon-o-lock-open class="h-12 w-12 text-slate-300 dark:text-slate-600" />
                             </x-slot>
                         </x-admin.empty-state>
-                    @elseif ($activeSessions->isEmpty())
+                    @elseif ($activeSessions->isEmpty() && $apiTokens->isEmpty())
                         <x-admin.empty-state
-                            :title="__('No active session remains')"
-                            :description="__('The user can try logging in again now.')"
+                            :title="__('No active access remains')"
+                            :description="__('The user can try logging in again now, or request a new API token if needed.')"
                             class="border-0 bg-transparent p-8 shadow-none dark:bg-transparent"
                         >
                             <x-slot name="icon">
@@ -145,48 +150,95 @@
                             </div>
                         </div>
 
-                        @foreach ($activeSessions as $session)
-                            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                                <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                    <div class="space-y-2">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <x-heroicon-o-computer-desktop class="h-5 w-5 text-slate-400" />
-                                            <p class="font-semibold text-slate-950 dark:text-white">{{ $session['user_agent'] }}</p>
-                                            @if ($session['is_current_device'])
-                                                <x-admin.status-badge tone="primary">{{ __('This device') }}</x-admin.status-badge>
-                                            @endif
-                                        </div>
-                                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
-                                            <span>{{ __('IP: :ip', ['ip' => $session['ip_address'] ?: __('Unknown')]) }}</span>
-                                            <span>{{ __('Last active: :time', ['time' => $session['last_activity']->diffForHumans()]) }}</span>
-                                        </div>
-                                    </div>
+                        <div class="space-y-3">
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Browser Sessions') }}</h3>
 
-                                    @if ($session['is_current_device'])
-                                        <x-actions.button
-                                            type="button"
-                                            variant="soft-danger"
-                                            label="{{ __('Current admin session cannot be disconnected here') }}"
-                                            disabled
-                                        >
-                                            <x-heroicon-m-lock-closed class="h-5 w-5" />
-                                            <span>{{ __('Protected') }}</span>
-                                        </x-actions.button>
-                                    @else
+                            @forelse ($activeSessions as $session)
+                                <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                        <div class="space-y-2">
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <x-heroicon-o-computer-desktop class="h-5 w-5 text-slate-400" />
+                                                <p class="font-semibold text-slate-950 dark:text-white">{{ $session['user_agent'] }}</p>
+                                                @if ($session['is_current_device'])
+                                                    <x-admin.status-badge tone="primary">{{ __('This device') }}</x-admin.status-badge>
+                                                @endif
+                                            </div>
+                                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+                                                <span>{{ __('IP: :ip', ['ip' => $session['ip_address'] ?: __('Unknown')]) }}</span>
+                                                <span>{{ __('Last active: :time', ['time' => $session['last_activity']->diffForHumans()]) }}</span>
+                                            </div>
+                                        </div>
+
+                                        @if ($session['is_current_device'])
+                                            <x-actions.button
+                                                type="button"
+                                                variant="soft-danger"
+                                                label="{{ __('Current admin session cannot be disconnected here') }}"
+                                                disabled
+                                            >
+                                                <x-heroicon-m-lock-closed class="h-5 w-5" />
+                                                <span>{{ __('Protected') }}</span>
+                                            </x-actions.button>
+                                        @else
+                                            <x-actions.button
+                                                type="button"
+                                                variant="danger"
+                                                wire:click="forgetSession('{{ $session['id'] }}')"
+                                                wire:confirm="{{ __('Disconnect this session?') }}"
+                                                label="{{ __('Disconnect') }}"
+                                            >
+                                                <x-heroicon-m-x-mark class="h-5 w-5" />
+                                                <span>{{ __('Disconnect') }}</span>
+                                            </x-actions.button>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="rounded-xl border border-dashed border-slate-200 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">{{ __('No active browser sessions.') }}</p>
+                            @endforelse
+                        </div>
+
+                        <div class="space-y-3 pt-3">
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('API Tokens') }}</h3>
+
+                            @forelse ($apiTokens as $token)
+                                <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                        <div class="space-y-2">
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <x-heroicon-o-key class="h-5 w-5 text-slate-400" />
+                                                <p class="font-semibold text-slate-950 dark:text-white">{{ $token['name'] }}</p>
+                                            </div>
+                                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+                                                <span>{{ $token['last_used_at'] ? __('Last used: :time', ['time' => $token['last_used_at']->diffForHumans()]) : __('Never used') }}</span>
+                                                <span>{{ $token['expires_at'] ? __('Expires: :time', ['time' => $token['expires_at']->diffForHumans()]) : __('Never expires') }}</span>
+                                            </div>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                @forelse ($token['abilities'] as $ability)
+                                                    <x-admin.status-badge tone="neutral">{{ $ability }}</x-admin.status-badge>
+                                                @empty
+                                                    <x-admin.status-badge tone="neutral">{{ __('No abilities') }}</x-admin.status-badge>
+                                                @endforelse
+                                            </div>
+                                        </div>
+
                                         <x-actions.button
                                             type="button"
                                             variant="danger"
-                                            wire:click="forgetSession('{{ $session['id'] }}')"
-                                            wire:confirm="{{ __('Disconnect this session?') }}"
-                                            label="{{ __('Disconnect') }}"
+                                            wire:click="revokeApiToken('{{ $token['id'] }}')"
+                                            wire:confirm="{{ __('Revoke this API token?') }}"
+                                            label="{{ __('Revoke') }}"
                                         >
                                             <x-heroicon-m-x-mark class="h-5 w-5" />
-                                            <span>{{ __('Disconnect') }}</span>
+                                            <span>{{ __('Revoke') }}</span>
                                         </x-actions.button>
-                                    @endif
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @empty
+                                <p class="rounded-xl border border-dashed border-slate-200 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">{{ __('No active API tokens.') }}</p>
+                            @endforelse
+                        </div>
                     @endif
                 </div>
             </x-admin.panel>

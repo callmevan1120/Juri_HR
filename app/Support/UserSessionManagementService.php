@@ -39,11 +39,34 @@ class UserSessionManagementService
                     ->whereColumn("{$this->table()}.user_id", 'users.id')
                     ->where("{$this->table()}.last_activity", '>=', $cutoff);
             }, 'active_sessions_count')
-            ->whereExists(function ($query) use ($cutoff): void {
-                $query->from($this->table())
-                    ->selectRaw('1')
-                    ->whereColumn("{$this->table()}.user_id", 'users.id')
-                    ->where("{$this->table()}.last_activity", '>=', $cutoff);
+            ->selectSub(function ($query): void {
+                $query->from('personal_access_tokens')
+                    ->selectRaw('count(*)')
+                    ->whereColumn('personal_access_tokens.tokenable_id', 'users.id')
+                    ->where('personal_access_tokens.tokenable_type', User::class)
+                    ->where(function ($query): void {
+                        $query->whereNull('personal_access_tokens.expires_at')
+                            ->orWhere('personal_access_tokens.expires_at', '>', now());
+                    });
+            }, 'active_api_tokens_count')
+            ->where(function (Builder $query) use ($cutoff): void {
+                $query
+                    ->whereExists(function ($query) use ($cutoff): void {
+                        $query->from($this->table())
+                            ->selectRaw('1')
+                            ->whereColumn("{$this->table()}.user_id", 'users.id')
+                            ->where("{$this->table()}.last_activity", '>=', $cutoff);
+                    })
+                    ->orWhereExists(function ($query): void {
+                        $query->from('personal_access_tokens')
+                            ->selectRaw('1')
+                            ->whereColumn('personal_access_tokens.tokenable_id', 'users.id')
+                            ->where('personal_access_tokens.tokenable_type', User::class)
+                            ->where(function ($query): void {
+                                $query->whereNull('personal_access_tokens.expires_at')
+                                    ->orWhere('personal_access_tokens.expires_at', '>', now());
+                            });
+                    });
             })
             ->when(! $this->canUseGlobalScope($actor), fn (Builder $query) => $query->where('company_id', $actor->company_id))
             ->when($search !== '', function (Builder $query) use ($search): void {
@@ -82,6 +105,50 @@ class UserSessionManagementService
                 'last_activity' => Carbon::createFromTimestamp((int) $session->last_activity),
                 'is_current_device' => $currentSessionId !== null && hash_equals((string) $session->id, $currentSessionId),
             ]);
+    }
+
+    /**
+     * @return Collection<int, array{id: string, name: string, abilities: array<int, string>, last_used_at: ?Carbon, expires_at: ?Carbon, created_at: ?Carbon}>
+     */
+    public function apiTokensFor(User $actor, User $target): Collection
+    {
+        $this->ensureCanManageTarget($actor, $target);
+
+        return $target->tokens()
+            ->where(function ($query): void {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->orderByRaw('last_used_at is null')
+            ->orderByDesc('last_used_at')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($token): array => [
+                'id' => (string) $token->id,
+                'name' => (string) $token->name,
+                'abilities' => collect($token->abilities ?? [])->map(fn ($ability): string => (string) $ability)->values()->all(),
+                'last_used_at' => $token->last_used_at,
+                'expires_at' => $token->expires_at,
+                'created_at' => $token->created_at,
+            ]);
+    }
+
+    public function revokeApiToken(User $actor, User $target, string $tokenId): int
+    {
+        $this->ensureCanManageTarget($actor, $target);
+
+        $deleted = $target->tokens()
+            ->whereKey($tokenId)
+            ->delete();
+
+        if ($deleted > 0) {
+            ActivityLog::record(
+                'User API Token Revoked',
+                "Admin {$actor->email} revoked one API token for {$target->email}."
+            );
+        }
+
+        return $deleted;
     }
 
     public function forgetSession(User $actor, User $target, string $sessionId, ?string $currentSessionId = null): int

@@ -76,6 +76,27 @@ class UserSessionManager extends Component
         ]));
     }
 
+    public function revokeApiToken(string $tokenId): void
+    {
+        $target = $this->selectedUser();
+
+        if (! $target instanceof User) {
+            $this->dangerBanner(__('Select a user first.'));
+
+            return;
+        }
+
+        $deleted = $this->sessions->revokeApiToken(
+            request()->user(),
+            $target,
+            $tokenId
+        );
+
+        $deleted > 0
+            ? $this->banner(__('API token revoked.'))
+            : $this->dangerBanner(__('API token was already gone.'));
+    }
+
     public function render()
     {
         $actor = request()->user();
@@ -88,6 +109,9 @@ class UserSessionManager extends Component
             'selectedUser' => $selectedUser,
             'activeSessions' => $selectedUser instanceof User
                 ? $this->sessions->activeSessionsFor($actor, $selectedUser, $currentSessionId)
+                : collect(),
+            'apiTokens' => $selectedUser instanceof User
+                ? $this->sessions->apiTokensFor($actor, $selectedUser)
                 : collect(),
         ])->layout('layouts.app');
     }
