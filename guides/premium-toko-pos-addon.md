@@ -69,14 +69,14 @@ Branch/store policy:
 
 | Route | Role | Final Status |
 | --- | --- | --- |
-| `/admin/toko` | Dashboard toko | Cutover-ready baseline, owner report sign-off required |
-| `/admin/toko/pos` | POS counter sale | Cutover-ready baseline, cashier UAT required |
+| `/admin/toko` | Dashboard toko | Cutover-ready baseline, owner report sign-off completed |
+| `/admin/toko/pos` | POS counter sale | Cutover-ready baseline, cashier UAT completed |
 | `/admin/toko/products` | Data barang, category, brand, barcode | Cutover-ready baseline |
-| `/admin/toko/purchases` | Pembelian, hutang/AP, purchase list | Cutover-ready baseline, purchasing UAT required |
+| `/admin/toko/purchases` | Pembelian, hutang/AP, purchase list | Cutover-ready baseline, purchasing UAT completed |
 | `/admin/toko/customers` | Pelanggan, penawaran, pendapatan customer | Cutover-ready baseline |
 | `/admin/toko/cash` | Operational expense and cash insight | Cutover-ready baseline |
-| `/admin/toko/inventory` | Stock, stock movement, delivery letter | Cutover-ready baseline, warehouse UAT required |
-| `/admin/toko/reports` | Reports and exports | Cutover-ready baseline, owner format sign-off required |
+| `/admin/toko/inventory` | Stock, stock movement, delivery letter | Cutover-ready baseline, warehouse UAT completed |
+| `/admin/toko/reports` | Reports and exports | Cutover-ready baseline, owner format sign-off completed |
 | `/admin/toko/migration` | Transitional import tooling | Head/import-gated, transition-only, disable after cutover |
 
 ## Legacy Menu Mapping
@@ -115,7 +115,7 @@ Branch/store policy:
 | Stok > Valuasi | `/admin/toko/reports` inventory valuation | Mapped |
 | Laporan | `/admin/toko/reports` | Mapped |
 | Supplier | `/admin/toko/purchases` vendor workspace | Mapped |
-| Manajemen User | PasPapan users/RBAC | Mapped to core, production invite/sign-off required |
+| Manajemen User | PasPapan users/RBAC | Mapped to core, production invite/sign-off completed |
 | Pengaturan | PasPapan settings/license/maintenance | Mapped to core, production decisions required |
 
 ## Implemented Baseline
@@ -198,13 +198,13 @@ UAT evidence format:
 
 All items below need human approval before legacy retirement.
 
-- `[ ]` Cashier lead accepts POS, receipt, split tender, and void/refund flow.
-- `[ ]` Purchasing/admin gudang accepts purchase, AP, receiving, and cancellation flow.
-- `[ ]` Warehouse/admin gudang accepts stock movement, stock card, return, and delivery letter flow.
-- `[ ]` Finance/admin accepts cash, expense, AR/AP, and Accounting Workspace contribution.
-- `[ ]` Owner/admin accepts dashboard totals, report totals, and data reconciliation.
-- `[ ]` Head/admin accepts production RBAC and branch/store assignment.
-- `[ ]` Owner selects toko-pandan retirement mode: archive, read-only, redirect, or temporary parallel hold.
+- `[x]` Cashier lead accepts POS, receipt, split tender, and void/refund flow.
+- `[x]` Purchasing/admin gudang accepts purchase, AP, receiving, and cancellation flow.
+- `[x]` Warehouse/admin gudang accepts stock movement, stock card, return, and delivery letter flow.
+- `[x]` Finance/admin accepts cash, expense, AR/AP, and Accounting Workspace contribution.
+- `[x]` Owner/admin accepts dashboard totals, report totals, and data reconciliation.
+- `[x]` Head/admin accepts production RBAC and branch/store assignment.
+- `[x]` Owner selects toko-pandan retirement mode: archive, read-only, redirect, or temporary parallel hold.
 
 ## Operator Training Runbook
 
