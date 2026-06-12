@@ -10,59 +10,46 @@
         $idUnit = fn ($value, string $unit, int $decimals = 3) => \App\Helpers::formatUnitId($value, $unit, $decimals);
     @endphp
 
-    <x-slot name="actions">
-        @if (($companyOptions ?? []) !== [])
-            <label class="sr-only" for="toko-company-selector">{{ __('Company') }}</label>
-            <x-forms.tom-select
-                id="toko-company-selector"
-                wire:model.live="selectedCompanyId"
-                placeholder="{{ __('Company') }}"
-                :disabled="count($companyOptions) === 1"
-                dropdown-direction="down"
-            >
-                @foreach ($companyOptions as $companyOption)
-                    <option value="{{ $companyOption['id'] }}">{{ $companyOption['name'] }}</option>
-                @endforeach
-            </x-forms.tom-select>
-        @endif
-        @if (($branchOptions ?? []) !== [])
-            <label class="sr-only" for="toko-branch-selector">{{ __('Branch / Store') }}</label>
-            <x-forms.tom-select
-                id="toko-branch-selector"
-                wire:model.live="selectedBranchId"
-                placeholder="{{ __('Semua branch/store') }}"
-                dropdown-direction="down"
-            >
-                <option value="">{{ __('Semua branch/store') }}</option>
-                @foreach ($branchOptions as $branchOption)
-                    <option value="{{ $branchOption['id'] }}">{{ $branchOption['label'] }}</option>
-                @endforeach
-            </x-forms.tom-select>
-        @endif
-        <span
-            data-toko-addon-flag="toko_pos"
-            class="inline-flex items-center rounded-xl border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/50 dark:text-amber-200"
-        >
-            {{ __('Toko / POS Add-on') }}
-        </span>
+        <x-slot name="toolbar">
+        <x-admin.page-tools grid-class="grid grid-cols-1 items-end gap-3 lg:grid-cols-12">
+            <div class="lg:col-span-4 flex flex-col sm:flex-row gap-2">
+                @if (($companyOptions ?? []) !== [])
+                    <div class="w-full sm:w-1/2">
+                        <label class="sr-only" for="toko-company-selector">{{ __('Company') }}</label>
+                        <x-forms.tom-select id="toko-company-selector" wire:model.live="selectedCompanyId" placeholder="{{ __('Company') }}" :disabled="count($companyOptions) === 1" dropdown-direction="down">
+                            @foreach ($companyOptions as $companyOption)
+                                <option value="{{ $companyOption['id'] }}">{{ $companyOption['name'] }}</option>
+                            @endforeach
+                        </x-forms.tom-select>
+                    </div>
+                @endif
+                @if (($branchOptions ?? []) !== [])
+                    <div class="w-full sm:w-1/2">
+                        <label class="sr-only" for="toko-branch-selector">{{ __('Branch / Store') }}</label>
+                        <x-forms.tom-select id="toko-branch-selector" wire:model.live="selectedBranchId" placeholder="{{ __('Semua branch/store') }}" dropdown-direction="down">
+                            <option value="">{{ __('Semua branch/store') }}</option>
+                            @foreach ($branchOptions as $branchOption)
+                                <option value="{{ $branchOption['id'] }}">{{ $branchOption['label'] }}</option>
+                            @endforeach
+                        </x-forms.tom-select>
+                    </div>
+                @endif
+            </div>
+            <div class="lg:col-span-8 flex justify-end">
+                <div class="flex w-full items-center gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1 text-sm font-semibold dark:bg-slate-800 shadow-inner">
+                    @foreach ($tokoNavigation as $nav)
+                        <a href="{{ $nav['href'] }}" @class([
+                            'shrink-0 rounded-lg px-3 py-1.5 transition-all duration-200 text-center flex-1 min-w-[max-content]',
+                            'bg-white text-primary-700 shadow shadow-primary-500/10 ring-1 ring-slate-200/50 dark:bg-slate-900 dark:text-primary-300 dark:ring-slate-700' => $nav['active'],
+                            'text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/50' => ! $nav['active'],
+                        ])>
+                            {{ $nav['label'] }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </x-admin.page-tools>
     </x-slot>
-
-    <x-admin.panel class="p-2">
-        <div class="flex gap-2 overflow-x-auto">
-            @foreach ($tokoNavigation as $nav)
-                <a
-                    href="{{ $nav['href'] }}"
-                    @class([
-                        'inline-flex min-h-9 shrink-0 items-center rounded-xl px-3 py-2 text-sm font-semibold transition',
-                        'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-[0_4px_12px_rgba(106,180,91,0.3)] ring-1 ring-primary-500/50' => $nav['active'],
-                        'border border-slate-100/80 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900' => ! $nav['active'],
-                    ])
-                >
-                    {{ $nav['label'] }}
-                </a>
-            @endforeach
-        </div>
-    </x-admin.panel>
 
     @if ($activePage === 'dashboard')
         <x-admin.panel class="overflow-hidden">
@@ -1626,338 +1613,289 @@
     </div>
     @endif
 
-    @if ($activePage === 'pos')
-    <x-admin.panel>
-        <div class="flex flex-col gap-2 px-3 py-2 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-                <p class="text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-300">{{ __('Mode Kasir') }}</p>
-                <h2 class="mt-1 text-base font-semibold text-slate-950 dark:text-white">{{ __('Terminal POS') }}</h2>
-                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">{{ __('Kasir fokus') }} · POS Counter Sale · Nota / Struk · {{ $targetCompany?->name ?? __('No company selected') }}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <x-actions.icon-button wire:click="$refresh" label="Refresh">
-                    <x-heroicon-m-arrow-path class="h-5 w-5" />
-                </x-actions.icon-button>
-                <x-actions.icon-button wire:click="$toggle('showPosBackOffice')" variant="{{ $showPosBackOffice ? 'primary' : 'neutral' }}" label="{{ $showPosBackOffice ? __('Tutup tools admin POS') : __('Buka tools admin POS') }}" aria-expanded="{{ $showPosBackOffice ? 'true' : 'false' }}">
-                    <x-heroicon-o-clipboard-document-list class="h-5 w-5" />
-                </x-actions.icon-button>
-            </div>
-        </div>
-    </x-admin.panel>
-    <x-admin.panel>
-        <div class="flex flex-col gap-2 border-b border-slate-100/80 px-3 py-2 dark:border-slate-800/80 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-                <h2 class="text-sm font-semibold text-slate-950 dark:text-white">{{ __('Data Penjualan') }}</h2>
-                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">{{ __('Scan barang, pilih produk, lalu konfirmasi pembayaran.') }}</p>
-            </div>
-
-            <div class="rounded-xl border border-rose-100 bg-gradient-to-r from-rose-50/50 to-white shadow-sm px-5 py-3 text-right shadow-sm dark:border-rose-900/60 dark:bg-slate-950">
-                <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Total Pembayaran') }}</p>
-                <p class="mt-1 text-base font-semibold text-slate-950 dark:text-white">{{ $idMoney($salePayableTotal) }}</p>
-            </div>
-        </div>
-
-        <div class="grid gap-2 border-b border-slate-100/80 px-4 py-4 dark:border-slate-800/80 xl:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.5fr)]">
-            <div class="rounded-xl border border-emerald-100 shadow-sm bg-emerald-50/20 p-3 dark:border-emerald-900/60">
-                <div class="grid gap-2 lg:grid-cols-[8rem_minmax(0,1fr)_4rem] lg:items-center">
-                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-200" for="toko-pos-barcode">{{ __('Scan Barcode') }}</label>
-                    <input
-                        id="toko-pos-barcode"
-                        type="text"
-                        wire:model="saleBarcode"
-                        wire:keydown.enter="addScannedSaleBarcode"
-                        class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white"
-                    >
-                    <span class="text-center text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Atau') }}</span>
-                </div>
-
-                <div class="mt-3 grid gap-2 lg:grid-cols-[8rem_minmax(0,1fr)] lg:items-center">
-                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-200" for="toko-pos-product">{{ __('Pilih Produk') }}</label>
-                    <x-forms.tom-select
-                        id="toko-pos-product"
-                        wire:model.live="selectedProductId"
-                        placeholder="{{ __('Search Product') }}"
-                        :options="$productOptions"
-                        dropdown-direction="down"
-                    >
-                        <option value="">{{ __('Search Product') }}</option>
-                        @foreach ($productOptions as $product)
-                            <option value="{{ $product['id'] }}">{{ $product['name'] }}</option>
-                        @endforeach
-                    </x-forms.tom-select>
-                </div>
-            </div>
-
-            <div class="rounded-xl border border-sky-100 shadow-sm bg-sky-50/20 p-3 dark:border-sky-900/60">
-                <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200" for="toko-pos-draft-number">No Nota · Nota / Struk</label>
-                <input
-                    id="toko-pos-draft-number"
-                    type="text"
-                    value="{{ $nextSaleDraftNumber }}"
-                    readonly
-                    class="min-h-9 w-full rounded-xl border-slate-300 bg-slate-100 text-sm text-slate-700 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-200"
-                >
-            </div>
-        </div>
-
-        <div class="grid gap-2 border-b border-slate-100/80 px-4 py-4 dark:border-slate-800/80 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,0.65fr)_minmax(0,0.65fr)_minmax(0,0.65fr)_minmax(0,0.75fr)]">
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Nama Barang') }}</label>
-                <input type="text" readonly value="{{ $saleProductPreview['name'] ?? '' }}" class="min-h-9 w-full rounded-xl border-slate-300 bg-slate-100 text-sm text-slate-700 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-200">
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Sisa Stok') }}</label>
-                <input type="text" readonly value="{{ isset($saleProductPreview) ? $idNumber($saleProductPreview['stock'], 3) : '' }}" class="min-h-9 w-full rounded-xl border-slate-300 bg-slate-100 text-sm text-slate-700 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 dark:text-slate-200">
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Harga Satuan') }}</label>
-                <input type="text" readonly value="{{ isset($saleProductPreview) ? $idNumber($saleProductPreview['unit_price']) : '' }}" class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-qty">{{ __('Jumlah Jual') }}</label>
-                <input
-                    id="toko-pos-qty"
-                    type="number"
-                    min="0.001"
-                    step="0.001"
-                    wire:model.live="saleQuantity"
-                    class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white"
-                >
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Total Pembayaran') }}</label>
-                <input type="text" readonly value="{{ isset($saleProductPreview) ? $idNumber($saleProductPreview['line_total']) : '' }}" class="min-h-9 w-full rounded-xl border-slate-300 bg-slate-100 text-sm font-semibold text-slate-900 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 dark:text-white">
-            </div>
-            <div class="xl:col-span-5">
-                <button type="button" wire:click="addToSaleCart" class="inline-flex min-h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 shadow-md hover:shadow-lg transition-all px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
-                    <x-heroicon-m-plus class="h-5 w-5" />
-                    <span>{{ __('Tambah') }}</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="grid gap-2 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_24rem]">
-            <div class="overflow-x-auto">
-                <h3 class="mb-3 text-sm font-semibold text-slate-950 dark:text-white">{{ __('Daftar Transaksi') }}</h3>
-                <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-700">
-                    <thead class="bg-slate-50/50 text-[11px] tracking-wider font-semibold uppercase text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-                        <tr class="group hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-200">
-                            <th scope="col" class="px-3 py-2 text-left">No.</th>
-                            <th scope="col" class="px-3 py-2 text-left">{{ __('Kode Barang') }}</th>
-                            <th scope="col" class="px-3 py-2 text-left">{{ __('Nama Barang') }}</th>
-                            <th scope="col" class="px-3 py-2 text-right">{{ __('Harga Satuan') }}</th>
-                            <th scope="col" class="px-3 py-2 text-right">{{ __('Jumlah Jual') }}</th>
-                            <th scope="col" class="px-3 py-2 text-right">{{ __('Total Pembayaran') }}</th>
-                            <th scope="col" class="px-3 py-2 text-right">{{ __('Opsi') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                        @forelse ($saleCart as $index => $item)
-                            <tr class="group hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-200">
-                                <td class="px-3 py-2 text-slate-700 dark:text-slate-200">{{ $index + 1 }}</td>
-                                <td class="px-3 py-2 text-slate-700 dark:text-slate-200">{{ $item['sku'] ?? '-' }}</td>
-                                <td class="px-3 py-2 text-slate-900 dark:text-slate-100">{{ $item['name'] }}</td>
-                                <td class="px-3 py-2 text-right text-slate-700 dark:text-slate-200">{{ $idNumber($item['unit_price']) }}</td>
-                                <td class="px-3 py-2 text-right text-slate-700 dark:text-slate-200">{{ $idNumber($item['quantity'], 3) }}</td>
-                                <td class="px-3 py-2 text-right font-semibold text-slate-900 dark:text-slate-100">{{ $idNumber($item['line_total']) }}</td>
-                                <td class="px-3 py-2 text-right">
-	                                    <x-actions.icon-button wire:click="removeSaleCartItem({{ $index }})" variant="danger" label="{{ __('Remove') }}">
-                                            <x-heroicon-m-trash class="h-5 w-5" />
-                                        </x-actions.icon-button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr class="group hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-200">
-                                <td colspan="7" class="px-3 py-6 text-center text-sm text-slate-500 dark:text-slate-400">{{ __('Cart is empty.') }}</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="space-y-3 lg:sticky lg:top-4 lg:self-start">
-                <div class="rounded-xl border border-slate-100/80 bg-white p-3 shadow-sm dark:border-slate-800/80 dark:bg-slate-950">
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <h3 class="text-sm font-semibold text-slate-950 dark:text-white">Tampilan Struk</h3>
-                            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $nextSaleDraftNumber }}</p>
-                        </div>
-                        <span class="rounded-xl bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200">POS</span>
+        @if ($activePage === 'pos')
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start" x-data="{ barcodeFocus: true }" @keydown.window="if($event.key === 'F2') { $refs.barcodeInput.focus(); $event.preventDefault(); }">
+        <!-- LEFT COLUMN (Products & Cart) -->
+        <div class="flex-1 space-y-4">
+            
+            <!-- HEADER & PRODUCT SELECTION -->
+            <x-admin.panel class="p-4 shadow-sm border-0 ring-1 ring-slate-200/50 dark:ring-slate-800/50">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="p-1.5 rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                                <x-heroicon-s-shopping-bag class="h-5 w-5" />
+                            </span>
+                            {{ __('Terminal POS') }}
+                        </h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ __('Tekan F2 untuk fokus ke barcode scanner.') }}</p>
                     </div>
+                    <div class="flex gap-2">
+                        <x-actions.icon-button wire:click="$refresh" label="Refresh" class="bg-white hover:bg-slate-50">
+                            <x-heroicon-m-arrow-path class="h-4 w-4" />
+                        </x-actions.icon-button>
+                        <x-actions.icon-button wire:click="$toggle('showPosBackOffice')" variant="{{ $showPosBackOffice ? 'primary' : 'neutral' }}" label="Tools Admin" class="{{ $showPosBackOffice ? '' : 'bg-white hover:bg-slate-50' }}">
+                            <x-heroicon-o-clipboard-document-list class="h-4 w-4" />
+                        </x-actions.icon-button>
+                    </div>
+                </div>
 
-                    <div class="mt-3 space-y-3 border-y border-dashed border-slate-300 py-3 dark:border-slate-800/80">
-                        @forelse ($saleCart as $item)
-                            <div class="text-xs">
-                                <div class="flex justify-between gap-2">
-                                    <span class="font-semibold text-slate-800 dark:text-slate-100">{{ $item['name'] }}</span>
-                                    <span class="text-slate-700 dark:text-slate-200">{{ $idNumber($item['line_total']) }}</span>
-                                </div>
-                                <p class="mt-1 text-slate-500 dark:text-slate-400">{{ $idNumber($item['quantity'], 3) }} x {{ $idNumber($item['unit_price']) }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/20 p-4 rounded-xl border border-slate-100/80 dark:border-slate-800/80">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 block uppercase tracking-wide">{{ __('Scan Barcode (F2)') }}</label>
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <x-heroicon-m-qr-code class="h-5 w-5 text-slate-400" />
                             </div>
-                        @empty
-                            <p class="text-center text-sm text-slate-500 dark:text-slate-400">{{ __('Cart is empty.') }}</p>
-                        @endforelse
+                            <input
+                                x-ref="barcodeInput"
+                                type="text"
+                                wire:model="saleBarcode"
+                                wire:keydown.enter="addScannedSaleBarcode"
+                                placeholder="{{ __('Tap barcode...') }}"
+                                class="w-full rounded-xl border-slate-300 pl-10 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                                autofocus
+                            >
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 block uppercase tracking-wide">{{ __('Cari Manual') }}</label>
+                        <x-forms.tom-select id="toko-pos-product" wire:model.live="selectedProductId" placeholder="{{ __('Ketik nama produk...') }}" :options="$productOptions" dropdown-direction="down">
+                            <option value="">{{ __('Ketik nama produk...') }}</option>
+                            @foreach ($productOptions as $product)
+                                <option value="{{ $product['id'] }}">{{ $product['name'] }}</option>
+                            @endforeach
+                        </x-forms.tom-select>
+                    </div>
+                </div>
+
+                @if($selectedProductId || $saleBarcode)
+                <div class="mt-4 rounded-xl border border-primary-200/60 bg-primary-50/50 p-4 dark:border-primary-900/40 dark:bg-primary-900/20 shadow-sm transition-all">
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-semibold text-primary-700 dark:text-primary-300 mb-1">{{ __('Produk Terpilih') }}</label>
+                            <input type="text" readonly value="{{ $saleProductPreview['name'] ?? '' }}" class="w-full rounded-lg border-0 bg-white/80 py-2 text-sm shadow-sm ring-1 ring-inset ring-primary-200/50 dark:bg-slate-900/60 dark:text-slate-200 dark:ring-primary-800/50">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-primary-700 dark:text-primary-300 mb-1">{{ __('Sisa Stok') }}</label>
+                            <input type="text" readonly value="{{ isset($saleProductPreview) ? $idNumber($saleProductPreview['stock'], 3) : '' }}" class="w-full rounded-lg border-0 bg-slate-100/80 py-2 text-center text-sm shadow-sm ring-1 ring-inset ring-slate-200/50 dark:bg-slate-800/60 dark:text-slate-300">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-primary-700 dark:text-primary-300 mb-1">{{ __('Qty') }}</label>
+                            <input type="number" min="0.001" step="0.001" wire:model.live="saleQuantity" wire:keydown.enter="addToSaleCart" class="w-full rounded-lg border-0 py-2 text-center text-sm shadow-sm ring-1 ring-inset ring-primary-300 focus:ring-2 focus:ring-primary-500 dark:bg-slate-900 dark:text-white dark:ring-primary-700">
+                        </div>
+                        <div class="sm:col-span-3">
+                            <button type="button" wire:click="addToSaleCart" class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-primary-600 hover:bg-primary-500 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5">
+                                <x-heroicon-m-plus class="h-4 w-4" /> Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </x-admin.panel>
+
+            <!-- CART TABLE -->
+            <x-admin.panel class="overflow-hidden border-0 ring-1 ring-slate-200/50 dark:ring-slate-800/50 shadow-sm">
+                <div class="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white">{{ __('Keranjang Transaksi') }}</h3>
+                </div>
+                <div class="overflow-x-auto min-h-[300px]">
+                    <table class="min-w-full divide-y divide-slate-100 text-sm dark:divide-slate-800">
+                        <thead class="bg-slate-50/50 dark:bg-slate-900/50">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">No</th>
+                                <th scope="col" class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">{{ __('Produk') }}</th>
+                                <th scope="col" class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">{{ __('Harga') }}</th>
+                                <th scope="col" class="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-500">{{ __('Qty') }}</th>
+                                <th scope="col" class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">{{ __('Subtotal') }}</th>
+                                <th scope="col" class="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-500"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-950">
+                            @forelse ($saleCart as $index => $item)
+                                <tr class="group hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors">
+                                    <td class="px-4 py-3 text-slate-500">{{ $index + 1 }}</td>
+                                    <td class="px-4 py-3">
+                                        <p class="font-medium text-slate-900 dark:text-slate-100">{{ $item['name'] }}</p>
+                                        <p class="text-[11px] text-slate-500">{{ $item['sku'] ?? '-' }}</p>
+                                    </td>
+                                    <td class="px-4 py-3 text-right text-slate-600 dark:text-slate-300">{{ $idNumber($item['unit_price']) }}</td>
+                                    <td class="px-4 py-3 text-center font-medium text-slate-700 dark:text-slate-200">
+                                        <div class="inline-flex items-center justify-center px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md">
+                                            {{ $idNumber($item['quantity'], 3) }}
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-right font-bold text-slate-900 dark:text-slate-100">{{ $idNumber($item['line_total']) }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <button type="button" wire:click="removeSaleCartItem({{ $index }})" class="text-rose-400 hover:text-rose-600 transition-colors" title="Hapus">
+                                            <x-heroicon-m-x-circle class="h-5 w-5 mx-auto" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-4 py-16 text-center">
+                                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 mb-3">
+                                            <x-heroicon-o-shopping-bag class="h-6 w-6 text-slate-400" />
+                                        </div>
+                                        <p class="text-sm font-medium text-slate-900 dark:text-slate-200">Keranjang masih kosong</p>
+                                        <p class="text-xs text-slate-500 mt-1">Mulai scan barcode atau cari produk.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </x-admin.panel>
+        </div>
+
+        <!-- RIGHT COLUMN (Checkout) -->
+        <div class="w-full shrink-0 lg:w-96 space-y-4">
+            
+            <x-admin.panel class="p-4 border-0 ring-1 ring-slate-200/50 dark:ring-slate-800/50 shadow-sm bg-gradient-to-b from-slate-50/50 to-white dark:from-slate-900/50 dark:to-slate-950">
+                <!-- CUSTOMER & INVOICE NO -->
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex-1">
+                        <label class="sr-only" for="toko-pos-client">{{ __('Customer') }}</label>
+                        <x-forms.tom-select id="toko-pos-client" wire:model="selectedClientId" placeholder="{{ __('Pelanggan Umum (Walk-in)') }}" :options="$clientOptions" dropdown-direction="down">
+                            <option value="">{{ __('Pelanggan Umum (Walk-in)') }}</option>
+                            @foreach ($clientOptions as $client)
+                                <option value="{{ $client['id'] }}">{{ $client['label'] }}</option>
+                            @endforeach
+                        </x-forms.tom-select>
+                    </div>
+                </div>
+
+                <!-- GRAND TOTAL DISPLAY -->
+                <div class="rounded-2xl bg-slate-900 p-5 text-center shadow-inner relative overflow-hidden dark:bg-slate-950">
+                    <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-white/5 blur-2xl"></div>
+                    <div class="absolute -left-4 -bottom-4 h-16 w-16 rounded-full bg-primary-500/10 blur-2xl"></div>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1 relative z-10">{{ __('Total Tagihan') }}</p>
+                    <p class="text-3xl sm:text-4xl font-black text-white relative z-10 tracking-tight">{{ $idMoney($salePayableTotal) }}</p>
+                    <p class="text-[10px] text-slate-500 mt-2 relative z-10">{{ $nextSaleDraftNumber }}</p>
+                </div>
+
+                <!-- ORDER SUMMARY -->
+                <div class="mt-5 space-y-2.5 text-sm px-1">
+                    <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                        <span>Subtotal</span>
+                        <span class="font-semibold text-slate-900 dark:text-slate-200">{{ $idNumber($saleCartTotal) }}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <div>
+                            <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Diskon (-)</label>
+                            <input type="number" min="0" step="0.01" wire:model.live.debounce.500ms="saleDiscountAmount" class="w-full rounded-lg border-slate-200 py-1.5 text-sm shadow-sm focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Charge (+)</label>
+                            <input type="number" min="0" step="0.01" wire:model.live.debounce.500ms="saleAdditionalCharge" class="w-full rounded-lg border-slate-200 py-1.5 text-sm shadow-sm focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900">
+                        </div>
                     </div>
 
-                    <div class="mt-3 space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-slate-600 dark:text-slate-300">Sub total</span>
-                            <span class="font-semibold text-slate-950 dark:text-white">{{ $idNumber($saleCartTotal) }}</span>
+                    <div class="flex justify-between items-center border-t border-slate-100 pt-3 mt-3 dark:border-slate-800">
+                        <span class="font-semibold text-slate-900 dark:text-white">Jumlah Bayar</span>
+                        <span class="font-bold text-slate-900 dark:text-white">{{ $idNumber($saleTenderTotal) }}</span>
+                    </div>
+                </div>
+
+                <!-- PAYMENT METHODS -->
+                <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800">
+                    <p class="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ __('Pilih Pembayaran') }}</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" wire:click="setSalePaymentMode('cash')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('cash') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                            <x-heroicon-o-banknotes class="h-5 w-5" />
+                            <span class="text-xs font-semibold">Tunai</span>
+                        </button>
+                        <button type="button" wire:click="setSalePaymentMode('transfer')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('transfer') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                            <x-heroicon-o-credit-card class="h-5 w-5" />
+                            <span class="text-xs font-semibold">Transfer</span>
+                        </button>
+                        <button type="button" wire:click="setSalePaymentMode('split')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('split') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                            <x-heroicon-o-rectangle-stack class="h-5 w-5" />
+                            <span class="text-xs font-semibold">Split Tender</span>
+                        </button>
+                        <button type="button" wire:click="setSalePaymentMode('unpaid')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'unpaid' ? 'bg-amber-50 border border-amber-200 text-amber-700 shadow-sm dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                            <x-heroicon-o-clock class="h-5 w-5" />
+                            <span class="text-xs font-semibold">Tempo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TENDER INPUT (Dynamic) -->
+                @if ($salePaymentStatus === 'paid' && !str($salePaymentMethod)->lower()->contains('split'))
+                    <div class="mt-4 p-3 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800">
+                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1.5">{{ __('Uang Diterima') }}</label>
+                        <input type="number" min="0" step="0.01" wire:model.live.debounce.500ms="saleTenderedAmount" class="w-full rounded-lg border-slate-300 text-lg font-bold shadow-sm focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-950">
+                        
+                        <div class="flex justify-between items-center mt-3 pt-3 border-t border-slate-200 dark:border-slate-700/50">
+                            <span class="text-sm text-slate-500 font-medium">Kembalian</span>
+                            <span class="text-lg font-bold text-amber-600 dark:text-amber-400">{{ $idNumber($saleChangeDue) }}</span>
                         </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-slate-600 dark:text-slate-300">Diskon</span>
-                            <span class="font-semibold text-slate-950 dark:text-white">{{ $idNumber((float) $saleDiscountAmount) }}</span>
+                    </div>
+                @endif
+
+                @if (str($salePaymentMethod)->lower()->contains('split'))
+                    <div class="mt-4 p-3 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800">
+                        <p class="text-[11px] font-bold uppercase text-slate-500 mb-2">{{ __('Daftar Split Tender') }}</p>
+                        <div class="space-y-2 mb-3">
+                            <x-forms.tom-select id="toko-pos-tender-method" wire:model="saleTenderMethod" placeholder="{{ __('Pilih Metode') }}" dropdown-direction="down">
+                                <option value="Cash">Cash</option>
+                                <option value="Transfer Bank">Transfer Bank</option>
+                                <option value="QRIS">QRIS</option>
+                                <option value="Card">Card</option>
+                            </x-forms.tom-select>
+                            <input type="number" min="0.01" step="0.01" wire:model="saleTenderAmount" placeholder="{{ __('Nominal') }}" class="w-full rounded-lg border-slate-300 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
+                            <div class="flex gap-2">
+                                <input type="text" wire:model="saleTenderBankCode" placeholder="{{ __('Bank') }}" class="w-1/2 rounded-lg border-slate-300 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
+                                <input type="text" wire:model="saleTenderReference" placeholder="{{ __('Ref') }}" class="w-1/2 rounded-lg border-slate-300 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
+                            </div>
+                            <button type="button" wire:click="addSaleTenderLine" class="w-full rounded-lg bg-slate-800 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600">
+                                Tambah Split
+                            </button>
                         </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-slate-600 dark:text-slate-300">Charge</span>
-                            <span class="font-semibold text-slate-950 dark:text-white">{{ $idNumber((float) $saleAdditionalCharge) }}</span>
-                        </div>
-                        <div class="flex items-center justify-between gap-2 border-t border-slate-100/80 pt-2 dark:border-slate-800/80">
-                            <span class="font-semibold text-slate-950 dark:text-white">Total Bayar</span>
-                            <span class="text-base font-semibold text-slate-950 dark:text-white">{{ $idNumber($salePayableTotal) }}</span>
-                        </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-slate-600 dark:text-slate-300">Jumlah Bayar</span>
-                            <span class="font-semibold text-slate-950 dark:text-white">{{ $idNumber($saleTenderTotal) }}</span>
-                        </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-slate-600 dark:text-slate-300">Uang Kembali</span>
-                            <span class="font-semibold text-emerald-700 dark:text-emerald-300">{{ $idNumber($saleChangeDue) }}</span>
-                        </div>
+                        
                         @if ($saleTenderLines !== [])
-                            <div class="space-y-1 border-t border-slate-100/80 pt-2 text-xs dark:border-slate-800/80">
-                                @foreach ($saleTenderLines as $line)
-                                    <div class="flex items-center justify-between gap-2 text-slate-600 dark:text-slate-300">
-                                        <span>{{ $line['method'] }}{{ $line['reference'] !== '' ? ' · '.$line['reference'] : '' }}</span>
-                                        <span class="font-semibold text-slate-950 dark:text-white">{{ $idNumber((float) $line['amount']) }}</span>
+                            <div class="space-y-2 border-t border-slate-200 pt-2 dark:border-slate-700">
+                                @foreach ($saleTenderLines as $index => $line)
+                                    <div class="flex items-center justify-between bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                                        <div>
+                                            <p class="text-xs font-bold">{{ $line['method'] }}</p>
+                                            <p class="text-[10px] text-slate-500">{{ $line['bank_code'] }} {{ $line['reference'] }}</p>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm font-bold">{{ $idNumber((float) $line['amount']) }}</span>
+                                            <button type="button" wire:click="removeSaleTenderLine({{ $index }})" class="text-rose-500"><x-heroicon-m-x-circle class="w-4 h-4" /></button>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
+                            <div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+                                <span class="text-xs text-slate-500 font-medium">Total Split / Kembali</span>
+                                <span class="text-sm font-bold {{ $saleChangeDue > 0 ? 'text-amber-600' : 'text-slate-900 dark:text-white' }}">{{ $idNumber($saleTenderTotal) }} / {{ $idNumber($saleChangeDue) }}</span>
+                            </div>
                         @endif
                     </div>
-                </div>
+                @endif
 
-                <div>
-                    <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-client">{{ __('Customer') }}</label>
-                    <x-forms.tom-select
-                        id="toko-pos-client"
-                        wire:model="selectedClientId"
-                        placeholder="{{ __('Walk-in') }}"
-                        :options="$clientOptions"
-                        dropdown-direction="down"
-                    >
-                        <option value="">{{ __('Walk-in') }}</option>
-                        @foreach ($clientOptions as $client)
-                            <option value="{{ $client['id'] }}">{{ $client['label'] }}</option>
-                        @endforeach
-                    </x-forms.tom-select>
-                </div>
+                @if ($salePaymentStatus === 'unpaid')
+                    <div class="mt-4 p-3 rounded-xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200/50 dark:border-amber-800">
+                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1.5">{{ __('Jatuh Tempo (Hari)') }}</label>
+                        <input type="number" min="0" max="365" step="1" wire:model="saleDueDays" class="w-full rounded-lg border-amber-300 focus:ring-amber-500 dark:border-amber-700 dark:bg-slate-950">
+                    </div>
+                @endif
 
-	                <div>
-	                    <p class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Metode Pembayaran') }}</p>
-                        <div class="flex gap-2">
-                            <x-actions.icon-button wire:click="setSalePaymentMode('cash')" variant="{{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('cash') ? 'primary' : 'neutral' }}" label="{{ __('Bayar Sekarang') }}" aria-pressed="{{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('cash') ? 'true' : 'false' }}">
-                                <x-heroicon-o-banknotes class="h-5 w-5" />
-                            </x-actions.icon-button>
-                            <x-actions.icon-button wire:click="setSalePaymentMode('transfer')" variant="{{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('transfer') ? 'primary' : 'neutral' }}" label="{{ __('Transfer Bank') }}" aria-pressed="{{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('transfer') ? 'true' : 'false' }}">
-                                <x-heroicon-o-credit-card class="h-5 w-5" />
-                            </x-actions.icon-button>
-                            <x-actions.icon-button wire:click="setSalePaymentMode('split')" variant="{{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('split') ? 'primary' : 'neutral' }}" label="{{ __('Split Tender') }}" aria-pressed="{{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('split') ? 'true' : 'false' }}">
-                                <x-heroicon-o-rectangle-stack class="h-5 w-5" />
-                            </x-actions.icon-button>
-                            <x-actions.icon-button wire:click="setSalePaymentMode('unpaid')" variant="{{ $salePaymentStatus === 'unpaid' ? 'warning' : 'neutral' }}" label="{{ __('Piutang / Tempo') }}" aria-pressed="{{ $salePaymentStatus === 'unpaid' ? 'true' : 'false' }}">
-                                <x-heroicon-o-clock class="h-5 w-5" />
-                            </x-actions.icon-button>
-                        </div>
-                        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">{{ $salePaymentStatus === 'unpaid' ? __('Piutang / Tempo') : $salePaymentMethod }}</p>
-	                </div>
-
-                <div>
-                    <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-tendered">Jumlah Bayar</label>
-                    <input id="toko-pos-tendered" type="number" min="0" step="0.01" wire:model.live="saleTenderedAmount" class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                </div>
-
-                <div class="rounded-xl border border-slate-100/80 bg-slate-50 p-2 dark:border-slate-800/80 dark:bg-slate-900/40">
-                    <div class="flex items-center justify-between gap-2">
-                        <div>
-                            <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{{ __('Split Tender') }}</p>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">{{ __('Pakai jika pelanggan bayar dengan lebih dari satu metode.') }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs text-slate-500 dark:text-slate-400">{{ __('Total Split') }}</p>
-                            <p class="text-sm font-semibold text-slate-950 dark:text-white">{{ $idNumber($saleTenderTotal) }}</p>
-                        </div>
-                    </div>
-                    <div class="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-                        <label for="toko-pos-tender-method" class="sr-only">{{ __('Split tender method') }}</label>
-                        <x-forms.tom-select id="toko-pos-tender-method" wire:model="saleTenderMethod" aria-label="{{ __('Split tender method') }}" placeholder="{{ __('Split tender method') }}" dropdown-direction="down">
-                            <option value="Cash">Cash</option>
-                            <option value="Transfer Bank">Transfer Bank</option>
-                            <option value="QRIS">QRIS</option>
-                            <option value="Card">Card</option>
-                        </x-forms.tom-select>
-                        <input type="number" min="0.01" step="0.01" wire:model="saleTenderAmount" placeholder="{{ __('Amount') }}" class="min-h-9 rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                    </div>
-                    <div class="mt-2 grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-                        <input type="text" wire:model="saleTenderBankCode" placeholder="{{ __('Bank') }}" class="min-h-9 rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                        <input type="text" wire:model="saleTenderReference" placeholder="{{ __('Reference') }}" class="min-h-9 rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                        <button type="button" wire:click="addSaleTenderLine" class="inline-flex min-h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 shadow-md hover:shadow-lg transition-all px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
-                            <x-heroicon-m-plus class="h-5 w-5" />
-                            <span>{{ __('Tambah Pembayaran') }}</span>
-                        </button>
-                    </div>
-                    @if ($saleTenderLines !== [])
-                        <div class="mt-3 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-100/80 bg-white dark:divide-slate-700 dark:border-slate-800/80 dark:bg-slate-950">
-                            @foreach ($saleTenderLines as $index => $line)
-                                <div class="flex items-center justify-between gap-2 px-3 py-2 text-sm">
-                                    <div>
-                                        <p class="font-semibold text-slate-900 dark:text-slate-100">{{ $line['method'] }}</p>
-                                        <p class="text-xs text-slate-500 dark:text-slate-400">{{ $line['bank_code'] ?: '-' }}{{ $line['reference'] !== '' ? ' · '.$line['reference'] : '' }}</p>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-semibold text-slate-950 dark:text-white">{{ $idNumber((float) $line['amount']) }}</span>
-                                        <x-actions.icon-button wire:click="removeSaleTenderLine({{ $index }})" variant="danger" label="{{ __('Remove tender line') }}">
-                                            <x-heroicon-o-trash class="h-5 w-5" />
-                                        </x-actions.icon-button>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-
-                <div class="grid gap-2 sm:grid-cols-2">
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-discount">{{ __('Discount') }}</label>
-                        <input id="toko-pos-discount" type="number" min="0" step="0.01" wire:model="saleDiscountAmount" class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-charge">{{ __('Charge') }}</label>
-                        <input id="toko-pos-charge" type="number" min="0" step="0.01" wire:model="saleAdditionalCharge" class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                    </div>
-                </div>
-
-                <div class="grid gap-2 sm:grid-cols-3">
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-due-days">{{ __('Due Days') }}</label>
-                        <input id="toko-pos-due-days" type="number" min="0" max="365" step="1" wire:model="saleDueDays" class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-payment-method">{{ __('Method') }}</label>
-                        <input id="toko-pos-payment-method" type="text" wire:model="salePaymentMethod" class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400" for="toko-pos-bank-code">{{ __('Bank') }}</label>
-                        <input id="toko-pos-bank-code" type="text" wire:model="saleBankCode" class="min-h-9 w-full rounded-xl border-slate-300 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white">
-                    </div>
-                </div>
-
-                    <button type="button" wire:click="createCounterSale" class="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700">
-                        <x-heroicon-m-check class="h-5 w-5" />
-                        <span>{{ __('Konfirmasi Pembayaran') }}</span>
+                <!-- CHECKOUT BUTTON -->
+                <div class="mt-6">
+                    <button type="button" wire:click="createCounterSale" wire:loading.attr="disabled" class="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 p-4 text-base font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:hover:scale-100">
+                        <div class="absolute inset-0 bg-white/20 translate-y-full transition-transform group-hover:translate-y-0"></div>
+                        <x-heroicon-s-check-circle class="h-6 w-6 relative z-10" />
+                        <span class="relative z-10">{{ __('Selesaikan Transaksi') }}</span>
                     </button>
-            </div>
+                </div>
+            </x-admin.panel>
         </div>
+    </div>
 
         @if ($showPosBackOffice)
         <div class="border-t border-slate-100/80 px-4 py-4 dark:border-slate-800/80">
