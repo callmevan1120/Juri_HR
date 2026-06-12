@@ -1,6 +1,7 @@
 @php
     $formatMoney = fn ($value) => 'Rp '.number_format((float) $value, 0, ',', '.');
     $formatQuantity = fn ($value) => rtrim(rtrim(number_format((float) $value, 3, ',', '.'), '0'), ',');
+    $showMoney = $type !== 'delivery-letter';
     $partyLines = collect([
         $document['partyContact'] ?? null,
         $document['partyEmail'] ?? null,
@@ -224,9 +225,11 @@
         <tr>
             <th style="width: 42%;">{{ __('Description') }}</th>
             <th style="width: 14%;" class="commercial-document-right">{{ __('Qty') }}</th>
-            <th style="width: 16%;" class="commercial-document-right">{{ $type === 'vendor-bill' ? __('Unit Cost') : __('Unit Price') }}</th>
-            <th style="width: 10%;" class="commercial-document-right">{{ __('Tax') }}</th>
-            <th style="width: 18%;" class="commercial-document-right">{{ __('Total') }}</th>
+            @if ($showMoney)
+                <th style="width: 16%;" class="commercial-document-right">{{ $type === 'vendor-bill' ? __('Unit Cost') : __('Unit Price') }}</th>
+                <th style="width: 10%;" class="commercial-document-right">{{ __('Tax') }}</th>
+                <th style="width: 18%;" class="commercial-document-right">{{ __('Total') }}</th>
+            @endif
         </tr>
     </thead>
     <tbody>
@@ -242,28 +245,32 @@
                     @endif
                 </td>
                 <td class="commercial-document-right">{{ $formatQuantity($item->quantity) }}</td>
-                <td class="commercial-document-right">{{ $formatMoney($unitValue) }}</td>
-                <td class="commercial-document-right">{{ number_format((float) $item->tax_rate, 2, ',', '.') }}%</td>
-                <td class="commercial-document-right">{{ $formatMoney($item->line_total) }}</td>
+                @if ($showMoney)
+                    <td class="commercial-document-right">{{ $formatMoney($unitValue) }}</td>
+                    <td class="commercial-document-right">{{ number_format((float) $item->tax_rate, 2, ',', '.') }}%</td>
+                    <td class="commercial-document-right">{{ $formatMoney($item->line_total) }}</td>
+                @endif
             </tr>
         @endforeach
     </tbody>
 </table>
 
-<table class="commercial-document-totals">
-    <tr>
-        <td>{{ __('Subtotal') }}</td>
-        <td class="commercial-document-right">{{ $formatMoney($record->subtotal) }}</td>
-    </tr>
-    <tr>
-        <td>{{ __('Tax') }}</td>
-        <td class="commercial-document-right">{{ $formatMoney($record->tax_total) }}</td>
-    </tr>
-    <tr class="grand">
-        <td>{{ __('Grand Total') }}</td>
-        <td class="commercial-document-right">{{ $formatMoney($record->grand_total) }}</td>
-    </tr>
-</table>
+@if ($showMoney)
+    <table class="commercial-document-totals">
+        <tr>
+            <td>{{ __('Subtotal') }}</td>
+            <td class="commercial-document-right">{{ $formatMoney($record->subtotal) }}</td>
+        </tr>
+        <tr>
+            <td>{{ __('Tax') }}</td>
+            <td class="commercial-document-right">{{ $formatMoney($record->tax_total) }}</td>
+        </tr>
+        <tr class="grand">
+            <td>{{ __('Grand Total') }}</td>
+            <td class="commercial-document-right">{{ $formatMoney($record->grand_total) }}</td>
+        </tr>
+    </table>
+@endif
 
 @if ($document['notes'] ?? null)
     <div class="commercial-document-notes">

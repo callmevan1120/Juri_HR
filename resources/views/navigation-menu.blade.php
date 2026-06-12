@@ -14,6 +14,7 @@
     $analyticsLocked = \App\Helpers\Editions::analyticsLocked();
     $appraisalLocked = \App\Helpers\Editions::appraisalLocked();
     $assetLocked = \App\Helpers\Editions::assetLocked();
+    $tokoPosLocked = \App\Helpers\Editions::tokoPosLocked();
     $documentRequestsLocked = false;
     $canReviewSubordinateRequests = $user?->can('reviewSubordinateRequests') ?? false;
     $isRouteActive = fn ($patterns) => request()->routeIs(...(array) $patterns);
@@ -182,11 +183,23 @@
             'type' => 'group',
             'id' => 'operations',
             'label' => __('Operations'),
-            'active' => $isRouteActive(['admin.operations', 'admin.commercial', 'admin.collaboration', 'admin.accounting', 'admin.custom-forms']),
+            'active' => $isRouteActive(['admin.operations', 'admin.commercial', 'admin.collaboration', 'admin.accounting', 'admin.custom-forms', 'admin.toko', 'admin.toko.*']),
             'items' => [
                 ['type' => 'heading', 'label' => __('CRM & Field Work')],
                 ['type' => 'link', 'label' => __('Workspace'), 'href' => route('admin.operations'), 'active' => $isRouteActive('admin.operations'), 'visible' => $can('viewOperationsWorkspace')],
                 ['type' => 'link', 'label' => __('Commercial'), 'href' => route('admin.commercial'), 'active' => $isRouteActive('admin.commercial'), 'visible' => $can('viewCommercialWorkspace')],
+                [
+                    'type' => 'feature',
+                    'label' => __('Toko / POS'),
+                    'href' => route('admin.toko'),
+                    'active' => $isRouteActive(['admin.toko', 'admin.toko.*']),
+                    'locked' => $tokoPosLocked,
+                    'lockTitle' => __('Toko Add-on Locked'),
+                    'lockMessage' => __('This premium add-on is available with the Toko / POS license feature.'),
+                    'addonFlag' => __('Add-on'),
+                    'addonFeature' => 'toko_pos',
+                    'visible' => $allowsAdminPermission('admin.toko_pos.view'),
+                ],
                 ['type' => 'link', 'label' => __('Collaboration'), 'href' => route('admin.collaboration'), 'active' => $isRouteActive('admin.collaboration'), 'visible' => $can('viewCollaborationWorkspace')],
                 ['type' => 'link', 'label' => __('Accounting'), 'href' => route('admin.accounting'), 'active' => $isRouteActive('admin.accounting'), 'visible' => $can('viewAccountingWorkspace')],
                 ['type' => 'link', 'label' => __('Forms'), 'href' => route('admin.custom-forms'), 'active' => $isRouteActive('admin.custom-forms'), 'visible' => $can('viewCustomForms')],
@@ -335,22 +348,42 @@
                                             @elseif ($navItem['type'] === 'divider')
                                                 <div class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
                                             @elseif (($navItem['type'] ?? 'link') === 'feature' && $navItem['locked'])
+                                                @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
                                                 <button
                                                     type="button"
                                                     @click.prevent="$dispatch('feature-lock', { title: @js($navItem['lockTitle']), message: @js($navItem['lockMessage']) })"
                                                     class="wcag-touch-target block w-full rounded-md px-4 py-2.5 text-start text-sm leading-5 text-gray-800 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-950 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
                                                     aria-label="{{ $navItem['label'] }}. {{ __('Locked feature') }}">
-                                                    <span>{{ $navItem['label'] }}</span>
-                                                    <x-heroicon-o-lock-closed class="ms-1 inline h-4 w-4" />
+                                                    <span class="flex items-center justify-between gap-3">
+                                                        <span class="inline-flex items-center gap-1.5">
+                                                            <span>{{ $navItem['label'] }}</span>
+                                                            <x-heroicon-o-lock-closed class="h-4 w-4" />
+                                                        </span>
+                                                        @if ($addonFlag)
+                                                            <span
+                                                                data-toko-nav-addon-flag="{{ $navItem['addonFeature'] ?? 'addon' }}"
+                                                                class="rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-amber-700 dark:border-amber-700/70 dark:bg-amber-950/50 dark:text-amber-200"
+                                                            >{{ $addonFlag }}</span>
+                                                        @endif
+                                                    </span>
                                                 </button>
                                             @else
                                                 @php($badge = isset($navItem['badge']) ? value($navItem['badge']) : null)
+                                                @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
                                                 <x-navigation.dropdown-link href="{{ $navItem['href'] }}" :active="$navItem['active']" wire:navigate>
                                                     <span class="flex items-center justify-between gap-3">
                                                         <span>{{ $navItem['label'] }}</span>
-                                                        @if ($badge)
-                                                            <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $badge }}</span>
-                                                        @endif
+                                                        <span class="inline-flex items-center gap-1.5">
+                                                            @if ($addonFlag)
+                                                                <span
+                                                                    data-toko-nav-addon-flag="{{ $navItem['addonFeature'] ?? 'addon' }}"
+                                                                    class="rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-amber-700 dark:border-amber-700/70 dark:bg-amber-950/50 dark:text-amber-200"
+                                                                >{{ $addonFlag }}</span>
+                                                            @endif
+                                                            @if ($badge)
+                                                                <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $badge }}</span>
+                                                            @endif
+                                                        </span>
                                                     </span>
                                                 </x-navigation.dropdown-link>
                                             @endif
@@ -502,22 +535,42 @@
                                     @elseif ($navItem['type'] === 'divider')
                                         <div class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
                                     @elseif (($navItem['type'] ?? 'link') === 'feature' && $navItem['locked'])
+                                        @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
                                         <button
                                             type="button"
                                             @click.prevent="$dispatch('feature-lock', { title: @js($navItem['lockTitle']), message: @js($navItem['lockMessage']) })"
                                             class="wcag-touch-target block w-full border-l-4 border-transparent py-2.5 pe-4 ps-3 text-start text-base font-medium text-gray-700 transition duration-150 ease-in-out hover:border-gray-400 hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-700 dark:hover:text-white"
                                             aria-label="{{ $navItem['label'] }}. {{ __('Locked feature') }}">
-                                            <span>{{ $navItem['label'] }}</span>
-                                            <x-heroicon-o-lock-closed class="ms-1 inline h-4 w-4" />
+                                            <span class="flex items-center justify-between gap-3">
+                                                <span class="inline-flex items-center gap-1.5">
+                                                    <span>{{ $navItem['label'] }}</span>
+                                                    <x-heroicon-o-lock-closed class="h-4 w-4" />
+                                                </span>
+                                                @if ($addonFlag)
+                                                    <span
+                                                        data-toko-nav-addon-flag="{{ $navItem['addonFeature'] ?? 'addon' }}"
+                                                        class="rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-amber-700 dark:border-amber-700/70 dark:bg-amber-950/50 dark:text-amber-200"
+                                                    >{{ $addonFlag }}</span>
+                                                @endif
+                                            </span>
                                         </button>
                                     @else
                                         @php($badge = isset($navItem['badge']) ? value($navItem['badge']) : null)
+                                        @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
                                         <x-navigation.responsive-nav-link href="{{ $navItem['href'] }}" :active="$navItem['active']" wire:navigate>
                                             <span class="flex items-center justify-between gap-3">
                                                 <span>{{ $navItem['label'] }}</span>
-                                                @if ($badge)
-                                                    <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $badge }}</span>
-                                                @endif
+                                                <span class="inline-flex items-center gap-1.5">
+                                                    @if ($addonFlag)
+                                                        <span
+                                                            data-toko-nav-addon-flag="{{ $navItem['addonFeature'] ?? 'addon' }}"
+                                                            class="rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-amber-700 dark:border-amber-700/70 dark:bg-amber-950/50 dark:text-amber-200"
+                                                        >{{ $addonFlag }}</span>
+                                                    @endif
+                                                    @if ($badge)
+                                                        <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $badge }}</span>
+                                                    @endif
+                                                </span>
                                             </span>
                                         </x-navigation.responsive-nav-link>
                                     @endif

@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\CompanyBranch;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Product;
@@ -63,10 +64,12 @@ class CommercialWorkspaceService
     public function recordStockMovement(User $actor, Product $product, array $data): StockMovement
     {
         $this->assertCompanyAccess($actor, $product->company_id);
+        $this->assertBelongsToCompany(CompanyBranch::class, $data['branch_id'] ?? null, $product->company_id);
 
         return DB::transaction(function () use ($actor, $product, $data): StockMovement {
             $movement = StockMovement::query()->create([
                 'company_id' => $product->company_id,
+                'branch_id' => $data['branch_id'] ?? null,
                 'product_id' => $product->id,
                 'user_id' => $actor->id,
                 'type' => $data['type'],
@@ -114,12 +117,14 @@ class CommercialWorkspaceService
         $companyId = (int) $data['company_id'];
         $this->assertCompanyAccess($actor, $companyId);
         $this->assertBelongsToCompany(Vendor::class, $data['vendor_id'] ?? null, $companyId);
+        $this->assertBelongsToCompany(CompanyBranch::class, $data['branch_id'] ?? null, $companyId);
 
         return DB::transaction(function () use ($actor, $companyId, $data, $items): VendorBill {
             $normalizedItems = $this->normalizeVendorBillItems($items, $companyId);
             $totals = $this->calculateVendorBillTotals($normalizedItems);
             $bill = VendorBill::query()->create([
                 'company_id' => $companyId,
+                'branch_id' => $data['branch_id'] ?? null,
                 'vendor_id' => (int) $data['vendor_id'],
                 'number' => $data['number'] ?? $this->nextNumber('BILL', VendorBill::query(), $companyId),
                 'status' => VendorBill::STATUS_POSTED,
@@ -141,6 +146,7 @@ class CommercialWorkspaceService
                 if ($item['product_id']) {
                     StockMovement::query()->create([
                         'company_id' => $companyId,
+                        'branch_id' => $data['branch_id'] ?? null,
                         'product_id' => $item['product_id'],
                         'user_id' => $actor->id,
                         'type' => StockMovement::TYPE_IN,
@@ -187,11 +193,13 @@ class CommercialWorkspaceService
         $this->assertBelongsToCompany(Client::class, $data['client_id'] ?? null, $companyId);
         $this->assertBelongsToCompany(Project::class, $data['project_id'] ?? null, $companyId);
         $this->assertBelongsToCompany(SalesOpportunity::class, $data['sales_opportunity_id'] ?? null, $companyId);
+        $this->assertBelongsToCompany(CompanyBranch::class, $data['branch_id'] ?? null, $companyId);
 
         return DB::transaction(function () use ($data, $items, $companyId): Quotation {
             $totals = $this->calculateTotals($items);
             $quotation = Quotation::query()->create([
                 'company_id' => $companyId,
+                'branch_id' => $data['branch_id'] ?? null,
                 'client_id' => $data['client_id'] ?? null,
                 'project_id' => $data['project_id'] ?? null,
                 'sales_opportunity_id' => $data['sales_opportunity_id'] ?? null,
@@ -287,6 +295,7 @@ class CommercialWorkspaceService
 
             $invoice = $this->createInvoice($actor, [
                 'company_id' => $quotation->company_id,
+                'branch_id' => $quotation->branch_id,
                 'client_id' => $quotation->client_id,
                 'quotation_id' => $quotation->id,
                 'project_id' => $quotation->project_id,
@@ -297,6 +306,7 @@ class CommercialWorkspaceService
                     'source' => 'quotation_conversion',
                     'quotation_id' => $quotation->id,
                     'quotation_number' => $quotation->number,
+                    'branch_id' => $quotation->branch_id,
                 ],
             ], $quotation->items->map(fn (QuotationItem $item): array => [
                 'product_id' => $item->product_id,
@@ -330,11 +340,13 @@ class CommercialWorkspaceService
         $this->assertBelongsToCompany(Client::class, $data['client_id'] ?? null, $companyId);
         $this->assertBelongsToCompany(Quotation::class, $data['quotation_id'] ?? null, $companyId);
         $this->assertBelongsToCompany(Project::class, $data['project_id'] ?? null, $companyId);
+        $this->assertBelongsToCompany(CompanyBranch::class, $data['branch_id'] ?? null, $companyId);
 
         return DB::transaction(function () use ($data, $items, $companyId): Invoice {
             $totals = $this->calculateTotals($items);
             $invoice = Invoice::query()->create([
                 'company_id' => $companyId,
+                'branch_id' => $data['branch_id'] ?? null,
                 'client_id' => $data['client_id'] ?? null,
                 'quotation_id' => $data['quotation_id'] ?? null,
                 'project_id' => $data['project_id'] ?? null,

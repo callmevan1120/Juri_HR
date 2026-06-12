@@ -326,6 +326,7 @@ class AccountingWorkspace extends Component
             'receivablesAging' => $this->accounting->receivablesAgingForCompanies($companyIds, $this->reportEndDate),
             'payablesAging' => $this->accounting->payablesAgingForCompanies($companyIds, $this->reportEndDate),
             'cashflowSummary' => $this->accounting->cashflowSummaryForCompanies($companyIds, $this->reportStartDate, $this->reportEndDate),
+            'tokoContribution' => $this->accounting->tokoContributionForCompanies($companyIds, $this->reportStartDate, $this->reportEndDate),
             'ledgerLines' => $this->accounting->ledgerLinesForCompanies($companyIds, $this->reportStartDate, $this->reportEndDate),
             'periodClosings' => $this->accounting->periodClosingsForCompanies($companyIds),
             'taxFilings' => $this->accounting->taxFilingsForCompanies($companyIds),

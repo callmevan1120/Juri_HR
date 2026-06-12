@@ -297,3 +297,21 @@ it('locks enterprise features that are not present in the license payload', func
         ->and(Editions::payrollLocked())->toBeFalse()
         ->and(Editions::auditLocked())->toBeTrue();
 });
+
+it('treats signed addons as separate premium entitlements', function () {
+    seedEnterpriseSettings();
+
+    Setting::where('key', 'enterprise_license_key')->update([
+        'value' => makeEnterpriseLicense([
+            'features' => ['payroll'],
+            'addons' => ['toko_pos'],
+        ]),
+    ]);
+    LicenseGuard::clearLicenseCache();
+
+    expect(LicenseGuard::hasValidLicense())->toBeTrue()
+        ->and(LicenseGuard::hasFeature('payroll'))->toBeTrue()
+        ->and(LicenseGuard::hasFeature('toko_pos'))->toBeTrue()
+        ->and(LicenseGuard::hasAddon('toko_pos'))->toBeTrue()
+        ->and(LicenseGuard::hasFeature('audit'))->toBeFalse();
+});

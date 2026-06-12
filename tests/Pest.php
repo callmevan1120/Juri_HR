@@ -168,6 +168,7 @@ function enterpriseTestFeatures(): array
         'appraisal',
         'system_backup',
         'document_requests',
+        'toko_pos',
     ];
 }
 

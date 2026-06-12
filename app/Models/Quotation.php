@@ -14,8 +14,11 @@ class Quotation extends Model
 
     public const STATUS_ACCEPTED = 'accepted';
 
+    public const STATUS_REJECTED = 'rejected';
+
     protected $fillable = [
         'company_id',
+        'branch_id',
         'client_id',
         'project_id',
         'sales_opportunity_id',
@@ -45,6 +48,11 @@ class Quotation extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(CompanyBranch::class, 'branch_id');
     }
 
     public function client(): BelongsTo

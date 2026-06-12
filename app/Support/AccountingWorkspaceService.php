@@ -77,6 +77,26 @@ class AccountingWorkspaceService
         'type' => AccountingAccount::TYPE_EXPENSE,
     ];
 
+    private const TOKO_INVOICE_SOURCES = [
+        'toko_pos_counter_sale',
+        'quotation_conversion',
+        'legacy_toko_sale',
+        'legacy_toko_retail_sale',
+    ];
+
+    private const TOKO_VENDOR_BILL_SOURCES = [
+        'toko_pos_purchase',
+        'legacy_toko_purchase',
+    ];
+
+    private const TOKO_JOURNAL_SOURCE_TYPES = [
+        'toko_pos_invoice_payment',
+        'toko_pos_invoice_refund',
+        'toko_pos_operational_expense',
+        'toko_pos_purchase_payment',
+        'toko_pos_purchase_refund',
+    ];
+
     public function canAccessCompany(User $actor, Company|int $company): bool
     {
         $companyId = $company instanceof Company ? $company->id : $company;
@@ -1004,6 +1024,84 @@ class AccountingWorkspaceService
             'inflows' => $inflows,
             'outflows' => $outflows,
             'net_cash' => round($inflows - $outflows, 2),
+        ];
+    }
+
+    /**
+     * @return array{
+     *     sales_total: float,
+     *     open_ar: float,
+     *     purchase_total: float,
+     *     open_ap: float,
+     *     operational_expenses: float,
+     *     posted_journals: int
+     * }
+     */
+    public function tokoContributionForCompanies(array $companyIds, ?string $startDate = null, ?string $endDate = null): array
+    {
+        $invoiceQuery = Invoice::query()
+            ->whereIn('company_id', $companyIds)
+            ->whereIn('metadata->source', self::TOKO_INVOICE_SOURCES)
+            ->where('status', '!=', Invoice::STATUS_CANCELLED);
+
+        if (filled($startDate)) {
+            $invoiceQuery->whereDate('issued_at', '>=', Carbon::parse($startDate)->toDateString());
+        }
+
+        if (filled($endDate)) {
+            $invoiceQuery->whereDate('issued_at', '<=', Carbon::parse($endDate)->toDateString());
+        }
+
+        $vendorBillQuery = VendorBill::query()
+            ->whereIn('company_id', $companyIds)
+            ->whereIn('metadata->source', self::TOKO_VENDOR_BILL_SOURCES)
+            ->where('status', '!=', VendorBill::STATUS_CANCELLED);
+
+        if (filled($startDate)) {
+            $vendorBillQuery->whereDate('issued_at', '>=', Carbon::parse($startDate)->toDateString());
+        }
+
+        if (filled($endDate)) {
+            $vendorBillQuery->whereDate('issued_at', '<=', Carbon::parse($endDate)->toDateString());
+        }
+
+        $expenseQuery = JournalEntryLine::query()
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->whereIn('journal_entries.company_id', $companyIds)
+            ->where('journal_entries.status', JournalEntry::STATUS_POSTED)
+            ->where('journal_entries.source_type', 'toko_pos_operational_expense');
+
+        $this->applyJoinedEntryDateRange($expenseQuery, $startDate, $endDate);
+
+        $tokoInvoiceIds = (clone $invoiceQuery)->pluck('id')->all();
+        $tokoVendorBillIds = (clone $vendorBillQuery)->pluck('id')->all();
+
+        $journalQuery = JournalEntry::query()
+            ->whereIn('company_id', $companyIds)
+            ->where('status', JournalEntry::STATUS_POSTED)
+            ->where(function (Builder $query) use ($tokoInvoiceIds, $tokoVendorBillIds): void {
+                $query->whereIn('source_type', self::TOKO_JOURNAL_SOURCE_TYPES)
+                    ->orWhere(function (Builder $nested) use ($tokoInvoiceIds): void {
+                        $nested
+                            ->where('source_type', Invoice::class)
+                            ->whereIn('source_id', $tokoInvoiceIds === [] ? [0] : $tokoInvoiceIds);
+                    })
+                    ->orWhere(function (Builder $nested) use ($tokoVendorBillIds): void {
+                        $nested
+                            ->where('source_type', VendorBill::class)
+                            ->whereIn('source_id', $tokoVendorBillIds === [] ? [0] : $tokoVendorBillIds);
+                    });
+            });
+
+        $this->applyEntryDateRange($journalQuery, $startDate, $endDate);
+
+        return [
+            'sales_total' => round((float) (clone $invoiceQuery)->sum('grand_total'), 2),
+            'open_ar' => round((float) (clone $invoiceQuery)->where('status', Invoice::STATUS_SENT)->sum('grand_total'), 2),
+            'purchase_total' => round((float) (clone $vendorBillQuery)->sum('grand_total'), 2),
+            'open_ap' => round((float) (clone $vendorBillQuery)->where('status', VendorBill::STATUS_POSTED)->sum('grand_total'), 2),
+            'operational_expenses' => round((float) $expenseQuery->sum('journal_entry_lines.debit'), 2),
+            'posted_journals' => (int) $journalQuery->count(),
         ];
     }
 

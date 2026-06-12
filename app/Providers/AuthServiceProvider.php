@@ -150,6 +150,10 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manageAccountingWorkspace', fn (User $user): bool => $adminPermission($user, 'admin.accounting.manage'));
         Gate::define('viewCustomForms', fn (User $user): bool => $adminPermission($user, 'admin.custom_forms.view'));
         Gate::define('manageCustomForms', fn (User $user): bool => $adminPermission($user, 'admin.custom_forms.manage'));
+        Gate::define('viewTokoPosAddon', fn (User $user): bool => ! Editions::tokoPosLocked() && $adminPermission($user, 'admin.toko_pos.view'));
+        Gate::define('manageTokoPosAddon', fn (User $user): bool => ! Editions::tokoPosLocked() && $adminPermission($user, 'admin.toko_pos.manage'));
+        Gate::define('importTokoPosAddon', fn (User $user): bool => ! Editions::tokoPosLocked() && $adminPermission($user, 'admin.toko_pos.import'));
+        Gate::define('exportTokoPosAddon', fn (User $user): bool => ! Editions::tokoPosLocked() && $adminPermission($user, 'admin.toko_pos.export'));
         Gate::define('manageSystemMaintenance', fn (User $user): bool => ! Editions::systemBackupLocked() && $adminPermission($user, 'admin.system_maintenance.manage'));
         Gate::define('viewUserImportExport', fn (User $user): bool => ! Editions::reportingLocked() && $adminPermission($user, 'admin.import_export_users.view'));
         Gate::define('accessUserImportExport', fn (User $user): bool => $user->can('viewUserImportExport'));

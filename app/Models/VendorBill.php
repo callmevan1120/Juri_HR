@@ -16,6 +16,7 @@ class VendorBill extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'vendor_id',
         'number',
         'status',
@@ -47,6 +48,11 @@ class VendorBill extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(CompanyBranch::class, 'branch_id');
     }
 
     public function vendor(): BelongsTo

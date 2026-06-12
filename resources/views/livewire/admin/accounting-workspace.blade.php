@@ -108,6 +108,32 @@
         </div>
     </div>
 
+    <div class="mb-4 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div class="flex flex-col gap-1 border-b border-slate-200 px-4 py-3 dark:border-slate-800 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Toko Finance Contribution') }}</h2>
+                <p class="text-sm text-slate-600 dark:text-slate-300">{{ __('Toko/POS add-on transactions are included in the global accounting totals for this report period.') }}</p>
+            </div>
+            <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200">{{ __('Integrated') }}</span>
+        </div>
+        <div class="grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+            @foreach ([
+                ['label' => __('Toko Sales'), 'value' => 'Rp'.number_format($tokoContribution['sales_total'], 0, ',', '.'), 'caption' => __('Paid, open, quotation-converted, and legacy store invoices.')],
+                ['label' => __('Toko Open AR'), 'value' => 'Rp'.number_format($tokoContribution['open_ar'], 0, ',', '.'), 'caption' => __('Outstanding customer invoices from Toko/POS.')],
+                ['label' => __('Toko Purchases'), 'value' => 'Rp'.number_format($tokoContribution['purchase_total'], 0, ',', '.'), 'caption' => __('Posted vendor bills from Toko purchasing.')],
+                ['label' => __('Toko Open AP'), 'value' => 'Rp'.number_format($tokoContribution['open_ap'], 0, ',', '.'), 'caption' => __('Outstanding vendor bills from Toko purchasing.')],
+                ['label' => __('Toko Expenses'), 'value' => 'Rp'.number_format($tokoContribution['operational_expenses'], 0, ',', '.'), 'caption' => __('Operational expense journals posted from Toko cash.')],
+                ['label' => __('Toko Journals'), 'value' => number_format($tokoContribution['posted_journals'], 0, ',', '.'), 'caption' => __('Posted Toko-specific accounting journals.')],
+            ] as $metric)
+                <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-700 dark:bg-slate-950/60">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ $metric['label'] }}</p>
+                    <p class="mt-1.5 text-lg font-semibold text-slate-950 dark:text-white">{{ $metric['value'] }}</p>
+                    <p class="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-300">{{ $metric['caption'] }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div class="order-2 space-y-4 xl:order-1">
             @if ($activeTab === 'journals')

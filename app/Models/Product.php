@@ -58,6 +58,10 @@ class Product extends Model
             : $this->stockMovements()->get();
 
         return round((float) $movements->sum(function (StockMovement $movement): float {
+            if (($movement->metadata['affects_stock'] ?? true) === false) {
+                return 0.0;
+            }
+
             return in_array($movement->type, [StockMovement::TYPE_IN, StockMovement::TYPE_ADJUSTMENT], true)
                 ? (float) $movement->quantity
                 : -1 * (float) $movement->quantity;

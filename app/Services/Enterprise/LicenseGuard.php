@@ -25,6 +25,8 @@ final class LicenseGuard
 
     private static ?array $requestFeatureMap = null;
 
+    private static ?array $requestAddonMap = null;
+
     public static function check()
     {
         if (! self::hasValidLicense()) {
@@ -77,6 +79,7 @@ final class LicenseGuard
         self::$requestLicenseHash = null;
         self::$requestValidationResult = null;
         self::$requestFeatureMap = null;
+        self::$requestAddonMap = null;
     }
 
     public static function cacheFingerprint(?string $rawKey = null, array $context = []): string
@@ -234,6 +237,27 @@ final class LicenseGuard
         return false;
     }
 
+    public static function hasAddon(string $addon, array $context = []): bool
+    {
+        if (! self::hasRuntimeObfuscatorKey()) {
+            return false;
+        }
+
+        $addon = self::normalizeFeatureKey($addon);
+        if ($addon === '') {
+            return false;
+        }
+
+        $result = $context === [] ? self::cachedValidationResult() : self::validateDetailed(null, $context);
+        if (! ($result['valid'] ?? false)) {
+            return false;
+        }
+
+        $addons = $context === [] ? self::cachedAddonMap($result) : self::addonMapFromResult($result);
+
+        return isset($addons['*']) || isset($addons[$addon]);
+    }
+
     private static function cachedValidationResult(): array
     {
         $licenseKey = self::configuredLicenseKey();
@@ -342,16 +366,50 @@ final class LicenseGuard
         return self::$requestFeatureMap;
     }
 
+    private static function cachedAddonMap(array $result): array
+    {
+        if (self::$requestAddonMap !== null) {
+            return self::$requestAddonMap;
+        }
+
+        self::$requestAddonMap = self::addonMapFromResult($result);
+
+        return self::$requestAddonMap;
+    }
+
     private static function featureMapFromResult(array $result): array
     {
         $features = $result['license']['features'] ?? [];
         if (! is_array($features)) {
-            return [];
+            $features = [];
+        }
+
+        $addons = $result['license']['addons'] ?? [];
+        if (is_array($addons)) {
+            $features = array_merge($features, $addons);
         }
 
         $map = [];
         foreach ($features as $feature) {
             $key = self::normalizeFeatureKey((string) $feature);
+            if ($key !== '') {
+                $map[$key] = true;
+            }
+        }
+
+        return $map;
+    }
+
+    private static function addonMapFromResult(array $result): array
+    {
+        $addons = $result['license']['addons'] ?? [];
+        if (! is_array($addons)) {
+            $addons = [];
+        }
+
+        $map = [];
+        foreach ($addons as $addon) {
+            $key = self::normalizeFeatureKey((string) $addon);
             if ($key !== '') {
                 $map[$key] = true;
             }
@@ -413,12 +471,33 @@ final class LicenseGuard
             );
         }
 
-        if (! isset($license['features']) || ! is_array($license['features']) || $license['features'] === []) {
+        $features = $license['features'] ?? [];
+        $addons = $license['addons'] ?? [];
+
+        if (! is_array($features)) {
             return self::fail(
                 'invalid_payload',
                 'License payload could not be read.',
                 ['field' => 'features'],
-                'LicenseGuard: Missing enterprise features.'
+                'LicenseGuard: Invalid enterprise features.'
+            );
+        }
+
+        if (! is_array($addons)) {
+            return self::fail(
+                'invalid_payload',
+                'License payload could not be read.',
+                ['field' => 'addons'],
+                'LicenseGuard: Invalid enterprise add-ons.'
+            );
+        }
+
+        if ($features === [] && $addons === []) {
+            return self::fail(
+                'invalid_payload',
+                'License payload could not be read.',
+                ['field' => 'features|addons'],
+                'LicenseGuard: Missing enterprise entitlements.'
             );
         }
 

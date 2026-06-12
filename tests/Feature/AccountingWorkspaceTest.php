@@ -9,6 +9,7 @@ use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Vendor;
@@ -338,6 +339,133 @@ test('accounting reports summarize aging cashflow and ledger detail', function (
     ]);
 
     expect($export->sheets())->toHaveCount(8);
+});
+
+test('accounting workspace surfaces toko contribution inside global finance', function (): void {
+    $this->travelTo(Carbon::parse('2026-06-09 09:00:00'));
+
+    $superadmin = User::factory()->admin(true)->create();
+    $company = app(MultiCompanyService::class)->createCompany('PT Toko Finance Integrated');
+    $client = Client::query()->create([
+        'company_id' => $company->id,
+        'name' => 'Walk-in',
+        'status' => Client::STATUS_ACTIVE,
+    ]);
+    $vendor = Vendor::query()->create([
+        'company_id' => $company->id,
+        'name' => 'Pandan Supplier',
+        'status' => Vendor::STATUS_ACTIVE,
+    ]);
+
+    $paidInvoice = Invoice::query()->create([
+        'company_id' => $company->id,
+        'client_id' => $client->id,
+        'number' => 'NOTA-20260609-0001',
+        'status' => Invoice::STATUS_PAID,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->toDateString(),
+        'subtotal' => 150000,
+        'tax_total' => 0,
+        'grand_total' => 150000,
+        'metadata' => ['source' => 'toko_pos_counter_sale'],
+    ]);
+    Invoice::query()->create([
+        'company_id' => $company->id,
+        'client_id' => $client->id,
+        'number' => 'NOTA-20260609-0002',
+        'status' => Invoice::STATUS_SENT,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->addDays(7)->toDateString(),
+        'subtotal' => 50000,
+        'tax_total' => 0,
+        'grand_total' => 50000,
+        'metadata' => ['source' => 'legacy_toko_sale'],
+    ]);
+    Invoice::query()->create([
+        'company_id' => $company->id,
+        'client_id' => $client->id,
+        'number' => '00519',
+        'status' => Invoice::STATUS_SENT,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->addDays(7)->toDateString(),
+        'subtotal' => 90000,
+        'tax_total' => 0,
+        'grand_total' => 90000,
+        'metadata' => ['source' => 'legacy_toko_retail_sale'],
+    ]);
+    VendorBill::query()->create([
+        'company_id' => $company->id,
+        'vendor_id' => $vendor->id,
+        'number' => 'PO-TOKO-001',
+        'status' => VendorBill::STATUS_POSTED,
+        'issued_at' => now()->toDateString(),
+        'due_at' => now()->addDays(14)->toDateString(),
+        'subtotal' => 70000,
+        'tax_total' => 0,
+        'grand_total' => 70000,
+        'metadata' => ['source' => 'toko_pos_purchase'],
+    ]);
+
+    $service = app(AccountingWorkspaceService::class);
+    $service->postInvoicePayment($superadmin, $paidInvoice);
+
+    $cash = $service->createAccount($superadmin, [
+        'company_id' => $company->id,
+        'code' => '1101',
+        'name' => 'Toko Cash',
+        'type' => AccountingAccount::TYPE_ASSET,
+    ]);
+    $expense = $service->createAccount($superadmin, [
+        'company_id' => $company->id,
+        'code' => '6101',
+        'name' => 'Toko Expense',
+        'type' => AccountingAccount::TYPE_EXPENSE,
+    ]);
+    $expenseJournal = JournalEntry::query()->create([
+        'company_id' => $company->id,
+        'created_by' => $superadmin->id,
+        'number' => 'TJ-EXP-001',
+        'entry_date' => now()->toDateString(),
+        'status' => JournalEntry::STATUS_POSTED,
+        'source_type' => 'toko_pos_operational_expense',
+        'reference_number' => 'OP-001',
+        'description' => 'Toko expense',
+        'metadata' => ['source' => 'toko_pos_operational_expense', 'expense_type' => 'Gaji Karyawan'],
+    ]);
+    JournalEntryLine::query()->create([
+        'journal_entry_id' => $expenseJournal->id,
+        'accounting_account_id' => $expense->id,
+        'debit' => 10000,
+        'credit' => 0,
+        'memo' => 'Toko salary expense',
+    ]);
+    JournalEntryLine::query()->create([
+        'journal_entry_id' => $expenseJournal->id,
+        'accounting_account_id' => $cash->id,
+        'debit' => 0,
+        'credit' => 10000,
+        'memo' => 'Toko salary payment',
+    ]);
+
+    $contribution = $service->tokoContributionForCompanies([
+        $company->id,
+    ], now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString());
+
+    expect($contribution['sales_total'])->toBe(290000.0)
+        ->and($contribution['open_ar'])->toBe(140000.0)
+        ->and($contribution['purchase_total'])->toBe(70000.0)
+        ->and($contribution['open_ap'])->toBe(70000.0)
+        ->and($contribution['operational_expenses'])->toBe(10000.0)
+        ->and($contribution['posted_journals'])->toBe(2);
+
+    $this->actingAs($superadmin);
+
+    Livewire::test(AccountingWorkspace::class)
+        ->assertViewHas('tokoContribution', fn (array $summary): bool => $summary['sales_total'] === 290000.0)
+        ->assertSee(__('Toko Finance Contribution'))
+        ->assertSee('Rp290.000')
+        ->assertSee('Rp70.000')
+        ->assertSee(__('Toko/POS add-on transactions are included in the global accounting totals for this report period.'));
 });
 
 test('closed accounting periods block new postings until reopened', function () {

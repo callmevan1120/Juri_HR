@@ -14,8 +14,11 @@ class Invoice extends Model
 
     public const STATUS_PAID = 'paid';
 
+    public const STATUS_CANCELLED = 'cancelled';
+
     protected $fillable = [
         'company_id',
+        'branch_id',
         'client_id',
         'quotation_id',
         'project_id',
@@ -47,6 +50,11 @@ class Invoice extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(CompanyBranch::class, 'branch_id');
     }
 
     public function client(): BelongsTo

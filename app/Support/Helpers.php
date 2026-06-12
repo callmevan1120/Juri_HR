@@ -80,4 +80,33 @@ class Helpers
 
         return $time->format($formatString);
     }
+
+    public static function formatNumberId(float|int|string|null $value, int $decimals = 0, bool $trimZeros = true): string
+    {
+        $number = is_numeric($value) ? (float) $value : 0.0;
+        $formatted = number_format($number, $decimals, ',', '.');
+
+        if ($trimZeros && $decimals > 0) {
+            $formatted = rtrim(rtrim($formatted, '0'), ',');
+        }
+
+        return $formatted;
+    }
+
+    public static function formatRupiah(float|int|string|null $value, int $decimals = 0): string
+    {
+        return 'Rp'.self::formatNumberId($value, $decimals, false);
+    }
+
+    public static function formatPercentId(float|int|string|null $value, int $decimals = 2, bool $trimZeros = true): string
+    {
+        return self::formatNumberId($value, $decimals, $trimZeros).'%';
+    }
+
+    public static function formatUnitId(float|int|string|null $value, string $unit, int $decimals = 3): string
+    {
+        $unit = trim($unit);
+
+        return trim(self::formatNumberId($value, $decimals).' '.$unit);
+    }
 }

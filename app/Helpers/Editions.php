@@ -72,6 +72,11 @@ class Editions
         return ! LicenseGuard::hasFeature('document_requests');
     }
 
+    public static function tokoPosLocked(): bool
+    {
+        return ! LicenseGuard::hasFeature('toko_pos');
+    }
+
     private static function featureForContract(string $contractClass): ?string
     {
         return match ($contractClass) {

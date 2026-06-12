@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Invoice;
 use App\Models\Quotation;
 use App\Models\Setting;
+use App\Models\DeliveryLetter;
 use App\Models\VendorBill;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
@@ -87,6 +88,37 @@ class CommercialDocumentPdfFactory
         ]);
     }
 
+    public function deliveryLetter(DeliveryLetter $letter): mixed
+    {
+        $letter->loadMissing(['company', 'client', 'invoice.items.product']);
+        $invoice = $letter->invoice;
+
+        return $this->make('delivery-letter', $letter, [
+            'title' => __('Delivery Letter'),
+            'numberLabel' => __('Letter No.'),
+            'dateLabel' => __('Issued Date'),
+            'dueLabel' => __('Invoice Date'),
+            'partyLabel' => __('Deliver To'),
+            'partyName' => $letter->destination ?: ($letter->client?->name ?? __('Client not assigned')),
+            'partyContact' => $letter->driver_name ? __('Driver: :name', ['name' => $letter->driver_name]) : null,
+            'partyEmail' => null,
+            'partyPhone' => $letter->contact_phone,
+            'partyAddress' => $letter->shipping_address,
+            'projectName' => null,
+            'sourceNumber' => $invoice?->number,
+            'number' => $letter->number,
+            'issuedAt' => $letter->issued_at,
+            'dueAt' => $invoice?->issued_at,
+            'status' => $letter->status,
+            'notes' => collect([
+                $letter->vehicle_number ? __('Vehicle: :number', ['number' => $letter->vehicle_number]) : null,
+                $letter->driver_phone ? __('Driver phone: :phone', ['phone' => $letter->driver_phone]) : null,
+                $letter->notes,
+            ])->filter()->join("\n"),
+            'items' => $invoice?->items ?? collect(),
+        ]);
+    }
+
     public function fileName(string $type, string $number): string
     {
         return sprintf('%s-%s.pdf', $type, Str::slug($number));
@@ -95,7 +127,7 @@ class CommercialDocumentPdfFactory
     /**
      * @param  array<string, mixed>  $document
      */
-    private function make(string $type, Quotation|Invoice|VendorBill $record, array $document): mixed
+    private function make(string $type, Quotation|Invoice|VendorBill|DeliveryLetter $record, array $document): mixed
     {
         $companyName = $record->company?->name ?: Setting::getValue('app.company_name', config('app.name'));
         $body = view('pdf.commercial-document', [

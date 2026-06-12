@@ -38,12 +38,18 @@ Yang membuat `main-vps` lebih menarik dibanding branch `main`:
 | Mau rilis Android/iOS | [operations.md](./operations.md) dan [ios-release.md](./ios-release.md) |
 | Mau audit security | [security-model.md](./security-model.md) dan [security-checklist.md](./security-checklist.md) |
 | Mau cek multi-company isolation | [multi-company-isolation.md](./multi-company-isolation.md) |
+| Mau lanjut add-on Toko/POS premium | [premium-toko-pos-addon.md](./premium-toko-pos-addon.md) |
+| Mau baca PRD Toko/POS premium | [premium-toko-pos-prd.md](./premium-toko-pos-prd.md) |
+| Mau tracking task Toko/POS | [premium-toko-pos-task-tracking.md](./premium-toko-pos-task-tracking.md) |
 | Mau cek release evidence | [reviewer-evidence.md](./reviewer-evidence.md) |
 
 ## Produk
 
 - [features.md](./features.md) berisi cakupan fitur HR, attendance, payroll, operations, commercial, accounting, collaboration, mobile, dan enterprise gate.
 - [feature-maturity.md](./feature-maturity.md) menjelaskan prioritas saat ini: pematangan logic, UX, security, data integrity, test, dan operasi.
+- [premium-toko-pos-addon.md](./premium-toko-pos-addon.md) menjelaskan boundary premium, scope, dan mapping legacy `toko-pandan` ke core Laravel.
+- [premium-toko-pos-prd.md](./premium-toko-pos-prd.md) menjelaskan target produk, struktur menu, role, scope migrasi, dan acceptance criteria add-on Toko/POS.
+- [premium-toko-pos-task-tracking.md](./premium-toko-pos-task-tracking.md) menjadi checklist kerja add-on Toko/POS dari discovery sampai cutover.
 - [roadmap-10-coverage.md](./roadmap-10-coverage.md) mencatat area yang sudah kuat dan gap yang masih butuh evidence.
 
 ## Deployment Dan Operasi

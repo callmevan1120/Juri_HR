@@ -52,6 +52,7 @@ class RedirectLockedEnterpriseFeature
             'payroll' => Editions::payrollLocked(),
             'reporting' => Editions::reportingLocked(),
             'system_backup', 'system-backup' => Editions::systemBackupLocked(),
+            'toko_pos', 'toko-pos', 'toko' => Editions::tokoPosLocked(),
             default => false,
         };
     }
@@ -89,6 +90,7 @@ class RedirectLockedEnterpriseFeature
             'payroll' => __('Payroll Locked'),
             'reporting' => __('Import/Export Locked'),
             'system_backup', 'system-backup' => __('System Backup Locked'),
+            'toko_pos', 'toko-pos', 'toko' => __('Toko Add-on Locked'),
             default => __('Enterprise Feature'),
         };
 

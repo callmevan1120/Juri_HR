@@ -518,7 +518,7 @@ class User extends Authenticatable implements MustVerifyEmail
             if ($this->hasAssignedRoles()) {
                 return $this->hasAnyPermission($permissions);
             }
-            
+
             // Fallback to readonly if no roles assigned
             $readOnlyPermissions = RbacRegistry::readOnlyPermissionKeys();
             foreach ($permissions as $permission) {
@@ -627,6 +627,19 @@ class User extends Authenticatable implements MustVerifyEmail
             'admin.commercial' => ['viewCommercialWorkspace'],
             'admin.accounting' => ['viewAccountingWorkspace'],
             'admin.custom-forms' => ['viewCustomForms'],
+            'admin.toko' => ['viewTokoPosAddon'],
+            'admin.toko.pos' => ['viewTokoPosAddon'],
+            'admin.toko.products' => ['viewTokoPosAddon'],
+            'admin.toko.customers' => ['viewTokoPosAddon'],
+            'admin.toko.vendors' => ['viewTokoPosAddon'],
+            'admin.toko.purchases' => ['viewTokoPosAddon'],
+            'admin.toko.inventory' => ['viewTokoPosAddon'],
+            'admin.toko.returns' => ['viewTokoPosAddon'],
+            'admin.toko.quotations' => ['viewTokoPosAddon'],
+            'admin.toko.delivery-letters' => ['viewTokoPosAddon'],
+            'admin.toko.cash' => ['viewTokoPosAddon'],
+            'admin.toko.reports' => ['viewTokoPosAddon'],
+            'admin.toko.migration' => ['importTokoPosAddon'],
             'admin.appraisals' => ['viewAdminAny', Appraisal::class],
             'admin.assets' => ['viewAdminAny', CompanyAsset::class],
             'admin.barcodes' => ['manageBarcodes'],
