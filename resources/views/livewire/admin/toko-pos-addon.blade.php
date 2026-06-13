@@ -1644,28 +1644,24 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/20 p-4 rounded-xl border border-slate-100/80 dark:border-slate-800/80">
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 block uppercase tracking-wide">{{ __('Scan Barcode (F2)') }}</label>
-                        <div class="relative">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <x-heroicon-m-qr-code class="h-5 w-5 text-slate-400" />
-                            </div>
-                            <input
-                                x-ref="barcodeInput"
-                                type="text"
-                                wire:model="saleBarcode"
-                                wire:keydown.enter="addScannedSaleBarcode"
-                                placeholder="{{ __('Tap barcode...') }}"
-                                class="w-full rounded-xl border-slate-300 pl-10 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                                autofocus
-                            >
+                <div class="flex flex-col md:flex-row items-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 transition-all">
+                    <div class="w-full md:w-1/2 relative flex items-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                            <x-heroicon-m-qr-code class="h-5 w-5 text-slate-400" />
                         </div>
+                        <input
+                            x-ref="barcodeInput"
+                            type="text"
+                            wire:model="saleBarcode"
+                            wire:keydown.enter="addScannedSaleBarcode"
+                            placeholder="{{ __('Scan Barcode (F2)...') }}"
+                            class="w-full border-0 bg-transparent py-3 pl-11 pr-3 text-sm focus:ring-0 dark:text-white"
+                            autofocus
+                        >
                     </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 block uppercase tracking-wide">{{ __('Cari Manual') }}</label>
-                        <x-forms.tom-select id="toko-pos-product" wire:model.live="selectedProductId" placeholder="{{ __('Ketik nama produk...') }}" :options="$productOptions" dropdown-direction="down">
-                            <option value="">{{ __('Ketik nama produk...') }}</option>
+                    <div class="w-full md:w-1/2 relative bg-slate-50/50 dark:bg-slate-800/20" wire:ignore>
+                        <x-forms.tom-select id="toko-pos-product" wire:model.live="selectedProductId" placeholder="{{ __('Ketik nama produk manual...') }}" :options="$productOptions" dropdown-direction="down" class="!border-0 !shadow-none !bg-transparent rounded-none [&_.ts-control]:!border-0 [&_.ts-control]:!bg-transparent [&_.ts-control]:!shadow-none [&_.ts-control]:!min-h-0 [&_.ts-control]:!py-3 [&_.ts-wrapper.focus_.ts-control]:!shadow-none [&_.ts-wrapper.focus_.ts-control]:!bg-transparent">
+                            <option value="">{{ __('Ketik nama produk manual...') }}</option>
                             @foreach ($productOptions as $product)
                                 <option value="{{ $product['id'] }}">{{ $product['name'] }}</option>
                             @endforeach
