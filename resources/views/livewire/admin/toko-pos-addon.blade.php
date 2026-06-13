@@ -1644,28 +1644,110 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row items-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 transition-all">
-                    <div class="w-full md:w-1/2 relative flex items-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                            <x-heroicon-m-qr-code class="h-5 w-5 text-slate-400" />
+                <div x-data="{
+                        open: false,
+                        search: @entangle('saleBarcode').live,
+                        options: @js($productOptions),
+                        highlightedIndex: -1,
+                        get filteredOptions() {
+                            if (!this.search) return [];
+                            const q = this.search.toLowerCase();
+                            return this.options.filter(o => o.name.toLowerCase().includes(q)).slice(0, 15);
+                        },
+                        selectOption(id) {
+                            $wire.set('selectedProductId', id);
+                            this.search = '';
+                            this.open = false;
+                            this.highlightedIndex = -1;
+                        },
+                        onKeyDown(e) {
+                            if (!this.open && this.search && this.search.length > 0) {
+                                this.open = true;
+                            }
+                            const opts = this.filteredOptions;
+                            if (e.key === 'ArrowDown') {
+                                e.preventDefault();
+                                if (this.highlightedIndex < opts.length - 1) this.highlightedIndex++;
+                                this.scrollToHighlighted();
+                            } else if (e.key === 'ArrowUp') {
+                                e.preventDefault();
+                                if (this.highlightedIndex > 0) this.highlightedIndex--;
+                                this.scrollToHighlighted();
+                            } else if (e.key === 'Enter') {
+                                if (this.open && this.highlightedIndex >= 0 && opts[this.highlightedIndex]) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    this.selectOption(opts[this.highlightedIndex].id);
+                                } else {
+                                    this.open = false;
+                                }
+                            } else if (e.key === 'Escape') {
+                                this.open = false;
+                            }
+                        },
+                        scrollToHighlighted() {
+                            this.$nextTick(() => {
+                                const activeEl = this.$refs.dropdown?.querySelector('[data-index=\'' + this.highlightedIndex + '\']');
+                                if (activeEl) {
+                                    activeEl.scrollIntoView({ block: 'nearest' });
+                                }
+                            });
+                        }
+                    }" 
+                    class="relative w-full"
+                    @click.away="open = false"
+                >
+                    <div class="flex items-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 transition-all">
+                        <div class="pointer-events-none flex items-center pl-4">
+                            <x-heroicon-m-magnifying-glass class="h-5 w-5 text-slate-400" x-show="!search" />
+                            <x-heroicon-m-qr-code class="h-5 w-5 text-primary-500" x-show="search" x-cloak />
                         </div>
                         <input
                             x-ref="barcodeInput"
                             type="text"
-                            wire:model="saleBarcode"
+                            wire:model.live="saleBarcode"
                             wire:keydown.enter="addScannedSaleBarcode"
-                            placeholder="{{ __('Scan Barcode (F2)...') }}"
-                            class="w-full border-0 bg-transparent py-3 pl-11 pr-3 text-sm focus:ring-0 dark:text-white"
+                            @keydown="onKeyDown($event)"
+                            @focus="open = true"
+                            @input="open = true; highlightedIndex = -1"
+                            placeholder="{{ __('Ketik nama produk atau Scan Barcode (F2)...') }}"
+                            class="w-full border-0 bg-transparent py-3 pl-3 pr-4 text-sm focus:ring-0 dark:text-white"
                             autofocus
                         >
+                        <!-- Clear button -->
+                        <button type="button" x-show="search" @click="search = ''; open = false; $refs.barcodeInput.focus()" class="pr-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" x-cloak>
+                            <x-heroicon-m-x-mark class="h-5 w-5" />
+                        </button>
                     </div>
-                    <div class="w-full md:w-1/2 relative bg-slate-50/50 dark:bg-slate-800/20" wire:ignore>
-                        <x-forms.tom-select id="toko-pos-product" wire:model.live="selectedProductId" placeholder="{{ __('Ketik nama produk manual...') }}" :options="$productOptions" dropdown-direction="down" class="!border-0 !shadow-none !bg-transparent rounded-none [&_.ts-control]:!border-0 [&_.ts-control]:!bg-transparent [&_.ts-control]:!shadow-none [&_.ts-control]:!min-h-0 [&_.ts-control]:!py-3 [&_.ts-wrapper.focus_.ts-control]:!shadow-none [&_.ts-wrapper.focus_.ts-control]:!bg-transparent">
-                            <option value="">{{ __('Ketik nama produk manual...') }}</option>
-                            @foreach ($productOptions as $product)
-                                <option value="{{ $product['id'] }}">{{ $product['name'] }}</option>
-                            @endforeach
-                        </x-forms.tom-select>
+
+                    <!-- Dropdown -->
+                    <div 
+                        x-ref="dropdown"
+                        x-show="open && search && search.length > 0" 
+                        x-transition.opacity.duration.150ms 
+                        style="display: none;" 
+                        class="absolute z-50 w-full mt-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 shadow-xl overflow-hidden"
+                    >
+                        <div class="max-h-60 overflow-y-auto p-1">
+                            <template x-for="(opt, index) in filteredOptions" :key="opt.id">
+                                <div 
+                                    @click="selectOption(opt.id)" 
+                                    @mouseenter="highlightedIndex = index"
+                                    :data-index="index"
+                                    :class="{'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300': highlightedIndex === index, 'text-slate-700 dark:text-slate-200': highlightedIndex !== index}"
+                                    class="px-3 py-2.5 text-sm cursor-pointer rounded-lg transition-colors flex items-center justify-between group"
+                                >
+                                    <span x-text="opt.name" class="truncate pr-4"></span>
+                                    <span class="text-[10px] uppercase font-bold tracking-wider text-primary-500 opacity-0 group-hover:opacity-100" x-show="highlightedIndex === index">{{ __('Pilih') }}</span>
+                                </div>
+                            </template>
+                            <template x-if="filteredOptions.length === 0">
+                                <div class="px-4 py-4 text-sm text-slate-500 dark:text-slate-400 text-center flex flex-col items-center justify-center gap-2">
+                                    <x-heroicon-o-magnifying-glass class="h-6 w-6 text-slate-300 dark:text-slate-600" />
+                                    <span>{{ __('Produk tidak ditemukan, tekan Enter jika ini adalah Barcode.') }}</span>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
 
