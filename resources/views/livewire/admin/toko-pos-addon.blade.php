@@ -1619,6 +1619,36 @@
 
         @if ($activePage === 'pos')
     <div class="flex flex-col gap-4 lg:flex-row lg:items-start" x-data="{ barcodeFocus: true }" @keydown.window="if($event.key === 'F2') { $refs.barcodeInput.focus(); $event.preventDefault(); }">
+        @if ($lastCreatedInvoice)
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-all" wire:transition>
+            <div class="w-full max-w-sm scale-100 rounded-2xl bg-white p-6 shadow-2xl transition-all dark:bg-slate-900">
+                <div class="flex flex-col items-center text-center">
+                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
+                        <x-heroicon-o-check class="h-8 w-8" stroke-width="2.5" />
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ __('Transaksi Berhasil!') }}</h2>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Nota :number telah dibuat dengan total tagihan :total.', ['number' => $lastCreatedInvoice['number'], 'total' => \App\Support\Helpers::formatNumberId($lastCreatedInvoice['total'])]) }}</p>
+                    
+                    <div class="mt-6 w-full space-y-3">
+                        <a href="{{ $lastCreatedInvoice['thermal_print_url'] }}" target="_blank" class="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
+                            <x-heroicon-s-ticket class="h-5 w-5" />
+                            {{ __('Cetak Struk (Thermal)') }}
+                        </a>
+                        <a href="{{ $lastCreatedInvoice['print_url'] }}" target="_blank" class="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+                            <x-heroicon-s-printer class="h-5 w-5" />
+                            {{ __('Cetak Nota (A4 / A5)') }}
+                        </a>
+                    </div>
+                    
+                    <div class="mt-6 w-full pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <button type="button" wire:click="$set('lastCreatedInvoice', null)" class="w-full text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
+                            {{ __('Tutup & Transaksi Baru') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
         <!-- LEFT COLUMN (Products & Cart) -->
         <div class="flex-1 space-y-4">
             

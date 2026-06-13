@@ -135,6 +135,17 @@ test('toko pos add-on can create counter sale from cart', function (): void {
         'stock_tracking' => true,
     ]);
 
+    \App\Models\StockMovement::query()->create([
+        'company_id' => $company->id,
+        'product_id' => $product->id,
+        'user_id' => $actor->id,
+        'type' => \App\Models\StockMovement::TYPE_IN,
+        'quantity' => 10,
+        'unit_cost' => 6500,
+        'occurred_at' => now(),
+        'metadata' => ['source' => 'opening'],
+    ]);
+
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class)
         ->set('selectedProductId', (string) $product->id)
@@ -385,6 +396,17 @@ test('toko pos paid cash checkout requires enough tendered amount before posting
         'stock_tracking' => true,
     ]);
 
+    \App\Models\StockMovement::query()->create([
+        'company_id' => $company->id,
+        'product_id' => $product->id,
+        'user_id' => $actor->id,
+        'type' => \App\Models\StockMovement::TYPE_IN,
+        'quantity' => 10,
+        'unit_cost' => 6500,
+        'occurred_at' => now(),
+        'metadata' => ['source' => 'opening'],
+    ]);
+
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->set('selectedProductId', (string) $product->id)
@@ -417,6 +439,17 @@ test('toko pos cashier supports split tender confirmation with payment line meta
         'selling_price' => 100000,
         'cost_price' => 70000,
         'stock_tracking' => true,
+    ]);
+
+    \App\Models\StockMovement::query()->create([
+        'company_id' => $company->id,
+        'product_id' => $product->id,
+        'user_id' => $actor->id,
+        'type' => \App\Models\StockMovement::TYPE_IN,
+        'quantity' => 10,
+        'unit_cost' => 6500,
+        'occurred_at' => now(),
+        'metadata' => ['source' => 'opening'],
     ]);
 
     Livewire::actingAs($actor)
@@ -490,6 +523,17 @@ test('toko pos add-on applies cashier discount additional charge and payment ref
         'selling_price' => 10000,
         'cost_price' => 6500,
         'stock_tracking' => true,
+    ]);
+
+    \App\Models\StockMovement::query()->create([
+        'company_id' => $company->id,
+        'product_id' => $product->id,
+        'user_id' => $actor->id,
+        'type' => \App\Models\StockMovement::TYPE_IN,
+        'quantity' => 10,
+        'unit_cost' => 6500,
+        'occurred_at' => now(),
+        'metadata' => ['source' => 'opening'],
     ]);
 
     Livewire::actingAs($actor)
