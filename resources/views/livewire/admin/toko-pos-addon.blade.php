@@ -1806,28 +1806,36 @@
                 <!-- PAYMENT METHODS -->
                 <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800">
                     <p class="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ __('Pilih Pembayaran') }}</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" wire:click="setSalePaymentMode('cash')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('cash') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" wire:click="setSalePaymentMode('cash')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('cash') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                             <x-heroicon-o-banknotes class="h-5 w-5" />
-                            <span class="text-xs font-semibold">Tunai</span>
+                            <span class="text-[10px] font-bold tracking-wide">Tunai</span>
                         </button>
-                        <button type="button" wire:click="setSalePaymentMode('transfer')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('transfer') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                        <button type="button" wire:click="setSalePaymentMode('qris')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('qris') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                            <x-heroicon-o-qr-code class="h-5 w-5" />
+                            <span class="text-[10px] font-bold tracking-wide">QRIS</span>
+                        </button>
+                        <button type="button" wire:click="setSalePaymentMode('debit')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('debit') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                             <x-heroicon-o-credit-card class="h-5 w-5" />
-                            <span class="text-xs font-semibold">Transfer</span>
+                            <span class="text-[10px] font-bold tracking-wide">Debit</span>
                         </button>
-                        <button type="button" wire:click="setSalePaymentMode('split')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('split') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                        <button type="button" wire:click="setSalePaymentMode('transfer')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('transfer') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                            <x-heroicon-o-arrows-right-left class="h-5 w-5" />
+                            <span class="text-[10px] font-bold tracking-wide">Transfer</span>
+                        </button>
+                        <button type="button" wire:click="setSalePaymentMode('split')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all {{ $salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('split') ? 'bg-primary-50 border border-primary-200 text-primary-700 shadow-sm dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                             <x-heroicon-o-rectangle-stack class="h-5 w-5" />
-                            <span class="text-xs font-semibold">Split Tender</span>
+                            <span class="text-[10px] font-bold tracking-wide">Split</span>
                         </button>
-                        <button type="button" wire:click="setSalePaymentMode('unpaid')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2.5 transition-all {{ $salePaymentStatus === 'unpaid' ? 'bg-amber-50 border border-amber-200 text-amber-700 shadow-sm dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800' }}">
+                        <button type="button" wire:click="setSalePaymentMode('unpaid')" class="flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all {{ $salePaymentStatus === 'unpaid' ? 'bg-amber-50 border border-amber-200 text-amber-700 shadow-sm dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                             <x-heroicon-o-clock class="h-5 w-5" />
-                            <span class="text-xs font-semibold">Tempo</span>
+                            <span class="text-[10px] font-bold tracking-wide">Tempo</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- TENDER INPUT (Dynamic) -->
-                @if ($salePaymentStatus === 'paid' && !str($salePaymentMethod)->lower()->contains('split'))
+                @if ($salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('cash'))
                     <div class="mt-4 p-3 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800">
                         <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1.5">{{ __('Uang Diterima') }}</label>
                         <input type="number" min="0" step="0.01" wire:model.live.debounce.500ms="saleTenderedAmount" class="w-full rounded-lg border-slate-300 text-lg font-bold shadow-sm focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-950">
@@ -1836,6 +1844,20 @@
                             <span class="text-sm text-slate-500 font-medium">Kembalian</span>
                             <span class="text-lg font-bold text-amber-600 dark:text-amber-400">{{ $idNumber($saleChangeDue) }}</span>
                         </div>
+                    </div>
+                @elseif ($salePaymentStatus === 'paid' && !str($salePaymentMethod)->lower()->contains('split'))
+                    <div class="mt-4 p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/50 text-center">
+                        <div class="mb-1 flex justify-center text-primary-500 dark:text-primary-400">
+                            @if(str($salePaymentMethod)->lower()->contains('qris'))
+                                <x-heroicon-s-qr-code class="h-6 w-6" />
+                            @elseif(str($salePaymentMethod)->lower()->contains('debit'))
+                                <x-heroicon-s-credit-card class="h-6 w-6" />
+                            @else
+                                <x-heroicon-s-arrows-right-left class="h-6 w-6" />
+                            @endif
+                        </div>
+                        <p class="text-xs font-semibold text-primary-700 dark:text-primary-300">{{ $salePaymentMethod }}</p>
+                        <p class="text-[10px] text-primary-600/70 dark:text-primary-400/70 mt-0.5">Sistem akan mencatat lunas sesuai total tagihan</p>
                     </div>
                 @endif
 
