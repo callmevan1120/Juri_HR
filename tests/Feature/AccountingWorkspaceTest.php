@@ -360,7 +360,7 @@ test('accounting workspace surfaces toko contribution inside global finance', fu
     $paidInvoice = Invoice::query()->create([
         'company_id' => $company->id,
         'client_id' => $client->id,
-        'number' => 'NOTA-20260609-0001',
+        'number' => 'POS-20260609-0001',
         'status' => Invoice::STATUS_PAID,
         'issued_at' => now()->toDateString(),
         'due_at' => now()->toDateString(),
@@ -372,7 +372,7 @@ test('accounting workspace surfaces toko contribution inside global finance', fu
     Invoice::query()->create([
         'company_id' => $company->id,
         'client_id' => $client->id,
-        'number' => 'NOTA-20260609-0002',
+        'number' => 'POS-20260609-0002',
         'status' => Invoice::STATUS_SENT,
         'issued_at' => now()->toDateString(),
         'due_at' => now()->addDays(7)->toDateString(),

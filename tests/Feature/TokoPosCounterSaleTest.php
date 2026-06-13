@@ -74,7 +74,7 @@ test('toko pos service creates paid counter sale and stock out movement', functi
     ]);
 
     expect($invoice)->toBeInstanceOf(Invoice::class)
-        ->and($invoice->number)->toStartWith('NOTA-')
+        ->and($invoice->number)->toStartWith('POS-')
         ->and($invoice->status)->toBe(Invoice::STATUS_PAID)
         ->and($invoice->grand_total)->toEqual('16000.00')
         ->and($invoice->metadata['source'])->toBe('toko_pos_counter_sale')
@@ -330,7 +330,7 @@ test('toko pos cashier mode avoids loading hidden back office datasets', functio
     for ($i = 1; $i <= 5; $i++) {
         Invoice::query()->create([
             'company_id' => $company->id,
-            'number' => 'NOTA-PERF-'.$i,
+            'number' => 'POS-PERF-'.$i,
             'status' => Invoice::STATUS_PAID,
             'issued_at' => now()->subDays($i),
             'due_at' => now()->subDays($i),
