@@ -2548,21 +2548,17 @@ class TokoPosAddon extends Component
                 ? [
                     'paymentInvoiceOptions' => $this->paymentInvoiceOptions($targetCompanyId),
                     'cancelInvoiceOptions' => $this->cancelInvoiceOptions($targetCompanyId),
-                    'recentPosInvoices' => $this->recentPosInvoices($targetCompanyId),
-                    'salesInvoiceRows' => $this->salesInvoiceRows($targetCompanyId),
-                    'salesTableMeta' => $this->salesTableMeta($targetCompanyId),
-                    'salesInvoiceDetail' => $this->salesInvoiceDetail($targetCompanyId),
                 ]
                 : [
                     'paymentInvoiceOptions' => [],
                     'cancelInvoiceOptions' => [],
-                    'recentPosInvoices' => [],
-                    'salesInvoiceRows' => [],
-                    'salesTableMeta' => ['page' => 1, 'pages' => 1, 'total' => 0, 'start' => 0, 'end' => 0],
-                    'salesInvoiceDetail' => null,
                 ];
 
             return view('livewire.admin.toko-pos-addon', array_merge($baseData, $posBackOfficeData, [
+                'recentPosInvoices' => $this->recentPosInvoices($targetCompanyId),
+                'salesInvoiceRows' => $this->salesInvoiceRows($targetCompanyId),
+                'salesTableMeta' => $this->salesTableMeta($targetCompanyId),
+                'salesInvoiceDetail' => $this->salesInvoiceDetail($targetCompanyId),
                 'productOptions' => $this->productOptions($targetCompanyId),
                 'clientOptions' => $this->clientOptions($targetCompanyId),
                 'saleCartTotal' => $saleCartTotal,
@@ -3785,7 +3781,7 @@ class TokoPosAddon extends Component
             ->get(['id', 'name', 'code'])
             ->map(fn (Client $client): array => [
                 'id' => $client->id,
-                'label' => trim($client->name.' · '.$client->code),
+                'name' => trim($client->name.' · '.$client->code), 'label' => trim($client->name.' · '.$client->code),
             ])
             ->all();
     }
@@ -5115,7 +5111,7 @@ class TokoPosAddon extends Component
 
                 return [
                     'id' => $invoice->id,
-                    'label' => $invoice->number.' · '.Helpers::formatNumberId($remaining),
+                    'name' => $invoice->number.' · '.Helpers::formatNumberId($remaining), 'label' => $invoice->number.' · '.Helpers::formatNumberId($remaining),
                     'remaining' => $remaining,
                 ];
             })
@@ -5143,7 +5139,7 @@ class TokoPosAddon extends Component
             ->get(['id', 'number', 'status', 'grand_total'])
             ->map(fn (Invoice $invoice): array => [
                 'id' => $invoice->id,
-                'label' => $invoice->number.' · '.$invoice->status.' · '.Helpers::formatNumberId((float) $invoice->grand_total),
+                'name' => $invoice->number.' · '.$invoice->status.' · '.Helpers::formatNumberId((float) $invoice->grand_total), 'label' => $invoice->number.' · '.$invoice->status.' · '.Helpers::formatNumberId((float) $invoice->grand_total),
             ])
             ->all();
     }
