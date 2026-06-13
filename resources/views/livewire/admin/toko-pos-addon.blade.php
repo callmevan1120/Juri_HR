@@ -1846,7 +1846,7 @@
                             @endforeach
                         </x-forms.tom-select>
                     </div>
-                    <button type="button" x-on:click="$dispatch('open-modal', 'quick-customer-modal')" class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 hover:text-primary-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors tooltip" data-tippy-content="{{ __('Tambah Pelanggan Baru') }}">
+                    <button type="button" wire:click="$set('showingQuickCustomerModal', true)" class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 hover:text-primary-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors tooltip" data-tippy-content="{{ __('Tambah Pelanggan Baru') }}">
                         <x-heroicon-m-user-plus class="h-5 w-5" />
                     </button>
                 </div>
@@ -4258,8 +4258,7 @@
         </script>
     @endonce
 
-    <!-- Quick Add Customer Modal -->
-    <x-overlays.dialog-modal id="quick-customer-modal" wire:ignore.self>
+    <x-overlays.dialog-modal id="quick-customer-modal" wire:model.live="showingQuickCustomerModal">
         <x-slot name="title">
             {{ __('Tambah Pelanggan Baru') }}
         </x-slot>
@@ -4280,7 +4279,7 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-actions.button variant="neutral" class="mr-3" wire:click="$set('quickCustomerName', '')" x-on:click="$dispatch('close-modal', 'quick-customer-modal')">
+            <x-actions.button variant="neutral" wire:click="$set('showingQuickCustomerModal', false)" class="mr-3">
                 {{ __('Batal') }}
             </x-actions.button>
             <x-actions.button wire:click="createQuickCustomer" variant="primary">
