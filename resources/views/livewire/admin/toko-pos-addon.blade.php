@@ -1919,7 +1919,19 @@
                 @if ($salePaymentStatus === 'paid' && str($salePaymentMethod)->lower()->contains('cash'))
                     <div class="mt-4 p-3 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800">
                         <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1.5">{{ __('Uang Diterima') }}</label>
-                        <input type="number" min="0" step="0.01" wire:model.live.debounce.500ms="saleTenderedAmount" class="w-full rounded-lg border-slate-300 text-lg font-bold shadow-sm focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-950">
+                        <div x-data="{ 
+                            display: '',
+                            format(val) {
+                                let num = String(val).replace(/\D/g, '');
+                                return num ? Number(num).toLocaleString('id-ID') : '0';
+                            }
+                        }" x-init="display = format($wire.saleTenderedAmount); $watch('$wire.saleTenderedAmount', val => display = format(val))">
+                            <input type="hidden" wire:model.live.debounce.500ms="saleTenderedAmount" x-ref="hiddenVal">
+                            <input type="text" inputmode="numeric"
+                                :value="display"
+                                @input="display = format($event.target.value); $refs.hiddenVal.value = String($event.target.value).replace(/\D/g, '') || '0'; $refs.hiddenVal.dispatchEvent(new Event('input', { bubbles: true }))"
+                                class="w-full rounded-lg border-slate-300 text-lg font-bold shadow-sm focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-950">
+                        </div>
                         
                         <div class="flex justify-between items-center mt-3 pt-3 border-t border-slate-200 dark:border-slate-700/50">
                             <span class="text-sm text-slate-500 font-medium">Kembalian</span>
@@ -1952,7 +1964,19 @@
                                 <option value="QRIS">QRIS</option>
                                 <option value="Card">Card</option>
                             </x-forms.tom-select>
-                            <input type="number" min="0.01" step="0.01" wire:model="saleTenderAmount" placeholder="{{ __('Nominal') }}" class="w-full rounded-lg border-slate-300 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
+                            <div x-data="{ 
+                                display: '',
+                                format(val) {
+                                    let num = String(val).replace(/\D/g, '');
+                                    return num ? Number(num).toLocaleString('id-ID') : '';
+                                }
+                            }" x-init="display = format($wire.saleTenderAmount); $watch('$wire.saleTenderAmount', val => display = format(val))">
+                                <input type="hidden" wire:model="saleTenderAmount" x-ref="hiddenVal">
+                                <input type="text" inputmode="numeric" placeholder="{{ __('Nominal') }}"
+                                    :value="display"
+                                    @input="display = format($event.target.value); $refs.hiddenVal.value = String($event.target.value).replace(/\D/g, ''); $refs.hiddenVal.dispatchEvent(new Event('input', { bubbles: true }))"
+                                    class="w-full rounded-lg border-slate-300 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
+                            </div>
                             <div class="flex gap-2">
                                 <input type="text" wire:model="saleTenderBankCode" placeholder="{{ __('Bank') }}" class="w-1/2 rounded-lg border-slate-300 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
                                 <input type="text" wire:model="saleTenderReference" placeholder="{{ __('Ref') }}" class="w-1/2 rounded-lg border-slate-300 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
