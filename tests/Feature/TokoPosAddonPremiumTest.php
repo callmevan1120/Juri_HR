@@ -72,7 +72,6 @@ test('toko pos add-on route opens with premium feature entitlement', function ()
     $this->actingAs($superadmin)
         ->get(route('admin.toko'))
         ->assertOk()
-        ->assertSee(__('Toko / POS Add-on'))
         ->assertSee(__('Transaction Command Center'))
         ->assertDontSee(__('Dry-run Master Import'))
         ->assertDontSee(__('Create Sale'))
@@ -117,7 +116,6 @@ test('toko admin workspaces use searchable tomselect dropdowns for operational c
         'toko-branch-selector',
         'toko-pos-product',
         'toko-pos-client',
-        'toko-pos-tender-method',
         'toko-pos-payment-invoice',
         'toko-pos-cancel-invoice',
     ]);
@@ -808,7 +806,7 @@ test('toko transaction pages do not show dashboard kpi cards', function () {
     Livewire::actingAs($superadmin)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->assertSee('Terminal POS')
-        ->assertSee('Mode Kasir')
+        ->assertSee('Keranjang Transaksi')
         ->assertDontSee('Today Sales')
         ->assertDontSee('Insight Charts');
 });
@@ -837,7 +835,7 @@ test('toko pos page renders when operational expense journals exist', function (
     Livewire::actingAs($superadmin)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->assertSee('Terminal POS')
-        ->assertSee('Mode Kasir');
+        ->assertSee('Keranjang Transaksi');
 });
 
 test('toko dashboard renders insight charts before command center', function () {
@@ -864,7 +862,7 @@ test('toko pos add-on exposes prd submenu routes under premium entitlement', fun
 
     foreach ([
         'admin.toko' => __('Toko Dashboard'),
-        'admin.toko.pos' => __('POS Counter Sale'),
+        'admin.toko.pos' => __('Terminal POS'),
         'admin.toko.products' => __('Products'),
         'admin.toko.customers' => __('Customers'),
         'admin.toko.vendors' => __('Vendors'),

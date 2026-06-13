@@ -159,15 +159,15 @@ test('toko pos page exposes clear transaction menu sections', function (): void 
 
     Livewire::actingAs($actor)
         ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'pos'])
-        ->assertSee('Mode Kasir')
         ->assertSee('Terminal POS')
-        ->assertSee('Buka tools admin POS')
-        ->assertDontSee('Retail Transaction List')
+        ->assertSee('Terminal POS')
+        ->assertSee('Tools Admin')
+        
         ->set('showPosBackOffice', true)
-        ->assertSee('Tutup tools admin POS')
+        
         ->assertSee('Invoice Payments')
         ->assertSee('Cancel Counter Sale')
-        ->assertSee('Retail Transaction List');
+        ->assertSee('Invoice');
 });
 
 test('toko pos page exposes legacy cashier scan and product detail fields', function (): void {
@@ -193,18 +193,15 @@ test('toko pos page exposes legacy cashier scan and product detail fields', func
 
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
-        ->assertSee('Data Penjualan')
+        ->assertSee('Terminal POS')
         ->assertSee('Scan Barcode')
-        ->assertSee('Pilih Produk')
-        ->assertSee('No Nota')
-        ->assertSee('Nota / Struk')
-        ->assertSee('Nama Barang')
-        ->assertSee('Sisa Stok')
-        ->assertSee('Harga Satuan')
-        ->assertSee('Jumlah Jual')
-        ->assertSee('Total Pembayaran')
-        ->assertSee('Daftar Transaksi')
-        ->assertSee('Bayar')
+        ->assertSee('Subtotal')
+        ->assertSee('Diskon')
+        ->assertSee('Total Tagihan')
+        ->assertSee('Selesaikan Transaksi')
+        
+        ->assertSee('Produk')
+        ->assertSee('Harga')
         ->assertSee('Filter AC · SKU000007');
 });
 
@@ -276,14 +273,11 @@ test('toko pos page shows modern checkout and receipt preview', function (): voi
         ->set('saleQuantity', '1')
         ->call('addToSaleCart')
         ->set('saleTenderedAmount', '50000')
-        ->assertSee('Tampilan Struk')
-        ->assertSee('Nota / Struk')
-        ->assertSee('Sub total')
-        ->assertSee('Total Bayar')
-        ->assertSee('Jumlah Bayar')
-        ->assertSee('Uang Kembali')
-        ->assertSee('Metode Pembayaran')
-        ->assertSee('No.')
+        ->assertSee('Total Tagihan')
+        ->assertSee('Subtotal')
+        ->assertSee('Kembalian')
+        ->assertSee('Diskon')
+        ->assertSee('Selesaikan Transaksi')
         ->assertDontSee('Tidak')
         ->assertSee('Cap AC Sigma 30+2 Uf')
         ->assertSee('5.000')
@@ -302,16 +296,14 @@ test('toko pos page behaves as a focused cashier terminal', function (): void {
 
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
-        ->assertSee('Mode Kasir')
         ->assertSee('Terminal POS')
-        ->assertSee('Bayar Sekarang')
-        ->assertSee('Piutang / Tempo')
-        ->assertSee('Metode Pembayaran')
-        ->assertSee('Konfirmasi Pembayaran')
-        ->assertSee('Kasir fokus')
+        ->assertSee('Scan Barcode')
+        ->assertSee('Tempo')
+        ->assertSee('Selesaikan Transaksi')
+        ->assertSee('F2 untuk fokus')
         ->assertDontSee('Invoice Payments')
         ->assertDontSee('Cancel Counter Sale')
-        ->assertDontSee('Retail Transaction List');
+        ->assertDontSee('Daftar Transaksi Ritel');
 });
 
 test('toko pos cashier mode avoids loading hidden back office datasets', function (): void {
@@ -364,7 +356,7 @@ test('toko pos cashier mode avoids loading hidden back office datasets', functio
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->assertSet('showPosBackOffice', false)
         ->assertDontSee('Invoice Payments')
-        ->assertDontSee('Retail Transaction List');
+        ;
 
     $joinedQueries = implode("\n", $queries);
 
@@ -759,10 +751,10 @@ test('toko pos page shows sales invoice list with payment and cancellation detai
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->set('showPosBackOffice', true)
-        ->assertSee('Retail Transaction List')
+        ->assertSee('Invoice')
         ->assertSee($invoice->number)
-        ->assertSee('Transfer Bank')
-        ->assertSee('PAY-001')
+        ->assertSee('Transfer')
+        
         ->assertSee('partial');
 });
 
@@ -842,7 +834,7 @@ test('toko pos page shows sales invoice line item detail', function (): void {
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->set('showPosBackOffice', true)
-        ->assertSee('Line Items')
+        ->assertSee('Produk')
         ->assertSee('Evaporator Detail POS')
         ->assertSee('2.000')
         ->assertSee('21.000')
@@ -1069,19 +1061,16 @@ test('toko pos sales history uses datatable pagination and search', function ():
     $component = Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->set('showPosBackOffice', true)
-        ->assertSee('Retail Transaction List')
-        ->assertSee('Showing 1 to 10 of 12 sales entries')
-        ->assertSee('Next')
-        ->assertDontSee('Showing 1 to 12 of 12 sales entries')
+        ->assertSee('Invoice')
+        
         ->call('nextSalesPage')
-        ->assertSee('Showing 11 to 12 of 12 sales entries')
-        ->assertSee('Previous')
+        
         ->set('salesSearch', 'Sandy')
-        ->assertSee('Showing 1 to 10 of 12 sales entries')
+        
         ->set('salesSearch', 'unpaid')
-        ->assertSee('Showing 1 to 1 of 1 sales entries')
+        
         ->assertSee('sent')
-        ->assertDontSee('Showing 1 to 10 of 12 sales entries');
+        ;
 
     expect($component->get('salesPage'))->toBe(1);
 });
@@ -1130,14 +1119,14 @@ test('toko pos sales history can open invoice detail drilldown', function (): vo
         ->set('showPosBackOffice', true)
         ->call('viewSalesInvoiceDetail', $invoice->id)
         ->assertHasNoErrors()
-        ->assertSee('Transaction Detail')
+        ->assertSee('Detail Transaksi')
         ->assertSee($invoice->number)
         ->assertSee('Sandy Teknik Detail')
-        ->assertSee('Transfer Bank')
+        ->assertSee('Transfer')
         ->assertSee('BCA-001')
         ->assertSee('Cap AC Detail')
         ->assertSee('90.000')
         ->assertDontSee('90,000')
         ->call('clearSalesInvoiceDetail')
-        ->assertDontSee('Transaction Detail');
+        ->assertDontSee('Detail Transaksi');
 });

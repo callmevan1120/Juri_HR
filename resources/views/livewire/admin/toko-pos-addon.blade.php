@@ -2,6 +2,8 @@
     :title="$pageTitle"
     :description="__('Premium store, POS, inventory, purchase, sales, invoice, and legacy migration workspace.')"
     :show-description="true"
+    data-toko-addon-flag="toko_pos"
+    data-toko-nav-addon-flag="toko_pos"
 >
     @php
         $idNumber = fn ($value, int $decimals = 0, bool $trimZeros = true) => \App\Helpers::formatNumberId($value, $decimals, $trimZeros);
@@ -9,6 +11,8 @@
         $idPercent = fn ($value, int $decimals = 2, bool $trimZeros = true) => \App\Helpers::formatPercentId($value, $decimals, $trimZeros);
         $idUnit = fn ($value, string $unit, int $decimals = 3) => \App\Helpers::formatUnitId($value, $unit, $decimals);
     @endphp
+
+    <div data-toko-addon-flag="toko_pos" data-toko-nav-addon-flag="toko_pos" class="hidden"></div>
 
         <x-slot name="toolbar">
         <x-admin.page-tools grid-class="grid grid-cols-1 items-end gap-3 lg:grid-cols-12">
@@ -2102,7 +2106,7 @@
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-right font-bold text-slate-900 dark:text-white">{{ $idNumber($sale['total']) }}</td>
                             <td class="whitespace-nowrap px-4 py-3 text-center">
-                                <x-actions.icon-button wire:click="loadSalesInvoiceDetail({{ $sale['id'] }})" label="{{ __('View') }}" class="bg-white hover:bg-slate-50 text-slate-500">
+                                <x-actions.icon-button wire:click="viewSalesInvoiceDetail({{ $sale['id'] }})" label="{{ __('View') }}" class="bg-white hover:bg-slate-50 text-slate-500">
                                     <x-heroicon-m-eye class="h-4 w-4" />
                                 </x-actions.icon-button>
                             </td>

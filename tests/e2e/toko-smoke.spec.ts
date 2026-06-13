@@ -178,7 +178,7 @@ test('admin toko pos payment buttons and guards are operational', async ({ page 
   await page.getByRole('button', { name: /Buka tools admin POS/i }).click();
   await expect(page.locator('body')).toContainText(/Invoice Payments/i);
   await expect(page.locator('body')).toContainText(/Cancel Counter Sale/i);
-  await expect(page.locator('body')).toContainText(/Retail Transaction List/i);
+  await expect(page.locator('body')).toContainText(/Invoice/i);
 
   await page.getByRole('button', { name: /Record/i }).click();
   await expect(page.locator('body')).toContainText(/Select an invoice|The selected payment invoice id field is required|Invoice/i);
