@@ -1836,7 +1836,7 @@
             
             <x-admin.panel class="p-4 border-0 ring-1 ring-slate-200/50 dark:ring-slate-800/50 shadow-sm bg-gradient-to-b from-slate-50/50 to-white dark:from-slate-900/50 dark:to-slate-950">
                 <!-- CUSTOMER & INVOICE NO -->
-                <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
                     <div class="flex-1">
                         <label class="sr-only" for="toko-pos-client">{{ __('Customer') }}</label>
                         <x-forms.tom-select id="toko-pos-client" wire:model="selectedClientId" placeholder="{{ __('Pelanggan Umum (Walk-in)') }}" :options="$clientOptions" dropdown-direction="down">
@@ -1846,6 +1846,9 @@
                             @endforeach
                         </x-forms.tom-select>
                     </div>
+                    <button type="button" x-on:click="$dispatch('open-modal', 'quick-customer-modal')" class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 hover:text-primary-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors tooltip" data-tippy-content="{{ __('Tambah Pelanggan Baru') }}">
+                        <x-heroicon-m-user-plus class="h-5 w-5" />
+                    </button>
                 </div>
 
                 <!-- GRAND TOTAL DISPLAY -->
@@ -4248,4 +4251,36 @@
             queueMicrotask(() => window.renderTokoDashboardCharts?.());
         </script>
     @endonce
+
+    <!-- Quick Add Customer Modal -->
+    <x-overlays.dialog-modal id="quick-customer-modal" wire:ignore.self>
+        <x-slot name="title">
+            {{ __('Tambah Pelanggan Baru') }}
+        </x-slot>
+
+        <x-slot name="content">
+            <div class="space-y-4">
+                <div>
+                    <x-forms.label for="quickCustomerName" value="{{ __('Nama Pelanggan') }}" />
+                    <x-forms.input id="quickCustomerName" type="text" class="mt-1 block w-full" wire:model="quickCustomerName" placeholder="Contoh: Budi Santoso" />
+                    <x-forms.input-error for="quickCustomerName" class="mt-2" />
+                </div>
+                <div>
+                    <x-forms.label for="quickCustomerPhone" value="{{ __('Nomor Telepon') }} ({{ __('Opsional') }})" />
+                    <x-forms.input id="quickCustomerPhone" type="text" class="mt-1 block w-full" wire:model="quickCustomerPhone" placeholder="Contoh: 081234567890" />
+                    <x-forms.input-error for="quickCustomerPhone" class="mt-2" />
+                </div>
+            </div>
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-actions.button variant="neutral" class="mr-3" wire:click="$set('quickCustomerName', '')" x-on:click="$dispatch('close-modal', 'quick-customer-modal')">
+                {{ __('Batal') }}
+            </x-actions.button>
+            <x-actions.button wire:click="createQuickCustomer" variant="primary">
+                {{ __('Simpan Pelanggan') }}
+            </x-actions.button>
+        </x-slot>
+    </x-overlays.dialog-modal>
+
 </x-admin.page-shell>
