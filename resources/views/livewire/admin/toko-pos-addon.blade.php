@@ -2074,8 +2074,11 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-slate-900 dark:text-white mr-2">{{ $idNumber($invoice['total']) }}</span>
-                            <x-actions.icon-button href="{{ $invoice['print_url'] }}" target="_blank" variant="primary" label="{{ __('Cetak Nota') }}">
+                            <x-actions.icon-button href="{{ $invoice['print_url'] }}" target="_blank" variant="primary" label="{{ __('Cetak Nota (A4)') }}">
                                 <x-heroicon-s-printer class="h-4 w-4" />
+                            </x-actions.icon-button>
+                            <x-actions.icon-button href="{{ $invoice['thermal_print_url'] }}" target="_blank" variant="neutral" label="{{ __('Cetak Struk (Thermal)') }}">
+                                <x-heroicon-s-ticket class="h-4 w-4" />
                             </x-actions.icon-button>
                             @if ($invoice['has_delivery_letter'])
                                 <x-actions.icon-button href="{{ $invoice['delivery_letter_url'] }}" target="_blank" label="{{ __('Cetak SJ') }}" class="bg-white hover:bg-slate-50 text-slate-600 border-slate-200">
@@ -2129,6 +2132,9 @@
                         <div class="flex items-center gap-2">
                             <x-actions.icon-button href="{{ $salesInvoiceDetail['print_url'] }}" target="_blank" variant="primary" label="{{ __('Cetak Nota') }}">
                                 <x-heroicon-s-printer class="h-4 w-4" />
+                            </x-actions.icon-button>
+                            <x-actions.icon-button href="{{ $salesInvoiceDetail['thermal_print_url'] }}" target="_blank" variant="neutral" label="{{ __('Cetak Struk (Thermal)') }}">
+                                <x-heroicon-o-ticket class="h-4 w-4" />
                             </x-actions.icon-button>
                             <x-actions.icon-button wire:click="clearSalesInvoiceDetail" label="{{ __('Tutup') }}" class="bg-white hover:bg-slate-50 text-slate-600">
                                 <x-heroicon-m-x-mark class="h-4 w-4" />

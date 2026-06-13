@@ -78,8 +78,13 @@ Route::livewire('/toko/migration', 'admin.toko-pos-addon')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.import,admin.dashboard')
     ->can('importTokoPosAddon');
 
-Route::get('/toko/invoices/{invoice}/pdf', DownloadTokoInvoicePdfController::class)
+Route::get('/toko/invoices/{invoice}/pdf', \App\Http\Controllers\Admin\Toko\DownloadTokoInvoicePdfController::class)
     ->name('admin.toko.invoices.pdf')
+    ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
+    ->can('viewTokoPosAddon');
+
+Route::get('/toko/invoices/{invoice}/thermal', \App\Http\Controllers\Admin\Toko\PrintTokoInvoiceThermalController::class)
+    ->name('admin.toko.invoices.thermal')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
