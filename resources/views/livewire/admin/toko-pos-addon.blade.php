@@ -1842,7 +1842,7 @@
                         <x-forms.tom-select id="toko-pos-client" wire:model="selectedClientId" placeholder="{{ __('Pelanggan Umum (Walk-in)') }}" :options="$clientOptions" dropdown-direction="down">
                             <option value="">{{ __('Pelanggan Umum (Walk-in)') }}</option>
                             @foreach ($clientOptions as $client)
-                                <option value="{{ $client['id'] }}">{{ $client['label'] }}</option>
+                                <option value="{{ $client['id'] }}">{{ $client['name'] }}</option>
                             @endforeach
                         </x-forms.tom-select>
                     </div>
@@ -2999,7 +2999,7 @@
             >
                 <option value="">{{ __('Customer') }}</option>
                 @foreach ($clientOptions as $client)
-                    <option value="{{ $client['id'] }}">{{ $client['label'] }}</option>
+                    <option value="{{ $client['id'] }}">{{ $client['name'] }}</option>
                 @endforeach
             </x-forms.tom-select>
 
