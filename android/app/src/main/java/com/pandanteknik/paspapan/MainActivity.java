@@ -27,6 +27,13 @@ public class MainActivity extends BridgeActivity {
         getBridge().getWebView().setBackgroundColor(Color.TRANSPARENT);
         getBridge().getWebView().addJavascriptInterface(nativeSettingsBridge, "NativeSettingsBridge");
 
+        // Handle File Downloads
+        getBridge().getWebView().setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        });
+
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
