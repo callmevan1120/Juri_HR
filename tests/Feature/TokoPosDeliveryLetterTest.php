@@ -4,7 +4,6 @@ use App\Livewire\Admin\TokoPosAddon;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\DeliveryLetter;
-use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;

@@ -30,7 +30,7 @@
             </x-admin.page-tools>
         </x-slot>
 
-        @unless ($databaseSessionsAvailable)
+        @unless ($sessionsAvailable)
             <x-admin.panel class="border-amber-200 bg-amber-50/80 p-4 text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
                 <div class="flex items-start gap-3">
                     <x-heroicon-o-exclamation-triangle class="mt-0.5 h-6 w-6 shrink-0" />

@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\TokoPosAddon;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Invoice;
@@ -87,7 +88,7 @@ test('toko pos add-on can create quotation from quotation cart and convert it', 
     [$company, $actor, $client, $product] = tokoQuotationFixture();
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class)
+        ->test(TokoPosAddon::class)
         ->set('selectedQuotationClientId', (string) $client->id)
         ->set('selectedQuotationProductId', (string) $product->id)
         ->set('quotationQuantity', '2')
@@ -100,7 +101,7 @@ test('toko pos add-on can create quotation from quotation cart and convert it', 
         ->firstOrFail();
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class)
+        ->test(TokoPosAddon::class)
         ->call('convertQuotationToInvoice', $quotation->id);
 
     expect(Invoice::query()->where('quotation_id', $quotation->id)->exists())->toBeTrue();
@@ -121,7 +122,7 @@ test('toko quotation can be accepted or rejected before final conversion', funct
     ]);
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'quotations'])
+        ->test(TokoPosAddon::class, ['page' => 'quotations'])
         ->assertSee('Recent Quotations')
         ->assertSee(__('Final'))
         ->call('markQuotationAccepted', $quotation->id);
@@ -132,7 +133,7 @@ test('toko quotation can be accepted or rejected before final conversion', funct
         ->and($quotation->metadata['accepted_by'])->toBe($actor->id);
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'quotations'])
+        ->test(TokoPosAddon::class, ['page' => 'quotations'])
         ->call('convertQuotationToInvoice', $quotation->id);
 
     expect(Invoice::query()->where('quotation_id', $quotation->id)->count())->toBe(1);
@@ -153,7 +154,7 @@ test('rejected toko quotation cannot be converted to invoice', function (): void
     ]);
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'quotations'])
+        ->test(TokoPosAddon::class, ['page' => 'quotations'])
         ->call('markQuotationRejected', $quotation->id)
         ->call('convertQuotationToInvoice', $quotation->id);
 
@@ -185,7 +186,7 @@ test('toko quotation desk uses searchable ten row datatable pagination', functio
     }
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'quotations'])
+        ->test(TokoPosAddon::class, ['page' => 'quotations'])
         ->assertSee('Data Penawaran')
         ->assertSee('Search')
         ->assertSee('Showing 1 to 10 of 12 quotation entries')

@@ -8,6 +8,7 @@ use App\Models\AttendanceCorrection;
 use App\Models\CashAdvance;
 use App\Models\Company;
 use App\Models\Holiday;
+use App\Models\HrChecklistCase;
 use App\Models\HrChecklistTask;
 use App\Models\Invoice;
 use App\Models\Overtime;
@@ -376,7 +377,7 @@ class AdminDashboardQueryService
                     ->tap($scopedUserQuery)
                     ->count()
                 : 0,
-            'overdue_hr_tasks' => $admin->can('viewAny', \App\Models\HrChecklistCase::class)
+            'overdue_hr_tasks' => $admin->can('viewAny', HrChecklistCase::class)
                 ? HrChecklistTask::query()
                     ->reminderReady()
                     ->whereHas('case.user', fn (Builder $query) => $query->managedBy($admin))

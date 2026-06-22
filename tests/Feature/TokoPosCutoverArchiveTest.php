@@ -1,7 +1,9 @@
 <?php
 
+use App\Livewire\Admin\TokoPosAddon;
 use App\Models\Company;
 use App\Models\ImportExportRun;
+use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
@@ -70,7 +72,7 @@ test('toko cutover archive stores legacy dump copy and migration report', functi
             'rollback_report' => [
                 'reversible' => true,
                 'targets' => [
-                    'invoices' => ['model' => \App\Models\Invoice::class, 'count' => 1, 'ids' => [99], 'rollback_order' => 20],
+                    'invoices' => ['model' => Invoice::class, 'count' => 1, 'ids' => [99], 'rollback_order' => 20],
                 ],
                 'notes' => ['rollback fixture'],
             ],
@@ -107,7 +109,7 @@ test('toko add-on can archive cutover report from selected dump', function (): v
     $actor = User::factory()->admin(true)->create(['company_id' => $company->id]);
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class)
+        ->test(TokoPosAddon::class)
         ->call('archiveCutoverReport');
 
     $run = ImportExportRun::query()

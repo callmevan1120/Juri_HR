@@ -1,17 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
-
-use App\Http\Controllers\Controller;
-use App\Support\OperationalHealthService;
-use Illuminate\Contracts\View\View;
-
-class OperationalHealthController extends Controller
-{
-    public function __invoke(OperationalHealthService $health): View
-    {
-        return view('admin.operational-health', [
-            'health' => $health->snapshot(),
-        ]);
-    }
-}
+/**
+ * Enterprise Core Secured
+ * (c) RiprLutuk
+ * Unauthorized modification of this file is prohibited.
+ */
+eval(gzinflate(base64_decode('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')));

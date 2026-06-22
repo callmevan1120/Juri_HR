@@ -36,15 +36,15 @@
     <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-6">
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Open Pipeline') }}</p>
-            <p class="mt-2 text-xl font-bold text-slate-950 dark:text-white">Rp{{ number_format($salesSummary['open_value'], 0, ',', '.') }}</p>
+            <p class="mt-2 text-xl font-bold text-slate-950 dark:text-white">Rp{{ number_format($salesSummary['open_value'], 2, ',', '.') }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Weighted') }}</p>
-            <p class="mt-2 text-xl font-bold text-primary-700 dark:text-primary-300">Rp{{ number_format($salesSummary['weighted_value'], 0, ',', '.') }}</p>
+            <p class="mt-2 text-xl font-bold text-primary-700 dark:text-primary-300">Rp{{ number_format($salesSummary['weighted_value'], 2, ',', '.') }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Won') }}</p>
-            <p class="mt-2 text-xl font-bold text-emerald-600 dark:text-emerald-300">Rp{{ number_format($salesSummary['won_value'], 0, ',', '.') }}</p>
+            <p class="mt-2 text-xl font-bold text-emerald-600 dark:text-emerald-300">Rp{{ number_format($salesSummary['won_value'], 2, ',', '.') }}</p>
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('Win rate :rate%', ['rate' => number_format($salesSummary['win_rate'], 2, ',', '.')]) }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -56,23 +56,26 @@
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Overdue AR') }}</p>
             <p class="mt-2 text-xl font-bold {{ $collectionSummary['overdue_total'] > 0 ? 'text-amber-600 dark:text-amber-300' : 'text-slate-950 dark:text-white' }}">
-                Rp{{ number_format($collectionSummary['overdue_total'], 0, ',', '.') }}
+                Rp{{ number_format($collectionSummary['overdue_total'], 2, ',', '.') }}
             </p>
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __(':count invoices', ['count' => number_format($collectionSummary['overdue_count'], 0, ',', '.')]) }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Due Soon') }}</p>
-            <p class="mt-2 text-xl font-bold text-primary-700 dark:text-primary-300">Rp{{ number_format($collectionSummary['due_soon_total'], 0, ',', '.') }}</p>
+            <p class="mt-2 text-xl font-bold text-primary-700 dark:text-primary-300">Rp{{ number_format($collectionSummary['due_soon_total'], 2, ',', '.') }}</p>
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ __('next 7 days') }}</p>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div class="order-2 space-y-4 xl:order-1">
+    <div class="space-y-4 mt-6">
+        <div>
             @if ($activeTab === 'pipeline')
                 <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Sales Pipeline') }}</h2>
+                        @if ($canManage)
+                            <x-actions.button wire:click="$set('showOpportunityModal', true)" size="sm">{{ __('Add Opportunity') }}</x-actions.button>
+                        @endif
                     </div>
                     <div class="grid grid-cols-1 gap-3 p-4 xl:grid-cols-2">
                         @forelse ($opportunities as $opportunity)
@@ -106,7 +109,7 @@
                                 <dl class="mt-4 grid grid-cols-2 gap-2 text-sm">
                                     <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Value') }}</dt>
-                                        <dd class="mt-1 font-semibold text-slate-900 dark:text-white">Rp{{ number_format((float) $opportunity->expected_value, 0, ',', '.') }}</dd>
+                                        <dd class="mt-1 font-semibold text-slate-900 dark:text-white">Rp{{ number_format((float) $opportunity->expected_value, 2, ',', '.') }}</dd>
                                     </div>
                                     <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
                                         <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Probability') }}</dt>
@@ -188,68 +191,78 @@
                 </x-admin.panel>
             @elseif ($activeTab === 'products' || $activeTab === 'stock')
                 <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ $activeTab === 'stock' ? __('Stock Overview') : __('Products') }}</h2>
+                        @if ($canManage)
+                            @if ($activeTab === 'products')
+                                <x-actions.button wire:click="openCreateProductModal" size="sm">{{ __('Add Product') }}</x-actions.button>
+                            @else
+                                <x-actions.button wire:click="$set('showStockMovementModal', true)" size="sm">{{ __('Add Stock Movement') }}</x-actions.button>
+                            @endif
+                        @endif
                     </div>
 
-                    <div class="grid grid-cols-1 gap-3 p-4 md:grid-cols-2">
-                        @forelse ($products as $product)
+                    <div class="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        @forelse ($paginatedProducts as $product)
                             @php
                                 $stockBalance = $product->stockBalance();
                                 $isLowStock = $product->isLowStock();
                             @endphp
-                            <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="min-w-0">
-                                        <h3 class="font-semibold text-slate-950 dark:text-white">{{ $product->name }}</h3>
-                                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                            <article class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900 flex flex-col">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <h3 class="font-semibold text-sm text-slate-950 dark:text-white truncate" title="{{ $product->name }}">{{ $product->name }}</h3>
+                                        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate" title="{{ $product->company?->name }} {{ $product->sku ? '· '.$product->sku : '' }}">
                                             {{ $product->company?->name }}
                                             @if ($product->sku)
-                                                · {{ $product->sku }}
+                                                · <span class="font-mono">{{ $product->sku }}</span>
                                             @endif
                                         </p>
                                     </div>
-                                    <div class="flex flex-col items-end gap-2">
-                                        <x-admin.status-badge tone="success">{{ __(str($product->status)->headline()->toString()) }}</x-admin.status-badge>
+                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                        <x-admin.status-badge tone="success" class="!px-1.5 !py-0 !text-[10px]">{{ __(str($product->status)->headline()->toString()) }}</x-admin.status-badge>
                                         @if ($isLowStock)
-                                            <x-admin.status-badge tone="warning">{{ __('Low Stock') }}</x-admin.status-badge>
+                                            <x-admin.status-badge tone="warning" class="!px-1.5 !py-0 !text-[10px]">{{ __('Low') }}</x-admin.status-badge>
                                         @endif
                                     </div>
                                 </div>
 
-                                <dl class="mt-4 grid grid-cols-3 gap-2 text-sm">
-                                    <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
-                                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Price') }}</dt>
-                                        <dd class="mt-1 font-semibold text-slate-900 dark:text-white">Rp{{ number_format((float) $product->selling_price, 0, ',', '.') }}</dd>
+                                <dl class="mt-3 grid grid-cols-2 gap-1.5">
+                                    <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-950/50">
+                                        <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{{ __('Price') }}</dt>
+                                        <dd class="mt-0.5 text-xs font-semibold text-slate-900 dark:text-white truncate">Rp{{ number_format((float) $product->selling_price, 2, ',', '.') }}</dd>
                                     </div>
-                                    <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
-                                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Cost') }}</dt>
-                                        <dd class="mt-1 font-semibold text-slate-900 dark:text-white">Rp{{ number_format((float) $product->cost_price, 0, ',', '.') }}</dd>
+                                    <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-950/50">
+                                        <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{{ __('Cost') }}</dt>
+                                        <dd class="mt-0.5 text-xs font-semibold text-slate-900 dark:text-white truncate">Rp{{ number_format((float) $product->cost_price, 2, ',', '.') }}</dd>
                                     </div>
-                                    <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
-                                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Stock') }}</dt>
-                                        <dd class="mt-1 font-semibold {{ $isLowStock ? 'text-amber-600 dark:text-amber-300' : 'text-slate-900 dark:text-white' }}">{{ number_format($stockBalance, 3, ',', '.') }} {{ $product->unit }}</dd>
+                                    <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-950/50">
+                                        <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{{ __('Stock') }}</dt>
+                                        <dd class="mt-0.5 text-xs font-semibold {{ $isLowStock ? 'text-amber-600 dark:text-amber-300' : 'text-slate-900 dark:text-white' }} truncate">{{ number_format($stockBalance, 2, ',', '.') }} {{ $product->unit }}</dd>
                                     </div>
-                                    <div class="rounded-lg bg-slate-50 p-3 dark:bg-slate-950/50">
-                                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Min') }}</dt>
-                                        <dd class="mt-1 font-semibold text-slate-900 dark:text-white">{{ number_format((float) $product->reorder_point, 3, ',', '.') }} {{ $product->unit }}</dd>
+                                    <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-950/50">
+                                        <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{{ __('Min') }}</dt>
+                                        <dd class="mt-0.5 text-xs font-semibold text-slate-900 dark:text-white truncate">{{ number_format((float) $product->reorder_point, 2, ',', '.') }} {{ $product->unit }}</dd>
                                     </div>
                                 </dl>
 
                                 @if ($activeTab === 'stock' && $product->stockMovements->isNotEmpty())
-                                    <div class="mt-3 space-y-2">
-                                        @foreach ($product->stockMovements->take(3) as $movement)
-                                            <div class="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-950/50 dark:text-slate-300">
-                                                <span class="font-semibold">{{ __(str($movement->type)->headline()->toString()) }}</span>
-                                                · {{ number_format((float) $movement->quantity, 3, ',', '.') }}
-                                                · {{ $movement->occurred_at?->format('d M Y H:i') }}
-                                                @if ($movement->metadata['accounting_journal_entry_id'] ?? null)
-                                                    · {{ __('Journal #:id', ['id' => $movement->metadata['accounting_journal_entry_id']]) }}
-                                                @endif
+                                    <div class="mt-2 space-y-1">
+                                        @foreach ($product->stockMovements->take(2) as $movement)
+                                            <div class="rounded-md bg-slate-50 px-2 py-1 text-[10px] leading-tight text-slate-600 dark:bg-slate-950/50 dark:text-slate-300 flex justify-between">
+                                                <span class="font-medium truncate">{{ __(str($movement->type)->headline()->toString()) }}</span>
+                                                <span class="font-mono shrink-0 ml-1">{{ number_format((float) $movement->quantity, 2, ',', '.') }}</span>
                                             </div>
                                         @endforeach
                                     </div>
                                 @endif
+
+                                <div class="mt-auto pt-3 flex flex-wrap items-center justify-end gap-2">
+                                    <button type="button" wire:click="editProduct({{ $product->id }})" class="inline-flex items-center gap-1 text-[11px] font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 bg-primary-50 dark:bg-primary-900/20 px-2 py-1 rounded-md transition-colors">
+                                        <x-heroicon-m-pencil-square class="h-3 w-3" />
+                                        {{ __('Edit') }}
+                                    </button>
+                                </div>
                             </article>
                         @empty
                             <x-admin.empty-state :title="__('No products yet')" :description="__('Create products from the active action panel.')" class="border-0 bg-transparent shadow-none">
@@ -259,11 +272,23 @@
                             </x-admin.empty-state>
                         @endforelse
                     </div>
+
+                    @if ($paginatedProducts->hasPages())
+                        <div class="border-t border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                            {{ $paginatedProducts->links() }}
+                        </div>
+                    @endif
                 </x-admin.panel>
             @elseif ($activeTab === 'purchases')
                 <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Vendor Bills & AP') }}</h2>
+                        @if ($canManage)
+                            <div class="flex gap-2">
+                                <x-actions.button wire:click="$set('showVendorModal', true)" variant="soft-primary" size="sm">{{ __('Add Vendor') }}</x-actions.button>
+                                <x-actions.button wire:click="$set('showVendorBillModal', true)" size="sm">{{ __('Add Vendor Bill') }}</x-actions.button>
+                            </div>
+                        @endif
                     </div>
                     <div class="grid grid-cols-1 gap-3 p-4">
                         @forelse ($vendorBills as $bill)
@@ -290,7 +315,7 @@
                                     </div>
                                     <div class="text-left md:text-right">
                                         <x-admin.status-badge :tone="$bill->status === \App\Models\VendorBill::STATUS_PAID ? 'success' : 'warning'">{{ __(str($bill->status)->headline()->toString()) }}</x-admin.status-badge>
-                                        <p class="mt-2 text-sm font-bold text-slate-900 dark:text-white">Rp{{ number_format((float) $bill->grand_total, 0, ',', '.') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-slate-900 dark:text-white">Rp{{ number_format((float) $bill->grand_total, 2, ',', '.') }}</p>
                                         <div class="mt-3 flex flex-col gap-2 md:items-end">
                                             <x-actions.button
                                                 href="{{ route('admin.commercial.vendor-bills.pdf', $bill) }}"
@@ -325,8 +350,8 @@
                                                 @if ($item->product)
                                                     · {{ $item->product->name }}
                                                 @endif
-                                                · {{ number_format((float) $item->quantity, 3, ',', '.') }} x Rp{{ number_format((float) $item->unit_cost, 0, ',', '.') }}
-                                                · Rp{{ number_format((float) $item->line_total, 0, ',', '.') }}
+                                                · {{ number_format((float) $item->quantity, 2, ',', '.') }} x Rp{{ number_format((float) $item->unit_cost, 2, ',', '.') }}
+                                                · Rp{{ number_format((float) $item->line_total, 2, ',', '.') }}
                                             </div>
                                         @endforeach
                                     </div>
@@ -339,8 +364,11 @@
                 </x-admin.panel>
             @elseif ($activeTab === 'quotations')
                 <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Quotations') }}</h2>
+                        @if ($canManage)
+                            <x-actions.button wire:click="$set('showDocumentModal', true)" size="sm">{{ __('Create Document') }}</x-actions.button>
+                        @endif
                     </div>
                     <div class="grid grid-cols-1 gap-3 p-4">
                         @forelse ($quotations as $quotation)
@@ -365,7 +393,7 @@
                                     </div>
                                     <div class="text-left md:text-right">
                                         <x-admin.status-badge tone="primary">{{ __(str($quotation->status)->headline()->toString()) }}</x-admin.status-badge>
-                                        <p class="mt-2 text-sm font-bold text-slate-900 dark:text-white">Rp{{ number_format((float) $quotation->grand_total, 0, ',', '.') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-slate-900 dark:text-white">Rp{{ number_format((float) $quotation->grand_total, 2, ',', '.') }}</p>
                                         <div class="mt-3 flex flex-col gap-2 md:items-end">
                                             <x-actions.button
                                                 href="{{ route('admin.commercial.quotations.pdf', $quotation) }}"
@@ -399,8 +427,11 @@
                 </x-admin.panel>
             @elseif ($activeTab === 'invoices')
                 <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
                         <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Invoices') }}</h2>
+                        @if ($canManage)
+                            <x-actions.button wire:click="$set('showDocumentModal', true)" size="sm">{{ __('Create Document') }}</x-actions.button>
+                        @endif
                     </div>
                     <div class="grid grid-cols-1 gap-3 p-4">
                         @forelse ($invoices as $invoice)
@@ -425,7 +456,7 @@
                                     </div>
                                     <div class="text-left md:text-right">
                                         <x-admin.status-badge :tone="$invoice->status === \App\Models\Invoice::STATUS_PAID ? 'success' : 'warning'">{{ __(str($invoice->status)->headline()->toString()) }}</x-admin.status-badge>
-                                        <p class="mt-2 text-sm font-bold text-slate-900 dark:text-white">Rp{{ number_format((float) $invoice->grand_total, 0, ',', '.') }}</p>
+                                        <p class="mt-2 text-sm font-bold text-slate-900 dark:text-white">Rp{{ number_format((float) $invoice->grand_total, 2, ',', '.') }}</p>
                                         <div class="mt-3 flex flex-col gap-2 md:items-end">
                                             <x-actions.button
                                                 href="{{ route('admin.commercial.invoices.pdf', $invoice) }}"
@@ -462,24 +493,15 @@
             @endif
         </div>
 
-        <div class="order-1 space-y-4 xl:order-2">
-            @if ($canManage)
-                <x-admin.panel class="border-primary-200 bg-primary-50/60 dark:border-primary-900/60 dark:bg-primary-950/20">
-                    <div class="space-y-1 p-3.5">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-primary-800 dark:text-primary-200">{{ __('Quick action') }}</p>
-                        <p class="text-sm leading-5 text-primary-700 dark:text-primary-100">
-                            {{ __('The form follows your selected tab so you only see the action you need right now.') }}
-                        </p>
-                    </div>
-                </x-admin.panel>
+            </div>
 
-                @if ($activeTab === 'pipeline')
-                <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
-                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Opportunity') }}</h2>
-                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Track a lead, expected value, close date, and next follow-up in one step.') }}</p>
-                    </div>
-                    <form wire:submit.prevent="createOpportunity" class="space-y-4 p-4">
+    @if ($canManage)
+        @if ($activeTab === 'pipeline')
+        <x-overlays.dialog-modal wire:model.live="showOpportunityModal">
+            <x-slot name="title">{{ __('Sales Opportunity') }}</x-slot>
+            <x-slot name="content">
+                <div class="space-y-4">
+
                         <div class="space-y-1.5">
                             <x-forms.label for="opportunity-company" value="{{ __('Company') }}" />
                             <x-forms.select id="opportunity-company" wire:model.live="opportunityForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
@@ -533,7 +555,7 @@
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="opportunity-value" value="{{ __('Expected value') }}" />
-                                <x-forms.input id="opportunity-value" type="number" min="0" step="0.01" wire:model.live="opportunityForm.expectedValue" placeholder="0" />
+                                <x-forms.input id="opportunity-value" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="opportunityForm.expectedValue" placeholder="0" />
                                 <x-forms.input-error for="opportunityForm.expectedValue" />
                             </div>
                         </div>
@@ -562,17 +584,21 @@
                             <x-forms.textarea id="opportunity-notes" wire:model.live="opportunityForm.notes" rows="3" placeholder="{{ __('Next action, buyer concern, or proposal note.') }}" />
                             <x-forms.input-error for="opportunityForm.notes" />
                         </div>
-                        <x-actions.button type="submit" class="w-full">{{ __('Create Opportunity') }}</x-actions.button>
-                    </form>
-                </x-admin.panel>
-
-                @elseif ($activeTab === 'products')
-                <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
-                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Product') }}</h2>
-                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Add a sellable item with pricing, cost, unit, and reorder threshold.') }}</p>
-                    </div>
-                    <form wire:submit.prevent="createProduct" class="space-y-4 p-4">
+                </div>
+            </x-slot>
+        <x-slot name="footer">
+            <x-actions.button type="button" wire:click="$set('showOpportunityModal', false)" variant="secondary" class="mr-2">{{ __('Cancel') }}</x-actions.button>
+            <x-actions.button type="button" wire:click="createOpportunity">{{ __('Save') }}</x-actions.button>
+        </x-slot>
+        </x-overlays.dialog-modal>
+        @endif
+        @if ($activeTab === 'products' || $activeTab === 'stock')
+        <x-overlays.dialog-modal wire:model.live="showProductModal">
+            <x-slot name="title">
+                {{ $productForm->productId ? __('Edit Product') : __('Create Product') }}
+            </x-slot>
+            <x-slot name="content">
+                <form wire:submit="saveProduct" id="product-form">
                         <div class="space-y-1.5">
                             <x-forms.label for="product-company" value="{{ __('Company') }}" />
                             <x-forms.select id="product-company" wire:model.live="productForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
@@ -590,7 +616,7 @@
                             <x-forms.input-error for="productForm.name" />
                         </div>
 
-                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-sku" value="{{ __('SKU') }}" />
                                 <x-forms.input id="product-sku" wire:model.live="productForm.sku" placeholder="{{ __('Optional') }}" />
@@ -598,42 +624,51 @@
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-unit" value="{{ __('Unit') }}" />
-                                <x-forms.input id="product-unit" wire:model.live="productForm.unit" placeholder="{{ __('pcs, unit, hour') }}" />
+                                <x-forms.input id="product-unit" type="text" wire:model="productForm.unit" placeholder="pcs, kg, box" />
                                 <x-forms.input-error for="productForm.unit" />
+                            </div>
+                            <div class="space-y-1.5">
+                                <x-forms.label for="product-status" value="{{ __('Status') }}" />
+                                <x-forms.select id="product-status" wire:model="productForm.status">
+                                    <option value="active">{{ __('Active') }}</option>
+                                    <option value="inactive">{{ __('Inactive') }}</option>
+                                </x-forms.select>
+                                <x-forms.input-error for="productForm.status" />
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-selling-price" value="{{ __('Selling price') }}" />
-                                <x-forms.input id="product-selling-price" type="number" min="0" step="0.01" wire:model.live="productForm.sellingPrice" placeholder="0" />
+                                <x-forms.input id="product-selling-price" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="productForm.sellingPrice" placeholder="0" />
                                 <x-forms.input-error for="productForm.sellingPrice" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-cost-price" value="{{ __('Cost price') }}" />
-                                <x-forms.input id="product-cost-price" type="number" min="0" step="0.01" wire:model.live="productForm.costPrice" placeholder="0" />
+                                <x-forms.input id="product-cost-price" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="productForm.costPrice" placeholder="0" />
                                 <x-forms.input-error for="productForm.costPrice" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="product-reorder-point" value="{{ __('Min stock') }}" />
-                                <x-forms.input id="product-reorder-point" type="number" min="0" step="0.001" wire:model.live="productForm.reorderPoint" placeholder="0" />
+                                <x-forms.input id="product-reorder-point" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="productForm.reorderPoint" placeholder="0" />
                                 <x-forms.input-error for="productForm.reorderPoint" />
                             </div>
                         </div>
-                        <x-actions.button type="submit" class="w-full">
-                            <x-heroicon-m-plus class="h-5 w-5" />
-                            <span>{{ __('Create Product') }}</span>
-                        </x-actions.button>
-                    </form>
-                </x-admin.panel>
+                </form>
+            </x-slot>
+            <x-slot name="footer">
+                <x-actions.button type="button" wire:click="$set('showProductModal', false)" variant="secondary" class="mr-2">{{ __('Cancel') }}</x-actions.button>
+                <x-actions.button type="submit" form="product-form" wire:loading.attr="disabled">
+                    {{ $productForm->productId ? __('Save Changes') : __('Create Product') }}
+                </x-actions.button>
+            </x-slot>
+        </x-overlays.dialog-modal>
 
-                @elseif ($activeTab === 'stock')
-                <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
-                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Record Stock') }}</h2>
-                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Record stock in, stock out, or adjustment with an accounting cost when needed.') }}</p>
-                    </div>
-                    <form wire:submit.prevent="recordStockMovement" class="space-y-4 p-4">
+        <x-overlays.dialog-modal wire:model.live="showStockMovementModal">
+            <x-slot name="title">{{ __('Stock Movement') }}</x-slot>
+            <x-slot name="content">
+                <div class="space-y-4">
+
                         <div class="space-y-1.5">
                             <x-forms.label for="stock-product" value="{{ __('Product') }}" />
                             <x-forms.select id="stock-product" wire:model.live="stockMovementForm.productId" class="w-full" placeholder="{{ __('Choose product') }}">
@@ -657,14 +692,14 @@
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="stock-quantity" value="{{ __('Quantity') }}" />
-                                <x-forms.input id="stock-quantity" type="number" min="0.001" step="0.001" wire:model.live="stockMovementForm.quantity" placeholder="0" />
+                                <x-forms.input id="stock-quantity" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="stockMovementForm.quantity" placeholder="0" />
                                 <x-forms.input-error for="stockMovementForm.quantity" />
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <x-forms.label for="stock-unit-cost" value="{{ __('Unit cost for accounting') }}" />
-                            <x-forms.input id="stock-unit-cost" type="number" min="0" step="0.01" wire:model.live="stockMovementForm.unitCost" placeholder="0" />
+                            <x-forms.input id="stock-unit-cost" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="stockMovementForm.unitCost" placeholder="0" />
                             <x-forms.input-error for="stockMovementForm.unitCost" />
                         </div>
 
@@ -673,17 +708,20 @@
                             <x-forms.textarea id="stock-notes" wire:model.live="stockMovementForm.notes" rows="3" placeholder="{{ __('Opening balance, transfer, adjustment reason, or delivery note.') }}" />
                             <x-forms.input-error for="stockMovementForm.notes" />
                         </div>
-                        <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Record Stock') }}</x-actions.button>
-                    </form>
-                </x-admin.panel>
+                </div>
+            </x-slot>
+        <x-slot name="footer">
+            <x-actions.button type="button" wire:click="$set('showStockMovementModal', false)" variant="secondary" class="mr-2">{{ __('Cancel') }}</x-actions.button>
+            <x-actions.button type="button" wire:click="recordStockMovement">{{ __('Save') }}</x-actions.button>
+        </x-slot>
+        </x-overlays.dialog-modal>
+        @endif
+        @if ($activeTab === 'purchases')
+        <x-overlays.dialog-modal wire:model.live="showVendorModal">
+            <x-slot name="title">{{ __('Vendor') }}</x-slot>
+            <x-slot name="content">
+                <div class="space-y-4">
 
-                @elseif ($activeTab === 'purchases')
-                <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
-                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Vendor') }}</h2>
-                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Add supplier contacts once, then reuse them for bills and AP tracking.') }}</p>
-                    </div>
-                    <form wire:submit.prevent="createVendor" class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="vendor-company" value="{{ __('Company') }}" />
                             <x-forms.select id="vendor-company" wire:model.live="vendorForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
@@ -719,16 +757,19 @@
                                 <x-forms.input-error for="vendorForm.phone" />
                             </div>
                         </div>
-                        <x-actions.button type="submit" variant="soft-primary" class="w-full">{{ __('Create Vendor') }}</x-actions.button>
-                    </form>
-                </x-admin.panel>
+                </div>
+            </x-slot>
+        <x-slot name="footer">
+            <x-actions.button type="button" wire:click="$set('showVendorModal', false)" variant="secondary" class="mr-2">{{ __('Cancel') }}</x-actions.button>
+            <x-actions.button type="button" wire:click="createVendor">{{ __('Save') }}</x-actions.button>
+        </x-slot>
+        </x-overlays.dialog-modal>
 
-                <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
-                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Post Vendor Bill') }}</h2>
-                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Post a vendor bill to accounts payable and optionally connect it to stock.') }}</p>
-                    </div>
-                    <form wire:submit.prevent="createVendorBill" class="space-y-4 p-4">
+        <x-overlays.dialog-modal wire:model.live="showVendorBillModal">
+            <x-slot name="title">{{ __('Vendor Bill') }}</x-slot>
+            <x-slot name="content">
+                <div class="space-y-4">
+
                         <div class="space-y-1.5">
                             <x-forms.label for="bill-vendor" value="{{ __('Vendor') }}" />
                             <x-forms.select id="bill-vendor" wire:model.live="vendorBillForm.vendorId" class="w-full" placeholder="{{ __('Choose vendor') }}">
@@ -760,12 +801,12 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div class="space-y-1.5">
                                 <x-forms.label for="bill-quantity" value="{{ __('Quantity') }}" />
-                                <x-forms.input id="bill-quantity" type="number" min="0.001" step="0.001" wire:model.live="vendorBillForm.quantity" placeholder="0" />
+                                <x-forms.input id="bill-quantity" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="vendorBillForm.quantity" placeholder="0" />
                                 <x-forms.input-error for="vendorBillForm.quantity" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="bill-unit-cost" value="{{ __('Unit cost') }}" />
-                                <x-forms.input id="bill-unit-cost" type="number" min="0" step="0.01" wire:model.live="vendorBillForm.unitCost" placeholder="0" />
+                                <x-forms.input id="bill-unit-cost" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="vendorBillForm.unitCost" placeholder="0" />
                                 <x-forms.input-error for="vendorBillForm.unitCost" />
                             </div>
                             <div class="space-y-1.5">
@@ -786,17 +827,20 @@
                             <x-forms.textarea id="bill-notes" wire:model.live="vendorBillForm.notes" rows="3" placeholder="{{ __('Payment term, PO number, or receiving notes.') }}" />
                             <x-forms.input-error for="vendorBillForm.notes" />
                         </div>
-                        <x-actions.button type="submit" variant="soft-success" class="w-full">{{ __('Post Bill to AP') }}</x-actions.button>
-                    </form>
-                </x-admin.panel>
+                </div>
+            </x-slot>
+        <x-slot name="footer">
+            <x-actions.button type="button" wire:click="$set('showVendorBillModal', false)" variant="secondary" class="mr-2">{{ __('Cancel') }}</x-actions.button>
+            <x-actions.button type="button" wire:click="createVendorBill" variant="soft-success">{{ __('Post Bill to AP') }}</x-actions.button>
+        </x-slot>
+        </x-overlays.dialog-modal>
+        @endif
+        @if (in_array($activeTab, ['quotations', 'invoices'], true))
+        <x-overlays.dialog-modal wire:model.live="showDocumentModal">
+            <x-slot name="title">{{ __('Commercial Document') }}</x-slot>
+            <x-slot name="content">
+                <div class="space-y-4">
 
-                @elseif (in_array($activeTab, ['quotations', 'invoices'], true))
-                <x-admin.panel>
-                    <div class="border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
-                        <h2 class="text-base font-semibold text-slate-950 dark:text-white">{{ __('Create Quotation / Invoice') }}</h2>
-                        <p class="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">{{ __('Choose the customer, project, product line, and whether this should become a quotation or invoice.') }}</p>
-                    </div>
-                    <div class="space-y-4 p-4">
                         <div class="space-y-1.5">
                             <x-forms.label for="document-company" value="{{ __('Company') }}" />
                             <x-forms.select id="document-company" wire:model.live="documentForm.companyId" class="w-full" placeholder="{{ __('Choose company') }}">
@@ -852,12 +896,12 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div class="space-y-1.5">
                                 <x-forms.label for="document-quantity" value="{{ __('Quantity') }}" />
-                                <x-forms.input id="document-quantity" type="number" min="0.001" step="0.001" wire:model.live="documentForm.quantity" placeholder="0" />
+                                <x-forms.input id="document-quantity" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="documentForm.quantity" placeholder="0" />
                                 <x-forms.input-error for="documentForm.quantity" />
                             </div>
                             <div class="space-y-1.5">
                                 <x-forms.label for="document-unit-price" value="{{ __('Unit price') }}" />
-                                <x-forms.input id="document-unit-price" type="number" min="0" step="0.01" wire:model.live="documentForm.unitPrice" placeholder="0" />
+                                <x-forms.input id="document-unit-price" type="text" x-data x-mask:dynamic="$money($input, ',', '.')" wire:model.live="documentForm.unitPrice" placeholder="0" />
                                 <x-forms.input-error for="documentForm.unitPrice" />
                             </div>
                             <div class="space-y-1.5">
@@ -872,18 +916,15 @@
                             <x-forms.textarea id="document-notes" wire:model.live="documentForm.notes" rows="3" placeholder="{{ __('Payment note, project scope, or terms.') }}" />
                             <x-forms.input-error for="documentForm.notes" />
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <x-actions.button type="button" wire:click="createQuotation" variant="soft-primary">{{ __('Quotation') }}</x-actions.button>
-                            <x-actions.button type="button" wire:click="createInvoice" variant="soft-success">{{ __('Invoice') }}</x-actions.button>
-                        </div>
-                    </div>
-                </x-admin.panel>
-                @endif
-            @else
-                <x-admin.alert tone="info">
-                    {{ __('You can view commercial records, but need manage permission to create products, stock movements, quotations, or invoices.') }}
-                </x-admin.alert>
-            @endif
-        </div>
-    </div>
+                        
+                </div>
+            </x-slot>
+        <x-slot name="footer">
+            <x-actions.button type="button" wire:click="$set('showDocumentModal', false)" variant="secondary" class="mr-2">{{ __('Cancel') }}</x-actions.button>
+            <x-actions.button type="button" wire:click="createQuotation" variant="soft-primary" class="mr-2">{{ __('Draft Quotation') }}</x-actions.button>
+            <x-actions.button type="button" wire:click="createInvoice">{{ __('Draft Invoice') }}</x-actions.button>
+        </x-slot>
+        </x-overlays.dialog-modal>
+        @endif
+    @endif
 </x-admin.page-shell>

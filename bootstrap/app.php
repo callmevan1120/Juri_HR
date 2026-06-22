@@ -48,6 +48,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             '__vercel-migrate',
         ]);
         $middleware->web(append: [
+            \App\Http\Middleware\TrackRedisSessions::class,
             LogUserActivity::class,
             EnsureSecurityHeaders::class,
             CheckMaintenanceMode::class,

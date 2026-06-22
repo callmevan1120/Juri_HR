@@ -549,7 +549,7 @@
                 renderCharts() {
                     if (typeof Chart === 'undefined') {
                         if (this.retryCount === undefined) this.retryCount = 0;
-                        if (this.retryCount < 20) {
+                        if (this.retryCount < 50) {
                             this.retryCount++;
                             setTimeout(() => this.renderCharts(), 100);
                         } else {

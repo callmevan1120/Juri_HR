@@ -8,13 +8,21 @@ use Livewire\Form;
 class DocumentForm extends Form
 {
     public string $companyId = '';
+
     public string $clientId = '';
+
     public string $projectId = '';
+
     public string $productId = '';
+
     public string $description = '';
+
     public string $quantity = '1';
+
     public string $unitPrice = '0';
+
     public string $taxRate = '11';
+
     public string $notes = '';
 
     public function rules(): array

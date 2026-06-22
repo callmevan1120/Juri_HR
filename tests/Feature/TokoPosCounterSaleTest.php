@@ -135,11 +135,11 @@ test('toko pos add-on can create counter sale from cart', function (): void {
         'stock_tracking' => true,
     ]);
 
-    \App\Models\StockMovement::query()->create([
+    StockMovement::query()->create([
         'company_id' => $company->id,
         'product_id' => $product->id,
         'user_id' => $actor->id,
-        'type' => \App\Models\StockMovement::TYPE_IN,
+        'type' => StockMovement::TYPE_IN,
         'quantity' => 10,
         'unit_cost' => 6500,
         'occurred_at' => now(),
@@ -169,13 +169,13 @@ test('toko pos page exposes clear transaction menu sections', function (): void 
     $actor = User::factory()->admin(true)->create(['company_id' => $company->id]);
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'pos'])
+        ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->assertSee('Terminal POS')
         ->assertSee('Terminal POS')
         ->assertSee('Tools Admin')
-        
+
         ->set('showPosBackOffice', true)
-        
+
         ->assertSee('Invoice Payments')
         ->assertSee('Cancel Counter Sale')
         ->assertSee('Invoice');
@@ -210,7 +210,7 @@ test('toko pos page exposes legacy cashier scan and product detail fields', func
         ->assertSee('Diskon')
         ->assertSee('Total Tagihan')
         ->assertSee('Selesaikan Transaksi')
-        
+
         ->assertSee('Produk')
         ->assertSee('Harga')
         ->assertSee('Filter AC · SKU000007');
@@ -366,8 +366,7 @@ test('toko pos cashier mode avoids loading hidden back office datasets', functio
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->assertSet('showPosBackOffice', false)
-        ->assertDontSee('Invoice Payments')
-        ;
+        ->assertDontSee('Invoice Payments');
 
     $joinedQueries = implode("\n", $queries);
 
@@ -396,11 +395,11 @@ test('toko pos paid cash checkout requires enough tendered amount before posting
         'stock_tracking' => true,
     ]);
 
-    \App\Models\StockMovement::query()->create([
+    StockMovement::query()->create([
         'company_id' => $company->id,
         'product_id' => $product->id,
         'user_id' => $actor->id,
-        'type' => \App\Models\StockMovement::TYPE_IN,
+        'type' => StockMovement::TYPE_IN,
         'quantity' => 10,
         'unit_cost' => 6500,
         'occurred_at' => now(),
@@ -441,11 +440,11 @@ test('toko pos cashier supports split tender confirmation with payment line meta
         'stock_tracking' => true,
     ]);
 
-    \App\Models\StockMovement::query()->create([
+    StockMovement::query()->create([
         'company_id' => $company->id,
         'product_id' => $product->id,
         'user_id' => $actor->id,
-        'type' => \App\Models\StockMovement::TYPE_IN,
+        'type' => StockMovement::TYPE_IN,
         'quantity' => 10,
         'unit_cost' => 6500,
         'occurred_at' => now(),
@@ -525,11 +524,11 @@ test('toko pos add-on applies cashier discount additional charge and payment ref
         'stock_tracking' => true,
     ]);
 
-    \App\Models\StockMovement::query()->create([
+    StockMovement::query()->create([
         'company_id' => $company->id,
         'product_id' => $product->id,
         'user_id' => $actor->id,
-        'type' => \App\Models\StockMovement::TYPE_IN,
+        'type' => StockMovement::TYPE_IN,
         'quantity' => 10,
         'unit_cost' => 6500,
         'occurred_at' => now(),
@@ -798,7 +797,7 @@ test('toko pos page shows sales invoice list with payment and cancellation detai
         ->assertSee('Invoice')
         ->assertSee($invoice->number)
         ->assertSee('Transfer')
-        
+
         ->assertSee('partial');
 });
 
@@ -1106,15 +1105,14 @@ test('toko pos sales history uses datatable pagination and search', function ():
         ->test(TokoPosAddon::class, ['page' => 'pos'])
         ->set('showPosBackOffice', true)
         ->assertSee('Invoice')
-        
+
         ->call('nextSalesPage')
-        
+
         ->set('salesSearch', 'Sandy')
-        
+
         ->set('salesSearch', 'unpaid')
-        
-        ->assertSee('sent')
-        ;
+
+        ->assertSee('sent');
 
     expect($component->get('salesPage'))->toBe(1);
 });

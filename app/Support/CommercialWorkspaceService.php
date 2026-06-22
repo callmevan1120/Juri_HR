@@ -58,6 +58,19 @@ class CommercialWorkspaceService
         ]);
     }
 
+    public function updateProduct(User $actor, Product $product, array $data): Product
+    {
+        $this->assertCompanyAccess($actor, (int) $data['company_id']);
+        
+        $product->update([
+            ...$data,
+            'sku' => filled($data['sku'] ?? null) ? Str::upper((string) $data['sku']) : null,
+            'status' => $data['status'] ?? Product::STATUS_ACTIVE,
+        ]);
+
+        return $product;
+    }
+
     /**
      * @param  array<string, mixed>  $data
      */

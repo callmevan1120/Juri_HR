@@ -1,7 +1,8 @@
 <?php
 
-use App\Models\Company;
+use App\Livewire\Admin\TokoPosAddon;
 use App\Models\AccountingAccount;
+use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
@@ -445,7 +446,7 @@ test('toko pos add-on can record stock opname adjustment', function (): void {
     ]);
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class)
+        ->test(TokoPosAddon::class)
         ->set('selectedAdjustmentProductId', (string) $product->id)
         ->set('countedStockQuantity', '8')
         ->call('recordStockOpname');
@@ -683,7 +684,7 @@ test('toko pos add-on can record manual stock in and stock out documents', funct
     [$company, $actor, $product] = tokoInventoryReportFixture();
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'inventory'])
+        ->test(TokoPosAddon::class, ['page' => 'inventory'])
         ->set('selectedManualStockProductId', (string) $product->id)
         ->set('manualStockType', 'in')
         ->set('manualStockQuantity', '7')
@@ -709,7 +710,7 @@ test('toko inventory page exposes legacy stock workflow sections in one modern w
     [$company, $actor] = tokoInventoryReportFixture();
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'inventory'])
+        ->test(TokoPosAddon::class, ['page' => 'inventory'])
         ->assertSee('Stok Masuk')
         ->assertSee('Stok Keluar')
         ->assertSee('Stok Sesuai')
@@ -754,7 +755,7 @@ test('toko pos add-on can cancel stock movement from inventory page', function (
     ]);
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'inventory'])
+        ->test(TokoPosAddon::class, ['page' => 'inventory'])
         ->assertSee('Stock Cancellation')
         ->set('selectedCancelStockMovementId', (string) $movement->id)
         ->set('cancelStockMovementReason', 'Retur dokumen stok')
@@ -786,7 +787,7 @@ test('toko inventory movement list uses datatable pagination and search', functi
     }
 
     $component = Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'inventory'])
+        ->test(TokoPosAddon::class, ['page' => 'inventory'])
         ->assertSee('Stock Movement List')
         ->assertSee('Showing 1 to 10 of 12 stock movement entries')
         ->assertSee('Next')

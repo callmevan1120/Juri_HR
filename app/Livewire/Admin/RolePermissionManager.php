@@ -79,6 +79,7 @@ class RolePermissionManager extends Component
     {
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('Roles cannot be modified in demo mode.'));
+
             return;
         }
 
@@ -132,6 +133,7 @@ class RolePermissionManager extends Component
     {
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('Roles cannot be deleted in demo mode.'));
+
             return;
         }
 

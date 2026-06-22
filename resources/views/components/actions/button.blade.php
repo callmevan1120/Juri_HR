@@ -34,14 +34,36 @@
         $accessibilityAttributes['aria-label'] = $label;
         $accessibilityAttributes['title'] = $label;
     }
+
+    $htmlContent = $slot->toHtml();
+    $textContent = trim(strip_tags($htmlContent));
+    if (empty($textContent) && $label) {
+        $textContent = trim($label);
+    }
+    $isAddButton = str_starts_with(strtolower($textContent), 'add ') || 
+                   str_starts_with(strtolower($textContent), 'create ') || 
+                   str_starts_with(strtolower($textContent), 'tambah ') || 
+                   str_starts_with(strtolower($textContent), 'buat ');
+                   
+    $hasIcon = strpos($htmlContent, '<svg') !== false;
 @endphp
 
 @if (!isset($attributes['href']))
   <button {{ $attributes->merge(array_merge(['type' => 'submit', 'class' => $class], $accessibilityAttributes)) }}>
+    @if ($isAddButton && !$hasIcon && $size !== 'icon')
+        <x-heroicon-m-plus class="h-4 w-4 shrink-0" />
+    @elseif ($isAddButton && !$hasIcon && $size === 'icon')
+        <x-heroicon-m-plus class="h-5 w-5" />
+    @endif
     {{ $slot }}
   </button>
 @else
   <a {{ $attributes->merge(array_merge(['class' => $class], $accessibilityAttributes)) }}>
+    @if ($isAddButton && !$hasIcon && $size !== 'icon')
+        <x-heroicon-m-plus class="h-4 w-4 shrink-0" />
+    @elseif ($isAddButton && !$hasIcon && $size === 'icon')
+        <x-heroicon-m-plus class="h-5 w-5" />
+    @endif
     {{ $slot }}
   </a>
 @endif

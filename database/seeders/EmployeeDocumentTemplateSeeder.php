@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\EmployeeDocumentTemplate;
 use App\Models\EmployeeDocumentType;
+use App\Services\Enterprise\LicenseGuard;
 use App\Support\EmployeeDocumentRequestService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
@@ -14,6 +15,10 @@ class EmployeeDocumentTemplateSeeder extends Seeder
     public function run(): void
     {
         if (! Schema::hasTable('employee_document_types') || ! Schema::hasTable('employee_document_templates')) {
+            return;
+        }
+
+        if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
             return;
         }
 

@@ -36,6 +36,7 @@ class Settings extends Component
 
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('Settings cannot be modified in demo mode.'));
+
             return;
         }
 
@@ -53,6 +54,7 @@ class Settings extends Component
 
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('License cannot be modified in demo mode.'));
+
             return;
         }
 

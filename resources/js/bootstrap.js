@@ -10,7 +10,7 @@ window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 const bootEcho = () => {
     const config = window.PasPapanBroadcast || {};
 
-    if (!config.enabled || window.Echo) {
+    if (!config.enabled || (window.Echo && !window.Echo.isDummy)) {
         return;
     }
 
@@ -56,6 +56,7 @@ const bootEcho = () => {
         }
 
         window.Echo = new Echo(options);
+        window.dispatchEvent(new Event('echo:ready'));
 
         return;
     }
@@ -75,6 +76,7 @@ const bootEcho = () => {
             disableStats: true,
             enabledTransports,
         });
+        window.dispatchEvent(new Event('echo:ready'));
     }
 };
 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Support\FeatureMaturityMatrix;
+
 test('roadmap 10 coverage claims are tied to concrete tests and public docs', function () {
     $requiredPaths = [
         'tests/Feature/ManagerInboxAuthorizationTest.php',
@@ -30,7 +32,7 @@ test('roadmap 10 coverage claims are tied to concrete tests and public docs', fu
 });
 
 test('feature maturity audit is evidence backed and intentionally conservative', function () {
-    $summary = app(\App\Support\FeatureMaturityMatrix::class)->summary();
+    $summary = app(FeatureMaturityMatrix::class)->summary();
 
     expect($summary['score'])->toBeGreaterThanOrEqual(80)
         ->and($summary['score'])->toBeLessThan($summary['target'])

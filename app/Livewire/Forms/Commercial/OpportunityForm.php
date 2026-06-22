@@ -9,14 +9,23 @@ use Livewire\Form;
 class OpportunityForm extends Form
 {
     public string $companyId = '';
+
     public string $clientId = '';
+
     public string $projectId = '';
+
     public string $title = '';
+
     public string $stage = SalesOpportunity::STAGE_LEAD;
+
     public string $expectedValue = '0';
+
     public string $expectedCloseAt = '';
+
     public string $nextFollowUpAt = '';
+
     public string $source = '';
+
     public string $notes = '';
 
     /**

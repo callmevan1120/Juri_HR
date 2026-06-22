@@ -430,6 +430,43 @@
         });
     </script>
 
+    <script>
+        // Provide a dummy Echo object so Livewire 3 doesn't crash on boot before app.js finishes.
+        // Once app.js executes, it will overwrite window.Echo with the real instance and dispatch 'echo:ready'.
+        if (typeof window.Echo === 'undefined') {
+            window.Echo = {
+                isDummy: true,
+                channel: function(name) {
+                    return {
+                        listen: function(event, callback) {
+                            window.addEventListener('echo:ready', () => {
+                                if (window.Echo && typeof window.Echo.channel === 'function') {
+                                    window.Echo.channel(name).listen(event, callback);
+                                }
+                            });
+                        },
+                        stopListening: function(event, callback) {}
+                    };
+                },
+                private: function(name) {
+                    return {
+                        listen: function(event, callback) {
+                            window.addEventListener('echo:ready', () => {
+                                if (window.Echo && typeof window.Echo.private === 'function') {
+                                    window.Echo.private(name).listen(event, callback);
+                                }
+                            });
+                        },
+                        stopListening: function(event, callback) {}
+                    };
+                },
+                leave: function() {},
+                leaveChannel: function() {},
+                socketId: function() { return null; },
+                connector: { pusher: {} }
+            };
+        }
+    </script>
     @livewireScripts
 
     {{-- Global Notification --}}

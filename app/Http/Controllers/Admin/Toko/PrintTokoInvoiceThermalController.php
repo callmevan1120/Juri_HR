@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Support\CommercialWorkspaceService;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 class PrintTokoInvoiceThermalController extends Controller
 {

@@ -25,11 +25,13 @@ use Laravel\Jetstream\InteractsWithBanner;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
 class CommercialWorkspace extends Component
 {
     use InteractsWithBanner;
+    use WithPagination;
 
     private const TABS = ['pipeline', 'products', 'stock', 'purchases', 'quotations', 'invoices'];
 
@@ -41,11 +43,28 @@ class CommercialWorkspace extends Component
     public string $search = '';
 
     public ProductForm $productForm;
+
     public StockMovementForm $stockMovementForm;
+
     public VendorForm $vendorForm;
+
     public VendorBillForm $vendorBillForm;
+
     public DocumentForm $documentForm;
+
     public OpportunityForm $opportunityForm;
+
+    public bool $showProductModal = false;
+
+    public bool $showStockMovementModal = false;
+
+    public bool $showVendorModal = false;
+
+    public bool $showVendorBillModal = false;
+
+    public bool $showDocumentModal = false;
+
+    public bool $showOpportunityModal = false;
 
     public function boot(CommercialWorkspaceService $commerce): void
     {
@@ -90,31 +109,82 @@ class CommercialWorkspace extends Component
         $this->normalizeActiveTab();
     }
 
-    public function createProduct(): void
+    public function updatingSearch(): void
+    {
+        $this->resetPage('productsPage');
+    }
+
+    public function openCreateProductModal(): void
+    {
+        $this->productForm->resetForm();
+        $this->showProductModal = true;
+    }
+
+    public function saveProduct(): void
     {
         Gate::authorize('manageCommercialWorkspace');
 
+        $this->productForm->sellingPrice = $this->normalizeCurrency($this->productForm->sellingPrice);
+        $this->productForm->costPrice = $this->normalizeCurrency($this->productForm->costPrice);
+        $this->productForm->reorderPoint = $this->normalizeCurrency($this->productForm->reorderPoint);
         $validated = $this->productForm->validate();
 
-        $this->commerce->createProduct(auth()->user(), [
+        $data = [
             'company_id' => (int) $validated['companyId'],
             'name' => $validated['name'],
             'sku' => $validated['sku'] ?: null,
+            'status' => $validated['status'],
             'unit' => $validated['unit'],
             'selling_price' => $validated['sellingPrice'],
             'cost_price' => $validated['costPrice'],
             'stock_tracking' => true,
             'reorder_point' => $validated['reorderPoint'],
-        ]);
+        ];
+
+        if ($this->productForm->productId) {
+            $product = Product::query()->findOrFail($this->productForm->productId);
+            $this->commerce->updateProduct(auth()->user(), $product, $data);
+            $message = __('Product updated successfully.');
+        } else {
+            $this->commerce->createProduct(auth()->user(), $data);
+            $message = __('Product created successfully.');
+        }
 
         $this->productForm->resetForm();
-        $this->banner(__('Product created.'));
+        $this->showProductModal = false;
+        $this->banner($message);
+    }
+
+    public function editProduct(int $productId): void
+    {
+        Gate::authorize('manageCommercialWorkspace');
+
+        $product = Product::query()->findOrFail($productId);
+        
+        $this->productForm->productId = $product->id;
+        $this->productForm->companyId = (string) $product->company_id;
+        $this->productForm->name = $product->name;
+        $this->productForm->sku = (string) $product->sku;
+        $this->productForm->status = $product->status;
+        $this->productForm->unit = $product->unit;
+        // In DB, money is stored as a standard decimal like 1000.50
+        // But our inputs are text with $money($input, ',', '.')
+        // which formats them dynamically, so we can just pass the raw value 
+        // Or format them? The x-mask handles the formatting of standard strings.
+        // Wait, if it's "1000.50", the mask might format it correctly when alpine initializes it!
+        $this->productForm->sellingPrice = (string) (float) $product->selling_price;
+        $this->productForm->costPrice = (string) (float) $product->cost_price;
+        $this->productForm->reorderPoint = (string) (float) $product->reorder_point;
+
+        $this->showProductModal = true;
     }
 
     public function recordStockMovement(): void
     {
         Gate::authorize('manageCommercialWorkspace');
 
+                $this->stockMovementForm->quantity = $this->normalizeCurrency($this->stockMovementForm->quantity);
+        $this->stockMovementForm->unitCost = $this->normalizeCurrency($this->stockMovementForm->unitCost);
         $validated = $this->stockMovementForm->validate();
         $product = Product::query()->findOrFail((int) $validated['productId']);
 
@@ -125,7 +195,8 @@ class CommercialWorkspace extends Component
             'notes' => $validated['notes'] ?: null,
         ]);
 
-        $this->stockMovementForm->resetForm();
+        $this->stockMovementForm->reset(['type', 'quantity', 'notes']);
+        $this->showStockMovementModal = false;
         $this->banner(__('Stock movement recorded.'));
     }
 
@@ -143,14 +214,17 @@ class CommercialWorkspace extends Component
             'phone' => $validated['phone'] ?: null,
         ]);
 
-        $this->vendorForm->resetForm();
-        $this->banner(__('Vendor created.'));
+        $this->vendorForm->reset();
+        $this->showVendorModal = false;
+        $this->banner(__('Vendor created successfully.'));
     }
 
     public function createVendorBill(): void
     {
         Gate::authorize('manageCommercialWorkspace');
 
+                $this->vendorBillForm->quantity = $this->normalizeCurrency($this->vendorBillForm->quantity);
+        $this->vendorBillForm->unitCost = $this->normalizeCurrency($this->vendorBillForm->unitCost);
         $validated = $this->vendorBillForm->validate();
         $vendor = Vendor::query()->findOrFail((int) $validated['vendorId']);
 
@@ -167,8 +241,9 @@ class CommercialWorkspace extends Component
             'tax_rate' => $validated['taxRate'],
         ]]);
 
-        $this->vendorBillForm->resetForm();
-        $this->banner(__('Vendor bill posted to AP.'));
+        $this->vendorBillForm->reset(['vendorId', 'productId', 'quantity']);
+        $this->showVendorBillModal = false;
+        $this->banner(__('Vendor bill logged.'));
     }
 
     public function markVendorBillPaid(int $billId): void
@@ -184,6 +259,8 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
+                $this->documentForm->quantity = $this->normalizeCurrency($this->documentForm->quantity);
+        $this->documentForm->unitPrice = $this->normalizeCurrency($this->documentForm->unitPrice);
         $validated = $this->documentForm->validate();
 
         $this->commerce->createQuotation(auth()->user(), [
@@ -200,6 +277,7 @@ class CommercialWorkspace extends Component
         ]]);
 
         $this->documentForm->resetForm();
+        $this->showDocumentModal = false;
         $this->banner(__('Quotation created.'));
     }
 
@@ -207,6 +285,8 @@ class CommercialWorkspace extends Component
     {
         Gate::authorize('manageCommercialWorkspace');
 
+                $this->documentForm->quantity = $this->normalizeCurrency($this->documentForm->quantity);
+        $this->documentForm->unitPrice = $this->normalizeCurrency($this->documentForm->unitPrice);
         $validated = $this->documentForm->validate();
 
         $this->commerce->createInvoice(auth()->user(), [
@@ -223,6 +303,7 @@ class CommercialWorkspace extends Component
         ]]);
 
         $this->documentForm->resetForm();
+        $this->showDocumentModal = false;
         $this->banner(__('Invoice created.'));
     }
 
@@ -246,6 +327,14 @@ class CommercialWorkspace extends Component
         $this->banner(__('Quotation converted to invoice.'));
     }
 
+    
+    private function normalizeCurrency(string $value): string
+    {
+        if ($value === '' || $value === null) return '0';
+        $val = str_replace('.', '', $value);
+        return str_replace(',', '.', $val);
+    }
+
     public function createOpportunity(): void
     {
         Gate::authorize('manageCommercialWorkspace');
@@ -266,8 +355,9 @@ class CommercialWorkspace extends Component
             'follow_up_notes' => $validated['notes'] ?: null,
         ]);
 
-        $this->opportunityForm->resetForm();
-        $this->banner(__('Sales opportunity created.'));
+        $this->opportunityForm->reset(['clientId', 'projectId', 'title', 'expectedValue', 'expectedCloseAt', 'source']);
+        $this->showOpportunityModal = false;
+        $this->banner(__('Opportunity created.'));
     }
 
     public function moveOpportunityStage(int $opportunityId, string $stage): void
@@ -312,7 +402,7 @@ class CommercialWorkspace extends Component
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        $products = Product::query()
+        $paginatedProducts = Product::query()
             ->with(['company:id,name', 'stockMovements'])
             ->whereIn('company_id', $companyIds)
             ->when($this->search !== '', fn (Builder $query) => $query->where(function (Builder $nested): void {
@@ -320,7 +410,13 @@ class CommercialWorkspace extends Component
                     ->where('name', 'like', '%'.$this->search.'%')
                     ->orWhere('sku', 'like', '%'.$this->search.'%');
             }))
-            ->latest()
+            ->latest('updated_at')
+            ->paginate(12, ['*'], 'productsPage');
+
+        $allProducts = Product::query()
+            ->with(['company:id,name'])
+            ->whereIn('company_id', $companyIds)
+            ->orderBy('name')
             ->get();
 
         $clients = Client::query()
@@ -336,13 +432,13 @@ class CommercialWorkspace extends Component
         $quotations = Quotation::query()
             ->with(['company:id,name', 'client:id,name', 'project:id,name', 'items'])
             ->whereIn('company_id', $companyIds)
-            ->latest()
+            ->latest('updated_at')
             ->get();
 
         $invoices = Invoice::query()
             ->with(['company:id,name', 'client:id,name', 'project:id,name', 'items'])
             ->whereIn('company_id', $companyIds)
-            ->latest()
+            ->latest('updated_at')
             ->get();
 
         $vendors = Vendor::query()
@@ -359,7 +455,7 @@ class CommercialWorkspace extends Component
         $vendorBills = VendorBill::query()
             ->with(['company:id,name', 'vendor:id,name', 'items.product', 'accountingJournalEntry', 'paymentJournalEntry'])
             ->whereIn('company_id', $companyIds)
-            ->latest()
+            ->latest('updated_at')
             ->get();
 
         $opportunities = SalesOpportunity::query()
@@ -371,7 +467,7 @@ class CommercialWorkspace extends Component
                     ->orWhere('source', 'like', '%'.$this->search.'%')
                     ->orWhereHas('client', fn (Builder $clientQuery) => $clientQuery->where('name', 'like', '%'.$this->search.'%'));
             }))
-            ->latest()
+            ->latest('updated_at')
             ->get();
 
         $documentCompanyId = $this->scopedCompanyId($companyIds, $this->documentForm->companyId);
@@ -380,15 +476,16 @@ class CommercialWorkspace extends Component
 
         return view('livewire.admin.commercial-workspace', [
             'companies' => $companies,
-            'products' => $products,
+            'paginatedProducts' => $paginatedProducts,
+            'products' => $allProducts,
             'clients' => $clients,
             'projects' => $projects,
             'documentClientOptions' => $documentCompanyId === null ? $clients : $clients->where('company_id', $documentCompanyId)->values(),
             'documentProjectOptions' => $documentCompanyId === null ? $projects : $projects->where('company_id', $documentCompanyId)->values(),
-            'documentProductOptions' => $documentCompanyId === null ? $products : $products->where('company_id', $documentCompanyId)->values(),
+            'documentProductOptions' => $documentCompanyId === null ? $allProducts : $allProducts->where('company_id', $documentCompanyId)->values(),
             'opportunityClientOptions' => $opportunityCompanyId === null ? $clients : $clients->where('company_id', $opportunityCompanyId)->values(),
             'opportunityProjectOptions' => $opportunityCompanyId === null ? $projects : $projects->where('company_id', $opportunityCompanyId)->values(),
-            'billProductOptions' => $billVendorCompanyId === null ? $products : $products->where('company_id', $billVendorCompanyId)->values(),
+            'billProductOptions' => $billVendorCompanyId === null ? $allProducts : $allProducts->where('company_id', $billVendorCompanyId)->values(),
             'quotations' => $quotations,
             'invoices' => $invoices,
             'vendors' => $vendors,

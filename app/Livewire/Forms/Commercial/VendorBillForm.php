@@ -9,12 +9,19 @@ use Livewire\Form;
 class VendorBillForm extends Form
 {
     public string $vendorId = '';
+
     public string $productId = '';
+
     public string $description = '';
+
     public string $quantity = '1';
+
     public string $unitCost = '0';
+
     public string $taxRate = '11';
+
     public string $dueAt = '';
+
     public string $notes = '';
 
     public function rules(): array

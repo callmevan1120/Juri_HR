@@ -8,6 +8,7 @@ use App\Models\CashAdvance;
 use App\Models\CompanyAsset;
 use App\Models\EmployeeDocumentRequest;
 use App\Models\HrChecklistCase;
+use App\Models\HrChecklistTask;
 use App\Models\HrChecklistTemplate;
 use App\Models\HrChecklistTemplateItem;
 use App\Models\ImportExportRun;
@@ -379,7 +380,7 @@ test('admin dashboard platform signals stay scoped to the current company', func
             'category' => 'onboarding',
             'assigned_to' => $starter->id,
             'due_date' => now()->subDay()->toDateString(),
-            'status' => \App\Models\HrChecklistTask::STATUS_PENDING,
+            'status' => HrChecklistTask::STATUS_PENDING,
         ]);
     }
 

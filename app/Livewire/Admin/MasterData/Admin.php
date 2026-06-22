@@ -69,6 +69,7 @@ class Admin extends Component
     {
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('Admin accounts cannot be created in demo mode.'));
+
             return;
         }
 
@@ -94,6 +95,7 @@ class Admin extends Component
     {
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('Admin accounts cannot be modified in demo mode.'));
+
             return;
         }
 
@@ -108,6 +110,7 @@ class Admin extends Component
     {
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('Admin accounts cannot be modified in demo mode.'));
+
             return;
         }
         $this->form->deleteProfilePhoto();
@@ -125,6 +128,7 @@ class Admin extends Component
     {
         if (auth()->user()?->is_demo) {
             $this->dispatch('error', message: __('Admin accounts cannot be deleted in demo mode.'));
+
             return;
         }
 

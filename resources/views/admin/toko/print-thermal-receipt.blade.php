@@ -8,7 +8,7 @@
     <style>
         @page {
             margin: 0;
-            size: 80mm 200mm; /* adjust height as needed or use auto if supported */
+            size: 58mm auto;
         }
         
         body {
@@ -16,8 +16,8 @@
             font-size: 12px;
             color: #000;
             margin: 0;
-            padding: 5mm;
-            width: 80mm;
+            padding: 2mm;
+            width: 58mm;
             box-sizing: border-box;
             line-height: 1.2;
         }

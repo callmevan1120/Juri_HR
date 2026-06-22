@@ -47,7 +47,7 @@ test('superadmin can manage commercial products stock quotations and invoices', 
         ->set('productForm.sellingPrice', '1500000')
         ->set('productForm.costPrice', '900000')
         ->set('productForm.reorderPoint', '10')
-        ->call('createProduct')
+        ->call('saveProduct')
         ->assertHasNoErrors();
 
     $product = Product::query()->where('sku', 'SUPPORT-001')->firstOrFail();
@@ -257,7 +257,7 @@ test('vendor bills post inventory AP and payment journals', function () {
         ->set('productForm.sellingPrice', '250000')
         ->set('productForm.costPrice', '100000')
         ->set('productForm.reorderPoint', '5')
-        ->call('createProduct')
+        ->call('saveProduct')
         ->assertHasNoErrors();
 
     $vendor = Vendor::query()->firstOrFail();
@@ -322,7 +322,7 @@ test('tenant scoped commercial admin cannot create product for another company',
         ->set('productForm.name', 'Cross tenant product')
         ->set('productForm.unit', 'pcs')
         ->set('productForm.sellingPrice', '10000')
-        ->call('createProduct')
+        ->call('saveProduct')
         ->assertForbidden();
 
     expect(Product::query()->where('company_id', $companyB->id)->exists())->toBeFalse()

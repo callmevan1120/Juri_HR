@@ -40,12 +40,14 @@ class OfflineAttendanceSyncService
             } catch (\Throwable) {
                 $submission->update(['status' => 'failed', 'error_message' => 'Invalid timestamp format.']);
                 $results[] = $this->result($submission);
+
                 continue;
             }
 
             if ($capturedAt->isFuture() || $capturedAt->diffInHours(now()) > 48) {
                 $submission->update(['status' => 'failed', 'error_message' => 'Timestamp is invalid or expired.']);
                 $results[] = $this->result($submission);
+
                 continue;
             }
 

@@ -9,9 +9,13 @@ use Livewire\Form;
 class StockMovementForm extends Form
 {
     public string $productId = '';
+
     public string $type = StockMovement::TYPE_IN;
+
     public string $quantity = '1';
+
     public string $unitCost = '0';
+
     public string $notes = '';
 
     public function rules(): array

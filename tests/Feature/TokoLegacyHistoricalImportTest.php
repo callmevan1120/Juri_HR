@@ -1,8 +1,10 @@
 <?php
 
+use App\Livewire\Admin\TokoPosAddon;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\DeliveryLetter;
+use App\Models\ImportExportRun;
 use App\Models\Invoice;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -357,7 +359,7 @@ test('toko add-on can run historical import from selected dump', function (): vo
     $path = base_path('../toko-pandan/database/toko.sql');
 
     Livewire::actingAs($actor)
-        ->test(\App\Livewire\Admin\TokoPosAddon::class, ['page' => 'migration'])
+        ->test(TokoPosAddon::class, ['page' => 'migration'])
         ->call('importHistoricalDocuments')
         ->assertSee('Historical Reconciliation')
         ->assertSee('Monthly Report Reconciliation')
@@ -365,7 +367,7 @@ test('toko add-on can run historical import from selected dump', function (): vo
         ->assertSee('Sales')
         ->assertSee('Operational Expenses');
 
-    expect(\App\Models\ImportExportRun::query()
+    expect(ImportExportRun::query()
         ->where('resource', 'toko_pos_history')
         ->where('source_path', $path)
         ->where('status', 'completed')

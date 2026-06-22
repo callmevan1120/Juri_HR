@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\SalesOpportunity;
 use App\Support\AccountingWorkspaceService;
 use App\Support\CommercialWorkspaceService;
-use App\Models\SalesOpportunity;
 
 test('it returns correct opportunity stages', function () {
     $service = new CommercialWorkspaceService(Mockery::mock(AccountingWorkspaceService::class));
@@ -19,9 +19,9 @@ test('it returns correct opportunity stages', function () {
 
 test('it calculates quotation totals correctly', function () {
     $service = new CommercialWorkspaceService(Mockery::mock(AccountingWorkspaceService::class));
-    
+
     $method = new ReflectionMethod(CommercialWorkspaceService::class, 'calculateTotals');
-    
+
     $items = [
         ['quantity' => 2, 'unit_price' => 1000, 'tax_rate' => 10], // subtotal: 2000, tax: 200
         ['quantity' => 1, 'unit_price' => 500, 'tax_rate' => 0],  // subtotal: 500, tax: 0
@@ -38,9 +38,9 @@ test('it calculates quotation totals correctly', function () {
 
 test('it calculates vendor bill totals correctly', function () {
     $service = new CommercialWorkspaceService(Mockery::mock(AccountingWorkspaceService::class));
-    
+
     $method = new ReflectionMethod(CommercialWorkspaceService::class, 'calculateVendorBillTotals');
-    
+
     $items = [
         ['quantity' => 1, 'unit_cost' => 100, 'tax_rate' => 11, 'line_subtotal' => 100, 'line_total' => 111],
         ['quantity' => 2, 'unit_cost' => 50, 'tax_rate' => 0, 'line_subtotal' => 100, 'line_total' => 100],
@@ -57,7 +57,7 @@ test('it calculates vendor bill totals correctly', function () {
 
 test('it returns default probabilities for stages', function () {
     $service = new CommercialWorkspaceService(Mockery::mock(AccountingWorkspaceService::class));
-    
+
     $method = new ReflectionMethod(CommercialWorkspaceService::class, 'defaultProbability');
 
     expect($method->invoke($service, SalesOpportunity::STAGE_LEAD))->toBe(25)

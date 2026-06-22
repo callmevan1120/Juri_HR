@@ -49,8 +49,8 @@ class EnsureSecurityHeaders
             "form-action 'self'",
         ];
 
-        // Allow Vite dev server in local environment
-        if ($this->app->environment('local')) {
+        // Allow Vite dev server in local and demo environment
+        if ($this->app->environment('local', 'demo')) {
             // Browsers are strict about wildcard ports. We allow common localhost variants
             // and the specific host if we're accessing via LAN IP.
             $host = $request->getHost();

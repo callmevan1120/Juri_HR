@@ -4,7 +4,6 @@ use App\Livewire\Admin\TokoPosAddon;
 use App\Models\AccountingAccount;
 use App\Models\Client;
 use App\Models\Company;
-use App\Models\Invoice;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\Product;

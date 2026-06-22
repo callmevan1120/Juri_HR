@@ -8,9 +8,13 @@ use Livewire\Form;
 class VendorForm extends Form
 {
     public string $companyId = '';
+
     public string $name = '';
+
     public string $contactName = '';
+
     public string $email = '';
+
     public string $phone = '';
 
     public function rules(): array

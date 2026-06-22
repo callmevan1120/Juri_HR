@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\Toko\DownloadTokoDeliveryLetterPdfController;
 use App\Http\Controllers\Admin\Toko\DownloadTokoInvoicePdfController;
 use App\Http\Controllers\Admin\Toko\DownloadTokoQuotationPdfController;
 use App\Http\Controllers\Admin\Toko\ExportTokoTransactionsCsvController;
+use App\Http\Controllers\Admin\Toko\ImportTokoDataCsvController;
+use App\Http\Controllers\Admin\Toko\PrintTokoInvoiceThermalController;
 use App\Http\Controllers\Admin\Toko\PrintTokoProductBarcodesController;
 use App\Http\Controllers\Admin\Toko\PrintTokoStockAdjustmentReportController;
 use Illuminate\Support\Facades\Route;
@@ -78,22 +80,22 @@ Route::livewire('/toko/migration', 'admin.toko-pos-addon')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.import,admin.dashboard')
     ->can('importTokoPosAddon');
 
-Route::get('/toko/invoices/{invoice}/pdf', \App\Http\Controllers\Admin\Toko\DownloadTokoInvoicePdfController::class)
+Route::get('/toko/invoices/{invoice}/pdf', [DownloadTokoInvoicePdfController::class, '__invoke'])
     ->name('admin.toko.invoices.pdf')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/invoices/{invoice}/thermal', \App\Http\Controllers\Admin\Toko\PrintTokoInvoiceThermalController::class)
+Route::get('/toko/invoices/{invoice}/thermal', [PrintTokoInvoiceThermalController::class, '__invoke'])
     ->name('admin.toko.invoices.thermal')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/quotations/{quotation}/pdf', DownloadTokoQuotationPdfController::class)
+Route::get('/toko/quotations/{quotation}/pdf', [DownloadTokoQuotationPdfController::class, '__invoke'])
     ->name('admin.toko.quotations.pdf')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/delivery-letters/{deliveryLetter}/pdf', DownloadTokoDeliveryLetterPdfController::class)
+Route::get('/toko/delivery-letters/{deliveryLetter}/pdf', [DownloadTokoDeliveryLetterPdfController::class, '__invoke'])
     ->name('admin.toko.delivery-letters.pdf')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
@@ -103,12 +105,12 @@ Route::get('/toko/purchases/{vendorBill}/pdf', [DownloadCommercialDocumentPdfCon
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/products/barcodes', PrintTokoProductBarcodesController::class)
+Route::get('/toko/products/barcodes', [PrintTokoProductBarcodesController::class, '__invoke'])
     ->name('admin.toko.products.barcodes')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/stock-adjustments/print', PrintTokoStockAdjustmentReportController::class)
+Route::get('/toko/stock-adjustments/print', [PrintTokoStockAdjustmentReportController::class, '__invoke'])
     ->name('admin.toko.stock-adjustments.print')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
@@ -117,6 +119,11 @@ Route::get('/toko/exports/sales.csv', [ExportTokoTransactionsCsvController::clas
     ->name('admin.toko.exports.sales')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
+
+Route::post('/toko/import', [ImportTokoDataCsvController::class, '__invoke'])
+    ->name('admin.toko.import')
+    ->middleware('feature.lock:toko_pos,admin.toko_pos.import,admin.dashboard')
+    ->can('importTokoPosAddon');
 
 Route::get('/toko/exports/purchases.csv', [ExportTokoTransactionsCsvController::class, 'purchases'])
     ->name('admin.toko.exports.purchases')

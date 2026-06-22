@@ -2,10 +2,10 @@
 
 namespace App\Support;
 
+use App\Models\DeliveryLetter;
 use App\Models\Invoice;
 use App\Models\Quotation;
 use App\Models\Setting;
-use App\Models\DeliveryLetter;
 use App\Models\VendorBill;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
