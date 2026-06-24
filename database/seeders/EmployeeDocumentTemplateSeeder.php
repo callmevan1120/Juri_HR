@@ -2,12 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmployeeDocumentRequest;
-use App\Models\EmployeeDocumentTemplate;
-use App\Models\EmployeeDocumentType;
-use App\Services\Enterprise\LicenseGuard;
-use App\Support\EmployeeDocumentRequestService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class EmployeeDocumentTemplateSeeder extends Seeder
@@ -18,44 +14,155 @@ class EmployeeDocumentTemplateSeeder extends Seeder
             return;
         }
 
-        if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
-            return;
-        }
-
-        app(EmployeeDocumentRequestService::class)->seedDefaultTypes();
+        $this->seedDefaultTypesLocally();
 
         foreach ($this->templatesByType() as $code => $templates) {
-            $type = EmployeeDocumentType::query()->where('code', $code)->first();
+            $type = DB::table('employee_document_types')->where('code', $code)->first();
 
             if (! $type) {
                 continue;
             }
 
             foreach ($templates as $index => $template) {
-                EmployeeDocumentTemplate::query()->updateOrCreate(
-                    [
-                        'document_type_id' => $type->id,
-                        'name' => $template['name'],
-                    ],
-                    [
-                        'paper_size' => $template['paper_size'] ?? 'a4',
-                        'orientation' => $template['orientation'] ?? 'portrait',
-                        'body' => $template['body'],
-                        'footer' => $template['footer'] ?? '{{ company.name }} · {{ company.support_contact }}',
-                        'is_active' => $index === 0,
-                    ],
-                );
+                $existingTemplate = DB::table('employee_document_templates')
+                    ->where('document_type_id', $type->id)
+                    ->where('name', $template['name'])
+                    ->first();
+
+                $payload = [
+                    'paper_size' => $template['paper_size'] ?? 'a4',
+                    'orientation' => $template['orientation'] ?? 'portrait',
+                    'body' => $template['body'],
+                    'footer' => $template['footer'] ?? '{{ company.name }} · {{ company.support_contact }}',
+                    'is_active' => $index === 0,
+                    'updated_at' => now(),
+                ];
+
+                if ($existingTemplate) {
+                    DB::table('employee_document_templates')
+                        ->where('id', $existingTemplate->id)
+                        ->update($payload);
+                } else {
+                    $payload['document_type_id'] = $type->id;
+                    $payload['name'] = $template['name'];
+                    $payload['created_at'] = now();
+                    DB::table('employee_document_templates')->insert($payload);
+                }
             }
         }
     }
 
-    /**
-     * @return array<string, array<int, array<string, string>>>
-     */
+    private function seedDefaultTypesLocally(): void
+    {
+        $types = [
+            [
+                'code' => 'employment_certificate',
+                'name' => 'Surat Keterangan Kerja (Employment Certificate)',
+                'category' => 'employment',
+                'description' => 'Official employment verification letter.',
+                'is_active' => true,
+                'employee_requestable' => true,
+                'admin_requestable' => true,
+                'requires_employee_upload' => false,
+                'auto_generate_enabled' => true,
+            ],
+            [
+                'code' => 'paklaring',
+                'name' => 'Paklaring (Experience Letter)',
+                'category' => 'employment',
+                'description' => 'Certificate of employment upon resignation.',
+                'is_active' => true,
+                'employee_requestable' => true,
+                'admin_requestable' => true,
+                'requires_employee_upload' => false,
+                'auto_generate_enabled' => true,
+            ],
+            [
+                'code' => 'salary_statement',
+                'name' => 'Surat Keterangan Penghasilan (Salary Statement)',
+                'category' => 'financial',
+                'description' => 'Income verification letter for external use.',
+                'is_active' => true,
+                'employee_requestable' => true,
+                'admin_requestable' => true,
+                'requires_employee_upload' => false,
+                'auto_generate_enabled' => true,
+            ],
+            [
+                'code' => 'npwp',
+                'name' => 'NPWP (Tax ID)',
+                'category' => 'personal_data',
+                'description' => 'Tax Identification Number upload.',
+                'is_active' => true,
+                'employee_requestable' => false,
+                'admin_requestable' => true,
+                'requires_employee_upload' => true,
+                'auto_generate_enabled' => false,
+            ],
+            [
+                'code' => 'bank_account',
+                'name' => 'Rekening Payroll (Bank Account)',
+                'category' => 'financial',
+                'description' => 'Bank account book/details upload for payroll.',
+                'is_active' => true,
+                'employee_requestable' => false,
+                'admin_requestable' => true,
+                'requires_employee_upload' => true,
+                'auto_generate_enabled' => false,
+            ],
+            [
+                'code' => 'visa_letter',
+                'name' => 'Surat Sponsor Visa (Visa Letter)',
+                'category' => 'travel',
+                'description' => 'Employer reference for visa application.',
+                'is_active' => true,
+                'employee_requestable' => true,
+                'admin_requestable' => true,
+                'requires_employee_upload' => false,
+                'auto_generate_enabled' => true,
+            ],
+            [
+                'code' => 'other',
+                'name' => 'Lainnya (Other)',
+                'category' => 'other',
+                'description' => 'Other specific HR documentation.',
+                'is_active' => true,
+                'employee_requestable' => true,
+                'admin_requestable' => true,
+                'requires_employee_upload' => false,
+                'auto_generate_enabled' => false,
+            ],
+        ];
+
+        foreach ($types as $type) {
+            $existing = DB::table('employee_document_types')->where('code', $type['code'])->first();
+
+            $payload = [
+                'name' => $type['name'],
+                'category' => $type['category'],
+                'description' => $type['description'],
+                'is_active' => $type['is_active'],
+                'employee_requestable' => $type['employee_requestable'],
+                'admin_requestable' => $type['admin_requestable'],
+                'requires_employee_upload' => $type['requires_employee_upload'],
+                'auto_generate_enabled' => $type['auto_generate_enabled'],
+                'updated_at' => now(),
+            ];
+
+            if ($existing) {
+                DB::table('employee_document_types')->where('id', $existing->id)->update($payload);
+            } else {
+                $payload['code'] = $type['code'];
+                $payload['created_at'] = now();
+                DB::table('employee_document_types')->insert($payload);
+            }
+        }
+    }
+
     private function templatesByType(): array
     {
         return [
-            EmployeeDocumentRequest::TYPE_EMPLOYMENT_CERTIFICATE => [
+            'employment_certificate' => [
                 [
                     'name' => 'Standard Employment Certificate',
                     'body' => $this->employmentCertificateBody(),
@@ -75,7 +182,7 @@ class EmployeeDocumentTemplateSeeder extends Seeder
                     'body' => $this->paklaringConductBody(),
                 ],
             ],
-            EmployeeDocumentRequest::TYPE_SALARY_STATEMENT => [
+            'salary_statement' => [
                 [
                     'name' => 'Standard Salary Statement',
                     'body' => $this->salaryStatementBody(),
@@ -105,7 +212,7 @@ class EmployeeDocumentTemplateSeeder extends Seeder
                     'body' => $this->bankUpdateBody(),
                 ],
             ],
-            EmployeeDocumentRequest::TYPE_VISA_LETTER => [
+            'visa_letter' => [
                 [
                     'name' => 'Visa Support Letter',
                     'body' => $this->visaLetterBody(),
@@ -115,7 +222,7 @@ class EmployeeDocumentTemplateSeeder extends Seeder
                     'body' => $this->bankReferenceBody(),
                 ],
             ],
-            EmployeeDocumentRequest::TYPE_OTHER => [
+            'other' => [
                 [
                     'name' => 'General Administration Letter',
                     'body' => $this->generalLetterBody(),
