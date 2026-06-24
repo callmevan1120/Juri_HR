@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Forms;
 
-use App\Models\Role;
+use App\Actions\Hr\SyncUserRoles;
 use App\Models\User;
+use App\Support\ManagerHierarchyGuard;
 use App\Support\SecureUploadPolicy;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Carbon;
@@ -353,26 +354,10 @@ class UserForm extends Form
             return;
         }
 
-        $visited = [];
-        $manager = User::query()
-            ->select(['id', 'manager_id'])
-            ->find($this->manager_id);
-
-        while ($manager !== null) {
-            if ($manager->id === $this->user->id) {
-                throw ValidationException::withMessages([
-                    'form.manager_id' => __('This direct manager would create a circular reporting line.'),
-                ]);
-            }
-
-            if (blank($manager->manager_id) || in_array($manager->id, $visited, true)) {
-                return;
-            }
-
-            $visited[] = $manager->id;
-            $manager = User::query()
-                ->select(['id', 'manager_id'])
-                ->find($manager->manager_id);
+        if (app(ManagerHierarchyGuard::class)->wouldCreateCycle($this->user, $this->manager_id)) {
+            throw ValidationException::withMessages([
+                'form.manager_id' => __('This direct manager would create a circular reporting line.'),
+            ]);
         }
     }
 
@@ -391,78 +376,15 @@ class UserForm extends Form
 
     private function syncRoles(User $subject): void
     {
-        $requestedRoleIds = $this->normalizeRequestedRoleIds($subject, array_values(array_unique($this->role_ids)));
-        $actor = auth()->user();
-        $originalRoleIds = $actor?->is($subject)
-            ? $subject->roles()->pluck('roles.id')->all()
-            : array_values(array_unique($this->original_role_ids));
-        $usingImplicitDefaultRole = $this->role_ids === [] && $originalRoleIds === [];
+        $result = app(SyncUserRoles::class)->handle(
+            $subject,
+            auth()->user(),
+            $this->role_ids,
+            $this->original_role_ids,
+        );
 
-        if ($requestedRoleIds === $originalRoleIds) {
-            return;
-        }
-
-        if (! $usingImplicitDefaultRole && ! $actor?->can('assignRoles')) {
-            throw new AuthorizationException(__('You do not have permission to assign roles.'));
-        }
-
-        if (! $usingImplicitDefaultRole && $actor->is($subject)) {
-            throw new AuthorizationException(__('You cannot change your own role assignment.'));
-        }
-
-        $roles = Role::query()
-            ->whereIn('id', $requestedRoleIds)
-            ->get();
-
-        if ($roles->count() !== count($requestedRoleIds)) {
-            throw new AuthorizationException(__('One or more selected roles are invalid.'));
-        }
-
-        $grantsFullAdminAccess = $roles->contains(fn (Role $role) => $role->grantsFullAdminAccess());
-
-        if ($grantsFullAdminAccess && ! $actor->canManageSuperadminAccounts()) {
-            throw new AuthorizationException(__('You do not have permission to assign the Super Admin role.'));
-        }
-
-        if ($subject->isSuperadmin && ! $actor->canManageSuperadminAccounts()) {
-            throw new AuthorizationException(__('You do not have permission to manage Super Admin accounts.'));
-        }
-
-        $subject->roles()->sync($roles->pluck('id')->all());
-        $this->synchronizeSubjectGroup($subject, $grantsFullAdminAccess);
-        $this->role_ids = $roles->pluck('id')->all();
-        $this->original_role_ids = $requestedRoleIds;
-    }
-
-    private function normalizeRequestedRoleIds(User $subject, array $requestedRoleIds): array
-    {
-        if ($requestedRoleIds !== [] || ! in_array($subject->group, ['admin', 'superadmin'], true)) {
-            return $requestedRoleIds;
-        }
-
-        $defaultRoleSlug = $subject->group === 'superadmin' ? 'super_admin' : 'admin';
-        $defaultRoleId = Role::query()->where('slug', $defaultRoleSlug)->value('id');
-
-        if (! is_string($defaultRoleId) || $defaultRoleId === '') {
-            throw new AuthorizationException(__('The default :group role is missing.', ['group' => $subject->group]));
-        }
-
-        return [$defaultRoleId];
-    }
-
-    private function synchronizeSubjectGroup(User $subject, bool $grantsFullAdminAccess): void
-    {
-        if ($subject->group === 'user') {
-            return;
-        }
-
-        $resolvedGroup = $grantsFullAdminAccess ? 'superadmin' : 'admin';
-
-        if ($subject->group === $resolvedGroup) {
-            return;
-        }
-
-        $subject->forceFill(['group' => $resolvedGroup])->save();
-        $this->group = $resolvedGroup;
+        $this->role_ids = $result['role_ids'];
+        $this->original_role_ids = $result['original_role_ids'];
+        $this->group = $result['group'];
     }
 }

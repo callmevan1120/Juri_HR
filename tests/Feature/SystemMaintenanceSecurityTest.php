@@ -1,9 +1,14 @@
 <?php
 
 use App\Livewire\Admin\SystemMaintenance;
+use App\Services\Enterprise\LicenseGuard;
 
 function verifyBackupSqlForTest(string $sql): string
 {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
+        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+
     $component = new SystemMaintenance;
     $method = new ReflectionMethod(SystemMaintenance::class, 'verifiedBackupSql');
     $method->setAccessible(true);

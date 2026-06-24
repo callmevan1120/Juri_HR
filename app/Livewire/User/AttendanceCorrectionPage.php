@@ -270,27 +270,12 @@ class AttendanceCorrectionPage extends Component
 
     private function inferRequestType(?Attendance $attendance, ?Carbon $requestedTimeIn, ?Carbon $requestedTimeOut): string
     {
-        if ($this->includeRequestedShift && ! $requestedTimeIn && ! $requestedTimeOut) {
-            return AttendanceCorrection::TYPE_WRONG_SHIFT;
-        }
-
-        if ($requestedTimeIn && $requestedTimeOut) {
-            return AttendanceCorrection::TYPE_WRONG_TIME;
-        }
-
-        if ($requestedTimeIn) {
-            return $attendance?->time_in
-                ? AttendanceCorrection::TYPE_WRONG_TIME
-                : AttendanceCorrection::TYPE_MISSING_CHECK_IN;
-        }
-
-        if ($requestedTimeOut) {
-            return $attendance?->time_out
-                ? AttendanceCorrection::TYPE_WRONG_TIME
-                : AttendanceCorrection::TYPE_MISSING_CHECK_OUT;
-        }
-
-        return AttendanceCorrection::TYPE_WRONG_SHIFT;
+        return $this->correctionService->inferRequestType(
+            $attendance,
+            $requestedTimeIn,
+            $requestedTimeOut,
+            $this->includeRequestedShift,
+        );
     }
 
     private function buildRequestedDateTime(?string $dateTime): ?Carbon
@@ -313,63 +298,16 @@ class AttendanceCorrectionPage extends Component
 
     private function defaultRequestedDateTime(string $direction): string
     {
-        $attendance = $this->currentAttendance();
-        $date = Carbon::parse($this->attendanceDate);
-
-        $snapshotValue = $this->attendanceSnapshotDateTime($attendance, $direction);
-
-        if ($snapshotValue) {
-            return $snapshotValue->format('Y-m-d H:i');
-        }
-
-        $shift = $attendance?->shift
-            ?? ($this->requestedShiftId ? Shift::query()->find($this->requestedShiftId) : null);
-
-        if ($direction === 'in') {
-            return $date->copy()
-                ->setTimeFromTimeString($shift?->start_time ?: '08:00:00')
-                ->format('Y-m-d H:i');
-        }
-
-        $defaultOut = $date->copy()->setTimeFromTimeString($shift?->end_time ?: '17:00:00');
-
-        if ($shift?->is_overnight) {
-            $defaultOut->addDay();
-        }
-
-        return $defaultOut->format('Y-m-d H:i');
+        return $this->correctionService->defaultRequestedDateTime(
+            $this->currentAttendance(),
+            $this->attendanceDate,
+            $this->requestedShiftId,
+            $direction,
+        );
     }
 
     private function attendanceSnapshotDateTime(?Attendance $attendance, string $direction): ?Carbon
     {
-        if (! $attendance) {
-            return null;
-        }
-
-        $rawValue = $direction === 'in' ? $attendance->time_in : $attendance->time_out;
-
-        if (! $rawValue) {
-            return null;
-        }
-
-        $baseDate = Carbon::parse($attendance->date ?? $this->attendanceDate);
-        $rawDateTime = Carbon::parse($rawValue);
-        $normalized = $baseDate->copy()->setTime(
-            (int) $rawDateTime->format('H'),
-            (int) $rawDateTime->format('i'),
-            (int) $rawDateTime->format('s')
-        );
-
-        if ($direction !== 'out') {
-            return $normalized;
-        }
-
-        $normalizedTimeIn = $this->attendanceSnapshotDateTime($attendance, 'in');
-
-        if ($attendance->shift?->is_overnight || ($normalizedTimeIn && $normalized->lessThanOrEqualTo($normalizedTimeIn))) {
-            $normalized->addDay();
-        }
-
-        return $normalized;
+        return $this->correctionService->snapshotDateTime($attendance, $direction, $this->attendanceDate);
     }
 }

@@ -170,6 +170,104 @@ class AttendanceCorrectionService
         return __('Attendance correction rejected.');
     }
 
+    /**
+     * Normalize a stored attendance time into a full datetime on the correct
+     * calendar day, accounting for overnight shifts on the check-out side.
+     */
+    public function snapshotDateTime(?Attendance $attendance, string $direction, string $fallbackDate): ?Carbon
+    {
+        if (! $attendance) {
+            return null;
+        }
+
+        $rawValue = $direction === 'in' ? $attendance->time_in : $attendance->time_out;
+
+        if (! $rawValue) {
+            return null;
+        }
+
+        $baseDate = Carbon::parse($attendance->date ?? $fallbackDate);
+        $rawDateTime = Carbon::parse($rawValue);
+        $normalized = $baseDate->copy()->setTime(
+            (int) $rawDateTime->format('H'),
+            (int) $rawDateTime->format('i'),
+            (int) $rawDateTime->format('s')
+        );
+
+        if ($direction !== 'out') {
+            return $normalized;
+        }
+
+        $normalizedTimeIn = $this->snapshotDateTime($attendance, 'in', $fallbackDate);
+
+        if ($attendance->shift?->is_overnight || ($normalizedTimeIn && $normalized->lessThanOrEqualTo($normalizedTimeIn))) {
+            $normalized->addDay();
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Compute the default check-in/out datetime to prefill a correction form:
+     * the existing snapshot when present, otherwise the shift boundary.
+     */
+    public function defaultRequestedDateTime(?Attendance $attendance, string $attendanceDate, int|string|null $requestedShiftId, string $direction): string
+    {
+        $date = Carbon::parse($attendanceDate);
+
+        $snapshotValue = $this->snapshotDateTime($attendance, $direction, $attendanceDate);
+
+        if ($snapshotValue) {
+            return $snapshotValue->format('Y-m-d H:i');
+        }
+
+        $shift = $attendance?->shift
+            ?? ($requestedShiftId ? Shift::query()->find($requestedShiftId) : null);
+
+        if ($direction === 'in') {
+            return $date->copy()
+                ->setTimeFromTimeString($shift?->start_time ?: '08:00:00')
+                ->format('Y-m-d H:i');
+        }
+
+        $defaultOut = $date->copy()->setTimeFromTimeString($shift?->end_time ?: '17:00:00');
+
+        if ($shift?->is_overnight) {
+            $defaultOut->addDay();
+        }
+
+        return $defaultOut->format('Y-m-d H:i');
+    }
+
+    /**
+     * Infer the correction request type from the requested times, the existing
+     * attendance record, and whether a shift change was requested.
+     */
+    public function inferRequestType(?Attendance $attendance, ?Carbon $requestedTimeIn, ?Carbon $requestedTimeOut, bool $includeShift): string
+    {
+        if ($includeShift && ! $requestedTimeIn && ! $requestedTimeOut) {
+            return AttendanceCorrection::TYPE_WRONG_SHIFT;
+        }
+
+        if ($requestedTimeIn && $requestedTimeOut) {
+            return AttendanceCorrection::TYPE_WRONG_TIME;
+        }
+
+        if ($requestedTimeIn) {
+            return $attendance?->time_in
+                ? AttendanceCorrection::TYPE_WRONG_TIME
+                : AttendanceCorrection::TYPE_MISSING_CHECK_IN;
+        }
+
+        if ($requestedTimeOut) {
+            return $attendance?->time_out
+                ? AttendanceCorrection::TYPE_WRONG_TIME
+                : AttendanceCorrection::TYPE_MISSING_CHECK_OUT;
+        }
+
+        return AttendanceCorrection::TYPE_WRONG_SHIFT;
+    }
+
     private function snapshot(?Attendance $attendance): ?array
     {
         if (! $attendance) {

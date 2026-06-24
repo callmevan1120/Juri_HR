@@ -41,6 +41,7 @@ test('known mysql-only migration statements have postgres or sqlite guards', fun
                 "DB::getDriverName() !== 'sqlite'",
                 "DB::getDriverName() === 'sqlite'",
                 "in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)",
+                'match (DB::getDriverName())',
             ]);
         })
         ->map(fn (string $path): string => str_replace(base_path().DIRECTORY_SEPARATOR, '', $path))

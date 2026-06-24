@@ -429,69 +429,75 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserNotificationPreference::class);
     }
 
+    /**
+     * Ordered map of admin route name => [ability, ...arguments]. The first
+     * route whose ability the current user passes is their landing route.
+     *
+     * @var array<string, array<int, mixed>>
+     */
+    private const ADMIN_ROUTE_ABILITIES = [
+        'admin.dashboard' => ['viewAdminDashboard'],
+        'admin.notifications' => ['manageAdminNotifications'],
+        'admin.attendances' => ['viewAdminAny', Attendance::class],
+        'admin.attendance-corrections' => ['viewAdminAny', AttendanceCorrection::class],
+        'admin.document-requests' => ['viewAdminAny', EmployeeDocumentRequest::class],
+        'admin.leaves' => ['manageLeaveApprovals'],
+        'admin.shift-swaps' => ['manageShiftSwapApprovals'],
+        'admin.overtime' => ['manageOvertime'],
+        'admin.schedules' => ['manageSchedules'],
+        'admin.analytics' => ['viewAnalyticsDashboard'],
+        'admin.holidays' => ['manageHolidays'],
+        'admin.announcements' => ['manageAnnouncements'],
+        'admin.payrolls' => ['viewAdminAny', Payroll::class],
+        'admin.reimbursements' => ['viewAdminAny', Reimbursement::class],
+        'admin.manage-kasbon' => ['manageCashAdvances'],
+        'admin.payroll.settings' => ['managePayrollSettings'],
+        'admin.employees' => ['viewEmployees'],
+        'admin.hr-checklists' => ['viewAny', HrChecklistCase::class],
+        'admin.operations' => ['viewOperationsWorkspace'],
+        'admin.commercial' => ['viewCommercialWorkspace'],
+        'admin.accounting' => ['viewAccountingWorkspace'],
+        'admin.custom-forms' => ['viewCustomForms'],
+        'admin.toko' => ['viewTokoPosAddon'],
+        'admin.toko.pos' => ['viewTokoPosAddon'],
+        'admin.toko.products' => ['viewTokoPosAddon'],
+        'admin.toko.customers' => ['viewTokoPosAddon'],
+        'admin.toko.vendors' => ['viewTokoPosAddon'],
+        'admin.toko.purchases' => ['viewTokoPosAddon'],
+        'admin.toko.inventory' => ['viewTokoPosAddon'],
+        'admin.toko.returns' => ['viewTokoPosAddon'],
+        'admin.toko.quotations' => ['viewTokoPosAddon'],
+        'admin.toko.delivery-letters' => ['viewTokoPosAddon'],
+        'admin.toko.cash' => ['viewTokoPosAddon'],
+        'admin.toko.reports' => ['viewTokoPosAddon'],
+        'admin.toko.migration' => ['importTokoPosAddon'],
+        'admin.appraisals' => ['viewAdminAny', Appraisal::class],
+        'admin.assets' => ['viewAdminAny', CompanyAsset::class],
+        'admin.barcodes' => ['manageBarcodes'],
+        'admin.masters.division' => ['manageDivisions'],
+        'admin.masters.job-title' => ['manageJobTitles'],
+        'admin.masters.education' => ['manageEducations'],
+        'admin.masters.shift' => ['manageShifts'],
+        'admin.masters.leave-types' => ['manageLeaveTypes'],
+        'admin.masters.admin' => ['viewAdminAccounts'],
+        'admin.settings' => ['viewAdminSettings'],
+        'admin.settings.kpi' => ['manageKpiSettings'],
+        'admin.companies' => ['manageCompanies'],
+        'admin.import-export.users' => ['viewUserImportExport'],
+        'admin.import-export.attendances' => ['viewAttendanceImportExport'],
+        'admin.activity-logs' => ['viewActivityLogs'],
+        'admin.user-sessions' => ['manageUserSessions'],
+        'admin.system-maintenance' => ['viewAny', SystemBackupRun::class],
+        'admin.roles.permissions' => ['manageRbac'],
+    ];
+
     public function preferredAdminRouteName(): ?string
     {
         if (! $this->canAccessAdminPanel()) {
             return null;
         }
 
-        $routeAbilities = [
-            'admin.dashboard' => ['viewAdminDashboard'],
-            'admin.notifications' => ['manageAdminNotifications'],
-            'admin.attendances' => ['viewAdminAny', Attendance::class],
-            'admin.attendance-corrections' => ['viewAdminAny', AttendanceCorrection::class],
-            'admin.document-requests' => ['viewAdminAny', EmployeeDocumentRequest::class],
-            'admin.leaves' => ['manageLeaveApprovals'],
-            'admin.shift-swaps' => ['manageShiftSwapApprovals'],
-            'admin.overtime' => ['manageOvertime'],
-            'admin.schedules' => ['manageSchedules'],
-            'admin.analytics' => ['viewAnalyticsDashboard'],
-            'admin.holidays' => ['manageHolidays'],
-            'admin.announcements' => ['manageAnnouncements'],
-            'admin.payrolls' => ['viewAdminAny', Payroll::class],
-            'admin.reimbursements' => ['viewAdminAny', Reimbursement::class],
-            'admin.manage-kasbon' => ['manageCashAdvances'],
-            'admin.payroll.settings' => ['managePayrollSettings'],
-            'admin.employees' => ['viewEmployees'],
-            'admin.hr-checklists' => ['viewAny', HrChecklistCase::class],
-            'admin.operations' => ['viewOperationsWorkspace'],
-            'admin.commercial' => ['viewCommercialWorkspace'],
-            'admin.accounting' => ['viewAccountingWorkspace'],
-            'admin.custom-forms' => ['viewCustomForms'],
-            'admin.toko' => ['viewTokoPosAddon'],
-            'admin.toko.pos' => ['viewTokoPosAddon'],
-            'admin.toko.products' => ['viewTokoPosAddon'],
-            'admin.toko.customers' => ['viewTokoPosAddon'],
-            'admin.toko.vendors' => ['viewTokoPosAddon'],
-            'admin.toko.purchases' => ['viewTokoPosAddon'],
-            'admin.toko.inventory' => ['viewTokoPosAddon'],
-            'admin.toko.returns' => ['viewTokoPosAddon'],
-            'admin.toko.quotations' => ['viewTokoPosAddon'],
-            'admin.toko.delivery-letters' => ['viewTokoPosAddon'],
-            'admin.toko.cash' => ['viewTokoPosAddon'],
-            'admin.toko.reports' => ['viewTokoPosAddon'],
-            'admin.toko.migration' => ['importTokoPosAddon'],
-            'admin.appraisals' => ['viewAdminAny', Appraisal::class],
-            'admin.assets' => ['viewAdminAny', CompanyAsset::class],
-            'admin.barcodes' => ['manageBarcodes'],
-            'admin.masters.division' => ['manageDivisions'],
-            'admin.masters.job-title' => ['manageJobTitles'],
-            'admin.masters.education' => ['manageEducations'],
-            'admin.masters.shift' => ['manageShifts'],
-            'admin.masters.leave-types' => ['manageLeaveTypes'],
-            'admin.masters.admin' => ['viewAdminAccounts'],
-            'admin.settings' => ['viewAdminSettings'],
-            'admin.settings.kpi' => ['manageKpiSettings'],
-            'admin.companies' => ['manageCompanies'],
-            'admin.import-export.users' => ['viewUserImportExport'],
-            'admin.import-export.attendances' => ['viewAttendanceImportExport'],
-            'admin.activity-logs' => ['viewActivityLogs'],
-            'admin.user-sessions' => ['manageUserSessions'],
-            'admin.system-maintenance' => ['viewAny', SystemBackupRun::class],
-            'admin.roles.permissions' => ['manageRbac'],
-        ];
-
-        foreach ($routeAbilities as $routeName => $abilityDefinition) {
+        foreach (self::ADMIN_ROUTE_ABILITIES as $routeName => $abilityDefinition) {
             $ability = $abilityDefinition[0] ?? null;
             $arguments = array_slice($abilityDefinition, 1);
 

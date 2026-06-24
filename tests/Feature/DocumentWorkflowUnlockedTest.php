@@ -2,8 +2,13 @@
 
 use App\Models\Role;
 use App\Models\User;
+use App\Services\Enterprise\LicenseGuard;
 
 test('document workflow admin pages do not require the enterprise document feature', function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
+        test()->markTestSkipped('Enterprise artifacts missing.');
+    }
+
     $requestViewer = User::factory()->admin()->create();
     $templateManager = User::factory()->admin()->create();
 

@@ -23,4 +23,6 @@ class Editions
     public static function cashAdvanceLocked(): bool {}
 
     public static function systemBackupLocked(): bool {}
+
+    public static function tokoPosLocked(): bool {}
 }

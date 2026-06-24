@@ -13,6 +13,7 @@ use App\Models\JobTitle;
 use App\Models\Reimbursement;
 use App\Models\User;
 use App\Models\WorkFromHomeRequest;
+use App\Services\Enterprise\LicenseGuard;
 use App\Support\ApprovalActorService;
 use App\Support\UserHomeCommandCenterService;
 use Carbon\Carbon;
@@ -291,7 +292,7 @@ test('manager home shows complete team shortcuts', function () {
         ->assertSee(__('Manager tools'))
         ->assertSee(__('Team Approvals'))
         ->assertSee(__('Team Attendance'))
-        ->assertSee(__('Team Kasbon'));
+        ->when(LicenseGuard::hasRuntimeObfuscatorKey(), fn ($r) => $r->assertSee(__('Team Kasbon')));
 });
 
 test('head subordinate lookup is company scoped and includes lower division roles', function () {

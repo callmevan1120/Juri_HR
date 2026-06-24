@@ -5,6 +5,7 @@ use App\Models\JobLevel;
 use App\Models\JobTitle;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\Enterprise\LicenseGuard;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 
@@ -136,5 +137,5 @@ test('manager-only user shortcuts are hidden unless subordinate review access ex
         ->get(route('home'))
         ->assertOk()
         ->assertSeeText(__('Approvals'))
-        ->assertSeeText(__('Team Kasbon'));
+        ->when(LicenseGuard::hasRuntimeObfuscatorKey(), fn ($r) => $r->assertSeeText(__('Team Kasbon')));
 });

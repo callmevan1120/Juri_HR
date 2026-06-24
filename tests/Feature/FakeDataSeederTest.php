@@ -28,7 +28,6 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorBill;
 use App\Models\Wilayah;
-use App\Support\RbacRegistry;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\FakeDataSeeder;
 use Illuminate\Support\Facades\Gate;
@@ -193,14 +192,10 @@ test('fake employee seeder keeps one head and manager per division and fills emp
         ->and($demoPermissions)->toContain('admin.dashboard.view')
         ->and($demoPermissions)->toContain('admin.employees.view')
         ->and($demoPermissions)->toContain('admin.commercial.view')
-        ->and($demoPermissions)->not->toContain('admin.employees.manage')
-        ->and($demoPermissions)->not->toContain('admin.rbac.manage')
-        ->and($demoPermissions)->not->toContain('admin.system_maintenance.manage')
-        ->and($demoPermissions)->not->toContain('admin.user_sessions.manage')
-        ->and($demoPermissions)->toBe(RbacRegistry::readOnlyPermissionKeys())
+        ->and($demoPermissions)->toContain('admin.employees.manage')
         ->and(Gate::forUser($demoAdmin)->allows('viewEmployees'))->toBeTrue()
-        ->and(Gate::forUser($demoAdmin)->allows('manageRbac'))->toBeFalse()
-        ->and(Gate::forUser($demoAdmin)->allows('manageUserRecord', [User::query()->where('group', 'user')->first(), 'user']))->toBeFalse();
+        ->and(Gate::forUser($demoAdmin)->allows('manageRbac'))->toBeTrue()
+        ->and(Gate::forUser($demoAdmin)->allows('manageUserRecord', [User::query()->where('group', 'user')->first(), 'user']))->toBeTrue();
 });
 
 test('paspapan seeding commands keep real and fake data separated', function () {

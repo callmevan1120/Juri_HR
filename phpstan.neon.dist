@@ -26,5 +26,6 @@ parameters:
     - stubs/Editions.stub
     - stubs/EmployeeDocumentRequestService.stub
     - stubs/RunSystemBackup.stub
+    - stubs/TokoControllers.stub
   parallel:
     maximumNumberOfProcesses: 1

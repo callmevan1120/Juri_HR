@@ -49,7 +49,7 @@
                             <x-heroicon-m-arrow-up-tray class="h-5 w-5" />
                         </x-actions.icon-button>
                     @else
-                        <span aria-label="Import Data" title="Import Data" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-700 opacity-60 dark:bg-primary-950/30 dark:text-primary-200">
+                        <span aria-label="Impor Data" title="Impor Data" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-700 opacity-60 dark:bg-primary-950/30 dark:text-primary-200">
                             <x-heroicon-m-arrow-down-tray class="h-5 w-5" />
                         </span>
                     @endif
@@ -165,7 +165,7 @@
                                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('Barcode') }}</label>
                                     <div class="flex gap-2">
                                         <input type="text" wire:model="productBarcode" placeholder="{{ __('Barcode') }}" class="w-full min-h-9 rounded-xl border-slate-200 bg-white text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-slate-950 dark:text-white">
-                                        <button type="button" @click="generateBarcode()" class="inline-flex min-h-9 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200" title="Generate Barcode">
+                                        <button type="button" @click="generateBarcode()" class="inline-flex min-h-9 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200" title="Buat Barcode">
                                             <x-heroicon-o-arrow-path class="h-4 w-4" />
                                         </button>
                                     </div>
@@ -456,17 +456,17 @@
                         <x-heroicon-o-table-cells class="h-5 w-5" />
                     </a>
                     @if (count($productRows) > 0)
-                        <a href="{{ route('admin.toko.products.barcodes', ['products' => collect($productRows)->pluck('id')->take(24)->all(), 'use_stock' => 1, 'format' => 'thermal']) }}" target="_blank" aria-label="Print Thermal" title="Print Thermal (Roll)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-700 dark:text-slate-200">
+                        <a href="{{ route('admin.toko.products.barcodes', ['products' => collect($productRows)->pluck('id')->take(24)->all(), 'use_stock' => 1, 'format' => 'thermal']) }}" target="_blank" aria-label="Cetak Thermal" title="Cetak Thermal (Roll)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-700 dark:text-slate-200">
                             <x-heroicon-o-document-text class="h-5 w-5" />
                         </a>
-                        <a href="{{ route('admin.toko.products.barcodes', ['products' => collect($productRows)->pluck('id')->take(24)->all(), 'use_stock' => 1, 'format' => 'a4']) }}" target="_blank" aria-label="Print A4" title="Print A4 (Sticker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-700 dark:text-slate-200">
+                        <a href="{{ route('admin.toko.products.barcodes', ['products' => collect($productRows)->pluck('id')->take(24)->all(), 'use_stock' => 1, 'format' => 'a4']) }}" target="_blank" aria-label="Cetak A4" title="Cetak A4 (Stiker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-700 dark:text-slate-200">
                             <x-heroicon-o-printer class="h-5 w-5" />
                         </a>
                     @else
-                        <span aria-label="Print Thermal" title="Print Thermal (Roll)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-400 opacity-60 dark:text-slate-500">
+                        <span aria-label="Cetak Thermal" title="Cetak Thermal (Roll)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-400 opacity-60 dark:text-slate-500">
                             <x-heroicon-o-document-text class="h-5 w-5" />
                         </span>
-                        <span aria-label="Print A4" title="Print A4 (Sticker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-400 opacity-60 dark:text-slate-500">
+                        <span aria-label="Cetak A4" title="Cetak A4 (Stiker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-400 opacity-60 dark:text-slate-500">
                             <x-heroicon-o-printer class="h-5 w-5" />
                         </span>
                     @endif
@@ -559,11 +559,11 @@
                                 
                                 @if ($barcodeProductPreview)
                                     <div class="grid grid-cols-2 gap-2">
-                                        <a :href="'{{ $barcodeProductPreview['print_url'] }}' + (String('{{ $barcodeProductPreview['print_url'] }}').includes('?') ? '&' : '?') + (useStock ? 'use_stock=1&' : '') + 'format=thermal'" target="_blank" aria-label="Print Thermal" title="Print Thermal (Roll)" class="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 shadow-sm transition-all px-2 text-xs font-semibold text-white">
+                                        <a :href="'{{ $barcodeProductPreview['print_url'] }}' + (String('{{ $barcodeProductPreview['print_url'] }}').includes('?') ? '&' : '?') + (useStock ? 'use_stock=1&' : '') + 'format=thermal'" target="_blank" aria-label="Cetak Thermal" title="Cetak Thermal (Roll)" class="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 shadow-sm transition-all px-2 text-xs font-semibold text-white">
                                             <x-heroicon-o-document-text class="h-4 w-4 shrink-0" />
                                             <span class="truncate">Thermal</span>
                                         </a>
-                                        <a :href="'{{ $barcodeProductPreview['print_url'] }}' + (String('{{ $barcodeProductPreview['print_url'] }}').includes('?') ? '&' : '?') + (useStock ? 'use_stock=1&' : '') + 'format=a4'" target="_blank" aria-label="Print A4" title="Print A4 (Sticker)" class="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-primary-600 hover:bg-primary-500 shadow-sm transition-all px-2 text-xs font-semibold text-white">
+                                        <a :href="'{{ $barcodeProductPreview['print_url'] }}' + (String('{{ $barcodeProductPreview['print_url'] }}').includes('?') ? '&' : '?') + (useStock ? 'use_stock=1&' : '') + 'format=a4'" target="_blank" aria-label="Cetak A4" title="Cetak A4 (Stiker)" class="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-primary-600 hover:bg-primary-500 shadow-sm transition-all px-2 text-xs font-semibold text-white">
                                             <x-heroicon-o-printer class="h-4 w-4 shrink-0" />
                                             <span class="truncate">A4 Label</span>
                                         </a>

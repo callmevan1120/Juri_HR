@@ -431,7 +431,7 @@
     </script>
 
     <script>
-        // Provide a dummy Echo object so Livewire 3 doesn't crash on boot before app.js finishes.
+        // Provide a dummy Echo object so Livewire doesn't crash on boot before app.js finishes.
         // Once app.js executes, it will overwrite window.Echo with the real instance and dispatch 'echo:ready'.
         if (typeof window.Echo === 'undefined') {
             window.Echo = {

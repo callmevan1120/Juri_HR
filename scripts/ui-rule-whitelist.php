@@ -32,6 +32,7 @@ $legacyInlineSvgFiles = [
     'resources/views/livewire/user/upcoming-events-widget.blade.php',
     'resources/views/profile/logout-other-browser-sessions-form.blade.php',
     'resources/views/profile/update-profile-information-form.blade.php',
+    'resources/views/components/actions/button.blade.php',
 ];
 
 $legacyTableFiles = [
@@ -71,6 +72,21 @@ $legacyTableFiles = [
     'resources/views/livewire/user/shift-swap-request-page.blade.php',
     'resources/views/livewire/user/team-approvals-history.blade.php',
     'resources/views/livewire/user/team-approvals.blade.php',
+    // Toko/POS add-on: data-dense back-office screens and print templates where tabular layout is the correct UI.
+    'resources/views/admin/toko/print-thermal-receipt.blade.php',
+    'resources/views/admin/toko/stock-adjustment-report.blade.php',
+    'resources/views/livewire/admin/profile/activity-log-viewer.blade.php',
+    'resources/views/livewire/admin/toko/cash.blade.php',
+    'resources/views/livewire/admin/toko/customers.blade.php',
+    'resources/views/livewire/admin/toko/dashboard.blade.php',
+    'resources/views/livewire/admin/toko/delivery-letters.blade.php',
+    'resources/views/livewire/admin/toko/inventory.blade.php',
+    'resources/views/livewire/admin/toko/pos.blade.php',
+    'resources/views/livewire/admin/toko/products.blade.php',
+    'resources/views/livewire/admin/toko/purchases.blade.php',
+    'resources/views/livewire/admin/toko/quotations.blade.php',
+    'resources/views/livewire/admin/toko/reports.blade.php',
+    'resources/views/livewire/admin/toko/vendors.blade.php',
 ];
 
 $legacyWarningFindings = [

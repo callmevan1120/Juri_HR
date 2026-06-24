@@ -4,10 +4,17 @@ use App\Jobs\RecordQueueHeartbeat;
 use App\Models\Role;
 use App\Models\SystemBackupRun;
 use App\Models\User;
+use App\Services\Enterprise\LicenseGuard;
 use App\Support\OperationalHealthService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+
+beforeEach(function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
+        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+});
 
 test('split admin route files preserve important route names and middleware', function () {
     $routes = collect(Route::getRoutes()->getRoutes())->keyBy(fn ($route) => $route->getName());
