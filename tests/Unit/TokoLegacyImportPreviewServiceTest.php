@@ -1,8 +1,13 @@
 <?php
 
+use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoLegacyImportPreviewService;
 
 test('toko legacy preview counts mapped rows from mysql dump', function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise artifacts missing.');
+    }
+
     $dump = <<<'SQL'
 CREATE TABLE `barang` (`kode` varchar(20), `nama` varchar(50));
 INSERT INTO `barang` (`kode`, `nama`, `kategori`, `brand`, `hargabeli`, `hargajual`, `sisa`) VALUES
@@ -36,6 +41,10 @@ SQL;
 });
 
 test('toko legacy preview reports missing dump without throwing', function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise artifacts missing.');
+    }
+
     $preview = app(TokoLegacyImportPreviewService::class)->preview('/nope/toko.sql');
 
     expect($preview['available'])->toBeFalse()
@@ -44,6 +53,10 @@ test('toko legacy preview reports missing dump without throwing', function () {
 });
 
 test('toko legacy preview reports master data readiness and issues', function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise artifacts missing.');
+    }
+
     $dump = <<<'SQL'
 INSERT INTO `barang` (`kode`, `sku`, `nama`, `kategori`, `brand`, `hargabeli`, `hargajual`, `sisa`, `stokmin`, `satuan`) VALUES
 ('000001', 'SKU000001', 'Kapasitor AC', 'Sparepart AC', 'Sigma', 34000, 45000, 5, 1, 'pcs'),
@@ -75,6 +88,10 @@ SQL;
 });
 
 test('toko legacy preview exposes unmapped table coverage gaps', function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise artifacts missing.');
+    }
+
     $dump = <<<'SQL'
 INSERT INTO `barang` (`kode`, `sku`, `nama`, `sisa`) VALUES
 ('000001', 'SKU000001', 'Kapasitor AC', 5);
@@ -103,6 +120,10 @@ SQL;
 });
 
 test('toko legacy preview lists selectable dump sources', function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise artifacts missing.');
+    }
+
     $root = sys_get_temp_dir().'/toko-source-'.bin2hex(random_bytes(4));
     mkdir($root, 0777, true);
     file_put_contents($root.'/toko.sql', 'INSERT INTO `barang` (`kode`) VALUES (\'0001\');');

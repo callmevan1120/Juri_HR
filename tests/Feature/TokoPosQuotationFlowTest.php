@@ -12,6 +12,12 @@ use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoPosQuotationService;
 use Livewire\Livewire;
 
+beforeEach(function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+});
+
 function setTokoPosQuotationLicenseFeatures(array $features): void
 {
     Setting::updateOrCreate(

@@ -11,6 +11,22 @@ Semua perubahan penting PasPapan dicatat di file ini.
 - Menambahkan izin *Privacy* (`Info.plist` untuk Kamera, Lokasi, Galeri) secara bawaan sehingga siap untuk proses review App Store.
 - Menghapus komponen *bottom navigation* web pada mode native iOS agar antarmuka lebih lega dan kompatibel dengan fitur navigasi gestur bawaan iPhone (Home Indicator).
 
+## [5.0.2] - 2026-06-24
+
+### Enterprise Hardening
+
+- **Toko/POS Add-on**: Meningkatkan keamanan artifact enterprise untuk modul Toko/POS. Eksekusi kini membutuhkan tambahan `ENTERPRISE_ADDON_SALT_TOKO_POS` di environment di samping master key obfuscator biasa. Langkah ini diperlukan untuk deployment baru bagi pelanggan add-on.
+- Open-source/community tetap bisa boot tanpa `ENTERPRISE_OBFUSCATOR_KEY`; requirement runtime hanya berlaku untuk artifact enterprise yang sudah di-salt.
+
+### APK Android
+
+- Nama file: `PasPapan-v5.0.2.apk`
+- ID aplikasi: `com.pandanteknik.paspapan`
+- Nama versi: `5.0.2`
+- Kode versi: `52`
+- Tipe build: APK rilis
+- SHA-256: `0150d4539c7c9845ae94080ad896f76c40d28539aab1a2b2239a66cc6f73d88a`
+
 ## [5.0.1] - 2026-06-06
 
 ### Sorotan & Perbaikan

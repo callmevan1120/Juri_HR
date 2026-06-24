@@ -4,7 +4,14 @@ use App\Models\Client;
 use App\Models\Company;
 use App\Models\Product;
 use App\Models\Vendor;
+use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoLegacyImportPreviewService;
+
+beforeEach(function (): void {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        $this->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+});
 
 test('toko legacy preview detects collisions against existing company data', function (): void {
     $company = Company::query()->create([

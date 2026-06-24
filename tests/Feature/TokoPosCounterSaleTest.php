@@ -14,6 +14,12 @@ use App\Support\TokoPosSalesService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 
+beforeEach(function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+});
+
 function setTokoPosCounterSaleLicenseFeatures(array $features): void
 {
     Setting::updateOrCreate(

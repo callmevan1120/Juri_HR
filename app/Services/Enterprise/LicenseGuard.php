@@ -311,12 +311,22 @@ final class LicenseGuard
             : trim((string) config('app.enterprise_license_key', ''));
     }
 
-    public static function hasRuntimeObfuscatorKey(): bool
+    public static function hasRuntimeObfuscatorKey(?string $addon = null): bool
     {
+        if (app()->environment('testing')) {
+            $testKey = getenv('TEST_ENTERPRISE_OBFUSCATOR_KEY') ?: ($_ENV['TEST_ENTERPRISE_OBFUSCATOR_KEY'] ?? $_SERVER['TEST_ENTERPRISE_OBFUSCATOR_KEY'] ?? null);
+
+            if (! is_string($testKey) || strlen(trim($testKey)) < 32) {
+                return false;
+            }
+
+            return $addon === null || self::hasRuntimeAddonSalt($addon, true);
+        }
+
         $key = getenv('ENTERPRISE_OBFUSCATOR_KEY') ?: ($_ENV['ENTERPRISE_OBFUSCATOR_KEY'] ?? $_SERVER['ENTERPRISE_OBFUSCATOR_KEY'] ?? null);
 
         if (is_string($key) && strlen(trim($key)) >= 32) {
-            return true;
+            return $addon === null || self::hasRuntimeAddonSalt($addon);
         }
 
         $envPath = base_path('.env');
@@ -338,6 +348,63 @@ final class LicenseGuard
 
             [$name, $rawValue] = explode('=', $line, 2);
             if (trim($name) !== 'ENTERPRISE_OBFUSCATOR_KEY') {
+                continue;
+            }
+
+            $rawValue = trim($rawValue);
+            if (
+                (str_starts_with($rawValue, '"') && str_ends_with($rawValue, '"'))
+                || (str_starts_with($rawValue, "'") && str_ends_with($rawValue, "'"))
+            ) {
+                $rawValue = substr($rawValue, 1, -1);
+            }
+
+            if (strlen(trim($rawValue)) < 32) {
+                return false;
+            }
+
+            return $addon === null || self::hasRuntimeAddonSalt($addon);
+        }
+
+        return false;
+    }
+
+    private static function hasRuntimeAddonSalt(string $addon, bool $testing = false): bool
+    {
+        $envName = 'ENTERPRISE_ADDON_SALT_'.strtoupper(str_replace('-', '_', $addon));
+        $testEnvName = 'TEST_'.$envName;
+
+        if ($testing) {
+            $testSalt = getenv($testEnvName) ?: ($_ENV[$testEnvName] ?? $_SERVER[$testEnvName] ?? null);
+
+            return is_string($testSalt) && strlen(trim($testSalt)) >= 32;
+        }
+
+        $salt = getenv($envName) ?: ($_ENV[$envName] ?? $_SERVER[$envName] ?? null);
+
+        if (is_string($salt) && strlen(trim($salt)) >= 32) {
+            return true;
+        }
+
+        $envPath = base_path('.env');
+        if (! is_file($envPath)) {
+            return false;
+        }
+
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (! is_array($lines)) {
+            return false;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if ($line === '' || str_starts_with($line, '#') || ! str_contains($line, '=')) {
+                continue;
+            }
+
+            [$name, $rawValue] = explode('=', $line, 2);
+            if (trim($name) !== $envName) {
                 continue;
             }
 

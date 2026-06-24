@@ -19,6 +19,12 @@ use App\Support\TokoLegacyImportPreviewService;
 use App\Support\TokoPosReportService;
 use Livewire\Livewire;
 
+beforeEach(function (): void {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        $this->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+});
+
 function setTokoLegacyHistoryLicenseFeatures(array $features): void
 {
     Setting::updateOrCreate(

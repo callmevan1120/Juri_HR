@@ -6,8 +6,15 @@ use App\Models\ImportExportRun;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoLegacyImportPreviewService;
 use App\Support\TokoPosCutoverReadinessService;
+
+beforeEach(function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+});
 
 test('toko cutover readiness compares legacy dump counts with target database', function (): void {
     $company = Company::query()->create([

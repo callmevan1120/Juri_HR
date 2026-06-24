@@ -21,6 +21,12 @@ use App\Support\TokoPosSalesService;
 use Livewire\Livewire;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
+beforeEach(function () {
+    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
+        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
+    }
+});
+
 function setTokoPosLicenseFeatures(array $features): void
 {
     Setting::updateOrCreate(
