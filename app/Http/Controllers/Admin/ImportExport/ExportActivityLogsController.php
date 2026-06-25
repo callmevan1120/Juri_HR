@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Admin\ImportExport;
 
 use App\Helpers\Editions;
 use App\Http\Controllers\Controller;
+use App\Support\EnterpriseRuntime;
 use App\Support\ImportExportRunService;
 use Illuminate\Http\Request;
 
 class ExportActivityLogsController extends Controller
 {
-    public function __invoke(Request $request, ImportExportRunService $runService)
+    public function __invoke(Request $request)
     {
         $this->authorize('exportActivityLogs');
 
-        if (Editions::auditLocked()) {
+        if (Editions::auditLocked() || ! EnterpriseRuntime::sourceAvailable()) {
             return to_route('admin.activity-logs')
                 ->with('flash.banner', __('Audit Logs Export is an Enterprise Feature. Please Upgrade.'))
                 ->with('flash.bannerStyle', 'danger');
@@ -28,7 +29,7 @@ class ExportActivityLogsController extends Controller
 
         $validated['actor_group'] ??= 'all';
 
-        $run = $runService->queueActivityLogExport($request->user(), $validated);
+        $run = app(ImportExportRunService::class)->queueActivityLogExport($request->user(), $validated);
 
         return to_route('admin.activity-logs')
             ->with('flash.banner', __('Activity log export queued in background. Track progress from run #:id.', ['id' => $run->id]))

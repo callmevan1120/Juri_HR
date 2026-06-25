@@ -56,7 +56,7 @@ Route::middleware([
     Route::prefix('admin')->middleware(['admin'])->group(function () {
         enterprise_livewire_route('/system-maintenance', 'admin.system-maintenance')
             ->name('admin.system-maintenance')
-            ->middleware('feature.lock:system_backup,admin.system_maintenance.view,admin.dashboard')
+            ->middleware('feature.lock:system_maintenance,admin.system_maintenance.view,admin.dashboard')
             ->can('viewAny', SystemBackupRun::class);
     });
 });

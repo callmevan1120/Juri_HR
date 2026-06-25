@@ -22,6 +22,8 @@ beforeEach(function () {
 });
 
 test('employee submits a document request for admin fulfillment', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestPage::class);
+
     $user = User::factory()->create();
 
     $this->actingAs($user);
@@ -44,6 +46,8 @@ test('employee submits a document request for admin fulfillment', function () {
 });
 
 test('admin marks a document request as ready and notifies employee', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestManager::class);
+
     Notification::fake();
 
     $admin = User::factory()->admin()->create();
@@ -87,6 +91,8 @@ test('admin marks a document request as ready and notifies employee', function (
 });
 
 test('admin requests an employee upload and employee submits private document', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestManager::class);
+
     Queue::fake();
     Storage::fake('local');
 
@@ -143,6 +149,8 @@ test('admin requests an employee upload and employee submits private document', 
 });
 
 test('admin generates a document from settings template', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestManager::class);
+
     Storage::fake('local');
 
     $admin = User::factory()->admin()->create();
@@ -181,6 +189,8 @@ test('admin generates a document from settings template', function () {
 });
 
 test('generated document status email attaches the pdf file', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestStatusUpdated::class);
+
     Storage::fake('local');
 
     $employee = User::factory()->create();
@@ -200,6 +210,8 @@ test('generated document status email attaches the pdf file', function () {
 });
 
 test('document template manager keeps one active template per document type and preserves used templates', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: DocumentTemplateManager::class);
+
     $admin = User::factory()->admin()->create();
     $type = EmployeeDocumentType::query()->create([
         'code' => 'bank_letter',
@@ -278,6 +290,8 @@ test('document template seeder creates two templates for every default document 
 });
 
 test('admin can create and immediately generate an auto template document request', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestManager::class);
+
     Storage::fake('local');
 
     $admin = User::factory()->admin()->create();
@@ -318,6 +332,8 @@ test('admin can create and immediately generate an auto template document reques
 });
 
 test('admin can create document requests for multiple employees and process them in bulk', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestManager::class);
+
     Storage::fake('local');
 
     $admin = User::factory()->admin()->create();
@@ -366,6 +382,8 @@ test('admin can create document requests for multiple employees and process them
 });
 
 test('admin rejects a document request and stores rejection note', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: EmployeeDocumentRequestManager::class);
+
     Notification::fake();
 
     $admin = User::factory()->admin()->create();

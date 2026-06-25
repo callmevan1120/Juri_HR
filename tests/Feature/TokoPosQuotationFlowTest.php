@@ -13,9 +13,7 @@ use App\Support\TokoPosQuotationService;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoPosQuotationLicenseFeatures(array $features): void

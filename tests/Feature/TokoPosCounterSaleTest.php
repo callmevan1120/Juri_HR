@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoPosCounterSaleLicenseFeatures(array $features): void
@@ -1056,14 +1054,14 @@ test('toko cash payment history uses datatable pagination and search', function 
     $component = Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'cash'])
         ->assertSee('Payment History')
-        ->assertSee('Showing 1 to 10 of 12 payment entries')
+        ->assertSee(__('Showing :start to :end of :total payment entries', ['start' => '1', 'end' => '10', 'total' => '12']))
         ->assertSee('Next')
         ->call('nextPaymentHistoryPage')
-        ->assertSee('Showing 11 to 12 of 12 payment entries')
+        ->assertSee(__('Showing :start to :end of :total payment entries', ['start' => '11', 'end' => '12', 'total' => '12']))
         ->set('paymentHistorySearch', 'QR-SPECIAL')
-        ->assertSee('Showing 1 to 1 of 1 payment entries')
+        ->assertSee(__('Showing :start to :end of :total payment entries', ['start' => '1', 'end' => '1', 'total' => '1']))
         ->assertSee('PAY-DT-12')
-        ->assertDontSee('Showing 1 to 10 of 12 payment entries');
+        ->assertDontSee(__('Showing :start to :end of :total payment entries', ['start' => '1', 'end' => '10', 'total' => '12']));
 
     expect($component->get('paymentHistoryPage'))->toBe(1);
 });

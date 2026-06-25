@@ -54,6 +54,8 @@ test('user return flow marks asset ready and clears assignment dates', function 
 });
 
 test('admin retrieval marks asset ready and records retrieval note', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: AssetManager::class);
+
     $admin = assetAdmin();
     $user = User::factory()->create();
 
@@ -95,6 +97,8 @@ test('admin retrieval marks asset ready and records retrieval note', function ()
 });
 
 test('admin selecting ready automatically releases the assigned user', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: AssetManager::class);
+
     $admin = assetAdmin();
     $user = User::factory()->create();
 
@@ -124,6 +128,8 @@ test('admin selecting ready automatically releases the assigned user', function 
 });
 
 test('asset admin page auto refreshes pending return otp notifications', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: AssetManager::class);
+
     $admin = assetAdmin();
 
     $this->actingAs($admin);

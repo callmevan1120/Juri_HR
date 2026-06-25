@@ -4,14 +4,11 @@ use App\Jobs\ProcessAttendanceExportRun;
 use App\Models\Attendance;
 use App\Models\ImportExportRun;
 use App\Models\User;
-use App\Services\Enterprise\LicenseGuard;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 test('attendance export run uses attendance filters and completes', function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests(probeClass: ProcessAttendanceExportRun::class);
 
     Storage::fake('local');
 

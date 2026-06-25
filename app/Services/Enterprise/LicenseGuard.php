@@ -327,29 +327,81 @@ final class LicenseGuard
     public static function hasRuntimeObfuscatorKey(?string $addon = null): bool
     {
         if (app()->environment('testing')) {
-            $testKey = getenv('TEST_ENTERPRISE_OBFUSCATOR_KEY') ?: ($_ENV['TEST_ENTERPRISE_OBFUSCATOR_KEY'] ?? $_SERVER['TEST_ENTERPRISE_OBFUSCATOR_KEY'] ?? null);
-
-            if (! is_string($testKey) || strlen(trim($testKey)) < 32) {
+            if (! self::hasRuntimeEnvironmentSecret('TEST_ENTERPRISE_OBFUSCATOR_KEY', false)) {
                 return false;
             }
 
             return $addon === null || self::hasRuntimeAddonSalt($addon, true);
         }
 
-        $key = getenv('ENTERPRISE_OBFUSCATOR_KEY') ?: ($_ENV['ENTERPRISE_OBFUSCATOR_KEY'] ?? $_SERVER['ENTERPRISE_OBFUSCATOR_KEY'] ?? null);
+        return self::hasRuntimeSourceKey($addon);
+    }
 
-        if (is_string($key) && strlen(trim($key)) >= 32) {
-            return $addon === null || self::hasRuntimeAddonSalt($addon);
+    public static function hasRuntimeSourceKey(?string $addon = null): bool
+    {
+        if (! self::hasRuntimeEnvironmentSecret('ENTERPRISE_OBFUSCATOR_KEY')) {
+            return false;
+        }
+
+        return $addon === null || self::hasRuntimeAddonSalt($addon);
+    }
+
+    public static function clearRuntimeSourceSecretCache(?string $addon = null): void
+    {
+        unset($GLOBALS['__enterprise_obfuscator_secret_ENTERPRISE_OBFUSCATOR_KEY']);
+
+        if ($addon !== null) {
+            unset($GLOBALS['__enterprise_obfuscator_secret_'.self::runtimeAddonSaltEnvName($addon)]);
+        }
+    }
+
+    public static function runtimeSourceSecretCacheMatches(?string $addon = null): bool
+    {
+        if (! self::cachedRuntimeEnvironmentSecretMatches('ENTERPRISE_OBFUSCATOR_KEY')) {
+            return false;
+        }
+
+        return $addon === null || self::cachedRuntimeEnvironmentSecretMatches(self::runtimeAddonSaltEnvName($addon));
+    }
+
+    private static function cachedRuntimeEnvironmentSecretMatches(string $envName): bool
+    {
+        $expected = self::runtimeEnvironmentValue($envName);
+        $cached = $GLOBALS['__enterprise_obfuscator_secret_'.$envName] ?? null;
+
+        return is_string($expected)
+            && trim($expected) !== ''
+            && is_string($cached)
+            && trim($cached) !== ''
+            && hash_equals(trim($expected), trim($cached));
+    }
+
+    private static function hasRuntimeEnvironmentSecret(string $envName, bool $includeDotEnv = true): bool
+    {
+        $value = self::runtimeEnvironmentValue($envName, $includeDotEnv);
+
+        return is_string($value) && strlen(trim($value)) >= 32;
+    }
+
+    private static function runtimeEnvironmentValue(string $envName, bool $includeDotEnv = true): ?string
+    {
+        $value = getenv($envName) ?: ($_ENV[$envName] ?? $_SERVER[$envName] ?? null);
+        if (is_string($value) && trim($value) !== '') {
+            return trim($value);
+        }
+
+        if (! $includeDotEnv) {
+            return null;
         }
 
         $envPath = base_path('.env');
         if (! is_file($envPath)) {
-            return false;
+            return null;
         }
 
         $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         if (! is_array($lines)) {
-            return false;
+            return null;
         }
 
         foreach ($lines as $line) {
@@ -359,8 +411,8 @@ final class LicenseGuard
                 continue;
             }
 
-            [$name, $rawValue] = explode('=', $line, 2);
-            if (trim($name) !== 'ENTERPRISE_OBFUSCATOR_KEY') {
+            [$lineName, $rawValue] = explode('=', $line, 2);
+            if (trim($lineName) !== $envName) {
                 continue;
             }
 
@@ -372,67 +424,27 @@ final class LicenseGuard
                 $rawValue = substr($rawValue, 1, -1);
             }
 
-            if (strlen(trim($rawValue)) < 32) {
-                return false;
-            }
-
-            return $addon === null || self::hasRuntimeAddonSalt($addon);
+            return trim(str_replace('\\n', PHP_EOL, $rawValue));
         }
 
-        return false;
+        return null;
     }
 
     private static function hasRuntimeAddonSalt(string $addon, bool $testing = false): bool
     {
-        $envName = 'ENTERPRISE_ADDON_SALT_'.strtoupper(str_replace('-', '_', $addon));
+        $envName = self::runtimeAddonSaltEnvName($addon);
         $testEnvName = 'TEST_'.$envName;
 
         if ($testing) {
-            $testSalt = getenv($testEnvName) ?: ($_ENV[$testEnvName] ?? $_SERVER[$testEnvName] ?? null);
-
-            return is_string($testSalt) && strlen(trim($testSalt)) >= 32;
+            return self::hasRuntimeEnvironmentSecret($testEnvName, false);
         }
 
-        $salt = getenv($envName) ?: ($_ENV[$envName] ?? $_SERVER[$envName] ?? null);
+        return self::hasRuntimeEnvironmentSecret($envName);
+    }
 
-        if (is_string($salt) && strlen(trim($salt)) >= 32) {
-            return true;
-        }
-
-        $envPath = base_path('.env');
-        if (! is_file($envPath)) {
-            return false;
-        }
-
-        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if (! is_array($lines)) {
-            return false;
-        }
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-
-            if ($line === '' || str_starts_with($line, '#') || ! str_contains($line, '=')) {
-                continue;
-            }
-
-            [$name, $rawValue] = explode('=', $line, 2);
-            if (trim($name) !== $envName) {
-                continue;
-            }
-
-            $rawValue = trim($rawValue);
-            if (
-                (str_starts_with($rawValue, '"') && str_ends_with($rawValue, '"'))
-                || (str_starts_with($rawValue, "'") && str_ends_with($rawValue, "'"))
-            ) {
-                $rawValue = substr($rawValue, 1, -1);
-            }
-
-            return strlen(trim($rawValue)) >= 32;
-        }
-
-        return false;
+    private static function runtimeAddonSaltEnvName(string $addon): string
+    {
+        return 'ENTERPRISE_ADDON_SALT_'.strtoupper(str_replace('-', '_', $addon));
     }
 
     private static function cachedFeatureMap(array $result): array

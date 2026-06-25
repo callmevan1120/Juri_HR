@@ -59,7 +59,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $renderEnterpriseRuntimeLock = function (Request $request) {
-            Log::warning('Enterprise runtime obfuscator key is missing.', [
+            Log::warning('Enterprise runtime is unavailable.', [
                 'path' => $request->path(),
                 'route' => $request->route()?->getName(),
                 'user_id' => $request->user()?->id,
@@ -106,7 +106,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (RuntimeException $e, Request $request) use ($renderEnterpriseRuntimeLock) {
-            if ($e->getMessage() !== 'Enterprise obfuscator key is missing.') {
+            if (! in_array($e->getMessage(), [
+                'Enterprise obfuscator key is missing.',
+                'Enterprise source decryption failed.',
+            ], true)) {
                 return null;
             }
 

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Helpers\Editions;
 use App\Models\User;
+use App\Support\EnterpriseRuntime;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -43,6 +44,10 @@ class RedirectLockedEnterpriseFeature
 
     private function isLocked(string $feature): bool
     {
+        if (! $this->runtimeAvailable($feature)) {
+            return true;
+        }
+
         return match ($feature) {
             'analytics' => Editions::analyticsLocked(),
             'appraisal', 'appraisals' => Editions::appraisalLocked(),
@@ -54,6 +59,14 @@ class RedirectLockedEnterpriseFeature
             'system_backup', 'system-backup' => Editions::systemBackupLocked(),
             'toko_pos', 'toko-pos', 'toko' => Editions::tokoPosLocked(),
             default => false,
+        };
+    }
+
+    private function runtimeAvailable(string $feature): bool
+    {
+        return match ($feature) {
+            'toko_pos', 'toko-pos', 'toko' => EnterpriseRuntime::sourceAvailable('toko_pos'),
+            default => EnterpriseRuntime::sourceAvailable(),
         };
     }
 

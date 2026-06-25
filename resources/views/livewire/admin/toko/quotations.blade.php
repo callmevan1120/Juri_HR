@@ -145,7 +145,7 @@
                                 <td class="px-4 py-3.5 text-slate-700 dark:text-slate-200">{{ $quotation['customer'] }}</td>
                                 <td class="px-4 py-3.5 text-slate-700 dark:text-slate-200">{{ $quotation['issued_at'] ?? '-' }}</td>
                                 <td class="px-4 py-3.5 text-slate-700 dark:text-slate-200">{{ $quotation['valid_until'] ?? '-' }}</td>
-                                <td class="px-4 py-3.5 text-slate-700 dark:text-slate-200">{{ $quotation['status'] }}</td>
+                                <td class="px-4 py-3.5 text-slate-700 dark:text-slate-200">{{ $quotation['status'] === \App\Models\Quotation::STATUS_ACCEPTED ? __('Final') : $quotation['status'] }}</td>
                                 <td class="px-4 py-3.5 text-right font-semibold text-slate-900 dark:text-slate-100">{{ $idNumber($quotation['total']) }}</td>
                                 <td class="px-4 py-3.5">
                                     <div x-data="{ openOptions: false }" class="relative inline-block text-left">
@@ -171,7 +171,7 @@
                                                 @if (! $quotation['converted'] && ! $quotation['rejected'])
                                                     <button type="button" @click.stop="openOptions = false; $wire.markQuotationAccepted({{ $quotation['id'] }})" class="group flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-white transition-colors">
                                                         <x-heroicon-m-check class="mr-3 h-4 w-4 shrink-0 text-slate-400 group-hover:text-slate-600 dark:text-slate-400 dark:group-hover:text-slate-200" />
-                                                        Mark Final
+                                                        {{ __('Final') }}
                                                     </button>
                                                     <button type="button" @click.stop="openOptions = false; $wire.convertQuotationToInvoice({{ $quotation['id'] }})" class="group flex w-full items-center px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 hover:text-primary-700 dark:text-primary-400 dark:hover:bg-primary-900/30 dark:hover:text-primary-300 transition-colors">
                                                         <x-heroicon-o-document-text class="mr-3 h-4 w-4 shrink-0 text-primary-500 group-hover:text-primary-600 dark:text-primary-400 dark:group-hover:text-primary-300" />

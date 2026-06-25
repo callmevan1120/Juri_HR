@@ -10,7 +10,14 @@ use App\Http\Controllers\Admin\Toko\ImportTokoDataCsvController;
 use App\Http\Controllers\Admin\Toko\PrintTokoInvoiceThermalController;
 use App\Http\Controllers\Admin\Toko\PrintTokoProductBarcodesController;
 use App\Http\Controllers\Admin\Toko\PrintTokoStockAdjustmentReportController;
+use App\Http\Controllers\System\LockedEnterpriseRouteController;
+use App\Support\EnterpriseRuntime;
 use Illuminate\Support\Facades\Route;
+
+$tokoRuntimeAvailable = EnterpriseRuntime::sourceAvailable('toko_pos');
+$tokoAction = fn (array|string $action): array|string => $tokoRuntimeAvailable
+    ? $action
+    : LockedEnterpriseRouteController::class;
 
 Route::livewire('/operations', 'admin.operational-workspace')
     ->name('admin.operations')
@@ -48,7 +55,7 @@ Route::livewire('/custom-forms', 'admin.custom-form-manager')
     ->name('admin.custom-forms')
     ->can('viewCustomForms');
 
-Route::livewire('/toko', 'admin.toko-pos-addon')
+enterprise_livewire_route('/toko', 'admin.toko-pos-addon', 'toko_pos')
     ->name('admin.toko')
     ->defaults('page', 'dashboard')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
@@ -67,35 +74,35 @@ foreach ([
     'cash',
     'reports',
 ] as $tokoPage) {
-    Route::livewire('/toko/'.$tokoPage, 'admin.toko-pos-addon')
+    enterprise_livewire_route('/toko/'.$tokoPage, 'admin.toko-pos-addon', 'toko_pos')
         ->name('admin.toko.'.$tokoPage)
         ->defaults('page', $tokoPage)
         ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
         ->can('viewTokoPosAddon');
 }
 
-Route::livewire('/toko/migration', 'admin.toko-pos-addon')
+enterprise_livewire_route('/toko/migration', 'admin.toko-pos-addon', 'toko_pos')
     ->name('admin.toko.migration')
     ->defaults('page', 'migration')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.import,admin.dashboard')
     ->can('importTokoPosAddon');
 
-Route::get('/toko/invoices/{invoice}/pdf', [DownloadTokoInvoicePdfController::class, '__invoke'])
+Route::get('/toko/invoices/{invoice}/pdf', $tokoAction([DownloadTokoInvoicePdfController::class, '__invoke']))
     ->name('admin.toko.invoices.pdf')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/invoices/{invoice}/thermal', [PrintTokoInvoiceThermalController::class, '__invoke'])
+Route::get('/toko/invoices/{invoice}/thermal', $tokoAction([PrintTokoInvoiceThermalController::class, '__invoke']))
     ->name('admin.toko.invoices.thermal')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/quotations/{quotation}/pdf', [DownloadTokoQuotationPdfController::class, '__invoke'])
+Route::get('/toko/quotations/{quotation}/pdf', $tokoAction([DownloadTokoQuotationPdfController::class, '__invoke']))
     ->name('admin.toko.quotations.pdf')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/delivery-letters/{deliveryLetter}/pdf', [DownloadTokoDeliveryLetterPdfController::class, '__invoke'])
+Route::get('/toko/delivery-letters/{deliveryLetter}/pdf', $tokoAction([DownloadTokoDeliveryLetterPdfController::class, '__invoke']))
     ->name('admin.toko.delivery-letters.pdf')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
@@ -105,17 +112,17 @@ Route::get('/toko/purchases/{vendorBill}/pdf', [DownloadCommercialDocumentPdfCon
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/products/barcodes', [PrintTokoProductBarcodesController::class, '__invoke'])
+Route::get('/toko/products/barcodes', $tokoAction([PrintTokoProductBarcodesController::class, '__invoke']))
     ->name('admin.toko.products.barcodes')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/stock-adjustments/print', [PrintTokoStockAdjustmentReportController::class, '__invoke'])
+Route::get('/toko/stock-adjustments/print', $tokoAction([PrintTokoStockAdjustmentReportController::class, '__invoke']))
     ->name('admin.toko.stock-adjustments.print')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.view,admin.dashboard')
     ->can('viewTokoPosAddon');
 
-Route::get('/toko/exports/sales.csv', [ExportTokoTransactionsCsvController::class, 'sales'])
+Route::get('/toko/exports/sales.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'sales']))
     ->name('admin.toko.exports.sales')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
@@ -125,77 +132,77 @@ Route::post('/toko/import', [ImportTokoDataCsvController::class, '__invoke'])
     ->middleware('feature.lock:toko_pos,admin.toko_pos.import,admin.dashboard')
     ->can('importTokoPosAddon');
 
-Route::get('/toko/exports/purchases.csv', [ExportTokoTransactionsCsvController::class, 'purchases'])
+Route::get('/toko/exports/purchases.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'purchases']))
     ->name('admin.toko.exports.purchases')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/sales-lines.csv', [ExportTokoTransactionsCsvController::class, 'salesLines'])
+Route::get('/toko/exports/sales-lines.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'salesLines']))
     ->name('admin.toko.exports.sales-lines')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/purchase-lines.csv', [ExportTokoTransactionsCsvController::class, 'purchaseLines'])
+Route::get('/toko/exports/purchase-lines.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'purchaseLines']))
     ->name('admin.toko.exports.purchase-lines')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/payments.csv', [ExportTokoTransactionsCsvController::class, 'payments'])
+Route::get('/toko/exports/payments.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'payments']))
     ->name('admin.toko.exports.payments')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/customer-income.csv', [ExportTokoTransactionsCsvController::class, 'customerIncome'])
+Route::get('/toko/exports/customer-income.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'customerIncome']))
     ->name('admin.toko.exports.customer-income')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/products.csv', [ExportTokoTransactionsCsvController::class, 'products'])
+Route::get('/toko/exports/products.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'products']))
     ->name('admin.toko.exports.products')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-sales.csv', [ExportTokoTransactionsCsvController::class, 'reportSales'])
+Route::get('/toko/exports/report-sales.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportSales']))
     ->name('admin.toko.exports.report-sales')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-purchases.csv', [ExportTokoTransactionsCsvController::class, 'reportPurchases'])
+Route::get('/toko/exports/report-purchases.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportPurchases']))
     ->name('admin.toko.exports.report-purchases')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-gross-profit.csv', [ExportTokoTransactionsCsvController::class, 'reportGrossProfit'])
+Route::get('/toko/exports/report-gross-profit.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportGrossProfit']))
     ->name('admin.toko.exports.report-gross-profit')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-operational-expenses.csv', [ExportTokoTransactionsCsvController::class, 'reportOperationalExpenses'])
+Route::get('/toko/exports/report-operational-expenses.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportOperationalExpenses']))
     ->name('admin.toko.exports.report-operational-expenses')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-product-movements.csv', [ExportTokoTransactionsCsvController::class, 'reportProductMovements'])
+Route::get('/toko/exports/report-product-movements.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportProductMovements']))
     ->name('admin.toko.exports.report-product-movements')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-inventory-valuation.csv', [ExportTokoTransactionsCsvController::class, 'reportInventoryValuation'])
+Route::get('/toko/exports/report-inventory-valuation.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportInventoryValuation']))
     ->name('admin.toko.exports.report-inventory-valuation')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-profit-loss.csv', [ExportTokoTransactionsCsvController::class, 'reportProfitLoss'])
+Route::get('/toko/exports/report-profit-loss.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportProfitLoss']))
     ->name('admin.toko.exports.report-profit-loss')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-ar-aging.csv', [ExportTokoTransactionsCsvController::class, 'reportArAging'])
+Route::get('/toko/exports/report-ar-aging.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportArAging']))
     ->name('admin.toko.exports.report-ar-aging')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');
 
-Route::get('/toko/exports/report-ap-aging.csv', [ExportTokoTransactionsCsvController::class, 'reportApAging'])
+Route::get('/toko/exports/report-ap-aging.csv', $tokoAction([ExportTokoTransactionsCsvController::class, 'reportApAging']))
     ->name('admin.toko.exports.report-ap-aging')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.export,admin.dashboard')
     ->can('exportTokoPosAddon');

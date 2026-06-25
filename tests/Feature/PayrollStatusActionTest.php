@@ -22,6 +22,8 @@ beforeEach(function () {
 });
 
 test('admin can publish and pay payroll records without activity log append only failures', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: PayrollManager::class);
+
     Notification::fake();
 
     $admin = User::factory()->admin()->create();
@@ -73,6 +75,8 @@ test('admin can publish and pay payroll records without activity log append only
 });
 
 test('admin can publish and pay selected payroll records in bulk', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: PayrollManager::class);
+
     Notification::fake();
 
     $admin = User::factory()->admin()->create();
@@ -126,6 +130,8 @@ test('admin can publish and pay selected payroll records in bulk', function () {
 });
 
 test('bulk payroll buttons only appear for eligible selected statuses', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: PayrollManager::class);
+
     $admin = User::factory()->admin(true)->create();
     $employees = User::factory()->count(2)->create();
 
@@ -164,6 +170,8 @@ test('bulk payroll buttons only appear for eligible selected statuses', function
 });
 
 test('regenerating an all paid payroll period records an audit trail', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: PayrollManager::class);
+
     $admin = User::factory()->admin(true)->create();
     $employees = User::factory()->count(2)->create();
     $month = (int) now()->month;

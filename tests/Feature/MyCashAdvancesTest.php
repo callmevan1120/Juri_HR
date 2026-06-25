@@ -6,6 +6,8 @@ use App\Models\User;
 use Livewire\Livewire;
 
 test('user can submit cash advance request within salary limit', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: MyCashAdvances::class);
+
     enableEnterpriseAttendanceForTests();
 
     $user = User::factory()->create([
@@ -30,6 +32,8 @@ test('user can submit cash advance request within salary limit', function () {
 });
 
 test('cash advance summary includes pending finance in unpaid total', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: MyCashAdvances::class);
+
     enableEnterpriseAttendanceForTests();
 
     $user = User::factory()->create([

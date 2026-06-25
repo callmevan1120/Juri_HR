@@ -20,9 +20,7 @@ use App\Support\TokoPosSalesService;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoPosInventoryLicenseFeatures(array $features): void
@@ -794,7 +792,7 @@ test('toko inventory movement list uses datatable pagination and search', functi
 
     $component = Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'inventory'])
-        ->assertSee('Stock Movement List')
+        ->assertSee(__('Stock Movement List'))
         ->assertSee('Showing 1 to 10 of 12 stock movement entries')
         ->assertSee('Next')
         ->call('nextInventoryMovementPage')

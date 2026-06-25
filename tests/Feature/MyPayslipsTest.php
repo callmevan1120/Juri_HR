@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Crypt;
 use Livewire\Livewire;
 
 test('my payslips component only loads paid payrolls after password setup is valid', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: MyPayslips::class);
+
     enableEnterpriseAttendanceForTests();
 
     $user = User::factory()->create([

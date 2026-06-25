@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoPosCutoverArchiveLicenseFeatures(array $features): void

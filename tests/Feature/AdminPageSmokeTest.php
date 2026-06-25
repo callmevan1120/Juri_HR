@@ -24,7 +24,10 @@ test('superadmin can open every concrete admin get page without server errors', 
             ->actingAs($superadmin)
             ->get(route($route->getName()));
 
-        expect($response->getStatusCode(), $route->getName())
-            ->toBeIn([200, 302, 303]);
+        $this->assertContains(
+            $response->getStatusCode(),
+            [200, 302, 303],
+            "Admin route [{$route->getName()}] returned {$response->getStatusCode()}."
+        );
     }
 });

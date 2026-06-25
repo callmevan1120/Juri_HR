@@ -4,6 +4,7 @@ use App\Contracts\AttendanceServiceInterface;
 use App\Models\Attendance;
 use App\Models\Barcode;
 use App\Models\User;
+use App\Services\Attendance\EnterpriseService;
 use App\Support\ApiTokenPermission;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
@@ -54,6 +55,8 @@ test('non admin cannot view another users attendance photo', function () {
 
 test('enterprise attendance service returns secure attachment routes for multi-photo attachments', function () {
     enableEnterpriseAttendanceForTests();
+    requireEnterpriseRuntimeSourceForTests(probeClass: EnterpriseService::class);
+
     app()->forgetInstance(AttendanceServiceInterface::class);
 
     $attendance = Attendance::create([

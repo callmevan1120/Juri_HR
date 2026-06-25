@@ -10,6 +10,8 @@ beforeEach(function () {
 });
 
 test('backup run job marks database runs as completed when backup service succeeds', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: SystemBackupService::class);
+
     $superadmin = User::factory()->admin(true)->create();
 
     $backupRun = SystemBackupRun::create([
@@ -41,6 +43,8 @@ test('backup run job marks database runs as completed when backup service succee
 });
 
 test('backup run job marks application runs as failed when backup service throws', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: SystemBackupService::class);
+
     $superadmin = User::factory()->admin(true)->create();
 
     $backupRun = SystemBackupRun::create([

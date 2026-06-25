@@ -1,11 +1,13 @@
 <?php
 
 use App\Console\Commands\EnterpriseHwId;
+use App\Contracts\AuditServiceInterface;
 use App\Helpers\Editions;
 use App\Livewire\Admin\Settings as AdminSettings;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\Admin\SettingsManagementService;
+use App\Services\Audit\CommunityAuditService;
 use App\Services\Enterprise\LicenseGuard;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -135,6 +137,48 @@ it('applies enterprise license from admin settings and refreshes validation stat
     expect(Setting::where('key', 'enterprise_license_key')->value('value'))->toBe($licenseKey)
         ->and(Cache::get('ent_lic_status'))->toBe('valid')
         ->and(Cache::get('ent_lic_hash'))->toBe(LicenseGuard::cacheFingerprint($licenseKey));
+});
+
+it('falls back to community audit service when enterprise audit runtime cannot be decrypted', function () {
+    seedEnterpriseSettings();
+
+    Setting::where('key', 'enterprise_license_key')->update([
+        'value' => makeEnterpriseLicense(['features' => ['audit']]),
+    ]);
+    LicenseGuard::clearLicenseCache();
+
+    $previousEnv = getenv('ENTERPRISE_OBFUSCATOR_KEY');
+    $previousServer = $_SERVER['ENTERPRISE_OBFUSCATOR_KEY'] ?? null;
+    $previousGlobalSecret = $GLOBALS['__enterprise_obfuscator_secret_ENTERPRISE_OBFUSCATOR_KEY'] ?? null;
+
+    try {
+        putenv('ENTERPRISE_OBFUSCATOR_KEY='.str_repeat('x', 32));
+        $_ENV['ENTERPRISE_OBFUSCATOR_KEY'] = str_repeat('x', 32);
+        $_SERVER['ENTERPRISE_OBFUSCATOR_KEY'] = str_repeat('x', 32);
+        unset($GLOBALS['__enterprise_obfuscator_secret_ENTERPRISE_OBFUSCATOR_KEY']);
+
+        expect(app(AuditServiceInterface::class))->toBeInstanceOf(CommunityAuditService::class);
+    } finally {
+        if ($previousEnv === false) {
+            putenv('ENTERPRISE_OBFUSCATOR_KEY');
+            unset($_ENV['ENTERPRISE_OBFUSCATOR_KEY']);
+        } else {
+            putenv('ENTERPRISE_OBFUSCATOR_KEY='.$previousEnv);
+            $_ENV['ENTERPRISE_OBFUSCATOR_KEY'] = $previousEnv;
+        }
+
+        if ($previousServer === null) {
+            unset($_SERVER['ENTERPRISE_OBFUSCATOR_KEY']);
+        } else {
+            $_SERVER['ENTERPRISE_OBFUSCATOR_KEY'] = $previousServer;
+        }
+
+        if ($previousGlobalSecret === null) {
+            unset($GLOBALS['__enterprise_obfuscator_secret_ENTERPRISE_OBFUSCATOR_KEY']);
+        } else {
+            $GLOBALS['__enterprise_obfuscator_secret_ENTERPRISE_OBFUSCATOR_KEY'] = $previousGlobalSecret;
+        }
+    }
 });
 
 it('invalidates cached enterprise status when the licensed company context changes', function () {

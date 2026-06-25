@@ -22,9 +22,7 @@ use Livewire\Livewire;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoPosLicenseFeatures(array $features): void
@@ -309,7 +307,7 @@ test('toko dashboard shows transaction cockpit and scoped recent activity', func
         ->assertSee('Dashboard Vendor')
         ->assertSee('Rp24.000')
         ->assertDontSee('999,000')
-        ->assertDontSee('Legacy Import Preview')
+        ->assertDontSee(__('Legacy Import Preview'))
         ->assertDontSee('Create Sale');
 });
 

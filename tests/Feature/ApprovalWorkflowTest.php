@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\Finance\CashAdvanceManager as AdminCashAdvanceManager;
 use App\Livewire\Admin\ReimbursementManager;
+use App\Livewire\Finance\Concerns\ManagesCashAdvances;
 use App\Livewire\User\Finance\TeamCashAdvanceManager;
 use App\Livewire\User\TeamApprovals;
 use App\Livewire\User\TeamApprovalsHistory;
@@ -166,6 +167,8 @@ test('team approval tabs keep selected query tab on reload', function () {
 });
 
 test('cash advance manager tabs keep selected query tab on reload', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: ManagesCashAdvances::class);
+
     enableEnterpriseAttendanceForTests();
 
     [$manager] = createApprovalHierarchy();
@@ -329,6 +332,8 @@ test('approval matrix can require manager finance and hr role for high value rei
 });
 
 test('team cash advance manager allows authorized supervisor to approve subordinate request', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: ManagesCashAdvances::class);
+
     enableEnterpriseAttendanceForTests();
 
     Notification::fake();
@@ -402,6 +407,8 @@ test('approval matrix can route cash advance through manager and finance', funct
 });
 
 test('team cash advance manager forbids unrelated users from approving subordinate request', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: ManagesCashAdvances::class);
+
     enableEnterpriseAttendanceForTests();
 
     [, $employee] = createApprovalHierarchy();

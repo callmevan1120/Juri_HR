@@ -13,6 +13,8 @@ beforeEach(function () {
 });
 
 test('authorized maintenance manager can queue database backup jobs from system maintenance', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: SystemMaintenance::class);
+
     Queue::fake();
 
     $admin = User::factory()->admin()->create();
@@ -48,6 +50,8 @@ test('authorized maintenance manager can queue database backup jobs from system 
 });
 
 test('plain admin without maintenance manage permission cannot queue backup jobs from system maintenance', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: SystemMaintenance::class);
+
     Queue::fake();
 
     $admin = User::factory()->admin()->create();

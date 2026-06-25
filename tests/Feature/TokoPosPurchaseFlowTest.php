@@ -15,9 +15,7 @@ use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
 beforeEach(function (): void {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        $this->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoPosPurchaseLicenseFeatures(array $features): void

@@ -11,7 +11,6 @@ use App\Models\HrChecklistTemplateItem;
 use App\Models\JobTitle;
 use App\Models\Role;
 use App\Models\User;
-use App\Services\Enterprise\LicenseGuard;
 use App\Support\HrChecklistService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -38,9 +37,7 @@ test('admin and hr roles can access hr checklists while employees cannot', funct
 });
 
 test('hr can start onboarding checklist case with employee manager and hr tasks', function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
-        $this->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests(probeClass: HrChecklistManager::class);
 
     $hr = User::factory()->admin()->create();
     $employee = User::factory()->create();

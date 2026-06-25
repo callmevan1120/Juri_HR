@@ -18,9 +18,7 @@ use App\Support\TokoPosSalesService;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoPosCatalogLicenseFeatures(array $features): void
@@ -1159,21 +1157,19 @@ test('toko cash page manages expense types and datatable operational expenses', 
         ->call('saveExpenseType')
         ->assertHasNoErrors()
         ->assertSee('Gaji Karyawan')
-        ->assertSee('Show')
         ->assertSee('10')
-        ->assertSee('entries')
-        ->assertSee('Showing 1 to 10 of 12 operational expense entries')
+        ->assertSee(__('Showing :start to :end of :total operational expense entries', ['start' => '1', 'end' => '10', 'total' => '12']))
         ->assertSee('Expense Datatable 12')
         ->assertSet('operationalExpensePage', 1);
 
     $component
         ->call('nextOperationalExpensePage')
-        ->assertSee('Showing 11 to 12 of 12 operational expense entries')
+        ->assertSee(__('Showing :start to :end of :total operational expense entries', ['start' => '11', 'end' => '12', 'total' => '12']))
         ->assertSet('operationalExpensePage', 2);
 
     $component
         ->set('operationalExpenseSearch', 'OPEX-DT-07')
-        ->assertSee('Showing 1 to 1 of 1 operational expense entries')
+        ->assertSee(__('Showing :start to :end of :total operational expense entries', ['start' => '1', 'end' => '1', 'total' => '1']))
         ->assertSee('Expense Datatable 07')
         ->assertSet('operationalExpensePage', 1);
 
@@ -1251,7 +1247,7 @@ test('toko cash operational expense table filters by report period and exports s
         ->set('operationalExpenseToDate', '2026-06-30')
         ->assertSee('June listrik toko')
         ->assertDontSee('May listrik toko')
-        ->assertSee('Showing 1 to 1 of 1 operational expense entries')
+        ->assertSee(__('Showing :start to :end of :total operational expense entries', ['start' => '1', 'end' => '1', 'total' => '1']))
         ->assertSee(route('admin.toko.exports.report-operational-expenses', [
             'from' => '2026-06-01',
             'to' => '2026-06-30',

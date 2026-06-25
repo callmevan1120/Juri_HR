@@ -1,14 +1,11 @@
 <?php
 
 use App\Models\Role;
-use App\Services\Enterprise\LicenseGuard;
 use App\Support\RbacAuditService;
 use Illuminate\Support\Facades\Artisan;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests();
 });
 
 test('rbac audit command returns a structured report', function () {

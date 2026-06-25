@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\Editions;
 use App\Livewire\AttendanceHistoryComponent;
 use App\Livewire\NotificationsPage;
 use App\Livewire\ReimbursementPage;
@@ -13,8 +14,8 @@ use App\Models\JobTitle;
 use App\Models\Reimbursement;
 use App\Models\User;
 use App\Models\WorkFromHomeRequest;
-use App\Services\Enterprise\LicenseGuard;
 use App\Support\ApprovalActorService;
+use App\Support\EnterpriseRuntime;
 use App\Support\UserHomeCommandCenterService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
@@ -292,7 +293,10 @@ test('manager home shows complete team shortcuts', function () {
         ->assertSee(__('Manager tools'))
         ->assertSee(__('Team Approvals'))
         ->assertSee(__('Team Attendance'))
-        ->when(LicenseGuard::hasRuntimeObfuscatorKey(), fn ($r) => $r->assertSee(__('Team Kasbon')));
+        ->when(
+            EnterpriseRuntime::sourceAvailable() && ! Editions::cashAdvanceLocked(),
+            fn ($r) => $r->assertSee(__('Team Kasbon'))
+        );
 });
 
 test('head subordinate lookup is company scoped and includes lower division roles', function () {

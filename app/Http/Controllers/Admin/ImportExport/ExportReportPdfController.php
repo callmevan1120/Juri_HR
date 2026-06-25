@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Admin\ImportExport;
 
 use App\Helpers\Editions;
 use App\Http\Controllers\Controller;
+use App\Support\EnterpriseRuntime;
 use App\Support\ImportExportRunService;
 use Illuminate\Http\Request;
 
 class ExportReportPdfController extends Controller
 {
-    public function __invoke(Request $request, ImportExportRunService $runService)
+    public function __invoke(Request $request)
     {
         $this->authorize('exportAdminReports');
 
-        if (Editions::reportingLocked()) {
+        if (Editions::reportingLocked() || ! EnterpriseRuntime::sourceAvailable()) {
             return to_route('admin.dashboard')
                 ->with('flash.banner', __('Advanced Reporting is an Enterprise Feature 🔒. Please Upgrade.'))
                 ->with('flash.bannerStyle', 'danger');
@@ -24,7 +25,7 @@ class ExportReportPdfController extends Controller
             'year' => ['nullable', 'integer', 'between:2000,2100'],
         ]);
 
-        $run = $runService->queueMonthlyAttendanceReport(
+        $run = app(ImportExportRunService::class)->queueMonthlyAttendanceReport(
             $request->user(),
             (int) ($validated['month'] ?? now()->month),
             (int) ($validated['year'] ?? now()->year),

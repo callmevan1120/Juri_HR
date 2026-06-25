@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Admin\ImportExport;
 
 use App\Helpers\Editions;
 use App\Http\Controllers\Controller;
+use App\Support\EnterpriseRuntime;
 use App\Support\ImportExportRunService;
 use Illuminate\Http\Request;
 
 class ExportUsersController extends Controller
 {
-    public function __invoke(Request $request, ImportExportRunService $runService)
+    public function __invoke(Request $request)
     {
         $this->authorize('exportUsers');
 
-        if (Editions::reportingLocked()) {
+        if (Editions::reportingLocked() || ! EnterpriseRuntime::sourceAvailable()) {
             return to_route('admin.import-export.users')
                 ->with('flash.banner', __('Advanced Reporting is an Enterprise Feature 🔒. Please Upgrade.'))
                 ->with('flash.bannerStyle', 'danger');
@@ -28,7 +29,7 @@ class ExportUsersController extends Controller
 
         abort_if($groups === [], 422, 'At least one group must be selected.');
 
-        $run = $runService->queueUsersExport($request->user(), $groups);
+        $run = app(ImportExportRunService::class)->queueUsersExport($request->user(), $groups);
 
         return to_route('admin.import-export.users')
             ->with('flash.banner', "User export queued in background. Track progress from run #{$run->id}.")

@@ -1,12 +1,9 @@
 <?php
 
-use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoLegacyImportPreviewService;
 
 test('toko legacy preview counts mapped rows from mysql dump', function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise artifacts missing.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 
     $dump = <<<'SQL'
 CREATE TABLE `barang` (`kode` varchar(20), `nama` varchar(50));
@@ -41,9 +38,7 @@ SQL;
 });
 
 test('toko legacy preview reports missing dump without throwing', function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise artifacts missing.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 
     $preview = app(TokoLegacyImportPreviewService::class)->preview('/nope/toko.sql');
 
@@ -53,9 +48,7 @@ test('toko legacy preview reports missing dump without throwing', function () {
 });
 
 test('toko legacy preview reports master data readiness and issues', function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise artifacts missing.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 
     $dump = <<<'SQL'
 INSERT INTO `barang` (`kode`, `sku`, `nama`, `kategori`, `brand`, `hargabeli`, `hargajual`, `sisa`, `stokmin`, `satuan`) VALUES
@@ -88,9 +81,7 @@ SQL;
 });
 
 test('toko legacy preview exposes unmapped table coverage gaps', function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise artifacts missing.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 
     $dump = <<<'SQL'
 INSERT INTO `barang` (`kode`, `sku`, `nama`, `sisa`) VALUES
@@ -120,9 +111,7 @@ SQL;
 });
 
 test('toko legacy preview lists selectable dump sources', function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        test()->markTestSkipped('Enterprise artifacts missing.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 
     $root = sys_get_temp_dir().'/toko-source-'.bin2hex(random_bytes(4));
     mkdir($root, 0777, true);

@@ -3,6 +3,7 @@
 function paspapan_enterprise_runtime_key_missing(Throwable $throwable): bool
 {
     return $throwable->getMessage() === 'Enterprise obfuscator key is missing.'
+        || $throwable->getMessage() === 'Enterprise source decryption failed.'
         || $throwable::class === 'App\\Exceptions\\EnterpriseObfuscatorKeyMissingException';
 }
 

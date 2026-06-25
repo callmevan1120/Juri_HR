@@ -142,7 +142,7 @@
                 </div>
 
                 <div class="mt-3 flex flex-col gap-2 pt-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-slate-600 dark:text-slate-300">{{ __('Showing :start to :end of :total expenses', ['start' => $idNumber($operationalExpenseTableMeta['start']), 'end' => $idNumber($operationalExpenseTableMeta['end']), 'total' => $idNumber($operationalExpenseTableMeta['total'])]) }}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">{{ __('Showing :start to :end of :total operational expense entries', ['start' => $idNumber($operationalExpenseTableMeta['start']), 'end' => $idNumber($operationalExpenseTableMeta['end']), 'total' => $idNumber($operationalExpenseTableMeta['total'])]) }}</p>
                     <div class="flex flex-wrap justify-end gap-2">
                         <button type="button" wire:click="previousOperationalExpensePage" @disabled($operationalExpenseTableMeta['page'] <= 1) class="inline-flex min-h-9 items-center justify-center rounded-2xl border border-slate-200/60 shadow-sm transition-all hover:shadow-md/80 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-400 disabled:opacity-60 dark:border-slate-700/50/80 dark:text-slate-200 dark:hover:bg-slate-900 dark:disabled:text-slate-500">{{ __('Previous') }}</button>
                         @php
@@ -219,7 +219,7 @@
                     </table>
                 </div>
                 <div class="mt-3 flex flex-col gap-2 pt-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-slate-600 dark:text-slate-300">{{ __('Showing :start to :end of :total payments', ['start' => $idNumber($paymentHistoryTableMeta['start']), 'end' => $idNumber($paymentHistoryTableMeta['end']), 'total' => $idNumber($paymentHistoryTableMeta['total'])]) }}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">{{ __('Showing :start to :end of :total payment entries', ['start' => $idNumber($paymentHistoryTableMeta['start']), 'end' => $idNumber($paymentHistoryTableMeta['end']), 'total' => $idNumber($paymentHistoryTableMeta['total'])]) }}</p>
                     <div class="flex flex-wrap justify-end gap-2">
                         <button type="button" wire:click="previousPaymentHistoryPage" @disabled($paymentHistoryTableMeta['page'] <= 1) class="inline-flex min-h-9 items-center justify-center rounded-2xl border border-slate-200/60 shadow-sm transition-all hover:shadow-md/80 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-400 disabled:opacity-60 dark:border-slate-700/50/80 dark:text-slate-200 dark:hover:bg-slate-900 dark:disabled:text-slate-500">{{ __('Previous') }}</button>
                         @php

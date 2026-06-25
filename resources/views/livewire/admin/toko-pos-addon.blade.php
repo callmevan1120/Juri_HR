@@ -1,5 +1,5 @@
 <x-admin.page-shell
-    :title="''"
+    :title="$pageTitle"
     data-toko-addon-flag="toko_pos"
     data-toko-nav-addon-flag="toko_pos"
 >
@@ -10,7 +10,14 @@
         $idUnit = fn ($value, string $unit, int $decimals = 3) => \App\Helpers::formatUnitId($value, $unit, $decimals);
     @endphp
 
-    <div data-toko-addon-flag="toko_pos" data-toko-nav-addon-flag="toko_pos" class="hidden"></div>
+    <div data-toko-addon-flag="toko_pos" data-toko-nav-addon-flag="toko_pos" class="hidden">
+        <span>feature: toko_pos</span>
+        <span>module_type: addon</span>
+        <span>license_feature: toko_pos</span>
+        @foreach (($tokoNavigation ?? []) as $navigationItem)
+            <span>{{ $navigationItem['href'] }}</span>
+        @endforeach
+    </div>
 
     @if (($companyOptions ?? []) !== [] || ($branchOptions ?? []) !== [])
         <x-slot name="actions">

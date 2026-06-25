@@ -138,7 +138,7 @@
                     <div @click.away="$wire.setProductWorkspace('catalog')" class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-slate-900">
                         <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
                             <div>
-                                <h3 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">{{ $editingProductId ? __('Update Product') : __('Tambah Barang') }}</h3>
+                                <h3 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">{{ $editingProductId ? __('Update Product') : 'Form Barang' }}</h3>
                                 <p class="text-sm text-slate-600 dark:text-slate-300">{{ __('Standard fields stay fast for cashier backoffice; advanced fields keep legacy detail complete.') }}</p>
                             </div>
                             <button type="button" wire:click="setProductWorkspace('catalog')" class="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300">
@@ -459,14 +459,14 @@
                         <a href="{{ route('admin.toko.products.barcodes', ['products' => collect($productRows)->pluck('id')->take(24)->all(), 'use_stock' => 1, 'format' => 'thermal']) }}" target="_blank" aria-label="Cetak Thermal" title="Cetak Thermal (Roll)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-700 dark:text-slate-200">
                             <x-heroicon-o-document-text class="h-5 w-5" />
                         </a>
-                        <a href="{{ route('admin.toko.products.barcodes', ['products' => collect($productRows)->pluck('id')->take(24)->all(), 'use_stock' => 1, 'format' => 'a4']) }}" target="_blank" aria-label="Cetak A4" title="Cetak A4 (Stiker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-700 dark:text-slate-200">
+                        <a href="{{ route('admin.toko.products.barcodes', ['products' => collect($productRows)->pluck('id')->take(24)->all(), 'use_stock' => 1, 'format' => 'a4']) }}" target="_blank" aria-label="Print" title="Cetak A4 (Stiker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-700 dark:text-slate-200">
                             <x-heroicon-o-printer class="h-5 w-5" />
                         </a>
                     @else
                         <span aria-label="Cetak Thermal" title="Cetak Thermal (Roll)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-400 opacity-60 dark:text-slate-500">
                             <x-heroicon-o-document-text class="h-5 w-5" />
                         </span>
-                        <span aria-label="Cetak A4" title="Cetak A4 (Stiker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-400 opacity-60 dark:text-slate-500">
+                        <span aria-label="Print" title="Cetak A4 (Stiker)" class="wcag-touch-target inline-flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all hover:shadow-md/80 text-slate-400 opacity-60 dark:text-slate-500">
                             <x-heroicon-o-printer class="h-5 w-5" />
                         </span>
                     @endif

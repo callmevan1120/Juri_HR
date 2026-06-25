@@ -177,7 +177,7 @@
         <div class="px-4 py-4 ">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h3 class="text-sm font-bold tracking-tight text-slate-900 dark:text-white">{{ __('Stock Movement History') }}</h3>
+                    <h3 class="text-sm font-bold tracking-tight text-slate-900 dark:text-white">{{ __('Stock Movement List') }}</h3>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <label for="toko-inventory-movement-search" class="text-sm font-semibold text-slate-700 dark:text-slate-200">Search</label>

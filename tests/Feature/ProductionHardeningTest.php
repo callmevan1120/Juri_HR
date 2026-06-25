@@ -183,3 +183,16 @@ test('missing enterprise obfuscator key returns a locked json response', functio
             'enterprise_runtime_locked' => true,
         ]);
 });
+
+test('enterprise decryption failure fails closed instead of rendering a raw runtime exception', function () {
+    Route::middleware('web')->get('/__test/enterprise-runtime-decryption-failed', function () {
+        throw new RuntimeException('Enterprise source decryption failed.');
+    })->name('test.enterprise-runtime-decryption-failed');
+
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin)
+        ->get('/__test/enterprise-runtime-decryption-failed')
+        ->assertRedirect(route('admin.dashboard'))
+        ->assertSessionHas('show-feature-lock', fn (array $payload): bool => $payload['title'] === __('Enterprise Runtime Locked'));
+});

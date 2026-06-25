@@ -5,6 +5,8 @@ use App\Models\User;
 use Livewire\Livewire;
 
 test('analytics dashboard month and year filters update the selected period', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: AnalyticsDashboard::class);
+
     enableEnterpriseAttendanceForTests();
 
     $admin = User::factory()->admin(true)->create();

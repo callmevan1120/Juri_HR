@@ -3,6 +3,7 @@
 use App\Models\Setting;
 use App\Services\Enterprise\LicenseGuard;
 use App\Support\ApiTokenPermission;
+use App\Support\EnterpriseRuntime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
@@ -152,6 +153,13 @@ function requireEnterpriseTestPrivateKey(): string
     }
 
     return $key;
+}
+
+function requireEnterpriseRuntimeSourceForTests(?string $addon = null, ?string $probeClass = null): void
+{
+    if (! EnterpriseRuntime::sourceAvailable($addon, $probeClass)) {
+        throw new SkippedWithMessageException('Enterprise runtime source is not available.');
+    }
 }
 
 function enterpriseTestFeatures(): array

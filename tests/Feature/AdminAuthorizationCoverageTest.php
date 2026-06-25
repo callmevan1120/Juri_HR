@@ -23,6 +23,7 @@ use App\Models\Reimbursement;
 use App\Models\Role;
 use App\Models\SystemBackupRun;
 use App\Models\User;
+use App\Support\EnterpriseRuntime;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
@@ -95,6 +96,10 @@ test('user import export endpoints require explicit permissions', function () {
         ->post(route('admin.users.import'), ['file' => $file])
         ->assertForbidden();
 
+    if (! EnterpriseRuntime::sourceAvailable()) {
+        return;
+    }
+
     $this->actingAs($importExportAdmin)
         ->get(route('admin.users.export'))
         ->assertRedirect();
@@ -113,6 +118,8 @@ test('user import export endpoints require explicit permissions', function () {
 });
 
 test('superadmin user import route queues a background run', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: ProcessUserImportRun::class);
+
     enableEnterpriseAttendanceForTests();
     Queue::fake();
 
@@ -142,6 +149,8 @@ test('superadmin user import route queues a background run', function () {
 });
 
 test('attendance import route queues a background run for authorized admins', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: ProcessAttendanceImportRun::class);
+
     enableEnterpriseAttendanceForTests();
     Queue::fake();
 
@@ -202,6 +211,10 @@ test('activity log export is blocked for regular admins', function () {
         ->get(route('admin.activity-logs'))
         ->assertForbidden();
 
+    if (! EnterpriseRuntime::sourceAvailable()) {
+        return;
+    }
+
     $this->actingAs($viewerAdmin)
         ->get(route('admin.activity-logs'))
         ->assertOk();
@@ -209,6 +222,10 @@ test('activity log export is blocked for regular admins', function () {
     $this->actingAs($viewerAdmin)
         ->get(route('admin.activity-logs.export'))
         ->assertForbidden();
+
+    if (! EnterpriseRuntime::sourceAvailable()) {
+        return;
+    }
 
     $this->actingAs($superadmin)
         ->get(route('admin.activity-logs.export'))
@@ -272,6 +289,8 @@ test('activity logs include and filter admin and superadmin actors', function ()
 });
 
 test('activity log export job applies actor group filter', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: ProcessActivityLogExportRun::class);
+
     Storage::fake('local');
 
     $employee = User::factory()->create();
@@ -306,6 +325,8 @@ test('activity log export job applies actor group filter', function () {
 });
 
 test('activity log export queues a background run for superadmin in enterprise mode', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: ProcessActivityLogExportRun::class);
+
     enableEnterpriseAttendanceForTests();
     Queue::fake();
 
@@ -530,7 +551,6 @@ test('shared resource admin routes allow admins and reject regular users', funct
     foreach ([
         'admin.attendances',
         'admin.reimbursements',
-        'admin.document-requests',
     ] as $routeName) {
         $this->actingAs($admin)
             ->get(route($routeName))
@@ -540,6 +560,16 @@ test('shared resource admin routes allow admins and reject regular users', funct
             ->get(route($routeName))
             ->assertForbidden();
     }
+
+    if (EnterpriseRuntime::sourceAvailable(probeClass: EmployeeDocumentRequestManager::class)) {
+        $this->actingAs($admin)
+            ->get(route('admin.document-requests'))
+            ->assertOk();
+    }
+
+    $this->actingAs($employee)
+        ->get(route('admin.document-requests'))
+        ->assertForbidden();
 });
 
 test('appraisal admin route requires explicit appraisal view permission', function () {
@@ -564,6 +594,10 @@ test('appraisal admin route requires explicit appraisal view permission', functi
     $this->actingAs($admin)
         ->get(route('admin.appraisals'))
         ->assertForbidden();
+
+    if (! EnterpriseRuntime::sourceAvailable(probeClass: 'App\\Livewire\\Admin\\AppraisalManager')) {
+        return;
+    }
 
     $this->actingAs($appraisalViewer)
         ->get(route('admin.appraisals'))
@@ -596,13 +630,17 @@ test('system routes allow explicitly authorized role admins and reject plain adm
     $systemAdmin->roles()->sync([$role->id]);
 
     foreach ([
-        'admin.settings',
-        'admin.activity-logs',
-        'admin.import-export.attendances',
-    ] as $routeName) {
+        'admin.settings' => true,
+        'admin.activity-logs' => EnterpriseRuntime::sourceAvailable(),
+        'admin.import-export.attendances' => EnterpriseRuntime::sourceAvailable(),
+    ] as $routeName => $runtimeAvailable) {
         $this->actingAs($admin)
             ->get(route($routeName))
             ->assertForbidden();
+
+        if (! $runtimeAvailable) {
+            continue;
+        }
 
         $this->actingAs($systemAdmin)
             ->get(route($routeName))
@@ -615,16 +653,24 @@ test('admin livewire components reject direct mounting by regular users', functi
 
     $this->actingAs($employee);
 
-    foreach ([
+    $components = [
         DashboardComponent::class,
         ScheduleComponent::class,
         OvertimeManager::class,
         NotificationsPage::class,
         HolidayManager::class,
         AnnouncementManager::class,
-        EmployeeDocumentRequestManager::class,
-        CashAdvanceManager::class,
-    ] as $component) {
+    ];
+
+    if (EnterpriseRuntime::sourceAvailable(probeClass: EmployeeDocumentRequestManager::class)) {
+        $components[] = EmployeeDocumentRequestManager::class;
+    }
+
+    if (EnterpriseRuntime::sourceAvailable(probeClass: 'App\\Livewire\\Finance\\Concerns\\ManagesCashAdvances')) {
+        $components[] = CashAdvanceManager::class;
+    }
+
+    foreach ($components as $component) {
         Livewire::test($component)
             ->assertForbidden();
     }

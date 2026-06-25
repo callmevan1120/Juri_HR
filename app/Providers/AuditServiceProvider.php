@@ -19,7 +19,7 @@ use App\Observers\SensitiveModelAuditObserver;
 use App\Observers\SystemBackupRunObserver;
 use App\Services\Audit\CommunityAuditService;
 use App\Services\Audit\EnterpriseAuditService;
-use App\Services\Enterprise\LicenseGuard;
+use App\Support\EnterpriseRuntime;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
@@ -30,11 +30,7 @@ class AuditServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(AuditServiceInterface::class, function () {
-            if (LicenseGuard::hasFeature('audit') && class_exists(EnterpriseAuditService::class)) {
-                return new EnterpriseAuditService;
-            }
-
-            return new CommunityAuditService;
+            return EnterpriseRuntime::resolve('audit', EnterpriseAuditService::class, new CommunityAuditService);
         });
     }
 

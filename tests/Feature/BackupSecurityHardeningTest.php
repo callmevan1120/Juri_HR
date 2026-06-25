@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\Setting;
 use App\Models\SystemBackupRun;
 use App\Models\User;
+use App\Support\EnterpriseRuntime;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -176,6 +177,8 @@ test('activity logs are append only and expose integrity tampering', function ()
 });
 
 test('throttled activity log repeats update count and integrity without warnings', function () {
+    requireEnterpriseRuntimeSourceForTests();
+
     Log::spy();
 
     $user = User::factory()->create();
@@ -240,6 +243,10 @@ test('backup artifact downloads and deletes require maintenance manager authoriz
 
     Storage::fake('local');
     Storage::disk('local')->put('backups/database.sql', 'select 1;');
+
+    if (! EnterpriseRuntime::sourceAvailable(probeClass: SystemMaintenance::class)) {
+        return;
+    }
 
     $this->actingAs($viewer);
 

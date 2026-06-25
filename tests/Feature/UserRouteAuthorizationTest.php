@@ -6,6 +6,7 @@ use App\Models\Overtime;
 use App\Models\Schedule;
 use App\Models\Shift;
 use App\Models\User;
+use App\Support\EnterpriseRuntime;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,10 @@ test('employee accounts can open self-service finance and overtime routes', func
     $this->actingAs($employee)
         ->get(route('overtime'))
         ->assertOk();
+
+    if (! EnterpriseRuntime::sourceAvailable(probeClass: 'App\\Livewire\\Finance\\Concerns\\ManagesCashAdvances')) {
+        return;
+    }
 
     $this->actingAs($employee)
         ->get(route('my-kasbon'))

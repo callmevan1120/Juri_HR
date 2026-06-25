@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Admin\ImportExport;
 
 use App\Helpers\Editions;
 use App\Http\Controllers\Controller;
+use App\Support\EnterpriseRuntime;
 use App\Support\ImportExportRunService;
 use Illuminate\Http\Request;
 
 class ExportAttendancesController extends Controller
 {
-    public function __invoke(Request $request, ImportExportRunService $runService)
+    public function __invoke(Request $request)
     {
         $this->authorize('exportAttendances');
 
-        if (Editions::reportingLocked()) {
+        if (Editions::reportingLocked() || ! EnterpriseRuntime::sourceAvailable()) {
             return to_route('admin.import-export.attendances')
                 ->with('flash.banner', __('Advanced Reporting is an Enterprise Feature 🔒. Please Upgrade.'))
                 ->with('flash.bannerStyle', 'danger');
@@ -29,7 +30,7 @@ class ExportAttendancesController extends Controller
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
         ]);
 
-        $run = $runService->queueAttendanceExport($request->user(), [
+        $run = app(ImportExportRunService::class)->queueAttendanceExport($request->user(), [
             'month' => $validated['month'] ?? null,
             'year' => $validated['year'] ?? null,
             'division' => $validated['division'] ?? null,

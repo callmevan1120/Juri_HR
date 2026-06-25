@@ -18,6 +18,7 @@ use App\Models\Role;
 use App\Models\SystemBackupRun;
 use App\Models\User;
 use App\Notifications\CashAdvanceRequested;
+use App\Support\EnterpriseRuntime;
 use App\Support\UserNotificationRecipientService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -409,9 +410,14 @@ test('assigned-role admin system maintenance access requires explicit permission
     expect(Gate::forUser($maintenanceAdmin)->allows('viewAny', SystemBackupRun::class))->toBeTrue()
         ->and(Gate::forUser($limitedAdmin)->allows('viewAny', SystemBackupRun::class))->toBeFalse();
 
-    $this->actingAs($maintenanceAdmin)
-        ->get(route('admin.system-maintenance'))
-        ->assertOk();
+    $maintenanceResponse = $this->actingAs($maintenanceAdmin)
+        ->get(route('admin.system-maintenance'));
+
+    if (EnterpriseRuntime::sourceAvailable(probeClass: 'App\\Livewire\\Admin\\SystemMaintenance')) {
+        $maintenanceResponse->assertOk();
+    } else {
+        $maintenanceResponse->assertRedirect();
+    }
 
     $this->actingAs($limitedAdmin)
         ->get(route('admin.system-maintenance'))
@@ -446,6 +452,10 @@ test('view-only appraisal admins cannot edit or calibrate appraisals', function 
         ->and(Gate::forUser($admin)->allows('manage', Appraisal::class))->toBeFalse()
         ->and(Gate::forUser($admin)->allows('calibrate', $appraisal))->toBeFalse();
 
+    if (! EnterpriseRuntime::sourceAvailable(probeClass: AppraisalManager::class)) {
+        return;
+    }
+
     Livewire::actingAs($admin)
         ->test(AppraisalManager::class)
         ->call('initOrEvaluate', $employee->id)
@@ -458,6 +468,8 @@ test('view-only appraisal admins cannot edit or calibrate appraisals', function 
 });
 
 test('explicitly authorized appraisal calibrator can approve pending calibration', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: AppraisalManager::class);
+
     $calibrator = User::factory()->admin()->create();
     $manager = User::factory()->admin()->create();
     $employee = User::factory()->create();
@@ -768,9 +780,16 @@ test('view-only activity log admins do not see export action', function () {
 
     $admin->roles()->sync([$role->id]);
 
-    $this->actingAs($admin)
-        ->get(route('admin.activity-logs'))
-        ->assertOk()
+    $response = $this->actingAs($admin)
+        ->get(route('admin.activity-logs'));
+
+    if (! EnterpriseRuntime::sourceAvailable()) {
+        $response->assertRedirect();
+
+        return;
+    }
+
+    $response->assertOk()
         ->assertSee(__('Read-only audit access'))
         ->assertDontSee(route('admin.activity-logs.export'));
 });

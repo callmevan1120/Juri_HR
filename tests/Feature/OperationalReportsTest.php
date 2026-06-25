@@ -129,6 +129,8 @@ test('schedule roster report export returns an excel download', function () {
 });
 
 test('payroll summary report export returns an excel download', function () {
+    requireEnterpriseRuntimeSourceForTests(probeClass: 'App\\Livewire\\Admin\\PayrollManager');
+
     $finance = User::factory()->admin(true)->create();
     $employee = User::factory()->create();
 

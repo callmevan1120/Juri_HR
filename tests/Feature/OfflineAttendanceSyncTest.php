@@ -4,14 +4,11 @@ use App\Models\Attendance;
 use App\Models\AttendanceOfflineSubmission;
 use App\Models\Barcode;
 use App\Models\User;
-use App\Services\Enterprise\LicenseGuard;
 use App\Support\ApiTokenPermission;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey()) {
-        test()->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests();
 });
 
 test('device offline attendance sync processes queued local submissions with risk flag', function () {

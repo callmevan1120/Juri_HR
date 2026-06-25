@@ -20,9 +20,7 @@ use App\Support\TokoPosReportService;
 use Livewire\Livewire;
 
 beforeEach(function (): void {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        $this->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 function setTokoLegacyHistoryLicenseFeatures(array $features): void
@@ -367,9 +365,9 @@ test('toko add-on can run historical import from selected dump', function (): vo
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'migration'])
         ->call('importHistoricalDocuments')
-        ->assertSee('Historical Reconciliation')
-        ->assertSee('Monthly Report Reconciliation')
-        ->assertSee('Cash/Bank Reconciliation')
+        ->assertSee(__('Historical Reconciliation'))
+        ->assertSee(__('Monthly Report Reconciliation'))
+        ->assertSee(__('Cash/Bank Reconciliation'))
         ->assertSee('Sales')
         ->assertSee('Operational Expenses');
 

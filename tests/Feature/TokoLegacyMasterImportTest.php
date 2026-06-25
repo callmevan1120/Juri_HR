@@ -8,13 +8,10 @@ use App\Models\Setting;
 use App\Models\StockMovement;
 use App\Models\User;
 use App\Models\Vendor;
-use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoLegacyImportPreviewService;
 
 beforeEach(function (): void {
-    if (! LicenseGuard::hasRuntimeObfuscatorKey('toko_pos')) {
-        $this->markTestSkipped('Enterprise runtime obfuscator key is not available.');
-    }
+    requireEnterpriseRuntimeSourceForTests('toko_pos');
 });
 
 test('toko master import creates master records and completed run', function (): void {

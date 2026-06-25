@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\ImportExport;
 
 use App\Helpers\Editions;
 use App\Http\Controllers\Controller;
+use App\Support\EnterpriseRuntime;
 use App\Support\ImportExportRunService;
 use App\Support\SecureUploadPolicy;
 use Illuminate\Http\RedirectResponse;
@@ -11,11 +12,11 @@ use Illuminate\Http\Request;
 
 class ImportAttendancesController extends Controller
 {
-    public function __invoke(Request $request, ImportExportRunService $runService, SecureUploadPolicy $secureUploadPolicy): RedirectResponse
+    public function __invoke(Request $request, SecureUploadPolicy $secureUploadPolicy): RedirectResponse
     {
         $this->authorize('importAttendances');
 
-        if (Editions::reportingLocked()) {
+        if (Editions::reportingLocked() || ! EnterpriseRuntime::sourceAvailable()) {
             return to_route('admin.import-export.attendances')
                 ->with('flash.banner', __('This feature is available in the Enterprise Edition. Please upgrade.'))
                 ->with('flash.bannerStyle', 'danger');
@@ -25,7 +26,7 @@ class ImportAttendancesController extends Controller
             'file' => ['required', ...$secureUploadPolicy->rules('spreadsheet')],
         ]);
 
-        $run = $runService->queueAttendanceImport($request->user(), $validated['file']);
+        $run = app(ImportExportRunService::class)->queueAttendanceImport($request->user(), $validated['file']);
 
         return to_route('admin.import-export.attendances')
             ->with('flash.banner', "Attendance import queued in background. Track progress from run #{$run->id}.")

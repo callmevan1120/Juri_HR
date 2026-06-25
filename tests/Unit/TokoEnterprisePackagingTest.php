@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
+
 test('toko pos addon is included in enterprise obfuscator build list', function (): void {
     $buildScript = file_get_contents(base_path('secure_tools/build_enterprise.php'));
 
@@ -20,6 +23,49 @@ test('toko pos addon is included in enterprise obfuscator build list', function 
         ->toContain('../app/Http/Controllers/Admin/Toko/PrintTokoStockAdjustmentReportController');
 });
 
+test('enterprise obfuscator does not promote secured artifacts into source files', function (): void {
+    $buildScript = file_get_contents(base_path('secure_tools/build_enterprise.php'));
+
+    expect($buildScript)
+        ->toContain('promoteEnterpriseTargetToSource')
+        ->toContain('enterpriseSourceLooksSecured($contents)')
+        ->toContain('*.Source.php harus berisi plaintext source');
+});
+
+test('enterprise runtime can recover when process obfuscator key is stale but env file is current', function (): void {
+    $artifact = base_path('app/Http/Controllers/Admin/OperationalHealthController.php');
+    $artifactContents = file_get_contents($artifact);
+
+    if (! is_string($artifactContents) || ! str_contains($artifactContents, 'eval(gzinflate(base64_decode(')) {
+        $this->markTestSkipped('Enterprise controller artifact is not currently secured.');
+    }
+
+    $envContents = is_file(base_path('.env')) ? file_get_contents(base_path('.env')) : false;
+    if (! is_string($envContents) || ! preg_match('/^ENTERPRISE_OBFUSCATOR_KEY=(.+)$/m', $envContents, $matches) || trim($matches[1], " \t\n\r\0\x0B\"'") === '') {
+        $this->markTestSkipped('ENTERPRISE_OBFUSCATOR_KEY is not available in .env.');
+    }
+
+    $php = (new PhpExecutableFinder)->find(false) ?: PHP_BINARY;
+    $process = new Process([
+        $php,
+        '-r',
+        <<<'PHP'
+require 'vendor/autoload.php';
+require 'app/Http/Controllers/Admin/OperationalHealthController.php';
+echo class_exists('App\\Http\\Controllers\\Admin\\OperationalHealthController') ? 'ok' : 'missing';
+PHP,
+    ], base_path(), [
+        'ENTERPRISE_OBFUSCATOR_KEY' => str_repeat('x', 32),
+    ]);
+
+    $process->setTimeout(30);
+    $process->run();
+
+    expect($process->isSuccessful())
+        ->toBeTrue($process->getErrorOutput().$process->getOutput())
+        ->and(trim($process->getOutput()))->toBe('ok');
+});
+
 test('toko pos addon is included in license generator feature catalog', function (): void {
     $licenseGenerator = file_get_contents(base_path('secure_tools/license_generator.php'));
 
@@ -30,6 +76,16 @@ test('toko pos addon is included in license generator feature catalog', function
         ->toContain('--addons=a,b')
         ->toContain('--features=none')
         ->toContain("'addons' => \$addons");
+});
+
+test('license generator treats db persistence and email delivery as optional integrations', function (): void {
+    $licenseGenerator = file_get_contents(base_path('secure_tools/license_generator.php'));
+
+    expect($licenseGenerator)
+        ->toContain('class_exists(LicensePurchase::class)')
+        ->toContain('class_exists(LicenseKeyMail::class)')
+        ->toContain('DB save: dilewati karena App\\\\Models\\\\LicensePurchase tidak tersedia.')
+        ->toContain('Email: dilewati karena App\\\\Mail\\\\LicenseKeyMail tidak tersedia.');
 });
 
 test('toko pos addon is flagged as an enterprise addon module', function (): void {
