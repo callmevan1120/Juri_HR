@@ -31,5 +31,10 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- Test-only gate flippers: in testing mode LicenseGuard only checks these are >=32 chars
+             (never used cryptographically). Production uses ENTERPRISE_OBFUSCATOR_KEY / ENTERPRISE_ADDON_SALT_*
+             read from the gitignored .env, so these dummy values unlock nothing real. -->
+        <env name="TEST_ENTERPRISE_OBFUSCATOR_KEY" value="testing-only-obfuscator-gate-flag-not-a-secret"/>
+        <env name="TEST_ENTERPRISE_ADDON_SALT_TOKO_POS" value="testing-only-toko-pos-addon-gate-flag-not-secret"/>
     </php>
 </phpunit>

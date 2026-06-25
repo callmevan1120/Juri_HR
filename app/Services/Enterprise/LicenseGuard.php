@@ -11,7 +11,13 @@ use Illuminate\Support\Facades\Log;
 
 final class LicenseGuard
 {
-    private const PUB = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUExRGFtV0wrK21aQjFvQVRrNXFrSwpNQnJiMWJ6emJqalJnekZnZkY2VWJPTlRKcm9uVGV5eXlIeHRkTzdWc0ttOTdxdUsyM3ZXNzFWekxNbnhCbnJ0CjhTN3lpaGNXNWZGaVIvQ3kzUWt2dVJaVWNOcEp3c2NuTi9QK081QVNtVWNOUktOWjVvYUhVc2VoNkwrbDhWUGwKaFZ1c3FmMDd4eUlGdm1nclcrLzE2TlRyaUs3VmU0R0U2eldWamJnZEpiNE9jMHdROGlZem5vY2NwZkd1Q2pqeQpyeEFwYk41blBDakVzZElUT0RsNklpaC9LektQdWdoOFA2RUx6MEs3TmZEcUI1QXdaOElGNmpZTi9sWTdHdHZpCndWdHFNYXJBc0J6ME1YcGZVV3Buekp0dlhaL1dGMFBJZTJSbWFnZFM5M3E0dXVZQ094dlVKcnZUWE9QMU5NWTEKOVFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==';
+    /**
+     * Ed25519 public verification key (32 bytes, base64). Rotated 2026-06:
+     * the license signing scheme moved from RSA-4096/openssl_verify to
+     * Ed25519/libsodium detached signatures. Licenses issued under the old
+     * RSA key no longer validate and must be re-issued.
+     */
+    private const PUB = '5v/kolh1IMuGVyQ0tg7RxfdNxHZ5OCIAUPCGI6n4/MI=';
 
     private const CACHE_STATUS_KEY = 'ent_lic_status';
 
@@ -114,7 +120,14 @@ final class LicenseGuard
                 return self::fail('invalid_format', 'License key format is invalid.', [], 'LicenseGuard: Invalid base64 payload or signature.');
             }
 
-            if (openssl_verify($payload, $signature, base64_decode(self::PUB), OPENSSL_ALGO_SHA256) !== 1) {
+            $publicKey = base64_decode(self::PUB, true);
+
+            if ($publicKey === false || strlen($publicKey) !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES) {
+                return self::fail('invalid_signature', 'License signature verification failed.', [], 'LicenseGuard: Public key is misconfigured.');
+            }
+
+            if (strlen($signature) !== SODIUM_CRYPTO_SIGN_BYTES
+                || ! sodium_crypto_sign_verify_detached($signature, $payload, $publicKey)) {
                 return self::fail('invalid_signature', 'License signature verification failed.', [], 'LicenseGuard: Signature verification failed.');
             }
 

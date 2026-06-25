@@ -191,7 +191,17 @@ function makeEnterpriseTestLicense(array $overrides = []): string
     ], $overrides);
 
     $json = json_encode($payload, JSON_THROW_ON_ERROR);
-    openssl_sign($json, $signature, requireEnterpriseTestPrivateKey(), OPENSSL_ALGO_SHA256);
+    $rawSecret = requireEnterpriseTestPrivateKey();
+    if (str_starts_with($rawSecret, 'base64:')) {
+        $rawSecret = substr($rawSecret, 7);
+    }
+    $secretKey = base64_decode(trim($rawSecret), true);
+
+    if ($secretKey === false || strlen($secretKey) !== SODIUM_CRYPTO_SIGN_SECRETKEYBYTES) {
+        throw new RuntimeException('Enterprise test signing key must be a base64-encoded Ed25519 secret key (64 bytes).');
+    }
+
+    $signature = sodium_crypto_sign_detached($json, $secretKey);
 
     return base64_encode($json).'.'.base64_encode($signature);
 }
