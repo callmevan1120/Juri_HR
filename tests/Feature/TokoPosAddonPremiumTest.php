@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorBill;
 use App\Services\Enterprise\LicenseGuard;
+use App\Support\TokoCsvImportTemplates;
 use App\Support\TokoPosPurchaseService;
 use App\Support\TokoPosReportService;
 use App\Support\TokoPosSalesService;
@@ -58,6 +59,34 @@ function expectTokoTomSelectIds(string $html, array $ids): void
         expect($html)->toContain('id="'.$id.'"');
         expect($html)->toContain('tomSelectInput(');
     }
+}
+
+function tokoTemplateCsvUpload(string $type): UploadedFile
+{
+    $template = TokoCsvImportTemplates::find($type);
+
+    if ($template === null) {
+        throw new RuntimeException("Unknown toko CSV template [{$type}].");
+    }
+
+    $stream = fopen('php://temp', 'r+');
+
+    if ($stream === false) {
+        throw new RuntimeException('Unable to create temporary CSV stream.');
+    }
+
+    fputcsv($stream, $template['headers']);
+    fputcsv($stream, $template['sample']);
+    rewind($stream);
+
+    $content = stream_get_contents($stream);
+    fclose($stream);
+
+    if ($content === false) {
+        throw new RuntimeException('Unable to read temporary CSV stream.');
+    }
+
+    return UploadedFile::fake()->createWithContent($template['filename'], $content);
 }
 
 test('toko pos add-on route is locked without premium feature entitlement', function () {
@@ -260,18 +289,20 @@ test('toko csv import templates can be downloaded', function () {
 
     $superadmin = User::factory()->admin(true)->create();
 
-    $response = $this->actingAs($superadmin)
-        ->get(route('admin.toko.import-template', ['type' => 'customers']));
+    foreach (TokoCsvImportTemplates::definitions() as $type => $template) {
+        $response = $this->actingAs($superadmin)
+            ->get(route('admin.toko.import-template', ['type' => $type]));
 
-    $response->assertOk()
-        ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $response->assertOk()
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
 
-    expect($response->streamedContent())
-        ->toContain('code,name,phone,email,address,status')
-        ->toContain('CUST-001');
+        expect($response->streamedContent())
+            ->toContain(implode(',', $template['headers']))
+            ->toContain($template['sample'][0]);
+    }
 });
 
-test('toko csv imports scoped products customers and vendors into target company', function () {
+test('toko csv template samples import into target company with mapped fields', function () {
     setTokoPosLicenseFeatures(['toko_pos']);
 
     $company = Company::query()->create([
@@ -286,51 +317,48 @@ test('toko csv imports scoped products customers and vendors into target company
     ]);
     $superadmin = User::factory()->admin(true)->create(['company_id' => $company->id]);
 
-    $productFile = UploadedFile::fake()->createWithContent('products.csv', implode("\n", [
-        'sku,name,unit,selling_price,cost_price,stock_tracking,reorder_point,status',
-        'CSV-001,Produk CSV,pcs,12500,8000,yes,3,active',
-    ]));
+    foreach (TokoCsvImportTemplates::keys() as $type) {
+        $this->actingAs($superadmin)
+            ->post(route('admin.toko.import'), [
+                'import_type' => $type,
+                'import_file' => tokoTemplateCsvUpload($type),
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+    }
 
-    $this->actingAs($superadmin)
-        ->post(route('admin.toko.import'), [
-            'import_type' => 'products',
-            'import_file' => $productFile,
-        ])
-        ->assertRedirect()
-        ->assertSessionHas('success');
+    $product = Product::query()->where('company_id', $company->id)->where('sku', 'CSV-001')->first();
+    $customer = Client::query()->where('company_id', $company->id)->where('code', 'CUST-001')->first();
+    $vendor = Vendor::query()->where('company_id', $company->id)->where('metadata->legacy_code', 'VEND-001')->first();
+    $categories = collect(json_decode((string) Setting::getValue('toko_pos.product_categories', '[]'), true, 512, JSON_THROW_ON_ERROR));
+    $brands = collect(json_decode((string) Setting::getValue('toko_pos.product_brands', '[]'), true, 512, JSON_THROW_ON_ERROR));
 
-    $customerFile = UploadedFile::fake()->createWithContent('customers.csv', implode("\n", [
-        'code,name,phone,email,address,status',
-        'CUST-CSV-001,Ayu CSV,08123456789,ayu@example.test,Jl CSV 1,active',
-    ]));
-
-    $this->actingAs($superadmin)
-        ->post(route('admin.toko.import'), [
-            'import_type' => 'customers',
-            'import_file' => $customerFile,
-        ])
-        ->assertRedirect()
-        ->assertSessionHas('success');
-
-    $vendorFile = UploadedFile::fake()->createWithContent('vendors.csv', implode("\n", [
-        'code,name,phone,email,address,tax_number,status',
-        'VEND-CSV-001,Vendor CSV,08987654321,vendor@example.test,Jl Vendor CSV,01.234.567.8-999.000,active',
-    ]));
-
-    $this->actingAs($superadmin)
-        ->post(route('admin.toko.import'), [
-            'import_type' => 'vendors',
-            'import_file' => $vendorFile,
-        ])
-        ->assertRedirect()
-        ->assertSessionHas('success');
-
-    expect(Product::query()->where('company_id', $company->id)->where('sku', 'CSV-001')->exists())->toBeTrue()
+    expect($product)->not->toBeNull()
+        ->and($product->name)->toBe('Produk Contoh')
+        ->and($product->unit)->toBe('pcs')
+        ->and((float) $product->selling_price)->toBe(12500.0)
+        ->and((float) $product->cost_price)->toBe(8000.0)
+        ->and($product->stock_tracking)->toBeTrue()
+        ->and((float) $product->reorder_point)->toBe(3.0)
+        ->and($product->metadata['source'])->toBe('toko_csv_product')
         ->and(Product::query()->where('company_id', $otherCompany->id)->where('sku', 'CSV-001')->exists())->toBeFalse()
-        ->and(Client::query()->where('company_id', $company->id)->where('code', 'CUST-CSV-001')->exists())->toBeTrue()
-        ->and(Client::query()->where('company_id', $otherCompany->id)->where('code', 'CUST-CSV-001')->exists())->toBeFalse()
-        ->and(Vendor::query()->where('company_id', $company->id)->where('metadata->legacy_code', 'VEND-CSV-001')->exists())->toBeTrue()
-        ->and(Vendor::query()->where('company_id', $otherCompany->id)->where('metadata->legacy_code', 'VEND-CSV-001')->exists())->toBeFalse();
+        ->and($customer)->not->toBeNull()
+        ->and($customer->name)->toBe('Ayu Customer')
+        ->and($customer->contact_phone)->toBe('08123456789')
+        ->and($customer->contact_email)->toBe('ayu@example.test')
+        ->and($customer->address)->toBe('Jl Contoh 1')
+        ->and($customer->metadata['source'])->toBe('toko_csv_customer')
+        ->and(Client::query()->where('company_id', $otherCompany->id)->where('code', 'CUST-001')->exists())->toBeFalse()
+        ->and($vendor)->not->toBeNull()
+        ->and($vendor->name)->toBe('Supplier Contoh')
+        ->and($vendor->phone)->toBe('08987654321')
+        ->and($vendor->email)->toBe('vendor@example.test')
+        ->and($vendor->tax_number)->toBe('01.234.567.8-999.000')
+        ->and($vendor->address)->toBe('Jl Supplier 1')
+        ->and($vendor->metadata['source'])->toBe('toko_csv_vendor')
+        ->and(Vendor::query()->where('company_id', $otherCompany->id)->where('metadata->legacy_code', 'VEND-001')->exists())->toBeFalse()
+        ->and($categories->pluck('name')->contains('Suku Cadang'))->toBeTrue()
+        ->and($brands->pluck('name')->contains('Pandan Teknik'))->toBeTrue();
 });
 
 test('toko dashboard shows transaction cockpit and scoped recent activity', function () {

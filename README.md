@@ -38,6 +38,19 @@ Dengan PasPapan, karyawan menikmati kemudahan *mobile experience* premium untuk 
 
 Detail lengkap ada di [guides/features.md](./guides/features.md).
 
+## Add-On Premium
+
+PasPapan memakai model **core + add-on**. Core HRIS, absensi, approval, operasional, finance, dan reporting tetap menjadi fondasi utama. Fitur add-on enterprise dibuka melalui license entitlement dan RBAC, sehingga perusahaan bisa mengaktifkan modul berbayar sesuai kebutuhan tanpa memecah login, company scope, payroll, atau accounting ke aplikasi terpisah.
+
+| Add-on | Cakupan | Status |
+| --- | --- | --- |
+| **Toko/POS Premium** | Dashboard toko, POS kasir, produk/barcode, pelanggan, vendor/pembelian, inventory, retur, quotation, surat jalan, cash & payment, report retail, dan migrasi master data via template CSV. Route utama: `/admin/toko`, `/admin/toko/pos`, `/admin/toko/products`, `/admin/toko/customers`, `/admin/toko/purchases`, `/admin/toko/inventory`, `/admin/toko/reports`. | Add-on enterprise dengan entitlement `toko_pos`; baseline code siap UAT/cutover dan tetap dikunci license + permission `admin.toko_pos.*`. |
+| **Enterprise Operations** | Audit/risk scoring, analytics dashboard, backup/restore, operational health, import/export background, document workflow, asset/appraisal, dan payroll lanjutan sesuai entitlement license. | Aktif sesuai fitur yang tertera di license enterprise. |
+
+Migration Toko/POS memakai template CSV yang sudah ditentukan untuk `products`, `customers`, `vendors`, `categories`, dan `brands`. Halaman `/admin/toko/migration` hanya untuk head/import-level dan bisa dimatikan setelah cutover dengan setting `toko_pos.migration_enabled=false`.
+
+Dokumen add-on ada di [premium-toko-pos-addon.md](./guides/premium-toko-pos-addon.md), PRD ada di [premium-toko-pos-prd.md](./guides/premium-toko-pos-prd.md), dan checklist cutover ada di [premium-toko-pos-task-tracking.md](./guides/premium-toko-pos-task-tracking.md).
+
 ## Kenapa Dipakai
 
 - **Satu Ekosistem Lengkap (All-in-One)**: Lupakan langganan mahal ke banyak aplikasi. Absensi, pengajuan cuti, perhitungan *payroll*, hingga pencatatan aset operasional ada di satu atap.
@@ -133,6 +146,8 @@ Dokumen penting:
 - [Attendance integration API](./guides/attendance-integration.md)
 - [Feature maturity](./guides/feature-maturity.md)
 - [Reviewer evidence](./guides/reviewer-evidence.md)
+- [Premium Toko/POS add-on](./guides/premium-toko-pos-addon.md)
+- [PRD Premium Toko/POS](./guides/premium-toko-pos-prd.md)
 
 ## Open Source & Enterprise
 
