@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\TokoPosAddon;
 use App\Models\AccountingAccount;
+use App\Models\Client;
 use App\Models\Company;
 use App\Models\CompanyBranch;
 use App\Models\ImportExportRun;
@@ -18,6 +19,7 @@ use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoPosPurchaseService;
 use App\Support\TokoPosReportService;
 use App\Support\TokoPosSalesService;
+use Illuminate\Http\UploadedFile;
 use Livewire\Livewire;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -84,7 +86,14 @@ test('toko pos add-on route opens with premium feature entitlement', function ()
         ->assertSee('module_type: addon')
         ->assertSee('license_feature: toko_pos')
         ->assertSee('data-toko-addon-flag="toko_pos"', false)
-        ->assertSee('data-toko-nav-addon-flag="toko_pos"', false);
+        ->assertSee('data-toko-nav-addon-flag="toko_pos"', false)
+        ->assertSee('data-toko-nav-tree="toko_pos"', false)
+        ->assertSee('x-data="{ treeExpanded: true }"', false)
+        ->assertSee('@click.stop="treeExpanded = !treeExpanded"', false)
+        ->assertSee('x-show="treeExpanded"', false)
+        ->assertSee('data-toko-nav-link="admin.toko.pos"', false)
+        ->assertSee('data-toko-nav-link="admin.toko.products"', false)
+        ->assertSee('data-toko-nav-link="admin.toko.reports"', false);
 });
 
 test('toko admin workspaces use searchable tomselect dropdowns for operational choices', function () {
@@ -191,12 +200,10 @@ test('toko admin workspaces use searchable tomselect dropdowns for operational c
         'toko-operational-expense-type',
     ]);
 
-    $migrationHtml = Livewire::actingAs($superadmin)
+    Livewire::actingAs($superadmin)
         ->test(TokoPosAddon::class, ['page' => 'migration'])
-        ->html();
-    expectTokoTomSelectIds($migrationHtml, [
-        'toko-dump-source',
-    ]);
+        ->assertSee(__('CSV Template Import'))
+        ->assertDontSee('toko-dump-source');
 });
 
 test('toko migration workspace is head-level and hidden from company admins', function () {
@@ -216,8 +223,114 @@ test('toko migration workspace is head-level and hidden from company admins', fu
     Livewire::actingAs($companyAdmin)
         ->test(TokoPosAddon::class, ['page' => 'dashboard'])
         ->assertDontSee(route('admin.toko.migration'), false)
+        ->assertDontSee(__('CSV Template Import'))
+        ->assertDontSee(__('Template-based master data migration.'));
+});
+
+test('toko migration workspace uses csv templates instead of legacy dump mapping', function () {
+    setTokoPosLicenseFeatures(['toko_pos']);
+
+    Company::query()->create([
+        'name' => 'CSV Migration Company',
+        'slug' => 'csv-migration-company',
+        'status' => Company::STATUS_ACTIVE,
+    ]);
+    $superadmin = User::factory()->admin(true)->create();
+
+    $this->actingAs($superadmin)
+        ->get(route('admin.toko.migration'))
+        ->assertOk()
+        ->assertSee(__('CSV Template Import'))
+        ->assertSee(__('Template-based master data migration.'))
+        ->assertSee('/admin/toko/import/templates/products.csv', false)
+        ->assertSee('/admin/toko/import/templates/customers.csv', false)
+        ->assertSee('/admin/toko/import/templates/vendors.csv', false)
+        ->assertSee('/admin/toko/import', false)
+        ->assertDontSee(__('Legacy dump source'))
         ->assertDontSee(__('Dry-run Master Import'))
-        ->assertDontSee(__('Import preview and cutover.'));
+        ->assertDontSee(__('Import Historical Documents'))
+        ->assertDontSee(__('Archive Cutover Report'))
+        ->assertDontSee(__('Mapped Rows'))
+        ->assertDontSee(__('Unmapped Tables'))
+        ->assertDontSee(__('Historical Reconciliation'));
+});
+
+test('toko csv import templates can be downloaded', function () {
+    setTokoPosLicenseFeatures(['toko_pos']);
+
+    $superadmin = User::factory()->admin(true)->create();
+
+    $response = $this->actingAs($superadmin)
+        ->get(route('admin.toko.import-template', ['type' => 'customers']));
+
+    $response->assertOk()
+        ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+
+    expect($response->streamedContent())
+        ->toContain('code,name,phone,email,address,status')
+        ->toContain('CUST-001');
+});
+
+test('toko csv imports scoped products customers and vendors into target company', function () {
+    setTokoPosLicenseFeatures(['toko_pos']);
+
+    $company = Company::query()->create([
+        'name' => 'CSV Target Company',
+        'slug' => 'csv-target-company',
+        'status' => Company::STATUS_ACTIVE,
+    ]);
+    $otherCompany = Company::query()->create([
+        'name' => 'Other CSV Company',
+        'slug' => 'other-csv-company',
+        'status' => Company::STATUS_ACTIVE,
+    ]);
+    $superadmin = User::factory()->admin(true)->create(['company_id' => $company->id]);
+
+    $productFile = UploadedFile::fake()->createWithContent('products.csv', implode("\n", [
+        'sku,name,unit,selling_price,cost_price,stock_tracking,reorder_point,status',
+        'CSV-001,Produk CSV,pcs,12500,8000,yes,3,active',
+    ]));
+
+    $this->actingAs($superadmin)
+        ->post(route('admin.toko.import'), [
+            'import_type' => 'products',
+            'import_file' => $productFile,
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success');
+
+    $customerFile = UploadedFile::fake()->createWithContent('customers.csv', implode("\n", [
+        'code,name,phone,email,address,status',
+        'CUST-CSV-001,Ayu CSV,08123456789,ayu@example.test,Jl CSV 1,active',
+    ]));
+
+    $this->actingAs($superadmin)
+        ->post(route('admin.toko.import'), [
+            'import_type' => 'customers',
+            'import_file' => $customerFile,
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success');
+
+    $vendorFile = UploadedFile::fake()->createWithContent('vendors.csv', implode("\n", [
+        'code,name,phone,email,address,tax_number,status',
+        'VEND-CSV-001,Vendor CSV,08987654321,vendor@example.test,Jl Vendor CSV,01.234.567.8-999.000,active',
+    ]));
+
+    $this->actingAs($superadmin)
+        ->post(route('admin.toko.import'), [
+            'import_type' => 'vendors',
+            'import_file' => $vendorFile,
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success');
+
+    expect(Product::query()->where('company_id', $company->id)->where('sku', 'CSV-001')->exists())->toBeTrue()
+        ->and(Product::query()->where('company_id', $otherCompany->id)->where('sku', 'CSV-001')->exists())->toBeFalse()
+        ->and(Client::query()->where('company_id', $company->id)->where('code', 'CUST-CSV-001')->exists())->toBeTrue()
+        ->and(Client::query()->where('company_id', $otherCompany->id)->where('code', 'CUST-CSV-001')->exists())->toBeFalse()
+        ->and(Vendor::query()->where('company_id', $company->id)->where('metadata->legacy_code', 'VEND-CSV-001')->exists())->toBeTrue()
+        ->and(Vendor::query()->where('company_id', $otherCompany->id)->where('metadata->legacy_code', 'VEND-CSV-001')->exists())->toBeFalse();
 });
 
 test('toko dashboard shows transaction cockpit and scoped recent activity', function () {
@@ -877,7 +990,7 @@ test('toko pos add-on exposes prd submenu routes under premium entitlement', fun
         'admin.toko.delivery-letters' => __('Delivery Letters'),
         'admin.toko.cash' => __('Cash'),
         'admin.toko.reports' => __('Toko Reports'),
-        'admin.toko.migration' => __('Legacy Import Preview'),
+        'admin.toko.migration' => __('CSV Template Import'),
     ] as $routeName => $expectedHeading) {
         $this->actingAs($superadmin)
             ->get(route($routeName))
@@ -887,18 +1000,17 @@ test('toko pos add-on exposes prd submenu routes under premium entitlement', fun
     }
 });
 
-test('toko pos add-on can switch selectable dump source', function () {
+test('toko migration workspace no longer exposes selectable sql dump source', function () {
     setTokoPosLicenseFeatures(['toko_pos']);
 
     $superadmin = User::factory()->admin(true)->create();
 
     Livewire::actingAs($superadmin)
         ->test(TokoPosAddon::class, ['page' => 'migration'])
-        ->assertSet('selectedDumpKey', 'toko')
-        ->assertSee('toko.sql')
-        ->assertSee('panh7986_toko.sql')
-        ->set('selectedDumpKey', 'proplus')
-        ->assertSet('selectedDumpKey', 'proplus');
+        ->assertSee(__('CSV Template Import'))
+        ->assertDontSee('toko.sql')
+        ->assertDontSee('panh7986_toko.sql')
+        ->assertDontSee('toko-dump-source');
 });
 
 test('toko pos add-on can run master import from selected dump', function () {

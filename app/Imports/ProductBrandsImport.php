@@ -14,9 +14,10 @@ class ProductBrandsImport implements ToCollection, WithHeadingRow
     {
         $setting = Setting::firstOrCreate(
             ['key' => 'toko_pos.product_brands'],
-            ['group' => 'toko_pos', 'type' => 'json', 'value' => []]
+            ['group' => 'toko_pos', 'type' => 'json', 'value' => '[]']
         );
-        $brands = $setting->value ?? [];
+        $brands = json_decode((string) $setting->value, true);
+        $brands = is_array($brands) ? $brands : [];
 
         foreach ($rows as $row) {
             $name = $row['name'] ?? $row['nama'] ?? $row['brand'] ?? $row['merek'] ?? null;
@@ -38,7 +39,8 @@ class ProductBrandsImport implements ToCollection, WithHeadingRow
             }
         }
 
-        $setting->value = $uniqueBrands;
+        $setting->value = json_encode($uniqueBrands, JSON_THROW_ON_ERROR);
         $setting->save();
+        Setting::flushCache('toko_pos.product_brands');
     }
 }

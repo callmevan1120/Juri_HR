@@ -29,11 +29,14 @@ class ProductsImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHea
             [
                 'name' => $row['nama_produk'] ?? $row['name'] ?? 'Produk',
                 'unit' => $row['satuan'] ?? $row['unit'] ?? 'pcs',
-                'selling_price' => isset($row['harga_jual']) ? (float) $row['harga_jual'] : 0,
-                'cost_price' => isset($row['harga_modal']) ? (float) $row['harga_modal'] : 0,
-                'stock_tracking' => strtolower((string) ($row['pantau_stok'] ?? 'ya')) === 'ya',
-                'reorder_point' => isset($row['reorder_point']) ? (float) $row['reorder_point'] : 0,
-                'status' => strtolower((string) ($row['status'] ?? 'aktif')) === 'aktif' ? 'active' : 'inactive',
+                'selling_price' => $this->decimal($row['harga_jual'] ?? $row['selling_price'] ?? 0),
+                'cost_price' => $this->decimal($row['harga_modal'] ?? $row['cost_price'] ?? 0),
+                'stock_tracking' => $this->truthy($row['pantau_stok'] ?? $row['stock_tracking'] ?? 'yes'),
+                'reorder_point' => $this->decimal($row['reorder_point'] ?? 0),
+                'status' => $this->normalizeStatus($row['status'] ?? Product::STATUS_ACTIVE),
+                'metadata' => [
+                    'source' => 'toko_csv_product',
+                ],
             ]
         );
     }
@@ -42,8 +45,30 @@ class ProductsImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHea
     {
         return [
             'nama_produk' => ['nullable', 'string'],
+            'name' => ['nullable', 'string'],
             'harga_jual' => ['nullable', 'numeric'],
+            'selling_price' => ['nullable', 'numeric'],
             'harga_modal' => ['nullable', 'numeric'],
+            'cost_price' => ['nullable', 'numeric'],
+            'reorder_point' => ['nullable', 'numeric'],
+            'status' => ['nullable', 'string', 'in:active,inactive,aktif,nonaktif'],
         ];
+    }
+
+    private function decimal(mixed $value): float
+    {
+        return (float) str_replace(',', '.', trim((string) $value));
+    }
+
+    private function truthy(mixed $value): bool
+    {
+        return in_array(strtolower(trim((string) $value)), ['1', 'true', 'yes', 'ya', 'y'], true);
+    }
+
+    private function normalizeStatus(mixed $status): string
+    {
+        return in_array(strtolower(trim((string) $status)), ['inactive', 'nonaktif'], true)
+            ? Product::STATUS_INACTIVE
+            : Product::STATUS_ACTIVE;
     }
 }

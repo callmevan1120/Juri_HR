@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Collaboration\DownloadCloudFileController;
 use App\Http\Controllers\Admin\Commercial\DownloadCommercialDocumentPdfController;
+use App\Http\Controllers\Admin\Toko\DownloadTokoCsvTemplateController;
 use App\Http\Controllers\Admin\Toko\DownloadTokoDeliveryLetterPdfController;
 use App\Http\Controllers\Admin\Toko\DownloadTokoInvoicePdfController;
 use App\Http\Controllers\Admin\Toko\DownloadTokoQuotationPdfController;
@@ -129,6 +130,11 @@ Route::get('/toko/exports/sales.csv', $tokoAction([ExportTokoTransactionsCsvCont
 
 Route::post('/toko/import', [ImportTokoDataCsvController::class, '__invoke'])
     ->name('admin.toko.import')
+    ->middleware('feature.lock:toko_pos,admin.toko_pos.import,admin.dashboard')
+    ->can('importTokoPosAddon');
+
+Route::get('/toko/import/templates/{type}.csv', [DownloadTokoCsvTemplateController::class, '__invoke'])
+    ->name('admin.toko.import-template')
     ->middleware('feature.lock:toko_pos,admin.toko_pos.import,admin.dashboard')
     ->can('importTokoPosAddon');
 

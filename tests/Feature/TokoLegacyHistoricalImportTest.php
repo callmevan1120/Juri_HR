@@ -4,7 +4,6 @@ use App\Livewire\Admin\TokoPosAddon;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\DeliveryLetter;
-use App\Models\ImportExportRun;
 use App\Models\Invoice;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -356,26 +355,21 @@ SQL);
         ->and(StockMovement::query()->where('company_id', $company->id)->where('product_id', $placeholder->id)->count())->toBe(2);
 });
 
-test('toko add-on can run historical import from selected dump', function (): void {
+test('toko migration workspace no longer exposes historical dump reconciliation controls', function (): void {
     setTokoLegacyHistoryLicenseFeatures(['toko_pos']);
 
-    [$company, $actor] = tokoHistoryFixtureWithExistingMasters();
-    $path = base_path('../toko-pandan/database/toko.sql');
+    [, $actor] = tokoHistoryFixtureWithExistingMasters();
 
     Livewire::actingAs($actor)
         ->test(TokoPosAddon::class, ['page' => 'migration'])
-        ->call('importHistoricalDocuments')
-        ->assertSee(__('Historical Reconciliation'))
-        ->assertSee(__('Monthly Report Reconciliation'))
-        ->assertSee(__('Cash/Bank Reconciliation'))
-        ->assertSee('Sales')
-        ->assertSee('Operational Expenses');
-
-    expect(ImportExportRun::query()
-        ->where('resource', 'toko_pos_history')
-        ->where('source_path', $path)
-        ->where('status', 'completed')
-        ->exists())->toBeTrue();
+        ->assertSee(__('CSV Template Import'))
+        ->assertDontSee(__('Historical Reconciliation'))
+        ->assertDontSee(__('Monthly Report Reconciliation'))
+        ->assertDontSee(__('Cash/Bank Reconciliation'))
+        ->assertDontSee(__('Import Historical Documents'))
+        ->assertDontSee('toko.sql')
+        ->assertDontSee('panh7986_toko.sql')
+        ->assertDontSee('toko-dump-source');
 });
 
 function tokoHistoryFixtureWithExistingMasters(): array

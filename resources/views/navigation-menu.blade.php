@@ -23,6 +23,54 @@
     $managerInboxService = app(\App\Support\ManagerInboxService::class);
     $managerInboxVisible = $user ? $managerInboxService->accessibleTabs($user) !== [] : false;
     $managerInboxCount = $user ? $managerInboxService->getTotalPendingCount($user) : 0;
+    $tokoMigrationEnabled = true;
+
+    try {
+        $tokoMigrationEnabledValue = \App\Models\Setting::getValue('toko_pos.migration_enabled', 'true');
+        $tokoMigrationEnabled = filter_var($tokoMigrationEnabledValue, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true;
+    } catch (\Throwable) {
+        $tokoMigrationEnabled = true;
+    }
+
+    $tokoNavigation = [
+        ['label' => __('Dashboard'), 'href' => route('admin.toko'), 'active' => $isRouteActive('admin.toko'), 'routeName' => 'admin.toko', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('POS'), 'href' => route('admin.toko.pos'), 'active' => $isRouteActive('admin.toko.pos'), 'routeName' => 'admin.toko.pos', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Products'), 'href' => route('admin.toko.products'), 'active' => $isRouteActive('admin.toko.products'), 'routeName' => 'admin.toko.products', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Customers'), 'href' => route('admin.toko.customers'), 'active' => $isRouteActive('admin.toko.customers'), 'routeName' => 'admin.toko.customers', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Vendors'), 'href' => route('admin.toko.vendors'), 'active' => $isRouteActive('admin.toko.vendors'), 'routeName' => 'admin.toko.vendors', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Purchases'), 'href' => route('admin.toko.purchases'), 'active' => $isRouteActive('admin.toko.purchases'), 'routeName' => 'admin.toko.purchases', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Inventory'), 'href' => route('admin.toko.inventory'), 'active' => $isRouteActive('admin.toko.inventory'), 'routeName' => 'admin.toko.inventory', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Returns'), 'href' => route('admin.toko.returns'), 'active' => $isRouteActive('admin.toko.returns'), 'routeName' => 'admin.toko.returns', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Quotations'), 'href' => route('admin.toko.quotations'), 'active' => $isRouteActive('admin.toko.quotations'), 'routeName' => 'admin.toko.quotations', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Delivery Letters'), 'href' => route('admin.toko.delivery-letters'), 'active' => $isRouteActive('admin.toko.delivery-letters'), 'routeName' => 'admin.toko.delivery-letters', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Cash & Payments'), 'href' => route('admin.toko.cash'), 'active' => $isRouteActive('admin.toko.cash'), 'routeName' => 'admin.toko.cash', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Reports'), 'href' => route('admin.toko.reports'), 'active' => $isRouteActive('admin.toko.reports'), 'routeName' => 'admin.toko.reports', 'visible' => $can('viewTokoPosAddon')],
+        ['label' => __('Migration'), 'href' => route('admin.toko.migration'), 'active' => $isRouteActive('admin.toko.migration'), 'routeName' => 'admin.toko.migration', 'visible' => $tokoMigrationEnabled && $can('importTokoPosAddon')],
+    ];
+    $tokoMenuItem = $tokoPosLocked
+        ? [
+            'type' => 'feature',
+            'label' => __('Toko / POS'),
+            'href' => route('admin.toko'),
+            'active' => $isRouteActive(['admin.toko', 'admin.toko.*']),
+            'locked' => true,
+            'lockTitle' => __('Toko Add-on Locked'),
+            'lockMessage' => __('This premium add-on is available with the Toko / POS license feature.'),
+            'addonFlag' => __('Add-on'),
+            'addonFeature' => 'toko_pos',
+            'visible' => $allowsAdminPermission('admin.toko_pos.view'),
+        ]
+        : [
+            'type' => 'tree',
+            'id' => 'toko_pos',
+            'label' => __('Toko / POS'),
+            'href' => route('admin.toko'),
+            'active' => $isRouteActive(['admin.toko', 'admin.toko.*']),
+            'addonFlag' => __('Add-on'),
+            'addonFeature' => 'toko_pos',
+            'visible' => $can('viewTokoPosAddon'),
+            'items' => $tokoNavigation,
+        ];
 
     $adminMenu = [
         [
@@ -188,18 +236,7 @@
                 ['type' => 'heading', 'label' => __('CRM & Field Work')],
                 ['type' => 'link', 'label' => __('Workspace'), 'href' => route('admin.operations'), 'active' => $isRouteActive('admin.operations'), 'visible' => $can('viewOperationsWorkspace')],
                 ['type' => 'link', 'label' => __('Commercial'), 'href' => route('admin.commercial'), 'active' => $isRouteActive('admin.commercial'), 'visible' => $can('viewCommercialWorkspace')],
-                [
-                    'type' => 'feature',
-                    'label' => __('Toko / POS'),
-                    'href' => route('admin.toko'),
-                    'active' => $isRouteActive(['admin.toko', 'admin.toko.*']),
-                    'locked' => $tokoPosLocked,
-                    'lockTitle' => __('Toko Add-on Locked'),
-                    'lockMessage' => __('This premium add-on is available with the Toko / POS license feature.'),
-                    'addonFlag' => __('Add-on'),
-                    'addonFeature' => 'toko_pos',
-                    'visible' => $allowsAdminPermission('admin.toko_pos.view'),
-                ],
+                $tokoMenuItem,
                 ['type' => 'link', 'label' => __('Collaboration'), 'href' => route('admin.collaboration'), 'active' => $isRouteActive('admin.collaboration'), 'visible' => $can('viewCollaborationWorkspace')],
                 ['type' => 'link', 'label' => __('Accounting'), 'href' => route('admin.accounting'), 'active' => $isRouteActive('admin.accounting'), 'visible' => $can('viewAccountingWorkspace')],
                 ['type' => 'link', 'label' => __('Forms'), 'href' => route('admin.custom-forms'), 'active' => $isRouteActive('admin.custom-forms'), 'visible' => $can('viewCustomForms')],
@@ -276,6 +313,24 @@
                 continue;
             }
 
+            if (($item['type'] ?? 'link') === 'tree') {
+                $treeItems = [];
+
+                foreach (($item['items'] ?? []) as $treeItem) {
+                    if (($treeItem['visible'] ?? true) === false) {
+                        continue;
+                    }
+
+                    $treeItems[] = $treeItem;
+                }
+
+                if ($treeItems === []) {
+                    continue;
+                }
+
+                $item['items'] = $treeItems;
+            }
+
             if (($item['type'] ?? 'link') === 'divider') {
                 if (! empty($items) && ($items[array_key_last($items)]['type'] ?? null) !== 'divider') {
                     $items[] = $item;
@@ -295,7 +350,10 @@
             array_shift($items);
         }
 
-        $hasInteractiveItems = collect($items)->contains(fn (array $item) => in_array($item['type'] ?? 'link', ['link', 'feature', 'button'], true));
+        $hasInteractiveItems = collect($items)->contains(
+            fn (array $item) => in_array($item['type'] ?? 'link', ['link', 'feature', 'button'], true)
+                || (($item['type'] ?? 'link') === 'tree' && ! empty($item['items']))
+        );
 
         if (! $hasInteractiveItems) {
             return null;
@@ -334,7 +392,7 @@
                                     {{ $menuItem['label'] }}
                                 </x-navigation.nav-link>
                             @else
-                                <x-navigation.nav-dropdown id="desktop-admin-{{ $menuItem['id'] }}" :active="$menuItem['active']" triggerClasses="text-nowrap">
+                                <x-navigation.nav-dropdown id="desktop-admin-{{ $menuItem['id'] }}" :active="$menuItem['active']" triggerClasses="text-nowrap" :dropdownClasses="$menuItem['id'] === 'operations' ? 'w-72' : 'w-48'">
                                     <x-slot name="trigger">
                                         {{ $menuItem['label'] }}
                                         <x-heroicon-o-chevron-down class="ms-2 h-5 w-5 text-gray-500 dark:text-gray-300" />
@@ -347,6 +405,48 @@
                                                 </div>
                                             @elseif ($navItem['type'] === 'divider')
                                                 <div class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
+                                            @elseif (($navItem['type'] ?? 'link') === 'tree')
+                                                @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
+                                                <div
+                                                    x-data="{ treeExpanded: {{ $navItem['active'] ? 'true' : 'false' }} }"
+                                                    class="px-2 py-1"
+                                                    data-toko-nav-tree="{{ $navItem['addonFeature'] ?? $navItem['id'] ?? 'tree' }}">
+                                                    <button
+                                                        type="button"
+                                                        @click.stop="treeExpanded = !treeExpanded"
+                                                        class="flex w-full items-center justify-between rounded-md px-2 py-2 text-start text-xs font-semibold uppercase tracking-wide text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                        :aria-expanded="treeExpanded.toString()"
+                                                        aria-controls="desktop-admin-subtree-{{ $menuItem['id'] }}-{{ $navItem['id'] }}">
+                                                        <span class="inline-flex items-center gap-1.5">
+                                                            <x-heroicon-o-chevron-right
+                                                                class="h-4 w-4 transform text-gray-400 transition-transform duration-200 dark:text-gray-500"
+                                                                x-bind:class="{ 'rotate-90': treeExpanded }"
+                                                                />
+                                                            <span>{{ $navItem['label'] }}</span>
+                                                        </span>
+                                                        @if ($addonFlag)
+                                                            <span
+                                                                data-toko-nav-addon-flag="{{ $navItem['addonFeature'] ?? 'addon' }}"
+                                                                class="rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-amber-700 dark:border-amber-700/70 dark:bg-amber-950/50 dark:text-amber-200"
+                                                            >{{ $addonFlag }}</span>
+                                                        @endif
+                                                    </button>
+                                                    <div
+                                                        id="desktop-admin-subtree-{{ $menuItem['id'] }}-{{ $navItem['id'] }}"
+                                                        x-show="treeExpanded"
+                                                        style="display: none;"
+                                                        class="ms-3 border-s border-gray-200 py-1 ps-2 dark:border-gray-700">
+                                                        @foreach ($navItem['items'] as $treeItem)
+                                                            <x-navigation.dropdown-link
+                                                                href="{{ $treeItem['href'] }}"
+                                                                :active="$treeItem['active']"
+                                                                data-toko-nav-link="{{ $treeItem['routeName'] ?? '' }}"
+                                                                wire:navigate>
+                                                                {{ $treeItem['label'] }}
+                                                            </x-navigation.dropdown-link>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
                                             @elseif (($navItem['type'] ?? 'link') === 'feature' && $navItem['locked'])
                                                 @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
                                                 <button
@@ -534,6 +634,50 @@
                                         </div>
                                     @elseif ($navItem['type'] === 'divider')
                                         <div class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
+                                    @elseif (($navItem['type'] ?? 'link') === 'tree')
+                                        @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
+                                        <div
+                                            x-data="{ subtreeExpanded: {{ $navItem['active'] ? 'true' : 'false' }} }"
+                                            class="border-t border-gray-200/70 dark:border-gray-800"
+                                            data-toko-nav-tree="{{ $navItem['addonFeature'] ?? $navItem['id'] ?? 'tree' }}">
+                                            <button
+                                                type="button"
+                                                @click="subtreeExpanded = !subtreeExpanded"
+                                                class="wcag-touch-target flex w-full items-center justify-between py-2.5 pe-4 ps-3 text-start text-base font-semibold text-gray-800 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-950 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                title="{{ __('Toggle menu section') }}"
+                                                :aria-expanded="subtreeExpanded.toString()"
+                                                aria-controls="mobile-admin-subtree-{{ $menuItem['id'] }}-{{ $navItem['id'] }}">
+                                                <span class="inline-flex items-center gap-2">
+                                                    <x-heroicon-o-chevron-down
+                                                        class="h-4 w-4 transform text-gray-500 transition-transform duration-200 dark:text-gray-400"
+                                                        x-bind:class="{ 'rotate-180': subtreeExpanded }"
+                                                        />
+                                                    <span>{{ $navItem['label'] }}</span>
+                                                </span>
+                                                @if ($addonFlag)
+                                                    <span
+                                                        data-toko-nav-addon-flag="{{ $navItem['addonFeature'] ?? 'addon' }}"
+                                                        class="rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-amber-700 dark:border-amber-700/70 dark:bg-amber-950/50 dark:text-amber-200"
+                                                    >{{ $addonFlag }}</span>
+                                                @endif
+                                            </button>
+
+                                            <div
+                                                id="mobile-admin-subtree-{{ $menuItem['id'] }}-{{ $navItem['id'] }}"
+                                                x-show="subtreeExpanded"
+                                                style="display: none;"
+                                                class="ms-5 border-s border-gray-200 bg-gray-50/70 py-1 ps-2 dark:border-gray-700 dark:bg-gray-950/40">
+                                                @foreach ($navItem['items'] as $treeItem)
+                                                    <x-navigation.responsive-nav-link
+                                                        href="{{ $treeItem['href'] }}"
+                                                        :active="$treeItem['active']"
+                                                        data-toko-nav-link="{{ $treeItem['routeName'] ?? '' }}"
+                                                        wire:navigate>
+                                                        {{ $treeItem['label'] }}
+                                                    </x-navigation.responsive-nav-link>
+                                                @endforeach
+                                            </div>
+                                        </div>
                                     @elseif (($navItem['type'] ?? 'link') === 'feature' && $navItem['locked'])
                                         @php($addonFlag = isset($navItem['addonFlag']) ? value($navItem['addonFlag']) : null)
                                         <button

@@ -14,9 +14,10 @@ class ProductCategoriesImport implements ToCollection, WithHeadingRow
     {
         $setting = Setting::firstOrCreate(
             ['key' => 'toko_pos.product_categories'],
-            ['group' => 'toko_pos', 'type' => 'json', 'value' => []]
+            ['group' => 'toko_pos', 'type' => 'json', 'value' => '[]']
         );
-        $categories = $setting->value ?? [];
+        $categories = json_decode((string) $setting->value, true);
+        $categories = is_array($categories) ? $categories : [];
 
         foreach ($rows as $row) {
             $name = $row['name'] ?? $row['nama'] ?? $row['kategori'] ?? $row['category'] ?? null;
@@ -38,7 +39,8 @@ class ProductCategoriesImport implements ToCollection, WithHeadingRow
             }
         }
 
-        $setting->value = $uniqueCategories;
+        $setting->value = json_encode($uniqueCategories, JSON_THROW_ON_ERROR);
         $setting->save();
+        Setting::flushCache('toko_pos.product_categories');
     }
 }

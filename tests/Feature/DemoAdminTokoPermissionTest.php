@@ -20,9 +20,11 @@ test('toko permission repair migration updates stale demo admin roles', function
         )),
     ])->save();
 
-    $migrationPath = database_path('migrations/2026_06_09_150000_grant_toko_pos_permissions_to_demo_admin_role.php');
+    $migrationPath = collect(glob(database_path('migrations/*_grant_toko_pos_permissions_to_demo_admin_role.php')) ?: [])
+        ->first();
 
-    expect(is_file($migrationPath))->toBeTrue();
+    expect($migrationPath)->not->toBeNull()
+        ->and(is_file($migrationPath))->toBeTrue();
 
     $migration = require $migrationPath;
     $migration->up();
