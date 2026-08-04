@@ -37,7 +37,7 @@ Isi `review-evidence-apk-smoke`:
 - `apk-device-smoke.png`
 - `apk-smoke-summary.md`
 
-Local physical-device evidence can also include:
+Local physical-device evidence can also include the following ignored output files, which should be uploaded as CI/release artifacts when they need to be retained:
 
 - `screenshots/apk-attendance-e2e.png`
 - `screenshots/apk-document-upload-e2e.png`
@@ -123,12 +123,8 @@ bun run apk:e2e:attendance
 bun run apk:e2e:document-upload
 ```
 
-Local evidence terakhir:
+Contoh output evidence lokal (di-ignore dari Git):
 
-- Device: `DQEQLFCEDEKFKFZ5`
-- `bun run apk:smoke`: pass
-- `bun run apk:e2e:attendance`: pass
-- `bun run apk:e2e:document-upload`: pass
 - Screenshots: `screenshots/apk-device-smoke.png`, `screenshots/apk-attendance-e2e.png`, `screenshots/apk-document-upload-e2e.png`
 
 ## Runtime Baseline

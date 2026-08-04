@@ -5,6 +5,8 @@
 /storage/*.key
 /storage/review-evidence/
 /storage/ui-backups/
+/screenshots/*
+!/screenshots/donation-qr.jpeg
 /vendor
 .env
 .env.backup

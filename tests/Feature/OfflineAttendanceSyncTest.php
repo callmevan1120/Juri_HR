@@ -20,6 +20,7 @@ test('device offline attendance sync processes queued local submissions with ris
     ]);
 
     Sanctum::actingAs($user, deviceApiAbilities());
+    $occurredAt = now()->subHour();
 
     $response = $this->postJson('/api/device/offline-attendance', [
         'items' => [
@@ -28,7 +29,7 @@ test('device offline attendance sync processes queued local submissions with ris
                 'barcode_data' => $barcode->value,
                 'latitude' => -6.2,
                 'longitude' => 106.8,
-                'timestamp' => now()->subHour()->format('Y-m-d H:i:s'),
+                'timestamp' => $occurredAt->format('Y-m-d H:i:s'),
                 'accuracy' => 1.4,
                 'gps_variance' => 0,
                 'mock_location_detected' => false,
@@ -50,7 +51,7 @@ test('device offline attendance sync processes queued local submissions with ris
 
     expect($submission->processed_attendance_id)->toBe($attendance->id)
         ->and($submission->status)->toBe('processed')
-        ->and($attendance->date?->toDateString())->toBe(now()->toDateString())
+        ->and($attendance->date?->toDateString())->toBe($occurredAt->toDateString())
         ->and($submission->risk_score)->toBe($attendance->risk_score)
         ->and($attendance->risk_level)->toBe('high')
         ->and($codes)->toContain('offline_submitted')

@@ -25,7 +25,7 @@ Release gates:
 - Icons and splash screens regenerated from `resources/icon.png` and `resources/splash.png` via `bun run ios:assets`.
 - iOS plugin set stays SPM-clean: camera, geolocation, browser, app, and splash screen. The legacy community barcode plugin remains Android-only because it does not ship a Capacitor 8 `Package.swift`; iOS QR scanning uses the WebView/HTML5 scanner path.
 - Simulator build passes with `CODE_SIGNING_ALLOWED=NO`.
-- Simulator screenshot evidence is captured in `screenshots/ios-simulator/` with `bun run ios:screenshot`.
+- Simulator screenshot evidence is captured in `screenshots/ios-simulator/` with `bun run ios:screenshot`, then uploaded as a CI/release artifact. Generated screenshots are intentionally not committed.
 - App identifier, icons, splash screen, permissions, and ATS/CSP reviewed.
 - Camera, GPS, file upload, Dynamic QR, login, and logout smoke-tested on a physical iPhone.
 - TestFlight build uploaded with version matching `package.json`, README, changelog, and release notes.

@@ -224,7 +224,7 @@ bun run e2e:smoke
 bun run screenshots:desktop
 ```
 
-`bun run screenshots:desktop` menyiapkan demo data lokal, login via token E2E, lalu menulis 62 halaman ke `screenshots/desktop-pages/` beserta `manifest.json`.
+`bun run screenshots:desktop` menyiapkan demo data lokal, login via token E2E, lalu menulis 62 halaman ke `screenshots/desktop-pages/` beserta `manifest.json`. Direktori hasil ini di-ignore dari Git; unggah sebagai artifact bila perlu dipertahankan.
 
 Smoke APK/device:
 
@@ -237,7 +237,7 @@ bun run screenshots:apk
 
 `bun run apk:smoke` mengecek launch, permission kamera/GPS, barcode/photo readiness, screenshot, dan crash log. `bun run apk:e2e:attendance` mengecek build debug APK, check-in, upload foto, dan check-out. `bun run apk:e2e:document-upload` mengecek build debug APK, file push ke device, upload dokumen, dan status processed/uploaded.
 
-`bun run screenshots:apk` memakai device ADB debug, WebView DevTools/CDP, dan katalog halaman yang sama dengan desktop. Output berada di `screenshots/apk-pages/` dan saat ini berisi 62 screenshot. Untuk state khusus Face ID, script menghapus descriptor demo sebelum screenshot `user-home-before-face-id` agar card `Daftar Face ID Sekarang` benar-benar terekam, lalu halaman berikutnya masuk ke setup Face ID.
+`bun run screenshots:apk` memakai device ADB debug, WebView DevTools/CDP, dan katalog halaman yang sama dengan desktop. Output 62 screenshot berada di `screenshots/apk-pages/`, di-ignore dari Git, dan sebaiknya disimpan sebagai CI/release artifact. Untuk state khusus Face ID, script menghapus descriptor demo sebelum screenshot `user-home-before-face-id` agar card `Daftar Face ID Sekarang` benar-benar terekam, lalu halaman berikutnya masuk ke setup Face ID.
 
 Catatan runtime CI:
 

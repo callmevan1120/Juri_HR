@@ -146,7 +146,7 @@ return [
                 'scripts/apk-device-smoke.sh',
                 'scripts/apk-attendance-e2e.sh',
                 'scripts/apk-document-upload-e2e.sh',
-                'screenshots/apk-pages/06-user-scan.png',
+                '.github/workflows/apk-smoke.yml',
             ],
             'gaps' => [
                 'Android is usable, but release-candidate device matrix must still run before every production release.',

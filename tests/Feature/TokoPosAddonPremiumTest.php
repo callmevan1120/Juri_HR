@@ -17,6 +17,7 @@ use App\Models\Vendor;
 use App\Models\VendorBill;
 use App\Services\Enterprise\LicenseGuard;
 use App\Support\TokoCsvImportTemplates;
+use App\Support\TokoLegacyImportPreviewService;
 use App\Support\TokoPosPurchaseService;
 use App\Support\TokoPosReportService;
 use App\Support\TokoPosSalesService;
@@ -1044,6 +1045,30 @@ test('toko migration workspace no longer exposes selectable sql dump source', fu
 test('toko pos add-on can run master import from selected dump', function () {
     setTokoPosLicenseFeatures(['toko_pos']);
 
+    $dump = <<<'SQL'
+INSERT INTO `barang` (`kode`, `sku`, `nama`, `kategori`, `brand`, `hargabeli`, `hargajual`, `sisa`, `stokmin`, `satuan`, `barcode`, `lokasi`, `keterangan`) VALUES
+('P001', 'SKU000001', 'Kapasitor AC', 'Sparepart AC', 'Sigma', 34000, 45000, 5, 1, 'pcs', '8991', 'Rak 1', 'test import');
+SQL;
+    $path = tempnam(sys_get_temp_dir(), 'toko-addon-import-');
+
+    if ($path === false) {
+        throw new RuntimeException('Unable to create temporary Toko import dump.');
+    }
+
+    file_put_contents($path, $dump);
+
+    $legacyPreview = Mockery::mock(TokoLegacyImportPreviewService::class)->makePartial();
+    $legacyPreview->shouldReceive('availableDumpSources')->andReturn([[
+        'key' => 'toko',
+        'label' => 'Toko test fixture',
+        'filename' => basename($path),
+        'path' => $path,
+        'exists' => true,
+        'size_bytes' => filesize($path),
+        'updated_at' => now()->toIso8601String(),
+    ]]);
+    app()->instance(TokoLegacyImportPreviewService::class, $legacyPreview);
+
     Company::query()->create([
         'name' => 'Pandan Teknik',
         'slug' => 'pandan-teknik',
@@ -1064,4 +1089,6 @@ test('toko pos add-on can run master import from selected dump', function () {
     expect($run->status)->toBe('completed')
         ->and($run->processed_rows)->toBeGreaterThan(0)
         ->and(Product::query()->count())->toBeGreaterThan(0);
+
+    unlink($path);
 });

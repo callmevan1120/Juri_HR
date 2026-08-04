@@ -30,14 +30,14 @@ Do not move `secure_tools/build_enterprise.php` or private source mirrors into `
 2. Set `ENTERPRISE_OBFUSCATOR_KEY` in the private build environment and run the internal enterprise obfuscator.
 3. Run smoke tests in the private enterprise runtime environment.
 4. Run `composer check:enterprise-boundary` before staging files.
-5. Regenerate release evidence that is meant to be public, such as Playwright smoke output and screenshot manifests.
-6. Commit only intended obfuscated enterprise runtime files, readable source changes, tests, docs, and public screenshots.
+5. Regenerate release evidence that is meant to be public, such as Playwright smoke output and screenshot manifests, then upload it as a CI/release artifact.
+6. Commit only intended obfuscated enterprise runtime files, readable source changes, tests, and docs. Do not commit generated screenshot galleries.
 7. Never publish the obfuscator implementation.
 
-For `v5.0.0`, the public evidence set includes:
+For `v5.0.0`, the public evidence set is retained through CI/release artifacts rather than the source tree and includes:
 
-- 62 desktop screenshots in `screenshots/desktop-pages/`
-- 62 APK screenshots in `screenshots/apk-pages/`
+- 62 desktop screenshots generated in `screenshots/desktop-pages/`
+- 62 APK screenshots generated in `screenshots/apk-pages/`
 - Playwright smoke workflow in `.github/workflows/e2e.yml`
 - security scan workflow in `.github/workflows/security.yml`
 - database portability workflow in `.github/workflows/database-portability.yml`
