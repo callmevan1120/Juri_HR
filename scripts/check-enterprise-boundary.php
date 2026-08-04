@@ -38,10 +38,20 @@ $requiredIgnorePatterns = [
 ];
 
 $gitignore = file_get_contents($root.'/.gitignore') ?: '';
+$exampleEnvironment = file_get_contents($root.'/.env.example') ?: '';
 
 foreach ($requiredIgnorePatterns as $pattern) {
     if (! str_contains($gitignore, $pattern)) {
         $failures[] = "Missing .gitignore enterprise boundary pattern: {$pattern}";
+    }
+}
+
+foreach ([
+    'ENTERPRISE_OBFUSCATOR_KEY',
+    'ENTERPRISE_ADDON_SALT_',
+] as $privateRuntimeSecret) {
+    if (str_contains($exampleEnvironment, $privateRuntimeSecret)) {
+        $failures[] = "Private enterprise runtime secret must not be listed in .env.example: {$privateRuntimeSecret}";
     }
 }
 
