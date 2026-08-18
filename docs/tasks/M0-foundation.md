@@ -35,6 +35,8 @@ Design tokens to reuse (from the legacy `resources/css/app.css`): primary green 
 
 ## M0.2 Frappe environment and app install
 
+**BLOCKED** — this machine has neither WSL2 nor Docker; installing either needs administrator rights and a reboot. M0.3–M0.6 proceed in fixture mode meanwhile.
+
 - [ ] Document and execute local setup in `docs/backend-setup.md`: bench init (Frappe v16), `bench get-app hrms`, create site, install `frappe`, `hrms`, then `juri_hr` from `frappe/juri_hr`
 - [ ] Enable the scheduler (`bench --site <site> enable-scheduler`) and record how to verify the heartbeat
 - [ ] Ensure `juri_hr` has a proper module structure for new doctypes (module `Juri Hr`), and `hooks.py` is ready for scheduler events
@@ -46,10 +48,10 @@ Design tokens to reuse (from the legacy `resources/css/app.css`): primary green 
 
 ## M0.3 Minimal UI kit
 
-- [ ] Port design tokens into `frontend/src/styles/app.css`: primary + brand color scales, dark variant, base focus rings, card and rounded conventions, WCAG touch target helper (min 2.75rem)
-- [ ] Build components in `frontend/src/components/ui/`: `AppButton`, `AppInput`, `AppSelect`, `AppTextarea`, `AppCheckbox`, `AppModal`, `AppBadge`, `DataTable` (sortable + paginated), `PageHeader`, `AppToast` (+ toast store), `AppEmptyState`, `AppSpinner`
-- [ ] Add a status badge helper mapping daily statuses to colors: `present` green, `late` amber, `rejected` red, `absent` red-muted, `izin` blue, `cuti` cyan, `sakit` violet, `off`/`holiday` gray
-- [ ] Add a dev-only route `/__dev/ui` rendering every component and status badge in light and dark mode
+- [x] Port design tokens into `frontend/src/styles/app.css`: primary + brand color scales, dark variant, base focus rings, card and rounded conventions, WCAG touch target helper (min 2.75rem)
+- [x] Build components in `frontend/src/components/ui/`: `AppButton`, `AppInput`, `AppSelect`, `AppTextarea`, `AppCheckbox`, `AppModal`, `AppBadge`, `DataTable` (sortable + paginated), `PageHeader`, `AppToast` (+ toast store), `AppEmptyState`, `AppSpinner`
+- [x] Add a status badge helper mapping daily statuses to colors: `present` green, `late` amber, `rejected` red, `absent` red-muted, `izin` blue, `cuti` cyan, `sakit` violet, `off`/`holiday` gray
+- [x] Add a dev-only route `/__dev/ui` rendering every component and status badge in light and dark mode
 
 **AC**
 - All components render correctly in light and dark
@@ -57,17 +59,17 @@ Design tokens to reuse (from the legacy `resources/css/app.css`): primary green 
 
 ## M0.4 API client and auth store
 
-- [ ] `frontend/src/api/client.ts`: base URL from env, `Authorization: token key:secret` injection, JSON handling, normalized error shape (`{ status, code, message, details }`) parsing Frappe `exc_type` and `_server_messages`, timeout/abort
-- [ ] `frontend/src/api/resource.ts`: `listResource`, `getResource`, `createResource`, `updateResource`, `deleteResource` with `fields`, `filters`, `limit_start`, `limit_page_length`, `order_by`
-- [ ] `frontend/src/api/method.ts`: `callMethod(name, params)`
-- [ ] `frontend/src/api/files.ts`: `uploadPrivateFile(file, { doctype, docname })` via `/api/method/upload_file` with `is_private=1`, and `fetchPrivateBlob(fileUrl)` for authenticated downloads/previews
-- [ ] `frontend/src/api/fixtures.ts`: interceptor that resolves requests from `frontend/src/api/fixtures/*.json` when `VITE_USE_FIXTURES=true` or the base URL is empty; supports basic filter + pagination simulation
-- [ ] `frontend/src/stores/auth.ts`: `login(email, password)` -> `POST /api/method/login` then `generate_keys` (or an equivalent `juri_hr` helper) -> persist token; `logout()`; `loadSession()`; expose `user`, `roles`, `isHrd`
-- [ ] Vitest: token injection, error normalization, fixture fallback, 401 clearing the session
+- [x] `frontend/src/api/client.ts`: base URL from env, `Authorization: token key:secret` injection, JSON handling, normalized error shape (`{ status, code, message, details }`) parsing Frappe `exc_type` and `_server_messages`, timeout/abort
+- [x] `frontend/src/api/resource.ts`: `listResource`, `getResource`, `createResource`, `updateResource`, `deleteResource` with `fields`, `filters`, `limit_start`, `limit_page_length`, `order_by`
+- [x] `frontend/src/api/method.ts`: `callMethod(name, params)`
+- [x] `frontend/src/api/files.ts`: `uploadPrivateFile(file, { doctype, docname })` via `/api/method/upload_file` with `is_private=1`, and `fetchPrivateBlob(fileUrl)` for authenticated downloads/previews
+- [x] `frontend/src/api/fixtures.ts`: interceptor that resolves requests from `frontend/src/api/fixtures/*.json` when `VITE_USE_FIXTURES=true` or the base URL is empty; supports basic filter + pagination simulation
+- [x] `frontend/src/stores/auth.ts`: `login(email, password)` -> `POST /api/method/login` then `generate_keys` (or an equivalent `juri_hr` helper) -> persist token; `logout()`; `loadSession()`; expose `user`, `roles`, `isHrd`
+- [x] Vitest: token injection, error normalization, fixture fallback, 401 clearing the session
 
 **AC**
-- Real login against the local Frappe site works and persists across reload
-- With `VITE_USE_FIXTURES=true` the app runs without any backend
+- Real login against the local Frappe site works and persists across reload — **pending M0.2** (no Frappe environment on this machine yet)
+- With `VITE_USE_FIXTURES=true` the app runs without any backend — verified by `src/api/client.spec.ts`
 
 ## M0.5 Roles, layouts, PWA
 

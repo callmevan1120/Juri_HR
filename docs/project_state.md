@@ -12,12 +12,12 @@
 
 | Field | Value |
 | --- | --- |
-| Stage | M0 in progress — M0.1 done (repo restructured, frontend scaffolded) |
+| Stage | M0 in progress — M0.1, M0.3, M0.4 done; M0.2 blocked (no WSL2/Docker) |
 | Active phase | M0 — Foundation |
-| Active task | M0.2 — Frappe HR v16 bench + site + install `juri_hr` + scheduler + `docs/backend-setup.md` |
+| Active task | M0.5 — router guards, `AdminLayout` / `UserLayout` / `GuestLayout`, theme toggle, PWA shell |
 | Branch | `main` tracking `origin/main` (`callmevan1120/Juri_HR`) |
 | Working directory | `D:\NEW JURIHR` (JuriHR). The legacy Laravel app is checked out at `D:\NEW JURIHR\PasPapan` as a git worktree on branch `legacy-reference` (gitignored) |
-| Frontend | scaffolded: `frontend/` Vite + Vue 3 `vue-ts`, Tailwind CSS 4 (`@tailwindcss/vite`), Pinia, Vue Router, ESLint + Prettier, Vitest; `bun run build` and `bun run test` pass |
+| Frontend | Vite + Vue 3 `vue-ts`, Tailwind CSS 4, Pinia, Vue Router 5, ESLint + Prettier, Vitest; UI kit + API client + auth store in place, running in fixture mode |
 | Backend | `frappe/juri_hr` skeleton only (hooks.py, `api/ping.py`, one legacy doctype `izin_request`), not installed on a site |
 | Legacy app | removed from `main`; preserved on `legacy-reference` @ `6d7fa91` (pushed to `origin`, checked out locally as a worktree) |
 | Deployment | none |
@@ -36,16 +36,18 @@ Completed work:
 - Plan and task files written (`docs/plans/`, `docs/tasks/`), `AGENTS.md` rewritten for JuriHR — commit `52805c5`
 - **M0.1 (partial)** — `legacy-reference` created and pushed to `origin` (`callmevan1120/Juri_HR`) at `6d7fa91`; Laravel app removed from the working branch (1388 files); brand images moved to `brand-assets/`; RBAC permissions extracted to `docs/reference/rbac-source.md`; README rewritten; `.gitignore` replaced with Node/Frappe rules; Laravel CI workflows removed — commit `a279cc2`
 - **M0.1 (done)** — `frontend/` scaffolded with Vite `vue-ts` (Vue 3.5, Vite 8, TS 6), Tailwind CSS 4 via `@tailwindcss/vite`, Pinia, Vue Router 5, ESLint 10 flat config + Prettier, Vitest 4 with jsdom; `@` alias to `src/`; `frontend/.env.example` added; verified `bun run build`, `bun run test` (1 passed), `bun run lint` clean
+- **M0.3 (done)** — design tokens ported to `frontend/src/styles/app.css` (primary `#6ab45b`, brand `#06b6d4`, `dark` class variant, focus rings, `card` / `tap-target` / `field-base` utilities); UI kit in `frontend/src/components/ui/` (`AppButton`, `AppInput`, `AppSelect`, `AppTextarea`, `AppCheckbox`, `AppModal` on native `<dialog>`, `AppBadge`, `DataTable` sortable + paginated, `PageHeader`, `AppToast` + toast store, `AppEmptyState`, `AppSpinner`); single status color map in `components/ui/status.ts`; theme store; dev-only route `/__dev/ui`
+- **M0.4 (done)** — `api/client.ts` (env base URL, `Authorization: token key:secret`, normalized `{status, code, message, details}` from `exc_type` + `_server_messages`, 20s timeout, `onUnauthorized` hook), `api/resource.ts`, `api/method.ts`, `api/files.ts` (`uploadPrivateFile` with `is_private=1`, `fetchPrivateBlob`), `api/fixtures.ts` (filter + pagination simulation), `stores/auth.ts` (`login`/`logout`/`loadSession`, `isHrd`), `utils/format.ts` (rupiah, date, time, duration); Vitest 17 passed across 5 files; `bun run build` and `bun run lint` clean
 
 ## 3. In progress
 
-**M0.2** — Frappe environment: bench init (v16), `bench get-app hrms`, create site, install `frappe` + `hrms` + `juri_hr`, enable scheduler, write `docs/backend-setup.md`, create HRD + Employee test users.
+**M0.5** — router guards with route meta `{ requiresAuth, roles, layout }`, `AdminLayout` / `UserLayout` / `GuestLayout`, login page, placeholder pages per nav entry, PWA manifest + service worker shell.
 
 ## 4. Blockers and open issues
 
 | # | Item | Impact | Notes |
 | --- | --- | --- | --- |
-| 1 | No Frappe HR environment yet | Blocks every backend task (M1+) | M0.2 sets up bench + site + `juri_hr`; frontend can proceed in fixture mode meanwhile |
+| 1 | No Frappe HR environment yet — **M0.2 blocked**: this machine has no WSL2 and no Docker, both need admin rights + a reboot to install | Blocks every backend task (M1+) and the real-login AC of M0.4 | Frontend proceeds in fixture mode (`VITE_USE_FIXTURES=true`). User must install WSL2 (or Docker Desktop) before M0.2 can run |
 | 2 | ~~M0.1 deletes the Laravel app~~ | resolved | `legacy-reference` @ `6d7fa91` pushed and verified on `origin`; deletion done in `a279cc2` |
 | 3 | HTTPS required for camera + geolocation | Attendance cannot be tested on a phone over plain HTTP | Local testing via `localhost` (allowed by browsers); production needs a real certificate (M7.4) |
 | 4 | Scheduler dependency for scheduled payslip publishing | A dead scheduler silently delays payslips | Heartbeat warning + manual publish fallback (M5.3, M7.3) |
@@ -86,16 +88,16 @@ Completed work:
 | 28 | Brand images kept in `brand-assets/` rather than deleted with `public/` | Reused by the new SPA (icons, logo, hero banner) |
 | 29 | `AGENTS.md` is tracked in git (it was ignored in the legacy `.gitignore`) | Agent rules must travel with the repo |
 | 30 | Local layout mirrors the remote split: JuriHR lives in `D:\NEW JURIHR`, the legacy Laravel app in `D:\NEW JURIHR\PasPapan` as a **git worktree** on `legacy-reference` | Visual reference stays one folder away without polluting the JuriHR tree or duplicating git history; `/PasPapan/` is gitignored |
+| 31 | M0.2 deferred; M0.3–M0.6 built first against fixtures | No WSL2/Docker on the dev machine yet; frontend work does not need to wait for the backend |
+| 32 | Auth uses a `juri_hr.auth.issue_token` / `juri_hr.auth.session` pair instead of calling `generate_keys` directly | Keeps key generation and role/employee resolution server-side in one whitelisted place (methods to be implemented in M0.2/M1) |
 
 ## 6. Next targets
 
 **Immediate (M0 — Foundation)**
 
-1. **M0.2** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md`
-2. **M0.3** Minimal UI kit + design tokens + status badge color map + `/__dev/ui`
-3. **M0.4** API client (resource/method/files/fixtures) + auth store, Vitest for client behaviour
-4. **M0.5** Router guards, `AdminLayout` / `UserLayout` / `GuestLayout`, theme toggle, PWA shell
-5. **M0.6** CI workflow (lint, typecheck, unit tests, build); delete legacy Laravel workflows
+1. **M0.5** Router guards, `AdminLayout` / `UserLayout` / `GuestLayout`, theme toggle, PWA shell
+2. **M0.6** CI workflow (lint, typecheck, unit tests, build); delete legacy Laravel workflows
+3. **M0.2 (blocked)** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md` — needs WSL2 or Docker installed first
 
 **Then**
 

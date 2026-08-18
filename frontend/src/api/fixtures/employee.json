@@ -1,0 +1,29 @@
+[
+  {
+    "name": "HR-EMP-00001",
+    "employee_name": "Budi Santoso",
+    "custom_nip": "001",
+    "department": "HRD",
+    "designation": "HR Manager",
+    "status": "Active",
+    "custom_work_pattern": "tetap"
+  },
+  {
+    "name": "HR-EMP-00002",
+    "employee_name": "Sari Dewi",
+    "custom_nip": "002",
+    "department": "Outlet Cabang A",
+    "designation": "Kasir",
+    "status": "Active",
+    "custom_work_pattern": "shift"
+  },
+  {
+    "name": "HR-EMP-00003",
+    "employee_name": "Andi Wijaya",
+    "custom_nip": "003",
+    "department": "Outlet Cabang B",
+    "designation": "Barista",
+    "status": "Active",
+    "custom_work_pattern": "shift"
+  }
+]
