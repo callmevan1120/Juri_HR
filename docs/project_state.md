@@ -15,10 +15,11 @@
 | Stage | M0 in progress — repo restructured, frontend not scaffolded yet |
 | Active phase | M0 — Foundation |
 | Active task | M0.1 — remaining step: scaffold `frontend/` (Vite vue-ts + Tailwind 4 + Pinia + Router + Vitest) |
-| Branch | `main-vps` (working branch); remote `origin` = `callmevan1120/Juri_HR` |
+| Branch | `main` tracking `origin/main` (`callmevan1120/Juri_HR`) |
+| Working directory | `D:\NEW JURIHR` (JuriHR). The legacy Laravel app is checked out at `D:\NEW JURIHR\PasPapan` as a git worktree on branch `legacy-reference` (gitignored) |
 | Frontend | not scaffolded yet |
 | Backend | `frappe/juri_hr` skeleton only (hooks.py, `api/ping.py`, one legacy doctype `izin_request`), not installed on a site |
-| Legacy app | removed from the working branch; preserved on `legacy-reference` @ `6d7fa91` (pushed and verified on `origin`) |
+| Legacy app | removed from `main`; preserved on `legacy-reference` @ `6d7fa91` (pushed to `origin`, checked out locally as a worktree) |
 | Deployment | none |
 
 **What JuriHR is:** a Vue 3 SPA (PWA) on top of Frappe HR v16 plus a small custom app `juri_hr`. It replaces the legacy Laravel PasPapan UI. MVP focus: employee attendance (office fixed hours + outlet shifts), attendance review/correction, izin/cuti self-service, and payslip distribution with scheduled publishing.
@@ -83,6 +84,7 @@ Completed work:
 | 27 | The existing `callmevan1120/JuriHR` repo (Next.js + Prisma attempt) is not used for this MVP | Different stack; the approved plan is Vue 3 SPA + Frappe HR |
 | 28 | Brand images kept in `brand-assets/` rather than deleted with `public/` | Reused by the new SPA (icons, logo, hero banner) |
 | 29 | `AGENTS.md` is tracked in git (it was ignored in the legacy `.gitignore`) | Agent rules must travel with the repo |
+| 30 | Local layout mirrors the remote split: JuriHR lives in `D:\NEW JURIHR`, the legacy Laravel app in `D:\NEW JURIHR\PasPapan` as a **git worktree** on `legacy-reference` | Visual reference stays one folder away without polluting the JuriHR tree or duplicating git history; `/PasPapan/` is gitignored |
 
 ## 6. Next targets
 

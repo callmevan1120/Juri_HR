@@ -8,6 +8,8 @@ JuriHR is an HR platform being rebuilt as a **Vue 3 SPA (PWA)** on top of **Frap
 
 It replaces a legacy Laravel/Livewire app (PasPapan), which is preserved on the branch `legacy-reference` and used only as a **visual reference** when porting screens.
 
+Local layout: JuriHR is the repository root (`D:\NEW JURIHR`). The legacy app is checked out beside it at `D:\NEW JURIHR\PasPapan` as a git worktree on `legacy-reference` — read it for reference, never edit or build inside it, and never commit from it.
+
 Current focus is the MVP: employee attendance (fixed office hours for office staff, shifts for outlet staff), attendance review and correction, izin/cuti self-service, and payslip distribution with scheduled publishing.
 
 ## Read these first, in this order
@@ -80,11 +82,13 @@ Everything else is verified manually: mobile Chrome (GPS, camera, permission den
 ```
 frontend/                 Vue 3 SPA (created in M0.1)
 frappe/juri_hr/           Frappe custom app (MVP backend)
+brand-assets/             logo, icons, hero banner reused from the legacy app
 docs/plans/               approved plans
 docs/tasks/               per-phase task breakdowns
 docs/reference/           legacy rewrite matrix, legacy RBAC source
 docs/project_state.md     living progress summary (max 500 lines)
 docs/backend-setup.md     Frappe environment setup (created in M0.2)
+PasPapan/                 legacy Laravel app (git worktree, gitignored, read-only reference)
 ```
 
 ## Conventions

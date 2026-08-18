@@ -27,6 +27,14 @@ docs/reference/      legacy rewrite matrix and RBAC reference
 docs/project_state.md  live progress summary
 brand-assets/        logo and imagery reused from the legacy app
 AGENTS.md            working rules for AI agents
+PasPapan/            legacy Laravel app (git worktree on legacy-reference, gitignored)
+```
+
+The legacy app is checked out next to this project as a git worktree, so the old screens stay one folder away for visual reference while sharing a single git history:
+
+```bash
+git worktree add PasPapan legacy-reference   # already done locally
+git worktree remove PasPapan                 # when it is no longer needed
 ```
 
 ## Getting started

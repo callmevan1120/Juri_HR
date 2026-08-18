@@ -35,3 +35,6 @@ playwright-report/
 *.sql
 *.dump
 *.log
+
+# Legacy Laravel app checked out as a git worktree (branch legacy-reference)
+/PasPapan/
