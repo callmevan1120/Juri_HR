@@ -25,8 +25,8 @@ Design tokens to reuse (from the legacy `resources/css/app.css`): primary green 
 - [x] Move `REWRITE-MATRIX.md` to `docs/reference/REWRITE-MATRIX.md`
 - [x] Copy the legacy RBAC definition to `docs/reference/rbac-source.md` (permission strings and sections, for later phases)
 - [x] Rewrite `README.md` for JuriHR: what it is, stack, how to run frontend + backend, link to `docs/plans/juri-hr-mvp.md`
-- [ ] Scaffold the frontend: `frontend/` via Vite (`vue-ts`), add Pinia, Vue Router, Tailwind CSS 4 (`@tailwindcss/vite`), ESLint + Prettier, Vitest
-- [ ] Add `frontend/.env.example` with `VITE_FRAPPE_BASE_URL=`, `VITE_USE_FIXTURES=true`, `VITE_APP_NAME=JuriHR`
+- [x] Scaffold the frontend: `frontend/` via Vite (`vue-ts`), add Pinia, Vue Router, Tailwind CSS 4 (`@tailwindcss/vite`), ESLint + Prettier, Vitest
+- [x] Add `frontend/.env.example` with `VITE_FRAPPE_BASE_URL=`, `VITE_USE_FIXTURES=true`, `VITE_APP_NAME=JuriHR`
 
 **AC**
 - `legacy-reference` exists remotely and still boots the old app (`composer install && php artisan serve`)

@@ -12,12 +12,12 @@
 
 | Field | Value |
 | --- | --- |
-| Stage | M0 in progress — repo restructured, frontend not scaffolded yet |
+| Stage | M0 in progress — M0.1 done (repo restructured, frontend scaffolded) |
 | Active phase | M0 — Foundation |
-| Active task | M0.1 — remaining step: scaffold `frontend/` (Vite vue-ts + Tailwind 4 + Pinia + Router + Vitest) |
+| Active task | M0.2 — Frappe HR v16 bench + site + install `juri_hr` + scheduler + `docs/backend-setup.md` |
 | Branch | `main` tracking `origin/main` (`callmevan1120/Juri_HR`) |
 | Working directory | `D:\NEW JURIHR` (JuriHR). The legacy Laravel app is checked out at `D:\NEW JURIHR\PasPapan` as a git worktree on branch `legacy-reference` (gitignored) |
-| Frontend | not scaffolded yet |
+| Frontend | scaffolded: `frontend/` Vite + Vue 3 `vue-ts`, Tailwind CSS 4 (`@tailwindcss/vite`), Pinia, Vue Router, ESLint + Prettier, Vitest; `bun run build` and `bun run test` pass |
 | Backend | `frappe/juri_hr` skeleton only (hooks.py, `api/ping.py`, one legacy doctype `izin_request`), not installed on a site |
 | Legacy app | removed from `main`; preserved on `legacy-reference` @ `6d7fa91` (pushed to `origin`, checked out locally as a worktree) |
 | Deployment | none |
@@ -35,10 +35,11 @@ Completed work:
 - MVP scope, data model, backend method list, and phase breakdown approved by the user
 - Plan and task files written (`docs/plans/`, `docs/tasks/`), `AGENTS.md` rewritten for JuriHR — commit `52805c5`
 - **M0.1 (partial)** — `legacy-reference` created and pushed to `origin` (`callmevan1120/Juri_HR`) at `6d7fa91`; Laravel app removed from the working branch (1388 files); brand images moved to `brand-assets/`; RBAC permissions extracted to `docs/reference/rbac-source.md`; README rewritten; `.gitignore` replaced with Node/Frappe rules; Laravel CI workflows removed — commit `a279cc2`
+- **M0.1 (done)** — `frontend/` scaffolded with Vite `vue-ts` (Vue 3.5, Vite 8, TS 6), Tailwind CSS 4 via `@tailwindcss/vite`, Pinia, Vue Router 5, ESLint 10 flat config + Prettier, Vitest 4 with jsdom; `@` alias to `src/`; `frontend/.env.example` added; verified `bun run build`, `bun run test` (1 passed), `bun run lint` clean
 
 ## 3. In progress
 
-**M0.1** — final step remaining: scaffold `frontend/` (Vite `vue-ts`, Tailwind CSS 4 via `@tailwindcss/vite`, Pinia, Vue Router, ESLint + Prettier, Vitest) and add `frontend/.env.example` with `VITE_FRAPPE_BASE_URL`, `VITE_USE_FIXTURES=true`, `VITE_APP_NAME=JuriHR`.
+**M0.2** — Frappe environment: bench init (v16), `bench get-app hrms`, create site, install `frappe` + `hrms` + `juri_hr`, enable scheduler, write `docs/backend-setup.md`, create HRD + Employee test users.
 
 ## 4. Blockers and open issues
 
@@ -90,12 +91,11 @@ Completed work:
 
 **Immediate (M0 — Foundation)**
 
-1. **M0.1 (finish)** Scaffold `frontend/` (Vite vue-ts + Tailwind 4 + Pinia + Router + ESLint/Prettier + Vitest) and `frontend/.env.example`; verify `bun run build`
-2. **M0.2** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md`
-3. **M0.3** Minimal UI kit + design tokens + status badge color map + `/__dev/ui`
-4. **M0.4** API client (resource/method/files/fixtures) + auth store, Vitest for client behaviour
-5. **M0.5** Router guards, `AdminLayout` / `UserLayout` / `GuestLayout`, theme toggle, PWA shell
-6. **M0.6** CI workflow (lint, typecheck, unit tests, build); delete legacy Laravel workflows
+1. **M0.2** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md`
+2. **M0.3** Minimal UI kit + design tokens + status badge color map + `/__dev/ui`
+3. **M0.4** API client (resource/method/files/fixtures) + auth store, Vitest for client behaviour
+4. **M0.5** Router guards, `AdminLayout` / `UserLayout` / `GuestLayout`, theme toggle, PWA shell
+5. **M0.6** CI workflow (lint, typecheck, unit tests, build); delete legacy Laravel workflows
 
 **Then**
 

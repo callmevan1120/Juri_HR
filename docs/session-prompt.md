@@ -20,16 +20,14 @@ Read these first, in order:
 4. docs/tasks/M0-foundation.md    — current phase tasks
 
 Current state: repo restructured and pushed (branch `main` -> origin callmevan1120/Juri_HR).
-No frontend yet. Backend is skeleton only (frappe/juri_hr).
+M0.1 done — `frontend/` scaffolded (Vite vue-ts, Tailwind 4, Pinia, Vue Router, ESLint/Prettier,
+Vitest); `bun run build` and `bun run test` pass. Backend is skeleton only (frappe/juri_hr).
 
-Next task — finish M0.1 (last unchecked items in docs/tasks/M0-foundation.md):
-- Scaffold `frontend/` with Vite (vue-ts) + Tailwind CSS 4 (@tailwindcss/vite) + Pinia +
-  Vue Router + ESLint/Prettier + Vitest
-- Add frontend/.env.example with VITE_FRAPPE_BASE_URL=, VITE_USE_FIXTURES=true,
-  VITE_APP_NAME=JuriHR
-- Verify: cd frontend && bun run build succeeds
-Then continue to M0.2 (Frappe bench v16 + hrms + install juri_hr + enable scheduler +
-write docs/backend-setup.md).
+Next task — M0.2 (docs/tasks/M0-foundation.md):
+- Frappe bench v16 + `bench get-app hrms` + create site + install frappe/hrms/juri_hr
+- Enable scheduler and document heartbeat verification
+- Module structure `Juri Hr` ready for new doctypes; hooks.py ready for scheduler events
+- Create HRD/Admin + Employee test users; write docs/backend-setup.md (no secrets committed)
 
 Reminders from AGENTS.md:
 - Docs and code in English; UI strings and conversation with me in Indonesian
