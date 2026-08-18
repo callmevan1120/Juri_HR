@@ -12,9 +12,9 @@
 
 | Field | Value |
 | --- | --- |
-| Stage | M0 in progress — M0.1, M0.3, M0.4, M0.5 done; M0.2 blocked (no WSL2/Docker) |
+| Stage | M0 nearly complete — M0.1, M0.3, M0.4, M0.5, M0.6 done; M0.2 blocked (no WSL2/Docker) |
 | Active phase | M0 — Foundation |
-| Active task | M0.6 — CI workflow (lint, typecheck, unit tests, build) |
+| Active task | none — M1 cannot start until M0.2 unblocks (needs a Frappe site) |
 | Branch | `main` tracking `origin/main` (`callmevan1120/Juri_HR`) |
 | Working directory | `D:\NEW JURIHR` (JuriHR). The legacy Laravel app is checked out at `D:\NEW JURIHR\PasPapan` as a git worktree on branch `legacy-reference` (gitignored) |
 | Frontend | Vue 3 SPA with UI kit, API client, auth store, role-guarded router, three layouts and a PWA shell; runs end to end in fixture mode |
@@ -40,9 +40,11 @@ Completed work:
 - **M0.4 (done)** — `api/client.ts` (env base URL, `Authorization: token key:secret`, normalized `{status, code, message, details}` from `exc_type` + `_server_messages`, 20s timeout, `onUnauthorized` hook), `api/resource.ts`, `api/method.ts`, `api/files.ts` (`uploadPrivateFile` with `is_private=1`, `fetchPrivateBlob`), `api/fixtures.ts` (filter + pagination simulation), `stores/auth.ts` (`login`/`logout`/`loadSession`, `isHrd`), `utils/format.ts` (rupiah, date, time, duration); Vitest 17 passed across 5 files; `bun run build` and `bun run lint` clean
 - **M0.5 (done)** — route meta `{ requiresAuth, roles, layout }` + `authGuard` (no session -> `/login?redirect=`, wrong role -> `/403`, signed-in user bounced off `/login`); `AdminLayout` (collapsible sidebar with 9 entries, topbar bell, user menu), `UserLayout` (mobile topbar + 5-entry bottom nav, `env(safe-area-inset-*)`), `GuestLayout`; `LoginView`, `ForbiddenView`, 14 placeholder pages; theme toggle component; PWA shell (`manifest.webmanifest`, `sw.js` precaching the shell with an `offline.html` fallback and an explicit `/api/` bypass, `OfflineBanner`), brand icons copied from `brand-assets/`; fixture login derives the role from the email (`hrd…` -> HRD, otherwise employee); Vitest 22 passed across 5 files, `bun run build` / `lint` clean, `bun run preview` serves `/`, `/login`, `/403`, `/admin`, the manifest, `sw.js` and `offline.html` with HTTP 200
 
+- **M0.6 (done)** — `.github/workflows/ci.yml` with a `frontend` job (bun 1.3.14, `bun install --frozen-lockfile`, `lint`, `format:check`, `typecheck`, `test`, `build`) and a `backend` job (byte-compile `frappe/juri_hr`, run pytest only when a `test_*.py` exists); `bun run lint` no longer auto-fixes so CI fails on violations (`lint:fix` added for local use); the stale `php artisan migrate` line in the PR template was replaced with the JuriHR checklist. All steps verified locally; no Laravel workflow remained to delete
+
 ## 3. In progress
 
-**M0.6** — GitHub Actions workflow for `frontend/` (bun install, lint, typecheck, Vitest, build) plus a Python test job that skips gracefully while `frappe/juri_hr` has no tests; remove any leftover Laravel workflow references.
+Nothing. **M0.2 is the only remaining M0 task and it is blocked**: a Frappe HR site cannot be created on this machine until WSL2 or Docker Desktop is installed (admin rights + reboot). M1 depends on it.
 
 ## 4. Blockers and open issues
 
@@ -95,10 +97,9 @@ Completed work:
 
 ## 6. Next targets
 
-**Immediate (M0 — Foundation)**
+**Immediate — one blocker, one action for the user**
 
-1. **M0.6** CI workflow (lint, typecheck, unit tests, build); delete legacy Laravel workflows
-2. **M0.2 (blocked)** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md` — needs WSL2 or Docker installed first
+1. **M0.2 (blocked, user action required)** Install WSL2 (`wsl --install`, admin + reboot) or Docker Desktop, then: bench init Frappe v16, `bench get-app hrms`, create the site, install `frappe`/`hrms`/`juri_hr`, enable the scheduler, create HRD + Employee test users, write `docs/backend-setup.md`. Also implement the whitelisted `juri_hr.auth.issue_token` / `juri_hr.auth.session` methods the SPA already calls.
 
 **Then**
 
