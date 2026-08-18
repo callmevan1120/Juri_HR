@@ -62,6 +62,19 @@ cp .env.example .env      # set VITE_FRAPPE_BASE_URL, or leave empty for fixture
 bun run dev
 ```
 
+Useful scripts: `bun run build`, `bun run test`, `bun run lint`, `bun run typecheck`, `bun run preview`.
+
+### Fixture mode (no backend required)
+
+With `VITE_USE_FIXTURES=true` (or an empty `VITE_FRAPPE_BASE_URL`) the SPA answers every request from `frontend/src/api/fixtures/*.json`. Login accepts **any password**, and the email decides the role:
+
+| Email | Role |
+| --- | --- |
+| `hrd@example.com` | HRD — lands on `/admin` |
+| `budi@example.com` | Employee — lands on `/` |
+
+The UI kit is browsable in dev at `/__dev/ui`. The service worker and PWA manifest only take effect in a production build, so test install and offline behaviour with `bun run build && bun run preview`.
+
 ## Notes
 
 - Timezone is `Asia/Jakarta`. All policy thresholds (grace period, geofence radius, leave quota, payslip deduction keywords, …) live in settings, never in code.

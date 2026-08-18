@@ -1,9 +1,9 @@
 {
-  "message": {
-    "token": "fixture-key:fixture-secret",
-    "user": "hrd@example.com",
-    "full_name": "HRD Demo",
-    "roles": ["HR Manager", "Employee"],
-    "employee": "HR-EMP-00001"
-  }
+    "message": {
+        "token": "fixture-key:fixture-secret",
+        "user": "hrd@example.com",
+        "full_name": "HRD Demo",
+        "roles": ["HR Manager", "Employee"],
+        "employee": "HR-EMP-00001"
+    }
 }

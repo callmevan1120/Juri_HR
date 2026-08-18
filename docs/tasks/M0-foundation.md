@@ -73,17 +73,19 @@ Design tokens to reuse (from the legacy `resources/css/app.css`): primary green 
 
 ## M0.5 Roles, layouts, PWA
 
-- [ ] Router with route meta `{ requiresAuth, roles, layout }` and guards: unauthenticated -> `/login`, wrong role -> `/403`
-- [ ] `AdminLayout`: sidebar (Dashboard, Karyawan, Absensi, Jadwal, Pengajuan, Slip Gaji, Pengumuman, Aktivitas, Pengaturan), topbar with notification bell and user menu
-- [ ] `UserLayout`: mobile-first topbar + bottom navigation (Home, Kalender, Pengajuan, Slip Gaji, Profil), safe-area padding
-- [ ] `GuestLayout` for login
-- [ ] Dark/light theme toggle persisted in localStorage
-- [ ] PWA: `manifest.json` (name JuriHR, standalone, icons), service worker precaching the app shell and an offline page, bypassing `/api/` requests; online/offline indicator
-- [ ] Placeholder pages for every nav entry so navigation is testable
+- [x] Router with route meta `{ requiresAuth, roles, layout }` and guards: unauthenticated -> `/login`, wrong role -> `/403`
+- [x] `AdminLayout`: sidebar (Dashboard, Karyawan, Absensi, Jadwal, Pengajuan, Slip Gaji, Pengumuman, Aktivitas, Pengaturan), topbar with notification bell and user menu
+- [x] `UserLayout`: mobile-first topbar + bottom navigation (Home, Kalender, Pengajuan, Slip Gaji, Profil), safe-area padding
+- [x] `GuestLayout` for login
+- [x] Dark/light theme toggle persisted in localStorage
+- [x] PWA: `manifest.json` (name JuriHR, standalone, icons), service worker precaching the app shell and an offline page, bypassing `/api/` requests; online/offline indicator
+- [x] Placeholder pages for every nav entry so navigation is testable
 
 **AC**
-- HRD lands on the admin dashboard, employee on their home
-- App installs on Android Chrome and shows the offline page when offline
+- HRD lands on the admin dashboard, employee on their home — verified in fixture mode (`hrd@…` -> `/admin`, other emails -> `/`) and covered by `src/router/guards.spec.ts`
+- App installs on Android Chrome and shows the offline page when offline — manifest, service worker and `offline.html` all served by `bun run preview`; installing on a real device is a manual check
+
+**Manual test in fixture mode:** set `VITE_USE_FIXTURES=true`, then log in with any password. An email starting with `hrd` (e.g. `hrd@example.com`) grants the HRD roles; any other email (e.g. `budi@example.com`) logs in as a plain employee.
 
 ## M0.6 CI
 

@@ -1,8 +1,8 @@
 {
-  "message": {
-    "user": "hrd@example.com",
-    "full_name": "HRD Demo",
-    "roles": ["HR Manager", "Employee"],
-    "employee": "HR-EMP-00001"
-  }
+    "message": {
+        "user": "hrd@example.com",
+        "full_name": "HRD Demo",
+        "roles": ["HR Manager", "Employee"],
+        "employee": "HR-EMP-00001"
+    }
 }

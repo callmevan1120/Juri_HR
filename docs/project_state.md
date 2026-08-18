@@ -12,12 +12,12 @@
 
 | Field | Value |
 | --- | --- |
-| Stage | M0 in progress — M0.1, M0.3, M0.4 done; M0.2 blocked (no WSL2/Docker) |
+| Stage | M0 in progress — M0.1, M0.3, M0.4, M0.5 done; M0.2 blocked (no WSL2/Docker) |
 | Active phase | M0 — Foundation |
-| Active task | M0.5 — router guards, `AdminLayout` / `UserLayout` / `GuestLayout`, theme toggle, PWA shell |
+| Active task | M0.6 — CI workflow (lint, typecheck, unit tests, build) |
 | Branch | `main` tracking `origin/main` (`callmevan1120/Juri_HR`) |
 | Working directory | `D:\NEW JURIHR` (JuriHR). The legacy Laravel app is checked out at `D:\NEW JURIHR\PasPapan` as a git worktree on branch `legacy-reference` (gitignored) |
-| Frontend | Vite + Vue 3 `vue-ts`, Tailwind CSS 4, Pinia, Vue Router 5, ESLint + Prettier, Vitest; UI kit + API client + auth store in place, running in fixture mode |
+| Frontend | Vue 3 SPA with UI kit, API client, auth store, role-guarded router, three layouts and a PWA shell; runs end to end in fixture mode |
 | Backend | `frappe/juri_hr` skeleton only (hooks.py, `api/ping.py`, one legacy doctype `izin_request`), not installed on a site |
 | Legacy app | removed from `main`; preserved on `legacy-reference` @ `6d7fa91` (pushed to `origin`, checked out locally as a worktree) |
 | Deployment | none |
@@ -38,10 +38,11 @@ Completed work:
 - **M0.1 (done)** — `frontend/` scaffolded with Vite `vue-ts` (Vue 3.5, Vite 8, TS 6), Tailwind CSS 4 via `@tailwindcss/vite`, Pinia, Vue Router 5, ESLint 10 flat config + Prettier, Vitest 4 with jsdom; `@` alias to `src/`; `frontend/.env.example` added; verified `bun run build`, `bun run test` (1 passed), `bun run lint` clean
 - **M0.3 (done)** — design tokens ported to `frontend/src/styles/app.css` (primary `#6ab45b`, brand `#06b6d4`, `dark` class variant, focus rings, `card` / `tap-target` / `field-base` utilities); UI kit in `frontend/src/components/ui/` (`AppButton`, `AppInput`, `AppSelect`, `AppTextarea`, `AppCheckbox`, `AppModal` on native `<dialog>`, `AppBadge`, `DataTable` sortable + paginated, `PageHeader`, `AppToast` + toast store, `AppEmptyState`, `AppSpinner`); single status color map in `components/ui/status.ts`; theme store; dev-only route `/__dev/ui`
 - **M0.4 (done)** — `api/client.ts` (env base URL, `Authorization: token key:secret`, normalized `{status, code, message, details}` from `exc_type` + `_server_messages`, 20s timeout, `onUnauthorized` hook), `api/resource.ts`, `api/method.ts`, `api/files.ts` (`uploadPrivateFile` with `is_private=1`, `fetchPrivateBlob`), `api/fixtures.ts` (filter + pagination simulation), `stores/auth.ts` (`login`/`logout`/`loadSession`, `isHrd`), `utils/format.ts` (rupiah, date, time, duration); Vitest 17 passed across 5 files; `bun run build` and `bun run lint` clean
+- **M0.5 (done)** — route meta `{ requiresAuth, roles, layout }` + `authGuard` (no session -> `/login?redirect=`, wrong role -> `/403`, signed-in user bounced off `/login`); `AdminLayout` (collapsible sidebar with 9 entries, topbar bell, user menu), `UserLayout` (mobile topbar + 5-entry bottom nav, `env(safe-area-inset-*)`), `GuestLayout`; `LoginView`, `ForbiddenView`, 14 placeholder pages; theme toggle component; PWA shell (`manifest.webmanifest`, `sw.js` precaching the shell with an `offline.html` fallback and an explicit `/api/` bypass, `OfflineBanner`), brand icons copied from `brand-assets/`; fixture login derives the role from the email (`hrd…` -> HRD, otherwise employee); Vitest 22 passed across 5 files, `bun run build` / `lint` clean, `bun run preview` serves `/`, `/login`, `/403`, `/admin`, the manifest, `sw.js` and `offline.html` with HTTP 200
 
 ## 3. In progress
 
-**M0.5** — router guards with route meta `{ requiresAuth, roles, layout }`, `AdminLayout` / `UserLayout` / `GuestLayout`, login page, placeholder pages per nav entry, PWA manifest + service worker shell.
+**M0.6** — GitHub Actions workflow for `frontend/` (bun install, lint, typecheck, Vitest, build) plus a Python test job that skips gracefully while `frappe/juri_hr` has no tests; remove any leftover Laravel workflow references.
 
 ## 4. Blockers and open issues
 
@@ -90,14 +91,14 @@ Completed work:
 | 30 | Local layout mirrors the remote split: JuriHR lives in `D:\NEW JURIHR`, the legacy Laravel app in `D:\NEW JURIHR\PasPapan` as a **git worktree** on `legacy-reference` | Visual reference stays one folder away without polluting the JuriHR tree or duplicating git history; `/PasPapan/` is gitignored |
 | 31 | M0.2 deferred; M0.3–M0.6 built first against fixtures | No WSL2/Docker on the dev machine yet; frontend work does not need to wait for the backend |
 | 32 | Auth uses a `juri_hr.auth.issue_token` / `juri_hr.auth.session` pair instead of calling `generate_keys` directly | Keeps key generation and role/employee resolution server-side in one whitelisted place (methods to be implemented in M0.2/M1) |
+| 33 | Fixture login accepts any password and derives the role from the email prefix (`hrd…` -> HRD, otherwise Employee) | Both roles are testable without a backend and without editing fixture files |
 
 ## 6. Next targets
 
 **Immediate (M0 — Foundation)**
 
-1. **M0.5** Router guards, `AdminLayout` / `UserLayout` / `GuestLayout`, theme toggle, PWA shell
-2. **M0.6** CI workflow (lint, typecheck, unit tests, build); delete legacy Laravel workflows
-3. **M0.2 (blocked)** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md` — needs WSL2 or Docker installed first
+1. **M0.6** CI workflow (lint, typecheck, unit tests, build); delete legacy Laravel workflows
+2. **M0.2 (blocked)** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md` — needs WSL2 or Docker installed first
 
 **Then**
 
