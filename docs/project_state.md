@@ -12,38 +12,39 @@
 
 | Field | Value |
 | --- | --- |
-| Stage | Planning complete, implementation not started |
-| Active phase | M0 — Foundation (not started) |
-| Active task | none |
-| Branch | `main-vps` (restructure to a clean `main` happens in M0.1) |
+| Stage | M0 in progress — repo restructured, frontend not scaffolded yet |
+| Active phase | M0 — Foundation |
+| Active task | M0.1 — remaining step: scaffold `frontend/` (Vite vue-ts + Tailwind 4 + Pinia + Router + Vitest) |
+| Branch | `main-vps` (working branch); remote `origin` = `callmevan1120/Juri_HR` |
 | Frontend | not scaffolded yet |
-| Backend | `frappe/juri_hr` skeleton only (hooks.py, one legacy doctype `izin_request`), not installed on a site |
-| Legacy app | Laravel/Livewire PasPapan still present in the working tree; to be preserved on `legacy-reference` and removed from `main` in M0.1 |
+| Backend | `frappe/juri_hr` skeleton only (hooks.py, `api/ping.py`, one legacy doctype `izin_request`), not installed on a site |
+| Legacy app | removed from the working branch; preserved on `legacy-reference` @ `6d7fa91` (pushed and verified on `origin`) |
 | Deployment | none |
 
 **What JuriHR is:** a Vue 3 SPA (PWA) on top of Frappe HR v16 plus a small custom app `juri_hr`. It replaces the legacy Laravel PasPapan UI. MVP focus: employee attendance (office fixed hours + outlet shifts), attendance review/correction, izin/cuti self-service, and payslip distribution with scheduled publishing.
 
 ## 2. Completed features
 
-None yet — no implementation has started.
+No product features yet.
 
-Completed groundwork:
+Completed work:
 
 - Full exploration of the legacy PasPapan codebase (stack, routes, models, flows, settings, enterprise gating, obfuscated modules identified)
 - Full-rewrite roadmap agreed (6 phases, ~29 weeks) and then deliberately reduced to an MVP because of limited available time
 - MVP scope, data model, backend method list, and phase breakdown approved by the user
-- Plan and task files written (`docs/plans/`, `docs/tasks/`)
+- Plan and task files written (`docs/plans/`, `docs/tasks/`), `AGENTS.md` rewritten for JuriHR — commit `52805c5`
+- **M0.1 (partial)** — `legacy-reference` created and pushed to `origin` (`callmevan1120/Juri_HR`) at `6d7fa91`; Laravel app removed from the working branch (1388 files); brand images moved to `brand-assets/`; RBAC permissions extracted to `docs/reference/rbac-source.md`; README rewritten; `.gitignore` replaced with Node/Frappe rules; Laravel CI workflows removed — commit `a279cc2`
 
 ## 3. In progress
 
-Nothing in progress. Next action is M0.1 (see Next targets).
+**M0.1** — final step remaining: scaffold `frontend/` (Vite `vue-ts`, Tailwind CSS 4 via `@tailwindcss/vite`, Pinia, Vue Router, ESLint + Prettier, Vitest) and add `frontend/.env.example` with `VITE_FRAPPE_BASE_URL`, `VITE_USE_FIXTURES=true`, `VITE_APP_NAME=JuriHR`.
 
 ## 4. Blockers and open issues
 
 | # | Item | Impact | Notes |
 | --- | --- | --- | --- |
 | 1 | No Frappe HR environment yet | Blocks every backend task (M1+) | M0.2 sets up bench + site + `juri_hr`; frontend can proceed in fixture mode meanwhile |
-| 2 | M0.1 deletes the Laravel app | Irreversible if the branch is not pushed | `legacy-reference` must be created **and verified on the remote** before deletion; ask the user to confirm |
+| 2 | ~~M0.1 deletes the Laravel app~~ | resolved | `legacy-reference` @ `6d7fa91` pushed and verified on `origin`; deletion done in `a279cc2` |
 | 3 | HTTPS required for camera + geolocation | Attendance cannot be tested on a phone over plain HTTP | Local testing via `localhost` (allowed by browsers); production needs a real certificate (M7.4) |
 | 4 | Scheduler dependency for scheduled payslip publishing | A dead scheduler silently delays payslips | Heartbeat warning + manual publish fallback (M5.3, M7.3) |
 | 5 | Legacy enterprise components are obfuscated (`eval(gzinflate(base64_decode(...)))`) | Their exact business logic cannot be read | Not an MVP blocker; MVP payroll is distribution-only. Post-MVP payroll must be rebuilt from requirements, not ported |
@@ -78,12 +79,16 @@ Nothing in progress. Next action is M0.1 (see Next targets).
 | 23 | All `.md` documentation in English; user communication in Indonesian | AI readability |
 | 24 | Toko/POS, Commercial/Invoice, Accounting, Assets+QR excluded permanently | Out of the HR product scope |
 | 25 | Future-ready but not executed: payslip password, Telegram/WhatsApp channels, operational health page, announcement targeting | Contract hooks kept; no implementation |
+| 26 | Project repository moved to `callmevan1120/Juri_HR`; old `RiprLutuk/PasPapan` kept as remote `paspapan-upstream` | No write access to the original repo |
+| 27 | The existing `callmevan1120/JuriHR` repo (Next.js + Prisma attempt) is not used for this MVP | Different stack; the approved plan is Vue 3 SPA + Frappe HR |
+| 28 | Brand images kept in `brand-assets/` rather than deleted with `public/` | Reused by the new SPA (icons, logo, hero banner) |
+| 29 | `AGENTS.md` is tracked in git (it was ignored in the legacy `.gitignore`) | Agent rules must travel with the repo |
 
 ## 6. Next targets
 
 **Immediate (M0 — Foundation)**
 
-1. **M0.1** Create and push `legacy-reference`; confirm with the user; restructure `main` (remove Laravel, keep `frappe/juri_hr`, move reference docs, rewrite README); scaffold `frontend/` (Vite vue-ts + Tailwind 4 + Pinia + Router + Vitest)
+1. **M0.1 (finish)** Scaffold `frontend/` (Vite vue-ts + Tailwind 4 + Pinia + Router + ESLint/Prettier + Vitest) and `frontend/.env.example`; verify `bun run build`
 2. **M0.2** Frappe HR v16 bench + site + install `juri_hr`, enable scheduler, write `docs/backend-setup.md`
 3. **M0.3** Minimal UI kit + design tokens + status badge color map + `/__dev/ui`
 4. **M0.4** API client (resource/method/files/fixtures) + auth store, Vitest for client behaviour

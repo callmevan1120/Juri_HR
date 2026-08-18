@@ -1,4 +1,4 @@
-# M0 — Foundation
+﻿# M0 â€” Foundation
 
 **Plan:** `docs/plans/juri-hr-mvp.md`
 **Depends on:** nothing
@@ -8,7 +8,7 @@
 
 The repository currently holds the legacy Laravel/Livewire app (PasPapan). The MVP replaces it with a Vue 3 SPA plus a minimal Frappe custom app. The legacy code is still valuable as a **visual reference** while porting screens, so it must be preserved on a branch before deletion.
 
-`frappe/juri_hr` already exists as a skeleton (hooks.py, one doctype) and **stays on `main`** — it is the MVP backend.
+`frappe/juri_hr` already exists as a skeleton (hooks.py, one doctype) and **stays on `main`** â€” it is the MVP backend.
 
 Design tokens to reuse (from the legacy `resources/css/app.css`): primary green scale around `#6ab45b`, brand cyan scale around `#06b6d4`, card/rounded/dark-mode conventions.
 
@@ -16,15 +16,15 @@ Design tokens to reuse (from the legacy `resources/css/app.css`): primary green 
 
 ## M0.1 Repo restructure and legacy branch
 
-**DESTRUCTIVE — confirm with the user before deleting anything.**
+**DESTRUCTIVE â€” confirm with the user before deleting anything.**
 
-- [ ] Verify the working tree is clean except intended changes (`git status`)
-- [ ] Create branch `legacy-reference` from the current commit and push it to the remote; verify it exists remotely
-- [ ] On `main` (or the working branch), delete Laravel artifacts: `app/`, `resources/`, `routes/`, `config/`, `database/`, `bootstrap/`, `storage/`, `lang/`, `public/` (keep reusable brand images: hero banner, icons, logo), `tests/`, `api/`, `composer.json`, `composer.lock`, `artisan`, `server.php`, `phpunit.xml`, `phpstan.neon.dist`, `pint.json`, `vercel.json`, `.vercelignore`, `capacitor.config.ts`, `capacitor-www/`, `android/`, `ios/`, `stubs/`, `update.sh`
-- [ ] Keep: `frappe/juri_hr/`, `.github/` (rewrite workflows later), `.agents/`, `docs/`, `screenshots/`, `README.md`, `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`
-- [ ] Move `REWRITE-MATRIX.md` to `docs/reference/REWRITE-MATRIX.md`
-- [ ] Copy the legacy RBAC definition to `docs/reference/rbac-source.md` (permission strings and sections, for later phases)
-- [ ] Rewrite `README.md` for JuriHR: what it is, stack, how to run frontend + backend, link to `docs/plans/juri-hr-mvp.md`
+- [x] Verify the working tree is clean except intended changes (`git status`)
+- [x] Create branch `legacy-reference` from the current commit and push it to the remote; verify it exists remotely
+- [x] On `main` (or the working branch), delete Laravel artifacts: `app/`, `resources/`, `routes/`, `config/`, `database/`, `bootstrap/`, `storage/`, `lang/`, `public/` (keep reusable brand images: hero banner, icons, logo), `tests/`, `api/`, `composer.json`, `composer.lock`, `artisan`, `server.php`, `phpunit.xml`, `phpstan.neon.dist`, `pint.json`, `vercel.json`, `.vercelignore`, `capacitor.config.ts`, `capacitor-www/`, `android/`, `ios/`, `stubs/`, `update.sh`
+- [x] Keep: `frappe/juri_hr/`, `.github/` (rewrite workflows later), `.agents/`, `docs/`, `screenshots/`, `README.md`, `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`
+- [x] Move `REWRITE-MATRIX.md` to `docs/reference/REWRITE-MATRIX.md`
+- [x] Copy the legacy RBAC definition to `docs/reference/rbac-source.md` (permission strings and sections, for later phases)
+- [x] Rewrite `README.md` for JuriHR: what it is, stack, how to run frontend + backend, link to `docs/plans/juri-hr-mvp.md`
 - [ ] Scaffold the frontend: `frontend/` via Vite (`vue-ts`), add Pinia, Vue Router, Tailwind CSS 4 (`@tailwindcss/vite`), ESLint + Prettier, Vitest
 - [ ] Add `frontend/.env.example` with `VITE_FRAPPE_BASE_URL=`, `VITE_USE_FIXTURES=true`, `VITE_APP_NAME=JuriHR`
 
