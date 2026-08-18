@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "juri_hr"
+authors = [{ name = "JURI HR", email = "dev@jurihr.app" }]
+description = "JURI HR custom features for Frappe HR"
+requires-python = ">=3.11"
+dependencies = ["frappe"]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = { attr = "juri_hr.__version__" }
+
+[tool.setuptools]
+packages = ["juri_hr"]

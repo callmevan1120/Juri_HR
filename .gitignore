@@ -1,47 +1,37 @@
-/node_modules
-!public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/review-evidence/
-/storage/ui-backups/
-/screenshots/*
-!/screenshots/donation-qr.jpeg
-/vendor
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+*.tsbuildinfo
+
+# Environment
 .env
-.env.backup
-.env.production
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
-auth.json
-AGENTS.md
-npm-debug.log
-yarn-error.log
-/.fleet
+.env.*
+!.env.example
+!frontend/.env.example
+
+# Python / Frappe
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Editors / OS
 /.idea
 /.vscode
+/.fleet
 **/.DS_Store
-/app/Mail/LicenseKeyMail.php
-/app/Models/LicensePurchase.php
-/resources/views/emails/license-key.blade.php
-/database/migrations/2026_02_25_000001_create_license_purchases_table.php
-*.sh
-!update.sh
-!scripts/apk-attendance-e2e.sh
-!scripts/collect-review-evidence.sh
-!scripts/database-portability-smoke.sh
-!scripts/apk-page-screenshots.sh
-!scripts/ios-polish-splash.sh
-!scripts/ios-release-preflight.sh
-!scripts/ios-simulator-screenshot.sh
+Thumbs.db
+
+# Test output
+/test-results/
+playwright-report/
+.playwright/
+
+# Local artifacts
 *.zip
 *.sql
 *.dump
-*.Source.php
-server.php
-/docs/*.md
-.vercel
-/secure_tools/
-/enterprise_build/
-/test-results/
+*.log
