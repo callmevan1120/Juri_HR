@@ -94,9 +94,9 @@ Design tokens to reuse (from the legacy `resources/css/app.css`): primary green 
 - [x] Remove or rewrite legacy workflows that reference Laravel/FTP deploys
 
 **AC**
-- CI green on push; no workflow references deleted Laravel paths — every step verified locally (`bun run lint`, `format:check`, `typecheck`, `test`, `build`, and `python -m compileall -q frappe/juri_hr`); the GitHub run itself is confirmed after the push
+- CI green on push; no workflow references deleted Laravel paths — **verified: the run on `6dc34d2` passed both the `frontend` and `backend` jobs**
 
 **Notes**
 - `.github/workflows/ci.yml` has two jobs: `frontend` (bun 1.3.14, `--frozen-lockfile`, lint, Prettier check, typecheck, Vitest, build) and `backend` (byte-compile `frappe/juri_hr`, then run pytest only if a `test_*.py` exists)
-- No Laravel workflow existed to delete — those were already removed in M0.1; the leftover `php artisan migrate` line in `.github/PULL_REQUEST_TEMPLATE.md` was replaced with the JuriHR verification checklist
+- No Laravel workflow existed on `main` to delete — those were already removed in M0.1; the leftover `php artisan migrate` line in `.github/PULL_REQUEST_TEMPLATE.md` was replaced with the JuriHR verification checklist. The `legacy-reference` branch still carries the old `Vercel Production` / `Deploy` workflows and they fail there on every push; that branch is a read-only reference, so they are left alone (disable them in the repository Actions settings if the red runs are distracting)
 - `bun run lint` no longer auto-fixes (CI must fail on violations); use `bun run lint:fix` locally
